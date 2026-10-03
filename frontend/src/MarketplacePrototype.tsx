@@ -13,7 +13,7 @@
 
 import { useState, lazy, Suspense, useMemo, useEffect } from 'react';
 import { fetchProperties } from './services/supabase';
-import { getImageUrl } from './services/cloudinary';
+import { resolveImageUrl } from './services/cloudinary';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import { PropertyDetailModal } from './components/ui/PropertyDetailModal';
 import { CROP_CATALOG, getCropInfo, getCertificationInfo } from './types/property';
@@ -525,7 +525,7 @@ function App(): React.ReactElement {
                 property.images && property.images.length > 0
                   ? typeof property.images[0] === 'string'
                     ? property.images[0]
-                    : getImageUrl(property.images[0].publicId, 'medium')
+                    : resolveImageUrl(property.images[0].publicId, 'medium')
                   : null;
               const delayClass = `delay-${Math.min((index + 10) * 100, 1200)}`;
 
