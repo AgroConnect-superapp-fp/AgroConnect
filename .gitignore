@@ -1,0 +1,54 @@
+# Dependencias
+node_modules/
+
+# Build
+dist/
+dist-ssr/
+frontend/dist/
+
+# Pruebas y cobertura
+coverage/
+frontend/coverage/
+test-results/
+playwright-report/
+
+# Variables de entorno (NUNCA subir .env reales)
+.env
+.env.local
+.env.*.local
+*.local
+backend/.env
+frontend/.env.local
+
+# Material interno del proyecto formativo (no se versiona en este repositorio)
+docs/
+obsidian-vault/
+mcp-servers/
+scripts/
+*.pdf
+opencode.json
+AGENTS.md*
+.opencode/
+
+# Configuración local
+.envrc
+
+# Cachés
+.ruff_cache/
+__pycache__/
+*.pyc
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
