@@ -6,6 +6,7 @@ module.exports = {
   testMatch: ['**/*.test.ts', '**/*.spec.ts'],
   setupFiles: ['<rootDir>/tests/env.setup.ts'],
   setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
+  forceExit: true,
   clearMocks: true,
   collectCoverageFrom: [
     'src/**/*.ts',

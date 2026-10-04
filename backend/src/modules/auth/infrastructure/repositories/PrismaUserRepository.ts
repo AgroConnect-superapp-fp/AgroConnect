@@ -1,4 +1,4 @@
-import type { PrismaClient, Prisma } from '@prisma/client';
+import type { PrismaClient, Prisma } from '../../../../generated/prisma/client';
 import { User } from '../../domain/entities/User';
 import { Role } from '../../domain/entities/Role';
 import { RefreshToken } from '../../domain/entities/RefreshToken';

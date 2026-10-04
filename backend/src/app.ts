@@ -4,7 +4,7 @@ import type { Express } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import pinoHttp from 'pino-http';
-import type { PrismaClient } from '@prisma/client';
+import type { PrismaClient } from './generated/prisma/client';
 import { env } from './config/env';
 import { logger } from './shared/infrastructure/logger';
 import { prisma } from './shared/infrastructure/prisma';
