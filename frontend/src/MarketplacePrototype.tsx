@@ -14,6 +14,7 @@
 import { useState, lazy, Suspense, useMemo, useEffect } from 'react';
 import { fetchProperties } from './services/supabase';
 import { resolveImageUrl } from './services/cloudinary';
+import { MOCK_PROPERTIES } from './data/mockProperties';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import { PropertyDetailModal } from './components/ui/PropertyDetailModal';
 import { SafeImage } from './components/ui/SafeImage';
@@ -140,6 +141,7 @@ function App(): React.ReactElement {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [usingMockData, setUsingMockData] = useState(false);
 
   const [showProductiveZones, setShowProductiveZones] = useState(true);
   const [enableDrawing, setEnableDrawing] = useState(true);
@@ -152,21 +154,17 @@ function App(): React.ReactElement {
     try {
       setLoading(true);
       setError(null);
-      console.log('[App] 🔄 Fetching properties from Supabase...');
       const data = await fetchProperties();
 
       if (data.length === 0) {
-        setError(
-          'La base de datos está vacía. Ejecuta el script SQL de inicialización en Supabase.'
-        );
-        setProperties([]);
+        setProperties(MOCK_PROPERTIES);
+        setUsingMockData(true);
       } else {
         setProperties(data);
-        console.log(`[App] ✅ Loaded ${data.length} properties from Supabase`);
+        setUsingMockData(false);
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
-      console.error('[App] ❌ Error loading properties:', err);
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -393,6 +391,27 @@ function App(): React.ReactElement {
           </div>
         </div>
       </header>
+
+      {usingMockData && (
+        <div className="max-w-7xl mx-auto px-6 pt-4">
+          <div
+            role="status"
+            className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900"
+          >
+            <p>
+              ⚠️ Mostrando <strong>datos de demostración</strong>: no se pudo conectar con
+              la base de datos.
+            </p>
+            <button
+              type="button"
+              onClick={loadProperties}
+              className="rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-700 interactive-transition"
+            >
+              Reintentar conexión
+            </button>
+          </div>
+        </div>
+      )}
 
       <main className="max-w-7xl mx-auto px-6 pt-20 pb-8">
         <section className="bg-white rounded-2xl shadow-md p-6 mb-20 animate-scaleIn delay-300 hover:shadow-2xl hover:-translate-y-1 interactive-transition group">
