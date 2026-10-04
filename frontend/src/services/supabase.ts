@@ -3,7 +3,6 @@
  */
 import { createClient } from '@supabase/supabase-js';
 import type { Property, PropertyImage } from '../types/property';
-import { resolveLegacyImageUrl } from '../data/legacyImageCorrections';
 
 const supabaseUrl = import.meta.env['VITE_SUPABASE_URL'] as string | undefined;
 const supabaseAnonKey = import.meta.env['VITE_SUPABASE_ANON_KEY'] as string | undefined;
@@ -36,21 +35,17 @@ export interface PropertyRow {
 }
 
 function normalizeImage(img: unknown): PropertyImage | null {
-  if (typeof img === 'string' && img.length > 0) {
-    const resolved = resolveLegacyImageUrl(img);
-    return { publicId: resolved, url: resolved } as PropertyImage;
-  }
   if (typeof img === 'object' && img !== null) {
-    if (
-      'publicId' in img &&
-      typeof img.publicId === 'string' &&
-      img.publicId.length > 0
-    ) {
-      return { ...img, publicId: resolveLegacyImageUrl(img.publicId) } as PropertyImage;
+    if ('publicId' in img) {
+      return img as PropertyImage;
     }
     if ('url' in img && typeof img.url === 'string' && img.url.length > 0) {
-      return { ...img, publicId: resolveLegacyImageUrl(img.url) } as PropertyImage;
+      return { ...img, publicId: img.url } as PropertyImage;
     }
+    return null;
+  }
+  if (typeof img === 'string' && img.length > 0) {
+    return { publicId: img, url: img } as PropertyImage;
   }
   return null;
 }
