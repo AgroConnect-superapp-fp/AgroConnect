@@ -19,11 +19,12 @@ export function LoginScreen({
   onGoToForgotPassword,
   onSuccess,
 }: LoginScreenProps): React.ReactElement {
-  const { login } = useAuth();
+  const { login, loginDemo } = useAuth();
   const [correo, setCorreo] = useState('');
   const [password, setPassword] = useState('');
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [generalError, setGeneralError] = useState<string | null>(null);
+  const [networkFallback, setNetworkFallback] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
@@ -34,6 +35,7 @@ export function LoginScreen({
     }
 
     setGeneralError(null);
+    setNetworkFallback(false);
 
     const parsed = loginSchema.safeParse({ correo, password });
     if (!parsed.success) {
@@ -63,6 +65,9 @@ export function LoginScreen({
             )
           );
         } else {
+          if (error.status === 0) {
+            setNetworkFallback(true);
+          }
           setGeneralError(error.message);
         }
       } else {
@@ -118,6 +123,27 @@ export function LoginScreen({
             className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700"
           >
             {generalError}
+          </div>
+        )}
+
+        {networkFallback && (
+          <div className="flex flex-col gap-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            <p>
+              El servidor de autenticación no está disponible en este entorno público.
+              Puedes continuar en <strong>modo demostración</strong> para explorar la
+              aplicación.
+            </p>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => {
+                loginDemo();
+                onSuccess();
+              }}
+              data-testid="login-demo-fallback"
+            >
+              🚀 Continuar en modo demostración
+            </Button>
           </div>
         )}
 
