@@ -1,6 +1,6 @@
 import { PlotRepository } from '../../domain/interfaces/PlotRepository';
 import { Plot } from '../../domain/entities/Plot';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../../../../generated/prisma/client';
 
 interface PlotRow {
   id: string;

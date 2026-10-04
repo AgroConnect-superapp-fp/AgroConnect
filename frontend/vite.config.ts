@@ -13,9 +13,10 @@
 
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), tailwindcss()],
   build: {
     // Increase warning limit to 600 kB (map applications are inherently larger)
     chunkSizeWarningLimit: 600,
