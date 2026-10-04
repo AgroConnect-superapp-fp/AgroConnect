@@ -1,6 +1,7 @@
 import { PrismaClient } from '../../generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
+import { env } from '../../config/env';
 
 declare global {
   // eslint-disable-next-line no-var
@@ -11,7 +12,9 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
-const adapter = new PrismaPg(pool);
+const adapter = new PrismaPg(pool, {
+  schema: env.DATABASE_SCHEMA,
+});
 
 export const prisma =
   global.__agroconnectPrisma ??
