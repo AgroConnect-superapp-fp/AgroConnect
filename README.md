@@ -203,7 +203,8 @@ npm run dev                   # http://localhost:5173
 ### Pruebas
 
 ```bash
-cd backend && npm test -- --coverage   # unitarias + integración
+cd backend && npm test -- --coverage   # unitarias + integración (cobertura 97%)
+cd frontend && npm run test:unit       # unitarias (Vitest)
 cd frontend && npm run test:e2e        # E2E (levanta API y web)
 ```
 
