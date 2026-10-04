@@ -210,16 +210,23 @@ jobs:
         run: npm ci
 
       - name: Pull de configuración y entorno (Vercel)
+        id: vercel_pull
         if: env.VERCEL_TOKEN != ''
+        continue-on-error: true
         run: npx --yes vercel@54 pull --yes --environment=production --token="$VERCEL_TOKEN"
         working-directory: .
 
+      - name: Aviso si el token no tiene acceso al equipo
+        if: env.VERCEL_TOKEN != '' && steps.vercel_pull.outcome == 'failure'
+        run: |
+          echo "::warning::VERCEL_TOKEN sin acceso al equipo AgroConnect - deploy automatico omitido. Usa el deploy manual documentado (npx vercel deploy --prod --yes --archive=tgz)."
+
       - name: Build de producción (Vercel)
-        if: env.VERCEL_TOKEN != ''
+        if: steps.vercel_pull.outcome == 'success'
         run: npx --yes vercel@54 build --prod --token="$VERCEL_TOKEN"
         working-directory: .
 
       - name: Deploy a producción
-        if: env.VERCEL_TOKEN != ''
+        if: steps.vercel_pull.outcome == 'success'
         run: npx --yes vercel@54 deploy --prebuilt --prod --yes --token="$VERCEL_TOKEN"
         working-directory: .
