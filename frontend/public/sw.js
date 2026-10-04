@@ -4,7 +4,7 @@
  * PhD-level caching strategy:
  * - Cache-First for vendor chunks (rarely change)
  * - Network-First for app chunks (change frequently)
- * - Stale-While-Revalidate for images (Cloudinary)
+ * - Stale-While-Revalidate for external images (Cloudinary, Wikimedia, Unsplash)
  * - Network-Only for API calls (when backend is added)
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API
@@ -95,14 +95,11 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Skip cross-origin requests except for Cloudinary and tile servers
+  // Skip cross-origin requests except for image CDNs, map tiles and CDN assets
   if (
     url.origin !== location.origin &&
-    !url.hostname.includes('cloudinary.com') &&
-    !url.hostname.includes('tile.openstreetmap.org') &&
-    !url.hostname.includes('arcgisonline.com') &&
-    !url.hostname.includes('opentopomap.org') &&
-    !url.hostname.includes('cartocdn.com') &&
+    !isCacheableImage(url) &&
+    !isMapTile(url) &&
     !url.hostname.includes('unpkg.com')
   ) {
     return;
@@ -120,8 +117,8 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Strategy 3: Stale-While-Revalidate for Cloudinary images
-  if (isCloudinaryImage(url)) {
+  // Strategy 3: Stale-While-Revalidate for external crop images
+  if (isCacheableImage(url)) {
     event.respondWith(staleWhileRevalidateStrategy(request, IMAGE_CACHE_NAME));
     return;
   }
@@ -150,11 +147,15 @@ function isMapTile(url) {
 }
 
 /**
- * Check if a URL is a Cloudinary image.
+ * Check if a URL is a cacheable external image
+ * (Cloudinary uploads, Wikimedia Commons/upload, Unsplash).
  */
-function isCloudinaryImage(url) {
+function isCacheableImage(url) {
   return (
-    url.hostname.includes('cloudinary.com') && url.pathname.includes('/image/upload/')
+    (url.hostname.includes('cloudinary.com') &&
+      url.pathname.includes('/image/upload/')) ||
+    url.hostname.includes('wikimedia.org') ||
+    url.hostname.includes('unsplash.com')
   );
 }
 
