@@ -256,4 +256,7 @@ Fotografías de cultivos usadas en el prototipo del mercado:
 
 Además se usan fotografías de [Unsplash](https://unsplash.com/license) (banano, maíz y café) bajo la licencia Unsplash.
 
+> La galería de detalle de la app muestra el crédito (autor · licencia) de cada imagen.
+> Si Supabase no responde, el prototipo muestra datos de demostración con un aviso visible.
+
 > Documentación elaborada por el equipo Scrum AgroConnect con base en el set documental oficial del proyecto formativo.
