@@ -18,6 +18,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { getResponsiveImageUrls } from '../../services/cloudinary';
+import { getImageCredit } from '../../data/imageCredits';
 import { SafeImage } from './SafeImage';
 import type { PropertyImage } from '../../types/property';
 
@@ -45,6 +46,7 @@ export function ImageGallery({
 
   const currentImage = images[currentIndex];
   const urls = currentImage ? getResponsiveImageUrls(currentImage.publicId) : null;
+  const credit = currentImage ? getImageCredit(currentImage.publicId) : null;
 
   // Check for prefers-reduced-motion
   useEffect(() => {
@@ -281,6 +283,30 @@ export function ImageGallery({
             ))}
           </div>
         </>
+      )}
+
+      {/* Image credit (author + license) */}
+      {credit && (
+        <p className="absolute bottom-2 left-2 max-w-[55%] truncate rounded bg-black/60 px-2 py-1 text-[10px] text-white">
+          📷{' '}
+          <a
+            href={credit.sourceUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-agro-yellow"
+          >
+            {credit.author}
+          </a>{' '}
+          ·{' '}
+          <a
+            href={credit.licenseUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-agro-yellow"
+          >
+            {credit.license}
+          </a>
+        </p>
       )}
 
       {/* Moderation status badge */}
