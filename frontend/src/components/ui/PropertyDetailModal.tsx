@@ -15,7 +15,7 @@
 
 import React, { useEffect, useCallback } from 'react';
 import type { Property } from '../../types/property';
-import { CROP_CATALOG, CERTIFICATION_CATALOG } from '../../types/property';
+import { getCropInfo, getCertificationInfo } from '../../types/property';
 import { getCropFallbackImage } from '../../data/fallbackImages';
 import { ImageGallery } from './ImageGallery';
 import { ImageUpload } from './ImageUpload';
@@ -33,10 +33,8 @@ export function PropertyDetailModal({
   property,
   onClose,
 }: PropertyDetailModalProps): React.ReactElement {
-  const cropInfo = CROP_CATALOG[property.crop];
-  const certificationInfo = property.certification
-    ? CERTIFICATION_CATALOG[property.certification]
-    : null;
+  const cropInfo = getCropInfo(property.crop);
+  const certificationInfo = getCertificationInfo(property.certification);
 
   // Extract property type from property name (first word)
   const propertyType = property.name.split(' ')[0] || 'Propiedad';
