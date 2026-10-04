@@ -16,6 +16,8 @@ import { fetchProperties } from './services/supabase';
 import { resolveImageUrl } from './services/cloudinary';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import { PropertyDetailModal } from './components/ui/PropertyDetailModal';
+import { SafeImage } from './components/ui/SafeImage';
+import { getCropFallbackImage } from './data/fallbackImages';
 import { CROP_CATALOG, getCropInfo, getCertificationInfo } from './types/property';
 import type { Property } from './types/property';
 
@@ -536,15 +538,12 @@ function App(): React.ReactElement {
                 >
                   {thumbnailUrl ? (
                     <div className="relative h-48 bg-gray-100 overflow-hidden group">
-                      <img
+                      <SafeImage
                         src={thumbnailUrl}
+                        fallbackSrc={getCropFallbackImage(property.crop)}
                         alt={property.name}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                         loading="lazy"
-                        onError={(e) => {
-                          // Fallback si la imagen falla al cargar
-                          (e.target as HTMLImageElement).style.display = 'none';
-                        }}
                       />
                       <div className="absolute top-2 right-2">
                         <span
@@ -741,6 +740,27 @@ function App(): React.ReactElement {
                 </span>
               </p>
             </div>
+            <p className="mt-4 text-center text-xs text-green-200/80">
+              Imágenes de cultivos:{' '}
+              <a
+                href="https://unsplash.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-agro-yellow"
+              >
+                Unsplash
+              </a>{' '}
+              y{' '}
+              <a
+                href="https://commons.wikimedia.org"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-agro-yellow"
+              >
+                Wikimedia Commons
+              </a>{' '}
+              (CC BY-SA 3.0/4.0). Créditos completos en el README del proyecto.
+            </p>
           </div>
         </div>
       </footer>

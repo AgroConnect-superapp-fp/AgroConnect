@@ -18,11 +18,13 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { getResponsiveImageUrls } from '../../services/cloudinary';
+import { SafeImage } from './SafeImage';
 import type { PropertyImage } from '../../types/property';
 
 interface ImageGalleryProps {
   images: PropertyImage[];
   className?: string;
+  fallbackSrc?: string;
 }
 
 /**
@@ -31,6 +33,7 @@ interface ImageGalleryProps {
 export function ImageGallery({
   images,
   className = '',
+  fallbackSrc,
 }: ImageGalleryProps): React.ReactElement {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -190,21 +193,22 @@ export function ImageGallery({
 
       {/* High-quality image */}
       {isInView && !hasError && (
-        <img
+        <SafeImage
           src={urls.medium}
+          fallbackSrc={fallbackSrc}
           srcSet={`
             ${urls.small} 200w,
             ${urls.medium} 600w,
             ${urls.large} 1200w
           `}
           sizes="(max-width: 600px) 200px, (max-width: 1200px) 600px, 1200px"
-          alt={currentImage.alt}
+          alt={currentImage.alt ?? 'Imagen de la propiedad'}
           className={`absolute inset-0 w-full h-full object-cover ${transitionClass} ${
             isLoaded ? 'opacity-100' : 'opacity-0'
           }`}
           loading="lazy"
           onLoad={() => setIsLoaded(true)}
-          onError={() => setHasError(true)}
+          onFinalError={() => setHasError(true)}
         />
       )}
 
