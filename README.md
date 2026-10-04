@@ -210,6 +210,26 @@ cd frontend && npm run test:e2e        # E2E (levanta API y web)
 
 ---
 
+## Despliegue (Vercel)
+
+- **URL de producción:** https://agroconnectpreview.vercel.app
+- **Proyecto:** `agro-connect/agroconnectpreview` · **Root Directory:** `frontend` · Node 24.x
+- **Variables de entorno (Production/Preview):** `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_CLOUDINARY_CLOUD_NAME`, `VITE_CLOUDINARY_UPLOAD_PRESET`.
+
+> **Nota de infraestructura (plan Hobby):** Vercel no permite conectar repositorios privados de organizaciones sin plan Pro, por lo que la Git Integration nativa no está activa. El job `deploy` del CI queda como respaldo automático (condicionado al scope del token) y no marca el pipeline en rojo si el token no tiene acceso.
+
+**Deploy manual (procedimiento vigente)** — desde la raíz del repo, con sesión `vercel login` activa:
+
+```bash
+npx vercel deploy --prod --yes --archive=tgz
+```
+
+**Verificación post-deploy:** `curl -I https://agroconnectpreview.vercel.app` debe responder `200` y el marketplace debe cargar las 12 propiedades con sus imágenes y créditos.
+
+> Detalle operativo completo en `docs/despliegue.md` (guía interna del proyecto).
+
+---
+
 ## Cumplimiento normativo colombiano
 
 | Norma | Aplicación en el sistema |
