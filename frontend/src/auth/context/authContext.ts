@@ -8,6 +8,7 @@ export interface AuthContextValue {
   usuario: PublicUser | null;
   login: (payload: LoginPayload) => Promise<void>;
   register: (payload: RegisterPayload) => Promise<void>;
+  loginDemo: () => void;
   logout: () => Promise<void>;
 }
 
