@@ -33,6 +33,7 @@ AGENTS.md*
 
 # Configuración local
 .envrc
+.vercel/
 
 # Cachés
 .ruff_cache/
@@ -53,3 +54,5 @@ Thumbs.db
 # Logs
 *.log
 npm-debug.log*
+.vercel
+.env*

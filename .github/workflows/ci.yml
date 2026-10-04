@@ -177,3 +177,49 @@ jobs:
           name: playwright-report
           path: frontend/playwright-report/
           retention-days: 7
+
+  deploy:
+    name: Deploy a producción (Vercel)
+    runs-on: ubuntu-latest
+    needs: [backend, frontend, e2e]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    env:
+      VERCEL_ORG_ID: team_IPTpVtm8CrxhxB4qo8AFvV4j
+      VERCEL_PROJECT_ID: prj_B1w9PUpDOqV9P104MgoVk61vDnab
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Aviso si falta VERCEL_TOKEN
+        if: env.VERCEL_TOKEN == ''
+        run: echo "::warning::VERCEL_TOKEN no configurado. Agrega el secret para habilitar el deploy automatico."
+
+      - name: Configurar Node.js
+        if: env.VERCEL_TOKEN != ''
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Instalar dependencias
+        if: env.VERCEL_TOKEN != ''
+        run: npm ci
+
+      - name: Pull de configuración y entorno (Vercel)
+        if: env.VERCEL_TOKEN != ''
+        run: npx --yes vercel@54 pull --yes --environment=production --token="$VERCEL_TOKEN"
+        working-directory: .
+
+      - name: Build de producción (Vercel)
+        if: env.VERCEL_TOKEN != ''
+        run: npx --yes vercel@54 build --prod --token="$VERCEL_TOKEN"
+        working-directory: .
+
+      - name: Deploy a producción
+        if: env.VERCEL_TOKEN != ''
+        run: npx --yes vercel@54 deploy --prebuilt --prod --yes --token="$VERCEL_TOKEN"
+        working-directory: .
