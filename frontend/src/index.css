@@ -1,6 +1,12 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@theme {
+  --color-agro-green: #2e7d32;
+  --color-agro-light: #4caf50;
+  --color-agro-yellow: #f9a825;
+  --color-agro-dark: #1b5e20;
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
 
 body {
   margin: 0;
