@@ -30,7 +30,7 @@ export function RegisterScreen({
   onGoToLogin,
   onSuccess,
 }: RegisterScreenProps): React.ReactElement {
-  const { register, loginDemo } = useAuth();
+  const { register } = useAuth();
   const roleOption = getRoleOption(role);
 
   const [step, setStep] = useState(1);
@@ -49,7 +49,6 @@ export function RegisterScreen({
   });
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [generalError, setGeneralError] = useState<string | null>(null);
-  const [networkFallback, setNetworkFallback] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const requiresFarm = role === 'productor';
@@ -108,7 +107,6 @@ export function RegisterScreen({
     }
 
     setGeneralError(null);
-    setNetworkFallback(false);
     const parsed = credentialsSchema.safeParse(credentials);
 
     if (!parsed.success) {
@@ -157,9 +155,6 @@ export function RegisterScreen({
         } else if (error.code === 'RATE_LIMITED') {
           setGeneralError('Demasiados intentos. Espera unos minutos e intenta de nuevo.');
         } else {
-          if (error.status === 0) {
-            setNetworkFallback(true);
-          }
           setGeneralError(error.message);
         }
       } else {
@@ -214,31 +209,6 @@ export function RegisterScreen({
           className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700"
         >
           {generalError}
-        </div>
-      )}
-
-      {networkFallback && (
-        <div className="mb-4 flex flex-col gap-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-          <p>
-            El servidor de autenticación no está disponible en este entorno público.
-            Puedes continuar en <strong>modo demostración</strong> para explorar la
-            aplicación con los datos que ingresaste.
-          </p>
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={() => {
-              loginDemo({
-                nombre: personal.nombre,
-                correo: personal.correo,
-                rol: role,
-              });
-              onSuccess();
-            }}
-            data-testid="register-demo-fallback"
-          >
-            🚀 Continuar en modo demostración
-          </Button>
         </div>
       )}
 

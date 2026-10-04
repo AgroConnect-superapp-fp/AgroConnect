@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { authApi } from '../api/authClient';
 import type { AuthSession, LoginPayload, PublicUser, RegisterPayload } from '../types';
-import { AuthContext, type DemoProfile } from './authContext';
+import { AuthContext } from './authContext';
 
 const STORAGE_KEY = 'agroconnect.session';
 
@@ -74,28 +74,25 @@ export function AuthProvider({ children }: { children: ReactNode }): React.React
     [applySession]
   );
 
-  const loginDemo = useCallback(
-    (profile?: DemoProfile) => {
-      const demoSession: AuthSession = {
-        usuario: {
-          id: 'demo-visitante',
-          nombre: profile?.nombre?.trim() || 'Visitante Demo',
-          correo: profile?.correo?.trim() || 'demo@agroconnect.local',
-          rol: profile?.rol ?? 'comprador_b2c',
-          estado: 'ACTIVO',
-          verificado: true,
-          fechaRegistro: new Date().toISOString(),
-        },
-        tokens: {
-          accessToken: 'demo-access',
-          refreshToken: 'demo-refresh',
-          expiresIn: 0,
-        },
-      };
-      applySession(demoSession);
-    },
-    [applySession]
-  );
+  const loginDemo = useCallback(() => {
+    const demoSession: AuthSession = {
+      usuario: {
+        id: 'demo-visitante',
+        nombre: 'Visitante Demo',
+        correo: 'demo@agroconnect.local',
+        rol: 'comprador_b2c',
+        estado: 'ACTIVO',
+        verificado: true,
+        fechaRegistro: new Date().toISOString(),
+      },
+      tokens: {
+        accessToken: 'demo-access',
+        refreshToken: 'demo-refresh',
+        expiresIn: 0,
+      },
+    };
+    applySession(demoSession);
+  }, [applySession]);
 
   const logout = useCallback(async () => {
     if (refreshToken && refreshToken !== 'demo-refresh') {
