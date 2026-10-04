@@ -74,8 +74,28 @@ export function AuthProvider({ children }: { children: ReactNode }): React.React
     [applySession]
   );
 
+  const loginDemo = useCallback(() => {
+    const demoSession: AuthSession = {
+      usuario: {
+        id: 'demo-visitante',
+        nombre: 'Visitante Demo',
+        correo: 'demo@agroconnect.local',
+        rol: 'comprador_b2c',
+        estado: 'ACTIVO',
+        verificado: true,
+        fechaRegistro: new Date().toISOString(),
+      },
+      tokens: {
+        accessToken: 'demo-access',
+        refreshToken: 'demo-refresh',
+        expiresIn: 0,
+      },
+    };
+    applySession(demoSession);
+  }, [applySession]);
+
   const logout = useCallback(async () => {
-    if (refreshToken) {
+    if (refreshToken && refreshToken !== 'demo-refresh') {
       try {
         await authApi.logout(refreshToken);
       } catch {
@@ -90,8 +110,8 @@ export function AuthProvider({ children }: { children: ReactNode }): React.React
   }, [refreshToken]);
 
   const value = useMemo(
-    () => ({ status, usuario, login, register, logout }),
-    [status, usuario, login, register, logout]
+    () => ({ status, usuario, login, register, loginDemo, logout }),
+    [status, usuario, login, register, loginDemo, logout]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

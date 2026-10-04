@@ -212,21 +212,21 @@ jobs:
       - name: Pull de configuración y entorno (Vercel)
         id: vercel_pull
         if: env.VERCEL_TOKEN != ''
-        continue-on-error: true
-        run: npx --yes vercel@54 pull --yes --environment=production --token="$VERCEL_TOKEN"
+        run: |
+          if npx --yes vercel@54 pull --yes --environment=production --token="$VERCEL_TOKEN" >/dev/null 2>&1; then
+            echo "access=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "access=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::VERCEL_TOKEN sin acceso al equipo AgroConnect - deploy automatico omitido. Usa el deploy manual documentado (npx vercel deploy --prod --yes --archive=tgz)."
+          fi
         working-directory: .
 
-      - name: Aviso si el token no tiene acceso al equipo
-        if: env.VERCEL_TOKEN != '' && steps.vercel_pull.outcome == 'failure'
-        run: |
-          echo "::warning::VERCEL_TOKEN sin acceso al equipo AgroConnect - deploy automatico omitido. Usa el deploy manual documentado (npx vercel deploy --prod --yes --archive=tgz)."
-
       - name: Build de producción (Vercel)
-        if: steps.vercel_pull.outcome == 'success'
+        if: steps.vercel_pull.outputs.access == 'true'
         run: npx --yes vercel@54 build --prod --token="$VERCEL_TOKEN"
         working-directory: .
 
       - name: Deploy a producción
-        if: steps.vercel_pull.outcome == 'success'
+        if: steps.vercel_pull.outputs.access == 'true'
         run: npx --yes vercel@54 deploy --prebuilt --prod --yes --token="$VERCEL_TOKEN"
         working-directory: .

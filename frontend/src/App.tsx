@@ -39,7 +39,7 @@ function LoadingScreen(): React.ReactElement {
 }
 
 function AppContent(): React.ReactElement {
-  const { status } = useAuth();
+  const { status, loginDemo } = useAuth();
   const [resetToken, setResetToken] = useState<string | null>(() =>
     new URLSearchParams(window.location.search).get('resetToken')
   );
@@ -172,6 +172,10 @@ function AppContent(): React.ReactElement {
     <WelcomeScreen
       onCreateAccount={() => setView('roles')}
       onLogin={() => setView('login')}
+      onDemo={() => {
+        loginDemo();
+        setView('marketplace');
+      }}
     />
   );
 }
