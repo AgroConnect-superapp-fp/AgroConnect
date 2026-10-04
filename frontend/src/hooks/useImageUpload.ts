@@ -14,7 +14,7 @@
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { uploadImage, validateImageFile } from '../services/cloudinary';
+import { uploadImage, validateImageFile, getLqipUrl } from '../services/cloudinary';
 import type { PropertyImage } from '../types/property';
 
 /**
@@ -136,7 +136,7 @@ export function useImageUpload(
           const propertyImage: PropertyImage = {
             publicId: response.public_id,
             url: response.secure_url,
-            lqip: `${response.secure_url}?w=50&q=10`,
+            lqip: getLqipUrl(response.secure_url),
             alt: `Imagen de ${tags.join(', ') || folder}`,
             width: response.width,
             height: response.height,
