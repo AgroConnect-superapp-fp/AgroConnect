@@ -232,12 +232,12 @@ npx vercel deploy --prod --yes --archive=tgz
 
 El backend Express + Prisma + PostgreSQL se despliega como **Web Service en Render** (plan free) con el Blueprint `render.yaml` de la raíz (Infraestructura como Código):
 
-1. Render → **New → Blueprint** → conectar `AgroConnect-superapp-fp/AgroConnect`.
-2. Completar `DATABASE_URL` con la connection string de **Supabase** (Settings → Database → Connection string → *Session pooler*).
-3. Deploy → URL del servicio (p. ej. `https://agroconnect-api.onrender.com`).
-4. En Vercel: `VITE_API_URL=https://agroconnect-api.onrender.com` (Production) → redeploy del frontend.
+- **URL del servicio (producción):** https://agroconnect-api-5t7n.onrender.com — `GET /health` → 200
+- **Base de datos:** PostgreSQL de Supabase, esquema `agroconnect` (migraciones aplicadas; el runtime usa `DATABASE_SCHEMA=agroconnect`).
+- **Registro e inicio de sesión reales verificados** desde la app pública (2026-10-04).
+- En Vercel: `VITE_API_URL=https://agroconnect-api-5t7n.onrender.com` (Production).
 
-Migraciones iniciales (una sola vez): `cd backend && DATABASE_URL="<supabase-connection-string>" npx prisma migrate deploy`.
+Despliegue (resumen): Blueprint `render.yaml` → `DATABASE_URL` con la connection string de Supabase (*Session pooler*) → `DATABASE_SCHEMA=agroconnect` → Manual Deploy. Migraciones: `cd backend && DATABASE_URL="<supabase-url>" npx prisma migrate deploy`.
 
 > Nota free tier: el servicio se suspende tras ~15 min de inactividad y despierta en ~1 min en la primera petición.
 
