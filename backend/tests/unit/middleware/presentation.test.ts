@@ -96,7 +96,11 @@ describe('validateQuery', () => {
 describe('errorHandler', () => {
   it('responde con el código y estado de un DomainError', () => {
     const res = mockResponse();
-    const error = new DomainError('EMAIL_ALREADY_EXISTS', 'El correo ya se encuentra registrado', 409);
+    const error = new DomainError(
+      'EMAIL_ALREADY_EXISTS',
+      'El correo ya se encuentra registrado',
+      409,
+    );
 
     errorHandler(error, { correlationId: 'corr-1' } as Request, res, jest.fn() as NextFunction);
 
@@ -217,13 +221,9 @@ describe('createRateLimiter', () => {
   it('bloquea con 429 y código RATE_LIMITED al superar el máximo', async () => {
     const app = express();
     app.use(express.json());
-    app.post(
-      '/limitado',
-      createRateLimiter({ windowMs: 60_000, max: 1 }),
-      (_req, res) => {
-        res.status(200).json({ ok: true });
-      },
-    );
+    app.post('/limitado', createRateLimiter({ windowMs: 60_000, max: 1 }), (_req, res) => {
+      res.status(200).json({ ok: true });
+    });
 
     const first = await request(app).post('/limitado').send({});
     const second = await request(app).post('/limitado').send({});

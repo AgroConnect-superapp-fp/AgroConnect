@@ -11,6 +11,9 @@ const plotRepository = new PrismaPlotRepository(prisma);
 const findNearbyPlotsUseCase = new FindNearbyPlotsUseCase(plotRepository);
 const plotController = new PlotController(findNearbyPlotsUseCase);
 
-router.get('/plots/nearby', asyncHandler((req, res) => plotController.findNearby(req, res)));
+router.get(
+  '/plots/nearby',
+  asyncHandler((req, res) => plotController.findNearby(req, res)),
+);
 
 export default router;
