@@ -1,12 +1,9 @@
-import type { PrismaClient, Prisma } from '@prisma/client';
+import type { PrismaClient, Prisma } from '../../../../generated/prisma/client';
 import { User } from '../../domain/entities/User';
 import { Role } from '../../domain/entities/Role';
 import { RefreshToken } from '../../domain/entities/RefreshToken';
 import type { RoleName } from '../../domain/entities/Role';
-import type {
-  RegisterUserData,
-  UserRepository,
-} from '../../domain/interfaces/UserRepository';
+import type { RegisterUserData, UserRepository } from '../../domain/interfaces/UserRepository';
 import { InfrastructureError } from '../../../../shared/domain/errors';
 
 type UserRecord = Prisma.UserGetPayload<{ include: { role: true } }>;

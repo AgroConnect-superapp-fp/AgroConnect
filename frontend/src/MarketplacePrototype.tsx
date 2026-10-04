@@ -13,9 +13,12 @@
 
 import { useState, lazy, Suspense, useMemo, useEffect } from 'react';
 import { fetchProperties } from './services/supabase';
-import { getImageUrl } from './services/cloudinary';
+import { resolveImageUrl } from './services/cloudinary';
+import { MOCK_PROPERTIES } from './data/mockProperties';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import { PropertyDetailModal } from './components/ui/PropertyDetailModal';
+import { SafeImage } from './components/ui/SafeImage';
+import { getCropFallbackImage } from './data/fallbackImages';
 import { CROP_CATALOG, getCropInfo, getCertificationInfo } from './types/property';
 import type { Property } from './types/property';
 
@@ -138,6 +141,7 @@ function App(): React.ReactElement {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [usingMockData, setUsingMockData] = useState(false);
 
   const [showProductiveZones, setShowProductiveZones] = useState(true);
   const [enableDrawing, setEnableDrawing] = useState(true);
@@ -150,21 +154,17 @@ function App(): React.ReactElement {
     try {
       setLoading(true);
       setError(null);
-      console.log('[App] 🔄 Fetching properties from Supabase...');
       const data = await fetchProperties();
 
       if (data.length === 0) {
-        setError(
-          'La base de datos está vacía. Ejecuta el script SQL de inicialización en Supabase.'
-        );
-        setProperties([]);
+        setProperties(MOCK_PROPERTIES);
+        setUsingMockData(true);
       } else {
         setProperties(data);
-        console.log(`[App] ✅ Loaded ${data.length} properties from Supabase`);
+        setUsingMockData(false);
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
-      console.error('[App] ❌ Error loading properties:', err);
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -392,6 +392,27 @@ function App(): React.ReactElement {
         </div>
       </header>
 
+      {usingMockData && (
+        <div className="max-w-7xl mx-auto px-6 pt-4">
+          <div
+            role="status"
+            className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900"
+          >
+            <p>
+              ⚠️ Mostrando <strong>datos de demostración</strong>: no se pudo conectar con
+              la base de datos.
+            </p>
+            <button
+              type="button"
+              onClick={loadProperties}
+              className="rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-700 interactive-transition"
+            >
+              Reintentar conexión
+            </button>
+          </div>
+        </div>
+      )}
+
       <main className="max-w-7xl mx-auto px-6 pt-20 pb-8">
         <section className="bg-white rounded-2xl shadow-md p-6 mb-20 animate-scaleIn delay-300 hover:shadow-2xl hover:-translate-y-1 interactive-transition group">
           <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
@@ -525,7 +546,7 @@ function App(): React.ReactElement {
                 property.images && property.images.length > 0
                   ? typeof property.images[0] === 'string'
                     ? property.images[0]
-                    : getImageUrl(property.images[0].publicId, 'medium')
+                    : resolveImageUrl(property.images[0].publicId, 'medium')
                   : null;
               const delayClass = `delay-${Math.min((index + 10) * 100, 1200)}`;
 
@@ -536,15 +557,12 @@ function App(): React.ReactElement {
                 >
                   {thumbnailUrl ? (
                     <div className="relative h-48 bg-gray-100 overflow-hidden group">
-                      <img
+                      <SafeImage
                         src={thumbnailUrl}
+                        fallbackSrc={getCropFallbackImage(property.crop)}
                         alt={property.name}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                         loading="lazy"
-                        onError={(e) => {
-                          // Fallback si la imagen falla al cargar
-                          (e.target as HTMLImageElement).style.display = 'none';
-                        }}
                       />
                       <div className="absolute top-2 right-2">
                         <span
@@ -741,6 +759,27 @@ function App(): React.ReactElement {
                 </span>
               </p>
             </div>
+            <p className="mt-4 text-center text-xs text-green-200/80">
+              Imágenes de cultivos:{' '}
+              <a
+                href="https://unsplash.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-agro-yellow"
+              >
+                Unsplash
+              </a>{' '}
+              y{' '}
+              <a
+                href="https://commons.wikimedia.org"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-agro-yellow"
+              >
+                Wikimedia Commons
+              </a>{' '}
+              (CC BY-SA 3.0/4.0). Créditos completos en el README del proyecto.
+            </p>
           </div>
         </div>
       </footer>

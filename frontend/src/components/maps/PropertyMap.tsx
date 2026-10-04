@@ -30,6 +30,7 @@ import 'react-leaflet-markercluster/styles';
 
 import type { Property, HeatmapPoint } from '../../types/property';
 import { CROP_CATALOG, getCropInfo } from '../../types/property';
+import { getCropFallbackImage } from '../../data/fallbackImages';
 import { createCropIcon, createClusterIcon } from '../../utils/mapIcons';
 import { useLeafletDraw } from '../../hooks/useLeafletDraw';
 import { ResetViewControl } from './ResetViewControl';
@@ -1488,7 +1489,11 @@ export function PropertyMap({
                     <div className="popup-gallery">
                       {property.images && property.images.length > 0 && (
                         <div style={{ margin: 0 }}>
-                          <ImageGallery images={property.images} className="h-52" />
+                          <ImageGallery
+                            images={property.images}
+                            fallbackSrc={getCropFallbackImage(property.crop)}
+                            className="h-52"
+                          />
                         </div>
                       )}
                     </div>

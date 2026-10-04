@@ -71,7 +71,13 @@ describe('User', () => {
 
 describe('Role', () => {
   it('acepta los cinco roles del sistema', () => {
-    const names = ['productor', 'comprador_b2c', 'comprador_b2b', 'transportista', 'administrador'] as const;
+    const names = [
+      'productor',
+      'comprador_b2c',
+      'comprador_b2b',
+      'transportista',
+      'administrador',
+    ] as const;
 
     for (const name of names) {
       const role = Role.create({ id: randomUUID(), name, description: name });

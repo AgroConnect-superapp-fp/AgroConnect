@@ -33,7 +33,12 @@ describe('JwtTokenService', () => {
   });
 
   it('rechaza tokens con firma de otro secreto', () => {
-    const other = new JwtTokenService('otro_secreto_de_32_caracteres_para_pruebas', REFRESH_SECRET, '15m', '7d');
+    const other = new JwtTokenService(
+      'otro_secreto_de_32_caracteres_para_pruebas',
+      REFRESH_SECRET,
+      '15m',
+      '7d',
+    );
     const tokens = other.generateTokens({ userId: 'user-4', role: 'productor' });
 
     expect(() => service.verifyAccessToken(tokens.accessToken)).toThrow('Token inválido');
@@ -49,9 +54,7 @@ describe('JwtTokenService', () => {
     const second = service.generateTokens({ userId: 'user-5', role: 'productor' });
 
     expect(first.refreshToken).not.toBe(second.refreshToken);
-    expect(service.hashToken(first.refreshToken)).not.toBe(
-      service.hashToken(second.refreshToken),
-    );
+    expect(service.hashToken(first.refreshToken)).not.toBe(service.hashToken(second.refreshToken));
   });
 
   it('calcula el hash SHA-256 estable de un token', () => {

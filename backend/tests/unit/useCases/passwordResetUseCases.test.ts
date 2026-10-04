@@ -140,9 +140,7 @@ describe('ResetPasswordUseCase', () => {
     await sut.resetPassword.execute({ token, password: 'NuevaClave2026*' });
 
     const user = sut.userRepository.users[0];
-    expect(user?.passwordHash).toBe(
-      `hashed:${Buffer.from('NuevaClave2026*').toString('base64')}`,
-    );
+    expect(user?.passwordHash).toBe(`hashed:${Buffer.from('NuevaClave2026*').toString('base64')}`);
     expect(sut.resetRepository.tokens[0]?.usedAt).not.toBeNull();
     expect(sut.userRepository.refreshTokens.every((refresh) => refresh.revoked)).toBe(true);
   });
@@ -182,8 +180,9 @@ describe('ResetPasswordUseCase', () => {
   it('rechaza contraseñas que no cumplen la política', async () => {
     const { sut, token } = await seedResetToken();
 
-    await expect(
-      sut.resetPassword.execute({ token, password: 'corta1' }),
-    ).rejects.toMatchObject({ code: 'VALIDATION_ERROR', statusCode: 422 });
+    await expect(sut.resetPassword.execute({ token, password: 'corta1' })).rejects.toMatchObject({
+      code: 'VALIDATION_ERROR',
+      statusCode: 422,
+    });
   });
 });

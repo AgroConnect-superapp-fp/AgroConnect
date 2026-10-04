@@ -19,7 +19,9 @@ export class CompanyProfile {
     }
 
     if (!NIT_REGEX.test(props.nit.trim())) {
-      throw new InvalidDataError('El NIT debe tener 9 o 10 dígitos, con guion y dígito de verificación opcional');
+      throw new InvalidDataError(
+        'El NIT debe tener 9 o 10 dígitos, con guion y dígito de verificación opcional',
+      );
     }
 
     return new CompanyProfile(props);

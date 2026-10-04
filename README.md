@@ -203,7 +203,8 @@ npm run dev                   # http://localhost:5173
 ### Pruebas
 
 ```bash
-cd backend && npm test -- --coverage   # unitarias + integración
+cd backend && npm test -- --coverage   # unitarias + integración (cobertura 97%)
+cd frontend && npm run test:unit       # unitarias (Vitest)
 cd frontend && npm run test:e2e        # E2E (levanta API y web)
 ```
 
@@ -236,5 +237,27 @@ cd frontend && npm run test:e2e        # E2E (levanta API y web)
 
 **Institución:** SENA — Análisis y Desarrollo de Software (ADSO), Ficha 2026, Centro de Comercio y Turismo, Regional Quindío.
 **Año:** 2026. Construido con tecnologías 100 % open source.
+
+### Créditos de imágenes
+
+Fotografías de cultivos usadas en el prototipo del mercado:
+
+| Cultivo | Archivo | Autor/a | Licencia |
+|---|---|---|---|
+| Banano | [Magdalena zona bananera.jpg](https://commons.wikimedia.org/wiki/File:Magdalena_zona_bananera.jpg) | Claudia Marcela Bolaño Castro | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
+| Café | [Coffee tree in Hacienda Guayabal, Colombia.jpg](https://commons.wikimedia.org/wiki/File:Coffee_tree_in_Hacienda_Guayabal,_Colombia.jpg) | Bernard Gagnon | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
+| Café | [Coffea arabica 2.jpg](https://commons.wikimedia.org/wiki/File:Coffea_arabica_2.jpg) | Kızıldeniz | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
+| Café | [Coffea arabica, coffee beans .jpg](https://commons.wikimedia.org/wiki/File:Coffea_arabica,_coffee_beans_.jpg) | Renjusplace | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
+| Arroz | [Blond and green rice fields.jpg](https://commons.wikimedia.org/wiki/File:Blond_and_green_rice_fields.jpg) | Basile Morin | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
+| Palma de aceite | [Oil palm plantation in Mersing District.jpg](https://commons.wikimedia.org/wiki/File:Oil_palm_plantation_in_Mersing_District.jpg) | Wee Hong | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
+| Cacao | [Cacao fruit in Côte d'Ivoire (11).JPG](https://commons.wikimedia.org/wiki/File:Cacao_fruit_in_C%C3%B4te_d%27Ivoire_(11).JPG) | Hanay | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
+| Cacao | [Theobroma cacao fruit.jpg](https://commons.wikimedia.org/wiki/File:Theobroma_cacao_fruit.jpg) | Bernard Gagnon | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0) |
+| Caña de azúcar | [Sugarcane plantation 01.jpg](https://commons.wikimedia.org/wiki/File:Sugarcane_plantation_01.jpg) | Filo gèn' | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
+| Yuca | [Cassava plants.jpg](https://commons.wikimedia.org/wiki/File:Cassava_plants.jpg) | Munkaila Sulemana | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
+
+Además se usan fotografías de [Unsplash](https://unsplash.com/license) (banano, maíz y café) bajo la licencia Unsplash.
+
+> La galería de detalle de la app muestra el crédito (autor · licencia) de cada imagen.
+> Si Supabase no responde, el prototipo muestra datos de demostración con un aviso visible.
 
 > Documentación elaborada por el equipo Scrum AgroConnect con base en el set documental oficial del proyecto formativo.

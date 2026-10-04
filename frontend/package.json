@@ -11,6 +11,7 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,css,json}\" \"public/**/*.{js,json}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,css,json}\" \"public/**/*.{js,json}\"",
     "preview": "vite preview",
+    "test:unit": "vitest run",
     "test:e2e": "playwright test",
     "test:e2e:report": "playwright show-report",
     "quality": "npm run format && npm run lint:fix",
@@ -32,6 +33,7 @@
   "devDependencies": {
     "@eslint/js": "^9.39.4",
     "@playwright/test": "^1.63.0",
+    "@tailwindcss/vite": "^4.3.3",
     "@types/leaflet": "^1.9.21",
     "@types/leaflet-draw": "^1.0.13",
     "@types/leaflet-geosearch": "^2.7.1",
@@ -39,7 +41,6 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
-    "autoprefixer": "^10.5.0",
     "eslint": "^9.39.4",
     "eslint-config-prettier": "^9.1.2",
     "eslint-plugin-prettier": "^5.5.6",
@@ -48,12 +49,12 @@
     "globals": "^15.15.0",
     "husky": "^9.1.7",
     "lint-staged": "^17.0.7",
-    "postcss": "^8.5.15",
     "prettier": "^3.8.3",
-    "tailwindcss": "^3.4.19",
+    "tailwindcss": "^4.3.3",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.60.1",
-    "vite": "^8.0.12"
+    "vite": "^8.0.12",
+    "vitest": "^5.0.3"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

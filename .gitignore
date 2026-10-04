@@ -5,6 +5,7 @@ node_modules/
 dist/
 dist-ssr/
 frontend/dist/
+backend/src/generated/
 
 # Pruebas y cobertura
 coverage/

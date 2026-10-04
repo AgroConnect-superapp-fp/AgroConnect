@@ -88,6 +88,48 @@ export const IMAGE_PRESETS = {
 } as const;
 
 /**
+ * Pattern to detect direct image URLs: external providers (e.g. Unsplash),
+ * Cloudinary delivery URLs, protocol-relative URLs and data URIs.
+ *
+ * AgroConnect stores image references in two shapes:
+ * - Cloudinary public IDs (e.g. "agroconnect/finca-12/cosecha") -> transformed.
+ * - Direct URLs from external providers (legacy Supabase rows) -> used as-is.
+ */
+const DIRECT_IMAGE_URL_PATTERN = /^(https?:)?\/\//i;
+const DATA_IMAGE_URL_PATTERN = /^data:image\//i;
+
+/**
+ * Check whether an image reference is already a direct URL.
+ */
+export function isDirectImageUrl(reference: string): boolean {
+  return (
+    DIRECT_IMAGE_URL_PATTERN.test(reference) || DATA_IMAGE_URL_PATTERN.test(reference)
+  );
+}
+
+/**
+ * Resolve an image reference to a displayable URL.
+ *
+ * - Direct URLs are returned unchanged: they already point to a hosted asset
+ *   and must NOT be treated as Cloudinary public IDs.
+ * - Cloudinary public IDs are transformed through the configured cloud.
+ *
+ * @param publicId - Cloudinary public ID or direct image URL
+ * @param preset - Transformation preset name (Cloudinary references only)
+ * @param customRadius - Optional custom corner radius (Cloudinary references only)
+ */
+export function resolveImageUrl(
+  publicId: string,
+  preset: keyof typeof IMAGE_PRESETS,
+  customRadius?: number
+): string {
+  if (isDirectImageUrl(publicId)) {
+    return publicId;
+  }
+  return getImageUrl(publicId, preset, customRadius);
+}
+
+/**
  * Generate optimized image URL with transformations.
  *
  * @param publicId - Cloudinary public ID
@@ -122,6 +164,10 @@ export function getImageUrl(
 
 /**
  * Generate responsive image URLs for different screen sizes.
+ *
+ * Direct URLs cannot be re-transformed client-side; the same reference is
+ * returned for every size so the browser resolves it through its own cache.
+ * The LQIP variant is reduced when the provider supports URL transformations.
  */
 export function getResponsiveImageUrls(
   publicId: string,
@@ -132,12 +178,63 @@ export function getResponsiveImageUrls(
   large: string;
   lqip: string;
 } {
+  if (isDirectImageUrl(publicId)) {
+    return {
+      small: publicId,
+      medium: publicId,
+      large: publicId,
+      lqip: getLqipUrl(publicId),
+    };
+  }
+
   return {
     small: getImageUrl(publicId, 'thumbnail', customRadius),
     medium: getImageUrl(publicId, 'medium', customRadius),
     large: getImageUrl(publicId, 'large', customRadius),
     lqip: getImageUrl(publicId, 'lqip', customRadius),
   };
+}
+
+/**
+ * Build a low-quality placeholder URL for any image reference.
+ *
+ * - Cloudinary public IDs use the `lqip` preset.
+ * - Unsplash and Wikimedia direct URLs get provider-specific small variants.
+ * - Unknown providers fall back to the original reference (no transformation).
+ */
+export function getLqipUrl(reference: string): string {
+  if (!isDirectImageUrl(reference)) {
+    return getImageUrl(reference, 'lqip');
+  }
+
+  try {
+    const parsed = new URL(reference);
+
+    if (parsed.hostname.includes('unsplash.com')) {
+      parsed.searchParams.set('w', '50');
+      parsed.searchParams.set('q', '10');
+      parsed.searchParams.set('blur', '40');
+      return parsed.toString();
+    }
+
+    if (parsed.hostname.includes('wikimedia.org')) {
+      if (parsed.searchParams.has('width')) {
+        parsed.searchParams.set('width', '50');
+      }
+      return parsed.toString();
+    }
+
+    if (
+      parsed.hostname.includes('cloudinary.com') &&
+      parsed.pathname.includes('/image/upload/')
+    ) {
+      return reference.replace('/image/upload/', '/image/upload/w_50,q_10,f_auto/');
+    }
+
+    return reference;
+  } catch {
+    return reference;
+  }
 }
 
 /**

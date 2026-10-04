@@ -43,6 +43,8 @@ export default defineConfig({
       timeout: 120_000,
       env: {
         VITE_API_URL: BACKEND_URL,
+        VITE_SUPABASE_URL: 'https://supabase.test',
+        VITE_SUPABASE_ANON_KEY: 'test-anon-key',
       },
     },
   ],

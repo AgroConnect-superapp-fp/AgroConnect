@@ -8,7 +8,7 @@ export class Plot {
     public readonly municipality: string,
     public readonly department: string,
     public readonly farmerId: string,
-    public readonly createdAt?: Date
+    public readonly createdAt?: Date,
   ) {}
 
   // Reglas de negocio puras (ej. validación de dominio)
