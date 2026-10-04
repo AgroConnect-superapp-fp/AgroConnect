@@ -4,7 +4,11 @@ import { ROLE_NAMES } from '../../domain/entities/Role';
 const roleSchema = z.enum(ROLE_NAMES);
 
 const producerProfileSchema = z.object({
-  nombre: z.string().trim().min(3, 'El nombre de la finca debe tener al menos 3 caracteres').max(120),
+  nombre: z
+    .string()
+    .trim()
+    .min(3, 'El nombre de la finca debe tener al menos 3 caracteres')
+    .max(120),
   municipio: z.string().trim().min(3, 'El municipio debe tener al menos 3 caracteres').max(120),
   vereda: z.string().trim().min(2, 'La vereda debe tener al menos 2 caracteres').max(120),
   latitud: z.number().min(-90).max(90).optional(),
@@ -12,11 +16,18 @@ const producerProfileSchema = z.object({
 });
 
 const companyProfileSchema = z.object({
-  razonSocial: z.string().trim().min(3, 'La razón social debe tener al menos 3 caracteres').max(160),
+  razonSocial: z
+    .string()
+    .trim()
+    .min(3, 'La razón social debe tener al menos 3 caracteres')
+    .max(160),
   nit: z
     .string()
     .trim()
-    .regex(/^\d{9,10}(-\d)?$/, 'El NIT debe tener 9 o 10 dígitos, con guion y dígito de verificación opcional'),
+    .regex(
+      /^\d{9,10}(-\d)?$/,
+      'El NIT debe tener 9 o 10 dígitos, con guion y dígito de verificación opcional',
+    ),
   direccion: z.string().trim().max(200).optional(),
 });
 

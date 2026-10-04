@@ -15,7 +15,8 @@
 
 import React, { useEffect, useCallback } from 'react';
 import type { Property } from '../../types/property';
-import { CROP_CATALOG, CERTIFICATION_CATALOG } from '../../types/property';
+import { getCropInfo, getCertificationInfo } from '../../types/property';
+import { getCropFallbackImage } from '../../data/fallbackImages';
 import { ImageGallery } from './ImageGallery';
 import { ImageUpload } from './ImageUpload';
 
@@ -32,10 +33,8 @@ export function PropertyDetailModal({
   property,
   onClose,
 }: PropertyDetailModalProps): React.ReactElement {
-  const cropInfo = CROP_CATALOG[property.crop];
-  const certificationInfo = property.certification
-    ? CERTIFICATION_CATALOG[property.certification]
-    : null;
+  const cropInfo = getCropInfo(property.crop);
+  const certificationInfo = getCertificationInfo(property.certification);
 
   // Extract property type from property name (first word)
   const propertyType = property.name.split(' ')[0] || 'Propiedad';
@@ -92,7 +91,11 @@ export function PropertyDetailModal({
                 📸 {galleryTitle}
               </h3>
               {property.images && property.images.length > 0 ? (
-                <ImageGallery images={property.images} className="h-72" />
+                <ImageGallery
+                  images={property.images}
+                  fallbackSrc={getCropFallbackImage(property.crop)}
+                  className="h-72"
+                />
               ) : (
                 <div className="h-72 bg-gray-100 rounded-xl flex flex-col items-center justify-center border-2 border-dashed border-gray-300 hover:border-agro-green/50 transition-colors duration-300">
                   <span className="text-4xl mb-2 animate-bounce">🖼️</span>

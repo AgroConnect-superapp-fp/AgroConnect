@@ -138,9 +138,10 @@ describe('VerifyEmailUseCase', () => {
   it('rechaza un token inexistente', async () => {
     const sut = buildSut();
 
-    await expect(
-      sut.verifyEmail.execute({ token: 'token-fantasma' }),
-    ).rejects.toMatchObject({ code: 'TOKEN_INVALID', statusCode: 401 });
+    await expect(sut.verifyEmail.execute({ token: 'token-fantasma' })).rejects.toMatchObject({
+      code: 'TOKEN_INVALID',
+      statusCode: 401,
+    });
   });
 
   it('rechaza un token ya utilizado', async () => {
@@ -163,8 +164,9 @@ describe('VerifyEmailUseCase', () => {
       expiresAt: new Date(Date.now() - 1_000),
     });
 
-    await expect(
-      sut.verifyEmail.execute({ token: 'token-expirado' }),
-    ).rejects.toMatchObject({ code: 'TOKEN_INVALID', statusCode: 401 });
+    await expect(sut.verifyEmail.execute({ token: 'token-expirado' })).rejects.toMatchObject({
+      code: 'TOKEN_INVALID',
+      statusCode: 401,
+    });
   });
 });

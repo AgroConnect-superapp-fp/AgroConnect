@@ -12,9 +12,7 @@ export function validateBody<T>(schema: ZodSchema<T>): RequestHandler {
         return path ? `${path}: ${issue.message}` : issue.message;
       });
 
-      next(
-        new DomainError('VALIDATION_ERROR', 'Datos incompletos o inválidos', 422, details),
-      );
+      next(new DomainError('VALIDATION_ERROR', 'Datos incompletos o inválidos', 422, details));
       return;
     }
 
@@ -33,9 +31,7 @@ export function validateQuery<T>(schema: ZodSchema<T>): RequestHandler {
         return path ? `${path}: ${issue.message}` : issue.message;
       });
 
-      next(
-        new DomainError('VALIDATION_ERROR', 'Parámetros de consulta inválidos', 422, details),
-      );
+      next(new DomainError('VALIDATION_ERROR', 'Parámetros de consulta inválidos', 422, details));
       return;
     }
 

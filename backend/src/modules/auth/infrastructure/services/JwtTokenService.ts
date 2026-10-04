@@ -42,15 +42,11 @@ export class JwtTokenService implements TokenService {
       expiresIn: parseDurationToSeconds(this.accessExpiresIn),
     });
 
-    const refreshToken = jwt.sign(
-      { role: payload.role, type: 'refresh' },
-      this.refreshSecret,
-      {
-        subject: payload.userId,
-        expiresIn: parseDurationToSeconds(this.refreshExpiresIn),
-        jwtid: randomUUID(),
-      },
-    );
+    const refreshToken = jwt.sign({ role: payload.role, type: 'refresh' }, this.refreshSecret, {
+      subject: payload.userId,
+      expiresIn: parseDurationToSeconds(this.refreshExpiresIn),
+      jwtid: randomUUID(),
+    });
 
     return {
       accessToken,

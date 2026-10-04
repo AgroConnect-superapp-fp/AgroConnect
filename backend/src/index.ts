@@ -8,10 +8,7 @@ function bootstrap(): void {
   const app = createApp();
 
   const server = app.listen(env.PORT, () => {
-    logger.info(
-      { port: env.PORT, environment: env.NODE_ENV },
-      'AgroConnect API escuchando',
-    );
+    logger.info({ port: env.PORT, environment: env.NODE_ENV }, 'AgroConnect API escuchando');
   });
 
   const shutdown = (signal: string): void => {

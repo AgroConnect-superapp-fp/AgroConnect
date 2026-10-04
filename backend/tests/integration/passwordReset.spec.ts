@@ -57,9 +57,7 @@ describe(`Recuperación de contraseña — ${API}`, () => {
     expect(forgot.status).toBe(202);
     expect(emailService.sent).toHaveLength(1);
 
-    const token = new URL(emailService.sent[0]?.resetUrl as string).searchParams.get(
-      'resetToken',
-    );
+    const token = new URL(emailService.sent[0]?.resetUrl as string).searchParams.get('resetToken');
     expect(token).toBeTruthy();
 
     const reset = await request(app)

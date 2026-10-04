@@ -11,6 +11,7 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,css,json}\" \"public/**/*.{js,json}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,css,json}\" \"public/**/*.{js,json}\"",
     "preview": "vite preview",
+    "test:unit": "vitest run",
     "test:e2e": "playwright test",
     "test:e2e:report": "playwright show-report",
     "quality": "npm run format && npm run lint:fix",
@@ -53,7 +54,8 @@
     "tailwindcss": "^3.4.19",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.60.1",
-    "vite": "^8.0.12"
+    "vite": "^8.0.12",
+    "vitest": "^5.0.3"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

@@ -103,12 +103,14 @@ export class AuthController {
       const input = req.body as ForgotPasswordInput;
       await this.requestPasswordResetUseCase.execute(input);
 
-      res.status(202).json(
-        success(
-          null,
-          'Si el correo está registrado, recibirás instrucciones para restablecer tu contraseña',
-        ),
-      );
+      res
+        .status(202)
+        .json(
+          success(
+            null,
+            'Si el correo está registrado, recibirás instrucciones para restablecer tu contraseña',
+          ),
+        );
     } catch (error) {
       next(error);
     }
@@ -141,12 +143,14 @@ export class AuthController {
       const input = req.body as ResendVerificationInput;
       await this.requestEmailVerificationUseCase.execute(input);
 
-      res.status(202).json(
-        success(
-          null,
-          'Si el correo está registrado y sin verificar, recibirás un nuevo enlace de verificación',
-        ),
-      );
+      res
+        .status(202)
+        .json(
+          success(
+            null,
+            'Si el correo está registrado y sin verificar, recibirás un nuevo enlace de verificación',
+          ),
+        );
     } catch (error) {
       next(error);
     }

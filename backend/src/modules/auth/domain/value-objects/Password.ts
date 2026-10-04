@@ -10,15 +10,11 @@ export class Password {
 
   static create(raw: string): Password {
     if (raw.length < MIN_LENGTH) {
-      throw new InvalidDataError(
-        `La contraseña debe tener al menos ${MIN_LENGTH} caracteres`,
-      );
+      throw new InvalidDataError(`La contraseña debe tener al menos ${MIN_LENGTH} caracteres`);
     }
 
     if (raw.length > MAX_LENGTH) {
-      throw new InvalidDataError(
-        `La contraseña no puede superar los ${MAX_LENGTH} caracteres`,
-      );
+      throw new InvalidDataError(`La contraseña no puede superar los ${MAX_LENGTH} caracteres`);
     }
 
     if (!HAS_LETTER.test(raw) || !HAS_NUMBER.test(raw)) {

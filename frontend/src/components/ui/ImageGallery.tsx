@@ -18,11 +18,14 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { getResponsiveImageUrls } from '../../services/cloudinary';
+import { getImageCredit } from '../../data/imageCredits';
+import { SafeImage } from './SafeImage';
 import type { PropertyImage } from '../../types/property';
 
 interface ImageGalleryProps {
   images: PropertyImage[];
   className?: string;
+  fallbackSrc?: string;
 }
 
 /**
@@ -31,6 +34,7 @@ interface ImageGalleryProps {
 export function ImageGallery({
   images,
   className = '',
+  fallbackSrc,
 }: ImageGalleryProps): React.ReactElement {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -42,6 +46,7 @@ export function ImageGallery({
 
   const currentImage = images[currentIndex];
   const urls = currentImage ? getResponsiveImageUrls(currentImage.publicId) : null;
+  const credit = currentImage ? getImageCredit(currentImage.publicId) : null;
 
   // Check for prefers-reduced-motion
   useEffect(() => {
@@ -190,21 +195,22 @@ export function ImageGallery({
 
       {/* High-quality image */}
       {isInView && !hasError && (
-        <img
+        <SafeImage
           src={urls.medium}
+          fallbackSrc={fallbackSrc}
           srcSet={`
             ${urls.small} 200w,
             ${urls.medium} 600w,
             ${urls.large} 1200w
           `}
           sizes="(max-width: 600px) 200px, (max-width: 1200px) 600px, 1200px"
-          alt={currentImage.alt}
+          alt={currentImage.alt ?? 'Imagen de la propiedad'}
           className={`absolute inset-0 w-full h-full object-cover ${transitionClass} ${
             isLoaded ? 'opacity-100' : 'opacity-0'
           }`}
           loading="lazy"
           onLoad={() => setIsLoaded(true)}
-          onError={() => setHasError(true)}
+          onFinalError={() => setHasError(true)}
         />
       )}
 
@@ -277,6 +283,30 @@ export function ImageGallery({
             ))}
           </div>
         </>
+      )}
+
+      {/* Image credit (author + license) */}
+      {credit && (
+        <p className="absolute bottom-2 left-2 max-w-[55%] truncate rounded bg-black/60 px-2 py-1 text-[10px] text-white">
+          📷{' '}
+          <a
+            href={credit.sourceUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-agro-yellow"
+          >
+            {credit.author}
+          </a>{' '}
+          ·{' '}
+          <a
+            href={credit.licenseUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-agro-yellow"
+          >
+            {credit.license}
+          </a>
+        </p>
       )}
 
       {/* Moderation status badge */}

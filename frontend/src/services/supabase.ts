@@ -34,18 +34,26 @@ export interface PropertyRow {
   updated_at: string;
 }
 
+function normalizeImage(img: unknown): PropertyImage | null {
+  if (typeof img === 'object' && img !== null) {
+    if ('publicId' in img) {
+      return img as PropertyImage;
+    }
+    if ('url' in img && typeof img.url === 'string' && img.url.length > 0) {
+      return { ...img, publicId: img.url } as PropertyImage;
+    }
+    return null;
+  }
+  if (typeof img === 'string' && img.length > 0) {
+    return { publicId: img, url: img } as PropertyImage;
+  }
+  return null;
+}
+
 function normalizeImages(images: unknown): PropertyImage[] {
   if (!images || !Array.isArray(images)) return [];
   return images
-    .map((img) => {
-      if (typeof img === 'object' && img !== null && 'publicId' in img) {
-        return img as PropertyImage;
-      }
-      if (typeof img === 'string' && img.length > 0) {
-        return { publicId: img, url: img } as PropertyImage;
-      }
-      return null;
-    })
+    .map((img) => normalizeImage(img))
     .filter((img): img is PropertyImage => img !== null);
 }
 

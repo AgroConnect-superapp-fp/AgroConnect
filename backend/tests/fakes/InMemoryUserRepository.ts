@@ -30,17 +30,19 @@ export class InMemoryUserRepository implements UserRepository {
     }
   }
 
-  seedUser(overrides: Partial<{
-    id: string;
-    fullName: string;
-    document: string;
-    email: string;
-    phone: string;
-    passwordHash: string;
-    roleName: RoleName;
-    status: 'ACTIVO' | 'INACTIVO' | 'SUSPENDIDO';
-    emailVerifiedAt: Date | null;
-  }> = {}): User {
+  seedUser(
+    overrides: Partial<{
+      id: string;
+      fullName: string;
+      document: string;
+      email: string;
+      phone: string;
+      passwordHash: string;
+      roleName: RoleName;
+      status: 'ACTIVO' | 'INACTIVO' | 'SUSPENDIDO';
+      emailVerifiedAt: Date | null;
+    }> = {},
+  ): User {
     const roleName = overrides.roleName ?? 'productor';
     const user = User.create({
       id: overrides.id ?? randomUUID(),
@@ -154,7 +156,9 @@ export class InMemoryUserRepository implements UserRepository {
 
   async revokeAllUserTokens(userId: string): Promise<void> {
     this.refreshTokens = this.refreshTokens.map((token) =>
-      token.userId === userId ? RefreshToken.create({ ...this.toProps(token), revoked: true }) : token,
+      token.userId === userId
+        ? RefreshToken.create({ ...this.toProps(token), revoked: true })
+        : token,
     );
   }
 
