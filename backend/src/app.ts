@@ -47,11 +47,7 @@ export function createApp(options: AppOptions = {}): Express {
     env.JWT_REFRESH_EXPIRES_IN,
   );
 
-  const registerUserUseCase = new RegisterUserUseCase(
-    userRepository,
-    passwordHasher,
-    tokenService,
-  );
+  const registerUserUseCase = new RegisterUserUseCase(userRepository, passwordHasher, tokenService);
   const loginUseCase = new LoginUseCase(userRepository, passwordHasher, tokenService);
   const refreshTokenUseCase = new RefreshTokenUseCase(userRepository, tokenService);
   const logoutUseCase = new LogoutUseCase(userRepository, tokenService);
@@ -73,9 +69,7 @@ export function createApp(options: AppOptions = {}): Express {
     tokenService,
   );
 
-  const emailVerificationTokenRepository = new PrismaEmailVerificationTokenRepository(
-    prismaClient,
-  );
+  const emailVerificationTokenRepository = new PrismaEmailVerificationTokenRepository(prismaClient);
   const requestEmailVerificationUseCase = new RequestEmailVerificationUseCase(
     userRepository,
     emailVerificationTokenRepository,
@@ -140,11 +134,14 @@ export function createApp(options: AppOptions = {}): Express {
     res.status(200).json({ status: 'ok', service: 'agroconnect-api' });
   });
 
-  app.use('/api/v1/auth', createAuthRouter({
-    controller: authController,
-    loginRateLimiter,
-    forgotPasswordRateLimiter,
-  }));
+  app.use(
+    '/api/v1/auth',
+    createAuthRouter({
+      controller: authController,
+      loginRateLimiter,
+      forgotPasswordRateLimiter,
+    }),
+  );
   app.use('/api/v1', plotRoutes);
 
   app.use((req, res) => {

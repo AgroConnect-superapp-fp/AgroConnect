@@ -111,9 +111,7 @@ describe('API de geolocalización — parcelas (integración)', () => {
   });
 
   it('responde 400 con coordenadas inválidas', async () => {
-    const response = await request(app)
-      .get('/api/v1/plots/nearby')
-      .query({ lat: 999, lng: 999 });
+    const response = await request(app).get('/api/v1/plots/nearby').query({ lat: 999, lng: 999 });
 
     expect(response.status).toBe(400);
     expect(response.body).toMatchObject({ success: false });

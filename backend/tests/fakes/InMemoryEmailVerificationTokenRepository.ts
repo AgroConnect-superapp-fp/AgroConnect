@@ -4,9 +4,7 @@ import type {
   EmailVerificationTokenRepository,
 } from '../../src/modules/auth/domain/interfaces/EmailVerificationTokenRepository';
 
-export class InMemoryEmailVerificationTokenRepository
-  implements EmailVerificationTokenRepository
-{
+export class InMemoryEmailVerificationTokenRepository implements EmailVerificationTokenRepository {
   tokens: EmailVerificationToken[] = [];
 
   async create(data: NewEmailVerificationTokenData): Promise<void> {

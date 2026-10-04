@@ -270,9 +270,10 @@ describe('RefreshTokenUseCase', () => {
   it('rechaza un refresh token con formato inválido', async () => {
     const sut = buildSut();
 
-    await expect(
-      sut.refresh.execute({ refreshToken: 'token-invalido' }),
-    ).rejects.toMatchObject({ code: 'TOKEN_INVALID', statusCode: 401 });
+    await expect(sut.refresh.execute({ refreshToken: 'token-invalido' })).rejects.toMatchObject({
+      code: 'TOKEN_INVALID',
+      statusCode: 401,
+    });
   });
 
   it('rechaza un refresh token no registrado', async () => {
@@ -302,7 +303,11 @@ describe('RefreshTokenUseCase', () => {
       sut.repository.refreshTokens = sut.repository.refreshTokens.filter(
         (token) => token.id !== stored.id,
       );
-      sut.repository.seedRefreshToken(stored.userId, stored.tokenHash, new Date(Date.now() - 1_000));
+      sut.repository.seedRefreshToken(
+        stored.userId,
+        stored.tokenHash,
+        new Date(Date.now() - 1_000),
+      );
     }
 
     await expect(sut.refresh.execute({ refreshToken })).rejects.toMatchObject({
@@ -318,11 +323,7 @@ describe('RefreshTokenUseCase', () => {
       status: 'SUSPENDIDO',
     });
     const refreshToken = `refresh:${user.id}:1`;
-    sut.repository.seedRefreshToken(
-      user.id,
-      `hash:${refreshToken}`,
-      new Date(Date.now() + 60_000),
-    );
+    sut.repository.seedRefreshToken(user.id, `hash:${refreshToken}`, new Date(Date.now() + 60_000));
 
     await expect(sut.refresh.execute({ refreshToken })).rejects.toMatchObject({
       code: 'TOKEN_INVALID',
@@ -351,9 +352,7 @@ describe('LogoutUseCase', () => {
   it('es idempotente con tokens inválidos', async () => {
     const sut = buildSut();
 
-    await expect(
-      sut.logout.execute({ refreshToken: 'token-invalido' }),
-    ).resolves.toBeUndefined();
+    await expect(sut.logout.execute({ refreshToken: 'token-invalido' })).resolves.toBeUndefined();
   });
 
   it('es idempotente con tokens no registrados', async () => {
