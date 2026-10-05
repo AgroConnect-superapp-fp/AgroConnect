@@ -6,6 +6,12 @@ Plataforma de comercio agrícola **B2B + B2C** que conecta directamente a produc
 Centro de Comercio y Turismo · Regional Quindío · Programa Análisis y Desarrollo de Software (código 228118)
 **Metodología:** RUP + Scrum (Scrum Guide 2020) · **Esfuerzo:** 410 Story Points en 12 sprints
 
+[![CI](https://github.com/AgroConnect-superapp-fp/AgroConnect/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/AgroConnect-superapp-fp/AgroConnect/actions/workflows/ci.yml)
+[![Node](https://img.shields.io/badge/node-%E2%89%A5%2020-339933?logo=node.js&logoColor=white)](.nvmrc)
+[![Pruebas](https://img.shields.io/badge/pruebas-178%20backend%20%C2%B7%2014%20unit%20%C2%B7%2010%20E2E-brightgreen)](https://github.com/AgroConnect-superapp-fp/AgroConnect/actions/workflows/ci.yml)
+[![Deploy](https://img.shields.io/badge/producci%C3%B3n-Vercel%20%C2%B7%20Render-000000?logo=vercel&logoColor=white)](https://agroconnectpreview.vercel.app)
+[![Licencia](https://img.shields.io/badge/licencia-Todos%20los%20derechos%20reservados-red)](LICENSE)
+
 ---
 
 ## Información del proyecto
@@ -324,3 +330,15 @@ Además se usan fotografías de [Unsplash](https://unsplash.com/license) (banano
 > Si Supabase no responde, el prototipo muestra datos de demostración con un aviso visible.
 
 > Documentación elaborada por el equipo Scrum AgroConnect con base en el set documental oficial del proyecto formativo.
+
+---
+
+## Contribución
+
+El flujo de trabajo, las convenciones de commits y los gates de calidad están en [`CONTRIBUTING.md`](CONTRIBUTING.md). Los reportes de vulnerabilidades siguen [`SECURITY.md`](SECURITY.md).
+
+## Licencia
+
+**Todos los derechos reservados** — proyecto formativo SENA ADSO (Ficha 2026). Ver [`LICENSE`](LICENSE) para el detalle.
+
+> Las fotografías de terceros conservan sus licencias originales (CC BY-SA / Unsplash), detalladas en «Créditos de imágenes».
