@@ -1,7 +1,10 @@
 {
-  "name": "frontend",
+  "name": "agroconnect-frontend",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "engines": {
+    "node": ">=20"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",

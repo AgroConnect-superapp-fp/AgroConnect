@@ -1,0 +1,3 @@
+# Propietario único del proyecto formativo: toda revisión pasa por el autor.
+# Se usa para asignar revisores automáticamente en cada Pull Request.
+* @NFGS
