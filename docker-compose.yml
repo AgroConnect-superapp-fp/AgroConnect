@@ -1,0 +1,31 @@
+# ---------------------------------------------------------------------------
+# AgroConnect — PostgreSQL 16 + PostGIS 3.4 para desarrollo local
+#
+#   docker compose up -d
+#
+# Coincide por defecto con el puerto 5434 y la base `agroconnect_dev`
+# esperados por backend/.env (ajusta ambos si tu configuración difiere).
+# El esquema de aplicación se define en backend/.env como DATABASE_SCHEMA.
+# ---------------------------------------------------------------------------
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: agroconnect-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: agroconnect
+      POSTGRES_PASSWORD: agroconnect_dev
+      POSTGRES_DB: agroconnect_dev
+    ports:
+      - "5434:5432"
+    volumes:
+      - agroconnect_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agroconnect -d agroconnect_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  agroconnect_pgdata:
+    name: agroconnect_pgdata
