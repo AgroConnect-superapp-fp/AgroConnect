@@ -16,7 +16,7 @@ Centro de Comercio y Turismo · Regional Quindío · Programa Análisis y Desarr
 | Tipo | Marketplace dual B2B y B2C agropecuario para Colombia rural |
 | Alcance | 17 módulos funcionales (M01–M17) |
 | Trazabilidad oficial | 68 RF · 30 RNF · 66 CU · 69 HU · 6 actores |
-| Documentación fuente | Notion: PT-PP-01, PT-ERS-01, PT-ECU-01, PT-AR-ARQ-01, PT-IGS-01, PT-PP-02, PT-MTC-01, PT-MU-01 |
+| Documentación fuente | Notion: PT-PP-01, PT-ERS-01, PT-ECU-01, PT-AR-ARQ-01, PT-IGS-01, PT-PP-02, PT-PS-01, PT-MTC-01, PT-MU-01, PT-OPS-01, PT-EVD-01 y ADR-0001 |
 
 ### Equipo Scrum
 
@@ -107,11 +107,11 @@ Reglas clave del diseño:
 
 | Capa | Tecnologías |
 |---|---|
-| Frontend | React 19 + Vite 8 + TypeScript 6 (strict) + Tailwind CSS 3 + Leaflet 1.9 (OpenStreetMap) |
+| Frontend | React 19 + Vite 8 + TypeScript 6 (strict) + Tailwind CSS 4 + Leaflet 1.9 (OpenStreetMap) |
 | Backend | Node.js 22 + Express 4 + TypeScript 5 (strict) + Zod |
-| Persistencia | PostgreSQL 16 + PostGIS 3.4 + Prisma ORM |
+| Persistencia | PostgreSQL 16 + PostGIS 3.4 + Prisma 7 (driver adapter `@prisma/adapter-pg`) |
 | Seguridad | JWT + refresh tokens rotativos, bcrypt (12 rondas), Helmet, rate limiting, Pino con redacción de PII |
-| Pruebas | Jest + Supertest (unitarias/integración) · Playwright (E2E) |
+| Pruebas | Jest 30 + Supertest (backend) · Vitest (frontend unitarias) · Playwright (E2E) |
 | Assets | Cloudinary (transformaciones y CDN) |
 
 **Design system:** verde primario `#2E7D32`, amarillo acento `#F9A825`, tipografías Inter (UI) y Merriweather (contenido), touch targets mínimos de 48×48 px y contraste WCAG AA.
@@ -134,7 +134,7 @@ AgroConnect/
 
 ---
 
-## Estado implementado (incrementos 1–2b)
+## Estado implementado (incrementos 1–2b + prototipo del mercado)
 
 ### M02 — Gestión de Usuarios y Perfiles
 
@@ -158,9 +158,16 @@ Características: contraseñas con bcrypt, unicidad de correo/documento/celular 
 - Parcelas almacenadas como `geography(Point, 4326)` con índice GiST y búsqueda por radio con `ST_DWithin` en `/api/v1/plots`.
 - Frontend: mapa Leaflet + OpenStreetMap con 4 capas base (OSM, satélite Esri, topográfico, CartoDB), clustering de fincas, heatmap de productividad y herramientas de dibujo de parcelas.
 
+### M03 — Prototipo del mercado (Supabase) y PWA
+
+- Marketplace React sobre datos de Supabase (PostgreSQL + PostgREST): mapa, KPIs, distribución por cultivo y tarjetas de fincas.
+- Imágenes de cultivos con créditos (autor · licencia) en la galería, fallback automático por cultivo (`SafeImage`) y LQIP por proveedor (Unsplash/Wikimedia/Cloudinary).
+- Respaldo de datos de demostración con aviso visible cuando Supabase no responde.
+- PWA: service worker con caché *stale-while-revalidate* de imágenes externas.
+
 ### Calidad
 
-- 178 pruebas Jest + Supertest (cobertura 97 % en líneas) y 7 pruebas E2E con Playwright.
+- 178 pruebas backend (Jest + Supertest, cobertura 97 % en líneas) · 14 pruebas unitarias de frontend (Vitest) · 10 pruebas E2E (Playwright: autenticación real, modo demo y marketplace).
 
 ---
 
@@ -218,7 +225,7 @@ cd frontend && npm run test:e2e        # E2E (levanta API y web)
 
 > **Nota de infraestructura (plan Hobby):** Vercel no permite conectar repositorios privados de organizaciones sin plan Pro, por lo que la Git Integration nativa no está activa. El job `deploy` del CI queda como respaldo automático (condicionado al scope del token) y no marca el pipeline en rojo si el token no tiene acceso.
 
-**Acceso de demostración:** el botón **«🚀 Explorar la demo (sin registro)»** del inicio permite entrar al mercado sin backend. El registro e inicio de sesión reales requieren el backend local (no desplegado).
+**Acceso de demostración:** el botón **«🚀 Explorar la demo (sin registro)»** del inicio permite entrar al mercado sin cuenta. El **registro e inicio de sesión reales funcionan en producción** con el backend desplegado en Render (sección siguiente); en local requieren ejecutar el backend.
 
 **Deploy manual (procedimiento vigente)** — desde la raíz del repo, con sesión `vercel login` activa:
 
@@ -262,7 +269,7 @@ Despliegue (resumen): Blueprint `render.yaml` → `DATABASE_URL` con la connecti
 
 ## Enlaces del proyecto
 
-- **Notion (SSOT documental):** repositorio de plantillas PT-PP-01, PT-ERS-01, PT-ECU-01, PT-AR-ARQ-01, PT-IGS-01, PT-PP-02, PT-MTC-01 y PT-MU-01.
+- **Notion (SSOT documental):** repositorio de plantillas PT-PP-01, PT-ERS-01, PT-ECU-01, PT-AR-ARQ-01, PT-IGS-01, PT-PP-02, PT-PS-01, PT-MTC-01, PT-MU-01, PT-OPS-01, PT-EVD-01 y ADR-0001.
 - **Jira (SSOT operativo):** tablero SCRUM del proyecto.
 - **GitHub:** organización `AgroConnect-superapp-fp`.
 
