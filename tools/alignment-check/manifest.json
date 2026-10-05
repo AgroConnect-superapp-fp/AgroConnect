@@ -1,0 +1,39 @@
+{
+  "project": "AgroConnect",
+  "updated": "2026-10-04",
+  "urls": {
+    "app": "https://agroconnectpreview.vercel.app",
+    "api": "https://agroconnect-api-5t7n.onrender.com",
+    "repo": "https://github.com/AgroConnect-superapp-fp/AgroConnect",
+    "notionRoot": "1d7bdc33f29483caadf20189d8ee9b19",
+    "notionOpsPage": "3efbdc33-f294-815d-a9e6-e6231aa0ca05"
+  },
+  "traceability": {
+    "modules": 17,
+    "rf": 68,
+    "rnf": 30,
+    "cu": 66,
+    "hu": 69,
+    "actors": 6
+  },
+  "stack": {
+    "frontend": "Tailwind CSS 4",
+    "backend": "Prisma 7",
+    "database": "PostgreSQL 16 + PostGIS 3.4"
+  },
+  "tests": {
+    "backend": 178,
+    "frontendUnit": 14,
+    "e2e": 10
+  },
+  "sources": {
+    "localReadme": "README.md",
+    "githubReadme": "origin/main:README.md",
+    "obsidianVault": "~/Documents/Obsidian Vaults/Ningendo Bee",
+    "obsidianNotes": [
+      "AgroConnect/Estado del Proyecto.md",
+      "AgroConnect/README.md",
+      "AgroConnect/Sustentación/Guía de Sustentación — Stack y MVP.md"
+    ]
+  }
+}

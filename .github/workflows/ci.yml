@@ -230,3 +230,17 @@ jobs:
         if: steps.vercel_pull.outputs.access == 'true'
         run: npx --yes vercel@54 deploy --prebuilt --prod --yes --token="$VERCEL_TOKEN"
         working-directory: .
+
+  alignment:
+    name: Alineación de entornos (manifiesto)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Verificar README contra el manifiesto de sincronización
+        run: node tools/alignment-check/check-alignment.mjs --ci
