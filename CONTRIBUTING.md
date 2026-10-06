@@ -30,10 +30,11 @@ hotfix/*    ← corrección urgente (sale de main, vuelve a main y develop)
    - **Revisión aprobada** antes del merge.
    - Para PRs hacia `main`: **2 aprobaciones** cuando el equipo lo disponga.
 
-> Nota: GitHub Free en repositorios privados de organización no permite
-> *branch protection* nativo. Mientras eso siga así, este flujo es una **regla
-> contractual del equipo**: no se hace push directo a `main` ni se mergea sin CI
-> verde y revisión.
+> **Protección efectiva**: el repositorio aplica *rulesets* activos — `main`
+> exige Pull Request + todos los checks del CI, y `develop` exige los checks
+> (los pushes directos quedan bloqueados en ambas ramas). Todo cambio llega por
+> **Pull Request**. Con un solo mantenedor activo, las aprobaciones requeridas
+> son 0; se elevarán a 1–2 cuando el equipo crezca.
 
 ## Gates de calidad (ejecutar antes de cada commit)
 
