@@ -40,7 +40,9 @@ export function ImageGallery({
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [isInView, setIsInView] = useState(false);
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(
+    () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
   const containerRef = useRef<HTMLDivElement>(null);
   const touchStartRef = useRef<number | null>(null);
 
@@ -48,10 +50,9 @@ export function ImageGallery({
   const urls = currentImage ? getResponsiveImageUrls(currentImage.publicId) : null;
   const credit = currentImage ? getImageCredit(currentImage.publicId) : null;
 
-  // Check for prefers-reduced-motion
+  // Sigue cambios de preferencia (el valor inicial se resolvió en el useState)
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setPrefersReducedMotion(mediaQuery.matches);
 
     const handler = (e: MediaQueryListEvent): void => {
       setPrefersReducedMotion(e.matches);
@@ -80,11 +81,14 @@ export function ImageGallery({
     return () => observer.disconnect();
   }, []);
 
-  // Reset loaded state when image changes
-  useEffect(() => {
+  // Reset del estado de carga al cambiar de imagen (patrón oficial de React:
+  // ajustar estado durante el render, sin efecto en cascada).
+  const [prevIndex, setPrevIndex] = useState(currentIndex);
+  if (prevIndex !== currentIndex) {
+    setPrevIndex(currentIndex);
     setIsLoaded(false);
     setHasError(false);
-  }, [currentIndex]);
+  }
 
   const handleNext = useCallback((): void => {
     setCurrentIndex((prev) => (prev + 1) % images.length);

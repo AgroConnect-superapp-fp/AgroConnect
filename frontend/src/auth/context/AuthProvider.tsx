@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useMemo, useState, type ReactNode } from 'react';
 import { authApi } from '../api/authClient';
 import type { AuthSession, LoginPayload, PublicUser, RegisterPayload } from '../types';
 import { AuthContext } from './authContext';
@@ -32,24 +32,19 @@ function persistSession(session: AuthSession | null): void {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }): React.ReactElement {
+  // Inicialización perezosa y síncrona desde localStorage: evita el efecto de
+  // montaje con setState (regla react-hooks/set-state-in-effect) y el "flash"
+  // de estado de carga.
+  const [initialSession] = useState(() => readStoredSession());
   const [status, setStatus] = useState<'loading' | 'anonymous' | 'authenticated'>(
-    'loading'
+    initialSession ? 'authenticated' : 'anonymous'
   );
-  const [usuario, setUsuario] = useState<PublicUser | null>(null);
-  const [refreshToken, setRefreshToken] = useState<string | null>(null);
-
-  useEffect(() => {
-    const stored = readStoredSession();
-
-    if (stored) {
-      setUsuario(stored.usuario);
-      setRefreshToken(stored.tokens.refreshToken);
-      setStatus('authenticated');
-      return;
-    }
-
-    setStatus('anonymous');
-  }, []);
+  const [usuario, setUsuario] = useState<PublicUser | null>(
+    initialSession?.usuario ?? null
+  );
+  const [refreshToken, setRefreshToken] = useState<string | null>(
+    initialSession?.tokens.refreshToken ?? null
+  );
 
   const applySession = useCallback((session: AuthSession) => {
     persistSession(session);
