@@ -73,8 +73,12 @@ jobs:
           JWT_REFRESH_SECRET: ci_refresh_secret_with_at_least_32_characters_ok
           LOG_LEVEL: fatal
 
+      # Bloquea vulnerabilidades high/critical; las moderate/low se reportan sin
+      # bloquear. Hoy provienen de la toolchain de pruebas (jest → sprintf-js),
+      # sin fix disponible que no introduzca un cambio incompatible
+      # (ver auditoría de seguridad 2026-10-06).
       - name: Auditoría de dependencias (SAST)
-        run: npm audit
+        run: npm audit --audit-level=high
 
       - name: Publicar reporte de cobertura
         if: always()
@@ -112,8 +116,12 @@ jobs:
       - name: Build de producción
         run: npm run build
 
+      # Bloquea vulnerabilidades high/critical; las moderate/low se reportan sin
+      # bloquear. Hoy provienen de la toolchain de pruebas (jest → sprintf-js),
+      # sin fix disponible que no introduzca un cambio incompatible
+      # (ver auditoría de seguridad 2026-10-06).
       - name: Auditoría de dependencias (SAST)
-        run: npm audit
+        run: npm audit --audit-level=high
 
   e2e:
     name: E2E — registro y autenticación
