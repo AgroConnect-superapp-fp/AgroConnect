@@ -1,0 +1,41 @@
+name: CodeQL
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    - cron: '23 3 * * 1' # lunes 03:23 UTC
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    name: Análisis de seguridad (JavaScript/TypeScript)
+    runs-on: ubuntu-latest
+    # Code scanning requiere visibilidad pública (o GitHub Advanced Security).
+    # Este guard activa el análisis automáticamente al publicar el repositorio
+    # y lo mantiene inactivo mientras sea privado.
+    if: github.event.repository.visibility == 'public'
+    permissions:
+      security-events: write
+      contents: read
+      actions: read
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [javascript-typescript]
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v7
+
+      - name: Inicializar CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-and-quality
+
+      - name: Analizar
+        uses: github/codeql-action/analyze@v4
