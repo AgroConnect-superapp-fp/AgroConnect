@@ -152,8 +152,6 @@ function App(): React.ReactElement {
   // ============================================
   const loadProperties = async (): Promise<void> => {
     try {
-      setLoading(true);
-      setError(null);
       const data = await fetchProperties();
 
       if (data.length === 0) {
@@ -171,8 +169,21 @@ function App(): React.ReactElement {
     }
   };
 
+  // Reintento explícito (clic del usuario): reestablece el estado de carga y
+  // vuelve a consultar, sin setState síncrono dentro del efecto de montaje.
+  const reload = (): void => {
+    setLoading(true);
+    setError(null);
+    void loadProperties();
+  };
+
   useEffect(() => {
-    loadProperties();
+    // Fetch de datos en el montaje: patrón recomendado por React cuando no se
+    // usa una librería de fetching (react.dev/learn/you-might-not-need-an-effect).
+    // No hay cascada síncrona: todo setState de `loadProperties` ocurre tras el
+    // `await`; se silencia la regla con esta justificación explícita.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void loadProperties();
   }, []);
 
   // ============================================
@@ -229,7 +240,7 @@ function App(): React.ReactElement {
   // RENDER: Error State
   // ============================================
   if (error) {
-    return <ErrorScreen error={error} onRetry={loadProperties} />;
+    return <ErrorScreen error={error} onRetry={reload} />;
   }
 
   // ============================================
@@ -249,7 +260,7 @@ function App(): React.ReactElement {
             ejemplo.
           </p>
           <button
-            onClick={loadProperties}
+            onClick={reload}
             className="w-full py-3 bg-agro-green text-white rounded-lg font-semibold hover:bg-agro-dark interactive-transition"
           >
             🔄 Recargar Datos
@@ -404,7 +415,7 @@ function App(): React.ReactElement {
             </p>
             <button
               type="button"
-              onClick={loadProperties}
+              onClick={reload}
               className="rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-700 interactive-transition"
             >
               Reintentar conexión

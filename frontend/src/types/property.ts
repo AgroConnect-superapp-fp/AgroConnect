@@ -12,14 +12,7 @@
 // CROP TYPES
 // ============================================
 export type CropType =
-  | 'coffee'
-  | 'cacao'
-  | 'banana'
-  | 'sugarcane'
-  | 'rice'
-  | 'corn'
-  | 'cassava'
-  | 'oil_palm';
+  'coffee' | 'cacao' | 'banana' | 'sugarcane' | 'rice' | 'corn' | 'cassava' | 'oil_palm';
 
 export interface CropInfo {
   displayName: string;
@@ -102,11 +95,7 @@ export function getCropInfo(crop: string | undefined | null): CropInfo {
 // CERTIFICATION TYPES
 // ============================================
 export type CertificationType =
-  | 'organic'
-  | 'rainforest_alliance'
-  | 'fair_trade'
-  | 'conventional'
-  | 'global_gap';
+  'organic' | 'rainforest_alliance' | 'fair_trade' | 'conventional' | 'global_gap';
 
 export interface CertificationInfo {
   displayName: string;

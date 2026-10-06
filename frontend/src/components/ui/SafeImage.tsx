@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 interface SafeImageProps extends Omit<
   React.ImgHTMLAttributes<HTMLImageElement>,
@@ -21,11 +21,15 @@ export function SafeImage({
 }: SafeImageProps): React.ReactElement | null {
   const [currentSrc, setCurrentSrc] = useState(src);
   const [failed, setFailed] = useState(false);
+  const [prevSrc, setPrevSrc] = useState(src);
 
-  useEffect(() => {
+  // Reacciona al cambio de `src` durante el render (patrón oficial de React
+  // para "ajustar estado cuando cambia una prop", sin cascada de efectos).
+  if (prevSrc !== src) {
+    setPrevSrc(src);
     setCurrentSrc(src);
     setFailed(false);
-  }, [src]);
+  }
 
   const usingFallback = fallbackSrc !== undefined && currentSrc === fallbackSrc;
 

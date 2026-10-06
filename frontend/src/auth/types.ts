@@ -1,9 +1,5 @@
 export type RoleName =
-  | 'productor'
-  | 'comprador_b2c'
-  | 'comprador_b2b'
-  | 'transportista'
-  | 'administrador';
+  'productor' | 'comprador_b2c' | 'comprador_b2b' | 'transportista' | 'administrador';
 
 export interface PublicUser {
   id: string;
