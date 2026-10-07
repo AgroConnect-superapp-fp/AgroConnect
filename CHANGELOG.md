@@ -7,6 +7,28 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [1.0.1] — 2026-10-06
+
+### Corregido
+
+- **Backend:** migración a zod 4 (`required_error` → `error`) y actualización de
+  `pino-http` a la versión 11 para alinear tipos con pino 10 (consecuencia de los
+  bumps de Dependabot). Suite completa: **178/178 pruebas** en verde.
+- **Frontend:** compatibilidad con eslint 10 (`eslint-plugin-react-hooks@7.1.1`),
+  refactor de los patrones marcados por `react-hooks/set-state-in-effect` y
+  reformateo con prettier 3.9.
+- **Seguridad:** `source-map-js` actualizado (GHSA-68fv-2mgg-jv7q) — **0
+  vulnerabilidades** en el frontend; umbral SAST `--audit-level=high` documentado
+  (moderates de la toolchain de pruebas sin fix no-breaking, alerta gestionada).
+
+### Añadido
+
+- **CodeQL** (`security-and-quality`) en el pipeline de CI.
+- **Rulesets** de protección en `main` y `develop` (PR + checks del CI; sin
+  force-push ni borrado).
+- **Secret scanning y push protection** activos.
+- `CODE_OF_CONDUCT.md` (Contributor Covenant 2.1).
+
 ## [1.0.0] — 2026-10-05
 
 Primera versión estable: MVP desplegado de punta a punta (M02 · M16 · M03) con
