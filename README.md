@@ -114,7 +114,7 @@ Reglas clave del diseño:
 | Capa | Tecnologías |
 |---|---|
 | Frontend | React 19 + Vite 8 + TypeScript 6 (strict) + Tailwind CSS 4 + Leaflet 1.9 (OpenStreetMap) |
-| Backend | Node.js 22 + Express 4 + TypeScript 5 (strict) + Zod |
+| Backend | Node.js 22 (CI · Render) — local en 24 (`.nvmrc`) + Express 4 + TypeScript 5 (strict) + Zod |
 | Persistencia | PostgreSQL 16 + PostGIS 3.4 + Prisma 7 (driver adapter `@prisma/adapter-pg`) |
 | Seguridad | JWT + refresh tokens rotativos, bcrypt (12 rondas), Helmet, rate limiting, Pino con redacción de PII |
 | Pruebas | Jest 30 + Supertest (backend) · Vitest (frontend unitarias) · Playwright (E2E) |
