@@ -260,22 +260,34 @@ Despliegue (resumen): Blueprint `render.yaml` → `DATABASE_URL` con la connecti
 
 ## Sincronización entre entornos (local · GitHub · Notion · Obsidian)
 
-Un **manifiesto de hechos canónicos** (`tools/alignment-check/manifest.json`) centraliza los datos compartidos —URLs, stack, cifras de trazabilidad (17·68·30·66·69·6) y conteos de pruebas (178 · 14 · 10)— y un verificador comprueba que los cuatro entornos manejen la misma información **sin incongruencias** (cada entorno conserva su rol y no son espejos):
+Un **manifiesto de hechos canónicos** (`tools/alignment-check/manifest.json`) centraliza los datos compartidos —URLs, stack, cifras de trazabilidad (17·68·30·66·69·6), conteos de pruebas (178 · 14 · 10), visibilidad del repositorio y última release— y un verificador comprueba que los cuatro entornos manejen la misma información **sin incongruencias**. No son espejos: cada entorno conserva su rol; el mecanismo garantiza que los hechos compartidos sean idénticos y, ante cada ❌, indica exactamente **qué actualizar** (`→ hint`).
 
 ```bash
-node tools/alignment-check/check-alignment.mjs        # local + GitHub + Obsidian
+node tools/alignment-check/check-alignment.mjs        # local + GitHub (+ API) + Obsidian
 node tools/alignment-check/check-alignment.mjs --all  # + Notion (requiere NOTION_AGROCONNECT_TOKEN)
 node tools/alignment-check/check-alignment.mjs --ci   # solo repo (lo ejecuta el CI en cada push)
+node tools/alignment-check/check-alignment.mjs --json # salida para automatización
 ```
 
-| Entorno | Qué verifica | Rol |
-|---|---|---|
-| Directorio del proyecto | README e IaC contra el manifiesto | Operación y código |
-| GitHub | `origin/main:README.md` + job `alignment` del CI en cada push | Fuente técnica del equipo |
-| Obsidian | Notas clave del vault (Estado, índice, guía) | Conocimiento enlazado |
-| Notion | PT-OPS-01 y root vía API | SSOT documental SENA |
+**Detección en el momento del cambio (instalar una vez por clon):**
 
-**Flujo ante un cambio que toque un hecho compartido:** actualizar la fuente del cambio → ajustar `manifest.json` si el hecho cambió → ejecutar el chequeo en modo `--all` hasta ver **0 desalineaciones** (el CI bloquea deriva en el README desde el primer push).
+```bash
+bash tools/alignment-check/install-git-hook.sh   # hook pre-push: bloquea el push si el README deriva
+```
+
+| Entorno | Rol | Qué vive aquí | Cuándo se toca |
+|---|---|---|---|
+| **Directorio del proyecto** | Operación y código | Código, IaC (`render.yaml`, `vercel.json`, `docker-compose.yml`), README, CHANGELOG | Cada cambio de implementación |
+| **GitHub** | Fuente técnica del equipo | Repositorio público, releases/tags, CI (5 jobs + CodeQL), rulesets, Dependabot | Cada push (vía PR); releases al cerrar versión |
+| **Obsidian** | Conocimiento enlazado | Notas de estudio: Estado del Proyecto, índice, guía de sustentación, dashboards Dataview | Cuando el cambio aporta contexto de estudio/operación |
+| **Notion** | SSOT documental SENA | Documentos PT-* oficiales, matriz de trazabilidad, PT-OPS-01 (hub operativo) | Cuando el cambio afecta documentación oficial |
+
+**Flujo ante un cambio que toque un hecho compartido:**
+
+1. Aplica el cambio en su **entorno fuente** (p. ej. el README local).
+2. Si el hecho en sí cambió (URL, cifra, versión, visibilidad), actualiza `manifest.json`.
+3. Ejecuta `check-alignment.mjs --all` y corrige cada ❌ siguiendo su **hint** (señala el archivo o página exacta).
+4. El **CI bloquea** cualquier push cuyo README derive del manifiesto (job `alignment`) y el **hook pre-push** te avisa antes incluso de subirlo.
 
 ---
 

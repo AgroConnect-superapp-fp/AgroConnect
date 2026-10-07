@@ -1,4 +1,18 @@
 #!/usr/bin/env node
+// ─────────────────────────────────────────────────────────────────────────────
+// Verificador de alineación cross-entorno — AgroConnect
+//
+// Audita que el directorio local, GitHub, Obsidian y Notion manejen los mismos
+// hechos canónicos (tools/alignment-check/manifest.json) SIN incongruencias.
+// No copia información entre entornos (cada uno tiene su rol): verifica y,
+// cuando algo falla, indica exactamente QUÉ entorno actualizar (→ hint).
+//
+// Uso:
+//   node tools/alignment-check/check-alignment.mjs        # local + GitHub + Obsidian
+//   node tools/alignment-check/check-alignment.mjs --all  # + Notion (requiere NOTION_AGROCONNECT_TOKEN)
+//   node tools/alignment-check/check-alignment.mjs --ci   # solo repo (lo ejecuta el CI)
+//   node tools/alignment-check/check-alignment.mjs --json # salida JSON
+// ─────────────────────────────────────────────────────────────────────────────
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
@@ -14,10 +28,19 @@ const mode = args.includes('--all') ? 'all' : args.includes('--ci') ? 'ci' : 'lo
 const asJson = args.includes('--json');
 
 const results = [];
+const record = (env, label, ok, detail = '', hint = '') =>
+  results.push({ env, label, ok, detail, hint });
 
-function record(env, label, ok, detail) {
-  results.push({ env, label, ok, detail: detail ?? '' });
-}
+const HINTS = {
+  local: 'Actualiza README.md (o el manifiesto) y verifica: node tools/alignment-check/check-alignment.mjs --ci',
+  github: 'Corrige el README y llévalo a main vía PR; después: git fetch.',
+  obsidian: 'Actualiza la nota correspondiente del vault (AgroConnect/...).',
+  notion: 'Añade la nota de actualización en la página de Notion correspondiente.',
+  release:
+    'Publica la release/tag correspondiente o actualiza github.latestRelease en manifest.json.',
+  visibility:
+    'Cambia la visibilidad del repositorio o actualiza github.visibility en manifest.json.',
+};
 
 function readIfExists(path) {
   try {
@@ -27,17 +50,13 @@ function readIfExists(path) {
   }
 }
 
-function missingNeedles(text, needles) {
-  return needles.filter((needle) => !text.includes(needle));
-}
-
 function checkText(env, label, text, needles) {
   if (text === null) {
-    record(env, label, false, 'fuente no encontrada');
+    record(env, label, false, 'fuente no encontrada', HINTS[env]);
     return;
   }
-  const missing = missingNeedles(text, needles);
-  record(env, label, missing.length === 0, missing.length ? `faltan: ${missing.join(' | ')}` : 'ok');
+  const missing = needles.filter((n) => !text.includes(n));
+  record(env, label, missing.length === 0, missing.length ? `faltan: ${missing.join(' | ')}` : 'ok', HINTS[env]);
 }
 
 function expandHome(path) {
@@ -69,9 +88,15 @@ const testNeedles = [
   `${manifest.tests.e2e} pruebas E2E`,
 ];
 
-const localReadme = readIfExists(join(repoRoot, manifest.sources.localReadme));
-checkText('local', `README (${manifest.sources.localReadme})`, localReadme, [...coreNeedles, ...testNeedles]);
+// ── 1) Directorio local ──────────────────────────────────────────────────────
+checkText(
+  'local',
+  `README (${manifest.sources.localReadme})`,
+  readIfExists(join(repoRoot, manifest.sources.localReadme)),
+  [...coreNeedles, ...testNeedles]
+);
 
+// ── 2) GitHub (README en origin/main + API pública) ─────────────────────────
 if (mode !== 'ci') {
   try {
     const remoteReadme = execFileSync('git', ['show', manifest.sources.githubReadme], {
@@ -83,20 +108,61 @@ if (mode !== 'ci') {
       ...testNeedles,
     ]);
   } catch {
-    record('github', `README (${manifest.sources.githubReadme})`, false, 'ref remota no disponible (¿fetch pendiente?)');
+    record(
+      'github',
+      `README (${manifest.sources.githubReadme})`,
+      false,
+      'ref remota no disponible (¿fetch pendiente?)',
+      HINTS.github
+    );
   }
 
+  if (manifest.github?.repoApi) {
+    try {
+      const headers = { 'User-Agent': 'agroconnect-alignment-check' };
+      const repoRes = await fetch(manifest.github.repoApi, { headers });
+      if (repoRes.ok) {
+        const repo = await repoRes.json();
+        record(
+          'github',
+          'API: visibilidad del repositorio',
+          repo.visibility === manifest.github.visibility,
+          `actual: ${repo.visibility} · esperado: ${manifest.github.visibility}`,
+          HINTS.visibility
+        );
+      } else {
+        record('github', 'API: visibilidad del repositorio', false, `HTTP ${repoRes.status}`);
+      }
+      const relRes = await fetch(`${manifest.github.repoApi}/releases/latest`, { headers });
+      if (relRes.ok) {
+        const rel = await relRes.json();
+        record(
+          'github',
+          'API: última release',
+          rel.tag_name === manifest.github.latestRelease,
+          `actual: ${rel.tag_name} · esperado: ${manifest.github.latestRelease}`,
+          HINTS.release
+        );
+      } else {
+        record('github', 'API: última release', false, `HTTP ${relRes.status}`);
+      }
+    } catch (error) {
+      record('github', 'API de GitHub', false, `red: ${String(error).slice(0, 60)}`);
+    }
+  }
+
+  // ── 3) Obsidian (notas clave del vault) ────────────────────────────────────
   const vault = expandHome(manifest.sources.obsidianVault);
   if (existsSync(vault)) {
     for (const note of manifest.sources.obsidianNotes) {
-      const text = readIfExists(join(vault, note));
-      checkText('obsidian', note, text, coreNeedles);
+      checkText('obsidian', note, readIfExists(join(vault, note)), coreNeedles);
     }
   } else {
     record('obsidian', vault, false, 'vault no encontrado');
   }
 }
 
+// ── 4) Notion (PT-OPS-01 + root) ─────────────────────────────────────────────
 if (mode === 'all') {
   const token = readNotionToken();
   if (!token) {
@@ -107,12 +173,10 @@ if (mode === 'all') {
       ['Root del proyecto', manifest.urls.notionRoot],
     ]) {
       try {
-        const response = await fetch(`https://api.notion.com/v1/blocks/${pageId}/children?page_size=100`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Notion-Version': '2022-06-28',
-          },
-        });
+        const response = await fetch(
+          `https://api.notion.com/v1/blocks/${pageId}/children?page_size=100`,
+          { headers: { Authorization: `Bearer ${token}`, 'Notion-Version': '2022-06-28' } }
+        );
         if (!response.ok) {
           record('notion', label, false, `HTTP ${response.status}`);
           continue;
@@ -129,6 +193,7 @@ if (mode === 'all') {
   }
 }
 
+// ── Salida ───────────────────────────────────────────────────────────────────
 const failed = results.filter((r) => !r.ok);
 
 if (asJson) {
@@ -144,11 +209,16 @@ if (asJson) {
     console.log(`  [${env.toUpperCase()}]`);
     for (const item of items) {
       console.log(`   ${item.ok ? '✅' : '❌'} ${item.label}${item.detail ? ` — ${item.detail}` : ''}`);
+      if (!item.ok && item.hint) console.log(`      → ${item.hint}`);
     }
   }
-  console.log(
-    `\n${failed.length === 0 ? '🎉 Todos los entornos alineados con el manifiesto' : `⚠️ ${failed.length} desalineación(es) detectada(s)`}\n`
-  );
+  if (failed.length === 0) {
+    console.log('\n🎉 Todos los entornos alineados con el manifiesto\n');
+  } else {
+    const envs = [...new Set(failed.map((f) => f.env.toUpperCase()))].join(' · ');
+    console.log(`\n⚠️ ${failed.length} desalineación(es) detectada(s) → revisar: ${envs}`);
+    console.log('   Cada ❌ indica arriba el entorno y el archivo a actualizar.\n');
+  }
 }
 
 process.exit(failed.length === 0 ? 0 : 1);
