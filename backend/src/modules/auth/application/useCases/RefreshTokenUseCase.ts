@@ -28,10 +28,13 @@ export class RefreshTokenUseCase {
       role: user.roleName,
     });
 
-    await this.userRepository.rotateRefreshToken(currentHash, {
+    const rotated = await this.userRepository.rotateRefreshToken(currentHash, {
       tokenHash: this.tokenService.hashToken(tokens.refreshToken),
       expiresAt: this.tokenService.refreshExpirationDate(),
     });
+    if (!rotated) {
+      throw new InvalidTokenError();
+    }
 
     return tokens;
   }

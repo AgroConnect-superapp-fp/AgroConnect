@@ -35,11 +35,12 @@ export class PrismaEmailVerificationTokenRepository implements EmailVerification
     });
   }
 
-  async markUsed(id: string): Promise<void> {
-    await this.prisma.emailVerificationToken.update({
-      where: { id },
+  async consume(id: string): Promise<boolean> {
+    const result = await this.prisma.emailVerificationToken.updateMany({
+      where: { id, usedAt: null },
       data: { usedAt: new Date() },
     });
+    return result.count === 1;
   }
 
   async invalidateUserTokens(userId: string): Promise<void> {

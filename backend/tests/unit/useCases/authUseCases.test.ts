@@ -138,6 +138,15 @@ describe('RegisterUserUseCase', () => {
     ).rejects.toMatchObject({ code: 'ROLE_NOT_FOUND', statusCode: 422 });
   });
 
+  it('impide el auto-registro como administrador con ROLE_NOT_ALLOWED', async () => {
+    const sut = buildSut();
+
+    await expect(
+      sut.register.execute({ ...validProducerInput, rol: 'administrador' as never }),
+    ).rejects.toMatchObject({ code: 'ROLE_NOT_ALLOWED', statusCode: 403 });
+    expect(sut.repository.users).toHaveLength(0);
+  });
+
   it('exige los datos de la finca al rol productor', async () => {
     const sut = buildSut();
 
@@ -265,6 +274,20 @@ describe('RefreshTokenUseCase', () => {
 
     expect(previous?.revoked).toBe(true);
     expect(renewed?.revoked).toBe(false);
+  });
+
+  it('solo una de dos renovaciones concurrentes con el mismo token tiene éxito', async () => {
+    const { sut, refreshToken } = await seedLoggedUser();
+
+    const results = await Promise.allSettled([
+      sut.refresh.execute({ refreshToken }),
+      sut.refresh.execute({ refreshToken }),
+    ]);
+
+    expect(results.filter((result) => result.status === 'fulfilled')).toHaveLength(1);
+    expect(results.find((result) => result.status === 'rejected')).toMatchObject({
+      reason: { code: 'TOKEN_INVALID' },
+    });
   });
 
   it('rechaza un refresh token con formato inválido', async () => {

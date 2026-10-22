@@ -162,6 +162,17 @@ describe('ResetPasswordUseCase', () => {
     ).rejects.toMatchObject({ code: 'TOKEN_INVALID', statusCode: 401 });
   });
 
+  it('solo uno de dos restablecimientos concurrentes con el mismo enlace tiene éxito', async () => {
+    const { sut, token } = await seedResetToken();
+
+    const results = await Promise.allSettled([
+      sut.resetPassword.execute({ token, password: 'PrimeraClave2026*' }),
+      sut.resetPassword.execute({ token, password: 'SegundaClave2026*' }),
+    ]);
+
+    expect(results.filter((result) => result.status === 'fulfilled')).toHaveLength(1);
+  });
+
   it('rechaza un token expirado', async () => {
     const sut = buildSut();
     const user = sut.userRepository.seedUser({ email: 'maria.lopez@example.com' });

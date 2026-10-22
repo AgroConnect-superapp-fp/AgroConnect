@@ -4,6 +4,7 @@ import {
   EmailAlreadyExistsError,
   InvalidDataError,
   PhoneAlreadyExistsError,
+  RoleNotAllowedError,
   RoleNotFoundError,
 } from '../../domain/errors/AuthErrors';
 import { Email } from '../../domain/value-objects/Email';
@@ -48,6 +49,10 @@ export class RegisterUserUseCase {
     const role = await this.userRepository.findRoleByName(input.rol);
     if (!role) {
       throw new RoleNotFoundError(input.rol);
+    }
+
+    if (!role.isSelfRegistrable()) {
+      throw new RoleNotAllowedError(role.name);
     }
 
     if (role.requiresProducerProfile() && !input.finca) {

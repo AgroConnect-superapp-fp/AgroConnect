@@ -26,10 +26,12 @@ services:
       - key: JWT_REFRESH_EXPIRES_IN
         value: 7d
       - key: CORS_ORIGIN
-        value: https://agroconnectpreview.vercel.app,http://localhost:5173
+        value: https://agroconnectpreview.vercel.app
       - key: APP_BASE_URL
         value: https://agroconnectpreview.vercel.app
       - key: RATE_LIMIT_MAX_ATTEMPTS
         value: '30'
+      - key: TRUST_PROXY
+        value: '1'
       - key: LOG_LEVEL
         value: info

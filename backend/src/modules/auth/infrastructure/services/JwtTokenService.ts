@@ -10,6 +10,8 @@ interface JwtClaims {
   type?: string;
 }
 
+const ALGORITHM = 'HS256';
+
 const TIME_UNITS: Record<string, number> = {
   s: 1,
   m: 60,
@@ -38,11 +40,13 @@ export class JwtTokenService implements TokenService {
 
   generateTokens(payload: TokenPayload): TokenPair {
     const accessToken = jwt.sign({ role: payload.role }, this.accessSecret, {
+      algorithm: ALGORITHM,
       subject: payload.userId,
       expiresIn: parseDurationToSeconds(this.accessExpiresIn),
     });
 
     const refreshToken = jwt.sign({ role: payload.role, type: 'refresh' }, this.refreshSecret, {
+      algorithm: ALGORITHM,
       subject: payload.userId,
       expiresIn: parseDurationToSeconds(this.refreshExpiresIn),
       jwtid: randomUUID(),
@@ -81,7 +85,7 @@ export class JwtTokenService implements TokenService {
 
   private verify(token: string, secret: string): JwtClaims {
     try {
-      const decoded = jwt.verify(token, secret);
+      const decoded = jwt.verify(token, secret, { algorithms: [ALGORITHM] });
 
       if (typeof decoded === 'string' || typeof decoded.sub !== 'string') {
         throw new InvalidTokenError();

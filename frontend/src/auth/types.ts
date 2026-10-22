@@ -93,6 +93,11 @@ export const ROLE_OPTIONS: RoleOption[] = [
   },
 ];
 
+/** Roles que un visitante puede elegir al registrarse; el administrador se asigna internamente. */
+export const SELF_REGISTRATION_ROLE_OPTIONS: RoleOption[] = ROLE_OPTIONS.filter(
+  (option) => option.id !== 'administrador'
+);
+
 export function getRoleOption(role: RoleName): RoleOption {
   return ROLE_OPTIONS.find((option) => option.id === role) ?? ROLE_OPTIONS[0];
 }

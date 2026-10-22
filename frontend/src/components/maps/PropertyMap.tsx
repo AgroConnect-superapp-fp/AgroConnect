@@ -32,6 +32,7 @@ import type { Property, HeatmapPoint } from '../../types/property';
 import { CROP_CATALOG, getCropInfo } from '../../types/property';
 import { getCropFallbackImage } from '../../data/fallbackImages';
 import { createCropIcon, createClusterIcon } from '../../utils/mapIcons';
+import { escapeHtml } from '../../utils/escapeHtml';
 import { useLeafletDraw } from '../../hooks/useLeafletDraw';
 import { ResetViewControl } from './ResetViewControl';
 import { CustomZoomControl } from './ZoomControl';
@@ -428,6 +429,13 @@ function SearchControl({
         if (!isMounted.current) return;
 
         const provider = new CombinedSearchProvider(properties);
+        // leaflet-geosearch pinta cada resultado con innerHTML y los nombres vienen de la BD y de
+        // Nominatim: se escapan para evitar XSS. `resultFormat` existe en el runtime 4.4 pero no
+        // en `SearchControlOptions`, por eso va en un objeto aparte.
+        const escapedResultFormat = {
+          resultFormat: ({ result }: { result: { label: string } }) =>
+            escapeHtml(result.label),
+        };
         control = new SearchControlClass({
           provider: provider as unknown as never,
           style: 'bar',
@@ -437,6 +445,7 @@ function SearchControl({
           animateZoom: true,
           position: 'topright',
           notFoundMessage: 'No se encontró ninguna opción, busca nuevamente !!!',
+          ...escapedResultFormat,
         });
 
         map.addControl(control as unknown as L.Control);

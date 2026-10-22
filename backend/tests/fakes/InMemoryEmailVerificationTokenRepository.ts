@@ -24,10 +24,15 @@ export class InMemoryEmailVerificationTokenRepository implements EmailVerificati
     return this.tokens.find((token) => token.tokenHash === tokenHash) ?? null;
   }
 
-  async markUsed(id: string): Promise<void> {
+  async consume(id: string): Promise<boolean> {
+    const current = this.tokens.find((token) => token.id === id);
+    if (!current || current.usedAt !== null) {
+      return false;
+    }
     this.tokens = this.tokens.map((token) =>
       token.id === id ? this.cloneWithUsedAt(token, new Date()) : token,
     );
+    return true;
   }
 
   async invalidateUserTokens(userId: string): Promise<void> {
