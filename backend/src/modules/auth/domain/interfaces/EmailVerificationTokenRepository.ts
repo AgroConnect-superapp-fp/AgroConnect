@@ -10,6 +10,7 @@ export interface NewEmailVerificationTokenData {
 export interface EmailVerificationTokenRepository {
   create(data: NewEmailVerificationTokenData): Promise<void>;
   findByHash(tokenHash: string): Promise<EmailVerificationToken | null>;
-  markUsed(id: string): Promise<void>;
+  /** Marca el token como usado solo si aún no lo estaba; `false` si otro proceso lo consumió primero. */
+  consume(id: string): Promise<boolean>;
   invalidateUserTokens(userId: string): Promise<void>;
 }

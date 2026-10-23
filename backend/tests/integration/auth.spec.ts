@@ -177,6 +177,16 @@ describe(`POST ${API}/register`, () => {
     expect(response.body.error.code).toBe('VALIDATION_ERROR');
   });
 
+  it('rechaza el auto-registro como administrador sin crear el usuario', async () => {
+    const response = await request(app)
+      .post(`${API}/register`)
+      .send({ ...validPayload, rol: 'administrador' });
+
+    expect(response.status).toBe(422);
+    expect(response.body.error.code).toBe('VALIDATION_ERROR');
+    expect(await prisma.user.count()).toBe(0);
+  });
+
   it('exige los datos de la finca al productor', async () => {
     const response = await request(app)
       .post(`${API}/register`)

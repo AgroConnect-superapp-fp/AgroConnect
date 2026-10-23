@@ -10,6 +10,7 @@ export interface NewPasswordResetTokenData {
 export interface PasswordResetTokenRepository {
   create(data: NewPasswordResetTokenData): Promise<void>;
   findByHash(tokenHash: string): Promise<PasswordResetToken | null>;
-  markUsed(id: string): Promise<void>;
+  /** Marca el token como usado solo si aún no lo estaba; `false` si otro proceso lo consumió primero. */
+  consume(id: string): Promise<boolean>;
   invalidateUserTokens(userId: string): Promise<void>;
 }

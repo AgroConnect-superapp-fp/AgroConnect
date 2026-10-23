@@ -10,6 +10,14 @@ export const ROLE_NAMES = [
 
 export type RoleName = (typeof ROLE_NAMES)[number];
 
+/** Roles que un visitante puede elegir al registrarse; `administrador` solo se asigna internamente. */
+export const SELF_REGISTRABLE_ROLE_NAMES = [
+  'productor',
+  'comprador_b2c',
+  'comprador_b2b',
+  'transportista',
+] as const satisfies readonly RoleName[];
+
 export interface RoleProps {
   id: string;
   name: RoleName;
@@ -43,6 +51,10 @@ export class Role {
 
   get description(): string {
     return this.props.description;
+  }
+
+  isSelfRegistrable(): boolean {
+    return (SELF_REGISTRABLE_ROLE_NAMES as readonly RoleName[]).includes(this.props.name);
   }
 
   requiresProducerProfile(): boolean {

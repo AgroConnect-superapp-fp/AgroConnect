@@ -7,6 +7,22 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+### Seguridad
+
+- **Auto-registro como administrador bloqueado:** el esquema de registro y el caso de
+  uso solo aceptan roles auto-registrables (`ROLE_NOT_ALLOWED`, 403); la pantalla de
+  selección de rol ya no ofrece "Administrador".
+- **Rate limiting real detrás del proxy de Render:** `trust proxy` configurable
+  (`TRUST_PROXY`, 1 en Render) y un limitador independiente por ruta, ahora también en
+  `/register` y `/refresh`.
+- **Tokens de un solo uso atómicos:** la rotación del refresh token y el consumo de
+  los enlaces de recuperación y verificación ya no admiten reutilización concurrente.
+- **JWT con algoritmo fijado** (`HS256`) al firmar y verificar.
+- **Violaciones de unicidad** en el registro concurrente responden 409 en lugar de 500.
+- **XSS en la búsqueda del mapa:** los resultados de `leaflet-geosearch` se escapan
+  antes de insertarse con `innerHTML`.
+- `CORS_ORIGIN` de producción sin `localhost`.
+
 ## [1.0.1] — 2026-10-06
 
 ### Corregido

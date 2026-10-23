@@ -30,8 +30,13 @@ export class ResetPasswordUseCase {
     const password = Password.create(input.password);
     const passwordHash = await this.passwordHasher.hash(password.value);
 
+    // Consumir primero: dos solicitudes concurrentes con el mismo enlace no pueden ganar ambas.
+    const consumed = await this.passwordResetTokenRepository.consume(storedToken.id);
+    if (!consumed) {
+      throw new InvalidTokenError('El enlace de recuperación es inválido o expiró');
+    }
+
     await this.userRepository.updatePassword(user.id, passwordHash);
-    await this.passwordResetTokenRepository.markUsed(storedToken.id);
     await this.userRepository.revokeAllUserTokens(user.id);
   }
 }

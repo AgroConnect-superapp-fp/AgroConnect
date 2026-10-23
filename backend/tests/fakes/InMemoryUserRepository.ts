@@ -165,14 +165,15 @@ export class InMemoryUserRepository implements UserRepository {
   async rotateRefreshToken(
     currentTokenHash: string,
     nextToken: { tokenHash: string; expiresAt: Date },
-  ): Promise<void> {
+  ): Promise<boolean> {
     const current = this.refreshTokens.find((token) => token.tokenHash === currentTokenHash);
-    if (!current) {
-      return;
+    if (!current || current.revoked) {
+      return false;
     }
 
     await this.revokeRefreshToken(currentTokenHash);
     this.seedRefreshToken(current.userId, nextToken.tokenHash, nextToken.expiresAt);
+    return true;
   }
 
   async updatePassword(userId: string, passwordHash: string): Promise<void> {

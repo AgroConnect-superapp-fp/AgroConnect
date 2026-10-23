@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { ROLE_NAMES } from '../../domain/entities/Role';
+import { SELF_REGISTRABLE_ROLE_NAMES } from '../../domain/entities/Role';
 
-const roleSchema = z.enum(ROLE_NAMES);
+const roleSchema = z.enum(SELF_REGISTRABLE_ROLE_NAMES);
 
 const producerProfileSchema = z.object({
   nombre: z

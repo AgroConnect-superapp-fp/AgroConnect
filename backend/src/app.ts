@@ -27,6 +27,7 @@ import { FileEmailService } from './modules/auth/infrastructure/services/FileEma
 import type { EmailService } from './modules/auth/domain/interfaces/EmailService';
 import { AuthController } from './modules/auth/presentation/controllers/AuthController';
 import { createAuthRouter } from './modules/auth/presentation/routes/authRoutes';
+import type { AuthRateLimitScope } from './modules/auth/presentation/routes/authRoutes';
 import { createRateLimiter } from './modules/auth/presentation/middleware/rateLimiters';
 import plotRoutes from './modules/geography/presentation/routes/plotRoutes';
 
@@ -94,18 +95,28 @@ export function createApp(options: AppOptions = {}): Express {
     verifyEmailUseCase,
   );
 
-  const loginRateLimiter = createRateLimiter({
-    windowMs: env.RATE_LIMIT_WINDOW_MS,
-    max: env.RATE_LIMIT_MAX_ATTEMPTS,
-  });
-  const forgotPasswordRateLimiter = createRateLimiter({
-    windowMs: env.RATE_LIMIT_WINDOW_MS,
-    max: env.RATE_LIMIT_MAX_ATTEMPTS,
-  });
+  const limiter = (multiplier = 1) =>
+    createRateLimiter({
+      windowMs: env.RATE_LIMIT_WINDOW_MS,
+      max: env.RATE_LIMIT_MAX_ATTEMPTS * multiplier,
+    });
+  const authRateLimiters: Record<AuthRateLimitScope, ReturnType<typeof limiter>> = {
+    register: limiter(),
+    login: limiter(),
+    // El refresh es legítimamente frecuente (cada 15 min por pestaña): margen mayor.
+    refresh: limiter(10),
+    forgotPassword: limiter(),
+    resetPassword: limiter(),
+    verifyEmail: limiter(),
+    resendVerification: limiter(),
+  };
 
   const app = express();
 
   app.disable('x-powered-by');
+  // Detrás del proxy de Render, sin esto todas las peticiones comparten la IP del balanceador
+  // y el rate limit se vuelve global (un atacante bloquea el login de todos).
+  app.set('trust proxy', env.TRUST_PROXY);
   app.use(correlationId);
   app.use(
     pinoHttp({
@@ -138,8 +149,7 @@ export function createApp(options: AppOptions = {}): Express {
     '/api/v1/auth',
     createAuthRouter({
       controller: authController,
-      loginRateLimiter,
-      forgotPasswordRateLimiter,
+      rateLimiters: authRateLimiters,
     }),
   );
   app.use('/api/v1', plotRoutes);
