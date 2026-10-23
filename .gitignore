@@ -22,7 +22,9 @@ backend/.env
 frontend/.env.local
 
 # Material interno del proyecto formativo (no se versiona en este repositorio)
-docs/
+# Excepción: los ADR sí se versionan porque gobiernan el código.
+docs/*
+!docs/adr/
 obsidian-vault/
 mcp-servers/
 scripts/
