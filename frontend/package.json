@@ -31,7 +31,8 @@
     "react-dom": "^19.3.0",
     "react-leaflet": "^5.0.0",
     "react-leaflet-markercluster": "^5.0.0-rc.0",
-    "zod": "^4.6.5"
+    "zod": "^4.6.5",
+    "@agroconnect/contracts": "*"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",

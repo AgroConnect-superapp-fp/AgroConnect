@@ -27,7 +27,7 @@ docs/*
 !docs/adr/
 obsidian-vault/
 mcp-servers/
-scripts/
+/scripts/
 *.pdf
 opencode.json
 AGENTS.md*
@@ -41,6 +41,7 @@ AGENTS.md*
 .ruff_cache/
 __pycache__/
 *.pyc
+.turbo/
 
 # IDE
 .vscode/
