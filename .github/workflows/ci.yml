@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: '22'
+  NODE_VERSION: '24'
   DATABASE_URL_TEST: postgresql://agroconnect:agroconnect_dev@localhost:5432/agroconnect_test?schema=public
 
 jobs:
@@ -43,10 +43,15 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
-          cache-dependency-path: backend/package-lock.json
+          cache-dependency-path: package-lock.json
 
-      - name: Instalar dependencias
+      - name: Instalar dependencias (monorepo)
         run: npm ci
+        working-directory: .
+
+      - name: Build de contratos compartidos
+        run: npm run build -w @agroconnect/contracts
+        working-directory: .
 
       - name: Generar cliente Prisma
         run: npx prisma generate
@@ -102,10 +107,15 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
-          cache-dependency-path: frontend/package-lock.json
+          cache-dependency-path: package-lock.json
 
-      - name: Instalar dependencias
+      - name: Instalar dependencias (monorepo)
         run: npm ci
+        working-directory: .
+
+      - name: Build de contratos compartidos
+        run: npm run build -w @agroconnect/contracts
+        working-directory: .
 
       - name: Lint (0 errores permitidos)
         run: npm run lint
@@ -149,17 +159,13 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
-          cache-dependency-path: |
-            backend/package-lock.json
-            frontend/package-lock.json
+          cache-dependency-path: package-lock.json
 
-      - name: Instalar dependencias del backend
+      - name: Instalar dependencias (monorepo)
         run: npm ci
-        working-directory: backend
 
-      - name: Instalar dependencias del frontend
-        run: npm ci
-        working-directory: frontend
+      - name: Build de contratos compartidos
+        run: npm run build -w @agroconnect/contracts
 
       - name: Preparar base de datos de pruebas
         run: npx prisma generate && npx prisma migrate deploy
@@ -211,11 +217,12 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
-          cache-dependency-path: frontend/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Instalar dependencias
         if: env.VERCEL_TOKEN != ''
         run: npm ci
+        working-directory: .
 
       - name: Pull de configuración y entorno (Vercel)
         id: vercel_pull
@@ -252,3 +259,22 @@ jobs:
 
       - name: Verificar README contra el manifiesto de sincronización
         run: node tools/alignment-check/check-alignment.mjs --ci
+
+  contracts:
+    name: Contratos — sincronía OpenAPI ↔ Zod
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Instalar dependencias (monorepo)
+        run: npm ci
+
+      - name: Verificar que openapi.json coincide con los esquemas Zod
+        run: npm run check:drift -w @agroconnect/contracts
