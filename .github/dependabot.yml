@@ -1,10 +1,16 @@
 # Dependabot — AgroConnect
 # Actualizaciones semanales con destino `develop` (respetando el flujo del equipo).
 # https://docs.github.com/code-security/dependabot/dependabot-version-updates
+#
+# ADR-015: el proyecto es un monorepo npm workspaces (backend, frontend,
+# packages/*). Dependabot debe apuntar a la RAÍZ para leer el package.json
+# raíz y actualizar el lockfile único; con directorios por workspace
+# (/backend, /frontend) sus PRs quedan inaplicables porque esos lockfiles ya
+# no existen.
 version: 2
 updates:
   - package-ecosystem: npm
-    directory: /backend
+    directory: /
     target-branch: develop
     schedule:
       interval: weekly
@@ -13,21 +19,16 @@ updates:
     commit-message:
       prefix: "chore(deps)"
     groups:
-      backend-minor-patch:
+      npm-minor-patch:
         update-types: [minor, patch]
-
-  - package-ecosystem: npm
-    directory: /frontend
-    target-branch: develop
-    schedule:
-      interval: weekly
-      day: monday
-    open-pull-requests-limit: 5
-    commit-message:
-      prefix: "chore(deps)"
-    groups:
-      frontend-minor-patch:
-        update-types: [minor, patch]
+        patterns:
+          - "*"
+      npm-security:
+        update-types:
+          - patch
+          - minor
+        patterns:
+          - "*"
 
   - package-ecosystem: github-actions
     directory: /
