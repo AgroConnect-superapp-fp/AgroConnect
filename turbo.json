@@ -20,6 +20,10 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "prisma:generate": {
+      "cache": false,
+      "outputs": ["src/generated/**"]
     }
   }
 }
