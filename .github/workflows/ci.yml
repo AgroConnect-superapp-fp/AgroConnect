@@ -93,6 +93,57 @@ jobs:
           path: backend/coverage/
           retention-days: 7
 
+  api:
+    name: API (NestJS) — lint, tipos y pruebas
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/api
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Instalar dependencias (monorepo)
+        run: npm ci
+        working-directory: .
+
+      - name: Build de contratos compartidos
+        run: npm run build -w @agroconnect/contracts
+        working-directory: .
+
+      - name: Generar cliente Prisma
+        run: npm run prisma:generate
+
+      - name: Lint (0 errores permitidos)
+        run: npm run lint
+
+      - name: Type check (0 errores permitidos)
+        run: npm run typecheck
+
+      # Las pruebas de este servicio no tocan la base de datos: el cliente
+      # Prisma se sustituye por un doble en la prueba e2e. Por eso este job no
+      # levanta el service container de PostGIS (a diferencia del backend legacy).
+      - name: Pruebas unitarias e integración con cobertura
+        run: npm run test:coverage
+        env:
+          JWT_ACCESS_SECRET: ci_access_secret_with_at_least_32_characters_ok
+          JWT_REFRESH_SECRET: ci_refresh_secret_with_at_least_32_characters_ok
+          LOG_LEVEL: fatal
+
+      - name: Publicar reporte de cobertura
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: api-coverage
+          path: apps/api/coverage/
+          retention-days: 7
+
   frontend:
     name: Frontend — lint, tipos y build
     runs-on: ubuntu-latest
