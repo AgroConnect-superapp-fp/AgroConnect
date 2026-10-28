@@ -10,8 +10,15 @@ process.env.JWT_ACCESS_EXPIRES_IN = '15m';
 process.env.JWT_REFRESH_EXPIRES_IN = '7d';
 process.env.BCRYPT_SALT_ROUNDS = '10';
 process.env.RATE_LIMIT_WINDOW_MS = '900000';
-process.env.RATE_LIMIT_MAX_ATTEMPTS = '1000';
+// Límite bajo a propósito: la e2e del módulo identity necesita agotarlo
+// para comprobar la respuesta 429 del guard de rate limiting.
+process.env.RATE_LIMIT_MAX_ATTEMPTS = '5';
 process.env.CORS_ORIGIN = 'http://localhost:5173';
 process.env.TRUST_PROXY = '0';
 process.env.APP_BASE_URL = 'http://localhost:5173';
 process.env.LOG_LEVEL = process.env.LOG_LEVEL ?? 'fatal';
+// Las pruebas NUNCA envían correo real: el entorno de desarrollo puede tener
+// SMTP_HOST exportado (direnv), y el servicio intentaría conectarse a un
+// servidor externo. Se deshabilita para que se use el servicio de archivo.
+process.env.SMTP_HOST = '';
+process.env.MAIL_DIR = process.env.MAIL_DIR ?? '/tmp/agroconnect-mails-test';

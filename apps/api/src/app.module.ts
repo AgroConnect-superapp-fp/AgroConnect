@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
-import { ThrottlerModule } from '@nestjs/throttler';
+import { APP_FILTER } from '@nestjs/core';
 import { HealthModule } from './health/health.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { IdentityModule } from './modules/identity/presentation/identity.module';
 import { parseEnv } from './shared/config/env';
+import { AllExceptionsFilter } from './shared/errors/all-exceptions.filter';
 import { PinoNestLogger } from './shared/logger/nest-logger.service';
 
 /**
@@ -15,7 +17,9 @@ import { PinoNestLogger } from './shared/logger/nest-logger.service';
  * - `ThrottlerModule` queda configurado con los valores del legacy, pero el
  *   guard NO se aplica globalmente: se aplica por ruta en el módulo identity
  *   para no limitar las sondas de `/health` que ejecuta Render.
- * - `JwtModule` queda registrado para el módulo identity (próximo paso).
+ * - `AllExceptionsFilter` se registra como `APP_FILTER`: sin él los
+ *   `DomainError` (401/403/409/422/429) saldrían como 500 en lugar del cuerpo
+ *   de error que espera el cliente.
  */
 @Module({
   imports: [
@@ -25,19 +29,15 @@ import { PinoNestLogger } from './shared/logger/nest-logger.service';
       envFilePath: ['.env'],
       validate: (raw: Record<string, unknown>) => parseEnv(raw),
     }),
-    ThrottlerModule.forRoot({
-      throttlers: [
-        {
-          ttl: parseEnv(process.env).RATE_LIMIT_WINDOW_MS,
-          limit: parseEnv(process.env).RATE_LIMIT_MAX_ATTEMPTS,
-        },
-      ],
-    }),
     JwtModule.register({}),
     PrismaModule,
     HealthModule,
+    IdentityModule,
   ],
-  providers: [PinoNestLogger],
+  providers: [
+    PinoNestLogger,
+    { provide: APP_FILTER, useClass: AllExceptionsFilter },
+  ],
   exports: [PinoNestLogger],
 })
 export class AppModule {}

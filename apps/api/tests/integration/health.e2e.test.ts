@@ -1,8 +1,9 @@
 import type { Server } from 'node:http';
-import type { INestApplication } from '@nestjs/common';
+import type { NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import { AppModule } from '../../src/app.module';
+import { configureApp } from '../../src/app.setup';
 import { PrismaService } from '../../src/prisma/prisma.service';
 
 /**
@@ -12,7 +13,7 @@ import { PrismaService } from '../../src/prisma/prisma.service';
  * datos, así que la prueba no necesita un PostGIS levantado.
  */
 describe('Health (e2e)', () => {
-  let app: INestApplication;
+  let app: NestExpressApplication;
   let server: Server;
 
   beforeAll(async () => {
@@ -26,7 +27,8 @@ describe('Health (e2e)', () => {
       })
       .compile();
 
-    app = moduleRef.createNestApplication();
+    app = moduleRef.createNestApplication<NestExpressApplication>();
+    configureApp(app);
     app.setGlobalPrefix('api/v1', { exclude: ['health'] });
     await app.init();
     server = app.getHttpServer() as Server;

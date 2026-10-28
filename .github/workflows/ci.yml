@@ -96,6 +96,20 @@ jobs:
   api:
     name: API (NestJS) — lint, tipos y pruebas
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_USER: agroconnect
+          POSTGRES_PASSWORD: agroconnect_dev
+          POSTGRES_DB: agroconnect_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U agroconnect"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
     defaults:
       run:
         working-directory: apps/api
@@ -126,12 +140,18 @@ jobs:
       - name: Type check (0 errores permitidos)
         run: npm run typecheck
 
-      # Las pruebas de este servicio no tocan la base de datos: el cliente
-      # Prisma se sustituye por un doble en la prueba e2e. Por eso este job no
-      # levanta el service container de PostGIS (a diferencia del backend legacy).
+      # El módulo identity sí toca la base de datos (registro, login, rotación
+      # de tokens), así que este job levanta PostGIS y aplica las migraciones.
+      - name: Aplicar migraciones en la base de pruebas
+        run: npm run prisma:deploy
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL_TEST }}
+
       - name: Pruebas unitarias e integración con cobertura
         run: npm run test:coverage
         env:
+          DATABASE_URL: ${{ env.DATABASE_URL_TEST }}
+          TEST_DATABASE_URL: ${{ env.DATABASE_URL_TEST }}
           JWT_ACCESS_SECRET: ci_access_secret_with_at_least_32_characters_ok
           JWT_REFRESH_SECRET: ci_refresh_secret_with_at_least_32_characters_ok
           LOG_LEVEL: fatal

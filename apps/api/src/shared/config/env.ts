@@ -24,6 +24,17 @@ export const envSchema = z.object({
   TRUST_PROXY: z.coerce.number().int().min(0).max(5).default(0),
   APP_BASE_URL: z.string().url().default('http://localhost:5173'),
   MAIL_DIR: z.string().default('/tmp/agroconnect-mails'),
+  // SMTP real para verificación de correo y recuperación de contraseña. Sin
+  // SMTP_HOST los correos se escriben en MAIL_DIR (desarrollo y pruebas).
+  SMTP_HOST: z.string().optional(),
+  SMTP_PORT: z.coerce.number().int().positive().default(587),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASS: z.string().optional(),
+  SMTP_SECURE: z
+    .union([z.literal('true'), z.literal('false')])
+    .default('false')
+    .transform((value) => value === 'true'),
+  SMTP_FROM: z.string().default('AgroConnect <no-reply@agroconnect.co>'),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
 });
 
