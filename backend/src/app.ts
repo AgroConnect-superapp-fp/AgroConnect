@@ -98,7 +98,7 @@ export function createApp(options: AppOptions = {}): Express {
   const limiter = (multiplier = 1) =>
     createRateLimiter({
       windowMs: env.RATE_LIMIT_WINDOW_MS,
-      max: env.RATE_LIMIT_MAX_ATTEMPTS * multiplier,
+      limit: env.RATE_LIMIT_MAX_ATTEMPTS * multiplier,
     });
   const authRateLimiters: Record<AuthRateLimitScope, ReturnType<typeof limiter>> = {
     register: limiter(),
