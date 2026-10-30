@@ -5,6 +5,7 @@ import { APP_FILTER } from '@nestjs/core';
 import { HealthModule } from './health/health.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { IdentityModule } from './modules/identity/presentation/identity.module';
+import { GeographyModule } from './modules/geography/presentation/geography.module';
 import { parseEnv } from './shared/config/env';
 import { AllExceptionsFilter } from './shared/errors/all-exceptions.filter';
 import { PinoNestLogger } from './shared/logger/nest-logger.service';
@@ -33,6 +34,7 @@ import { PinoNestLogger } from './shared/logger/nest-logger.service';
     PrismaModule,
     HealthModule,
     IdentityModule,
+    GeographyModule,
   ],
   providers: [
     PinoNestLogger,

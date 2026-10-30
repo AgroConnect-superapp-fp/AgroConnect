@@ -302,6 +302,61 @@
           }
         }
       }
+    },
+    "/plots/nearby": {
+      "get": {
+        "tags": [
+          "Geography"
+        ],
+        "summary": "Busca parcelas dentro de un radio alrededor de un punto (PostGIS ST_DWithin)",
+        "parameters": [
+          {
+            "name": "lat",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "minimum": -90,
+              "maximum": 90
+            }
+          },
+          {
+            "name": "lng",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "minimum": -180,
+              "maximum": 180
+            }
+          },
+          {
+            "name": "radius",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "default": 10,
+              "type": "number",
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Parcelas dentro del radio de búsqueda"
+          },
+          "400": {
+            "description": "Solicitud malformada o cuerpo inválido"
+          },
+          "422": {
+            "description": "Reglas de negocio incumplidas (detalles por campo)"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -528,6 +583,32 @@
           "correo"
         ],
         "additionalProperties": false
+      },
+      "NearbyPlotsQuery": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "lat": {
+            "type": "number",
+            "minimum": -90,
+            "maximum": 90
+          },
+          "lng": {
+            "type": "number",
+            "minimum": -180,
+            "maximum": 180
+          },
+          "radius": {
+            "default": 10,
+            "type": "number",
+            "minimum": 1,
+            "maximum": 100
+          }
+        },
+        "required": [
+          "lat",
+          "lng"
+        ]
       }
     }
   }
