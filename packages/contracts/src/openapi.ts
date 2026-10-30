@@ -20,6 +20,7 @@ import {
   resetPasswordSchema,
   verifyEmailSchema,
 } from './authSchemas';
+import { nearbyPlotsQuerySchema } from './plotSchemas';
 
 export interface OpenApiDocument {
   openapi: '3.1.0';
@@ -75,6 +76,22 @@ const authOperation = (summary: string, schemaRef: string, responses: Record<str
     responses,
   },
 });
+
+/**
+ * Convierte el JSON Schema de un objeto Zod en parámetros `in: query` de
+ * OpenAPI (uno por propiedad). Los campos con `.default()` no son obligatorios.
+ */
+const queryParameters = (jsonSchema: Record<string, unknown>) => {
+  const properties = (jsonSchema.properties ?? {}) as Record<string, Record<string, unknown>>;
+  const required = new Set((jsonSchema.required ?? []) as string[]);
+
+  return Object.entries(properties).map(([name, schema]) => ({
+    name,
+    in: 'query' as const,
+    required: required.has(name),
+    schema,
+  }));
+};
 
 export function buildOpenApiDocument(): OpenApiDocument {
   return {
@@ -134,6 +151,19 @@ export function buildOpenApiDocument(): OpenApiDocument {
         ...validationErrors,
         ...rateLimited,
       }),
+      '/plots/nearby': {
+        get: {
+          tags: ['Geography'],
+          summary: 'Busca parcelas dentro de un radio alrededor de un punto (PostGIS ST_DWithin)',
+          // `io: 'input'`: el documento describe lo que el cliente envía; el
+          // campo con `.default()` (radius) no es obligatorio en la query.
+          parameters: queryParameters(z.toJSONSchema(nearbyPlotsQuerySchema, { io: 'input' })),
+          responses: {
+            '200': response('Parcelas dentro del radio de búsqueda'),
+            ...validationErrors,
+          },
+        },
+      },
     },
     components: {
       schemas: {
@@ -145,6 +175,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
         ResetPasswordRequestBody: z.toJSONSchema(resetPasswordSchema),
         VerifyEmailRequestBody: z.toJSONSchema(verifyEmailSchema),
         ResendVerificationRequestBody: z.toJSONSchema(resendVerificationSchema),
+        NearbyPlotsQuery: z.toJSONSchema(nearbyPlotsQuerySchema, { io: 'input' }),
       },
     },
   };
