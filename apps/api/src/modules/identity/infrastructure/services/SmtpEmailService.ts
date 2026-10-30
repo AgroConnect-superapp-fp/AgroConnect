@@ -32,6 +32,11 @@ export class SmtpEmailService implements EmailService {
       port: config.port,
       secure: config.secure,
       auth: config.user ? { user: config.user, pass: config.pass } : undefined,
+      // Límites duros: sin ellos un SMTP inalcanzable cuelga el envío
+      // indefinidamente y degrada cualquier flujo que espere el resultado.
+      connectionTimeout: 5_000,
+      greetingTimeout: 5_000,
+      socketTimeout: 10_000,
     });
   }
 

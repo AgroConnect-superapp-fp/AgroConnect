@@ -1,4 +1,4 @@
-import type { AuthSession, LoginPayload, RegisterPayload, SessionTokens } from '../types';
+import type { AuthSession, LoginPayload, RegisterPayload } from '../types';
 
 const API_URL: string = import.meta.env['VITE_API_URL'] ?? 'http://localhost:4000';
 
@@ -42,6 +42,9 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   try {
     response = await fetch(`${API_URL}${path}`, {
       ...options,
+      // La sesión viaja en cookies httpOnly: el navegador las adjunta (y las
+      // renueva) automáticamente. El JavaScript NUNCA lee ni envía tokens.
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
         ...(options.headers ?? {}),
@@ -104,17 +107,18 @@ export const authApi = {
     });
   },
 
-  refresh(refreshToken: string): Promise<{ tokens: SessionTokens }> {
-    return request<{ tokens: SessionTokens }>('/api/v1/auth/refresh', {
+  // Cookie-only: el refreshToken vive en la cookie httpOnly y el navegador lo
+  // adjunta solo. La respuesta trae la sesión completa (usuario + tokens) para
+  // restaurar el estado tras recargar la página.
+  refresh(): Promise<AuthSession> {
+    return request<AuthSession>('/api/v1/auth/refresh', {
       method: 'POST',
-      body: JSON.stringify({ refreshToken }),
     });
   },
 
-  logout(refreshToken: string): Promise<void> {
+  logout(): Promise<void> {
     return request<void>('/api/v1/auth/logout', {
       method: 'POST',
-      body: JSON.stringify({ refreshToken }),
     });
   },
 

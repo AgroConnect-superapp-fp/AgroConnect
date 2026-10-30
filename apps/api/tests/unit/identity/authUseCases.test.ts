@@ -257,19 +257,20 @@ describe('RefreshTokenUseCase', () => {
     return { sut, refreshToken: login.tokens.refreshToken };
   }
 
-  it('rota el refresh token y emite un par nuevo', async () => {
+  it('rota el refresh token, emite un par nuevo y devuelve el usuario', async () => {
     const { sut, refreshToken } = await seedLoggedUser();
 
-    const tokens = await sut.refresh.execute({ refreshToken });
+    const result = await sut.refresh.execute({ refreshToken });
 
-    expect(tokens.accessToken).toBeTruthy();
-    expect(tokens.refreshToken).not.toBe(refreshToken);
+    expect(result.tokens.accessToken).toBeTruthy();
+    expect(result.tokens.refreshToken).not.toBe(refreshToken);
+    expect(result.user.correo).toBe('maria.lopez@example.com');
 
     const previous = sut.repository.refreshTokens.find(
       (token) => token.tokenHash === `hash:${refreshToken}`,
     );
     const renewed = sut.repository.refreshTokens.find(
-      (token) => token.tokenHash === `hash:${tokens.refreshToken}`,
+      (token) => token.tokenHash === `hash:${result.tokens.refreshToken}`,
     );
 
     expect(previous?.revoked).toBe(true);
