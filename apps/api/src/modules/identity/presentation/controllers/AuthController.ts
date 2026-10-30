@@ -86,11 +86,14 @@ export class AuthController {
   ): Promise<unknown> {
     const result = await this.registerUserUseCase.execute(body);
 
-    try {
-      await this.requestEmailVerificationUseCase.execute({ correo: result.user.correo });
-    } catch (error) {
-      logger.warn({ err: error }, 'No fue posible enviar el correo de verificación');
-    }
+    // El correo de verificación es best-effort: se dispara sin bloquear la
+    // respuesta. Un SMTP lento o caído no puede penalizar el P95 del registro
+    // (medido: un intento SMTP fallido añadía ~10 s al endpoint).
+    void this.requestEmailVerificationUseCase
+      .execute({ correo: result.user.correo })
+      .catch((error: unknown) => {
+        logger.warn({ err: error }, 'No fue posible enviar el correo de verificación');
+      });
 
     this.sessionCookies.setSessionCookies(response, result.tokens);
 
@@ -134,11 +137,20 @@ export class AuthController {
     @Body(new ZodValidationPipe(refreshSchema)) body: RefreshInput,
     @Res({ passthrough: true }) response: Response,
   ): Promise<unknown> {
-    const tokens = await this.refreshTokenUseCase.execute(body);
+    const result = await this.refreshTokenUseCase.execute(body);
 
-    this.sessionCookies.setSessionCookies(response, tokens);
+    this.sessionCookies.setSessionCookies(response, result.tokens);
 
-    return success({ tokens }, 'Token renovado');
+    // Mismo shape que login/register: el frontend restaura la sesión completa
+    // con el usuario renovado. El refreshToken del cuerpo se ignora en el
+    // frontend nuevo (la cookie httpOnly es la única vía legítima).
+    return success(
+      {
+        usuario: result.user,
+        tokens: result.tokens,
+      },
+      'Token renovado',
+    );
   }
 
   @Post('logout')

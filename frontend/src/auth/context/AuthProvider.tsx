@@ -1,57 +1,51 @@
-import { useCallback, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { authApi } from '../api/authClient';
 import type { AuthSession, LoginPayload, PublicUser, RegisterPayload } from '../types';
 import { AuthContext } from './authContext';
 
-const STORAGE_KEY = 'agroconnect.session';
-
-function readStoredSession(): AuthSession | null {
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      return null;
-    }
-
-    const parsed = JSON.parse(raw) as AuthSession;
-    if (!parsed.usuario || !parsed.tokens?.refreshToken) {
-      return null;
-    }
-
-    return parsed;
-  } catch {
-    return null;
-  }
-}
-
-function persistSession(session: AuthSession | null): void {
-  if (session) {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
-  } else {
-    window.localStorage.removeItem(STORAGE_KEY);
-  }
-}
+const DEMO_USER_ID = 'demo-visitante';
 
 export function AuthProvider({ children }: { children: ReactNode }): React.ReactElement {
-  // Inicialización perezosa y síncrona desde localStorage: evita el efecto de
-  // montaje con setState (regla react-hooks/set-state-in-effect) y el "flash"
-  // de estado de carga.
-  const [initialSession] = useState(() => readStoredSession());
+  // La sesión se restaura con un refresh silencioso contra la cookie httpOnly:
+  // el JavaScript no puede leerla, así que no existe inicialización síncrona
+  // posible. Mientras resuelve, el estado es 'loading' (App muestra un spinner).
   const [status, setStatus] = useState<'loading' | 'anonymous' | 'authenticated'>(
-    initialSession ? 'authenticated' : 'anonymous'
+    'loading'
   );
-  const [usuario, setUsuario] = useState<PublicUser | null>(
-    initialSession?.usuario ?? null
-  );
-  const [refreshToken, setRefreshToken] = useState<string | null>(
-    initialSession?.tokens.refreshToken ?? null
-  );
+  const [usuario, setUsuario] = useState<PublicUser | null>(null);
+  // Cookie-only puro: NINGÚN token vive en JavaScript. apps/api emite las
+  // cookies httpOnly `access_token` (corta vida) y `refresh_token` (7 días),
+  // y el navegador las adjunta a cada request vía `credentials: 'include'`.
+  // Guardar el access token en memoria duplicaría la cookie y reabriría la
+  // vía de lectura por XSS que esta migración cierra.
+
+  // Refresh silencioso serializado: en StrictMode el provider monta dos veces
+  // y dos renovaciones concurrentes con la misma cookie rotarían el token dos
+  // veces (la segunda fallaría porque la primera ya revocó el anterior). La
+  // promesa compartida garantiza UNA sola renovación por ciclo de montaje.
+  const refreshInFlight = useRef<Promise<void> | null>(null);
 
   const applySession = useCallback((session: AuthSession) => {
-    persistSession(session);
     setUsuario(session.usuario);
-    setRefreshToken(session.tokens.refreshToken);
     setStatus('authenticated');
   }, []);
+
+  useEffect(() => {
+    if (refreshInFlight.current) {
+      return;
+    }
+
+    refreshInFlight.current = authApi
+      .refresh()
+      .then(applySession)
+      .catch(() => {
+        // Sin cookie válida no hay sesión: queda anónimo.
+        setStatus('anonymous');
+      })
+      .finally(() => {
+        refreshInFlight.current = null;
+      });
+  }, [applySession]);
 
   const login = useCallback(
     async (payload: LoginPayload) => {
@@ -70,9 +64,10 @@ export function AuthProvider({ children }: { children: ReactNode }): React.React
   );
 
   const loginDemo = useCallback(() => {
-    const demoSession: AuthSession = {
+    // Sesión demo SOLO en memoria: no toca la API ni persiste nada.
+    applySession({
       usuario: {
-        id: 'demo-visitante',
+        id: DEMO_USER_ID,
         nombre: 'Visitante Demo',
         correo: 'demo@agroconnect.local',
         rol: 'comprador_b2c',
@@ -85,24 +80,22 @@ export function AuthProvider({ children }: { children: ReactNode }): React.React
         refreshToken: 'demo-refresh',
         expiresIn: 0,
       },
-    };
-    applySession(demoSession);
+    });
   }, [applySession]);
 
   const logout = useCallback(async () => {
-    if (refreshToken && refreshToken !== 'demo-refresh') {
+    // La sesión demo no tiene cookie de servidor: no hay nada que revocar.
+    if (usuario?.id !== DEMO_USER_ID) {
       try {
-        await authApi.logout(refreshToken);
+        await authApi.logout();
       } catch {
         // La sesión local se cierra aunque el servidor no responda.
       }
     }
 
-    persistSession(null);
     setUsuario(null);
-    setRefreshToken(null);
     setStatus('anonymous');
-  }, [refreshToken]);
+  }, [usuario]);
 
   const value = useMemo(
     () => ({ status, usuario, login, register, loginDemo, logout }),

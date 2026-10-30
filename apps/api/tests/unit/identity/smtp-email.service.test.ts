@@ -76,7 +76,7 @@ describe('SmtpEmailService', () => {
     expect(mensaje.html).toContain('https://agroconnect.co/?verifyToken=xyz789');
   });
 
-  it('configura el transporte con los datos del servidor SMTP', () => {
+  it('configura el transporte con los datos del servidor SMTP y límites de tiempo', () => {
     new SmtpEmailService(config);
 
     expect(createTransport).toHaveBeenCalledWith({
@@ -84,6 +84,9 @@ describe('SmtpEmailService', () => {
       port: 587,
       secure: false,
       auth: { user: 'no-reply@agroconnect.co', pass: 'secreto' },
+      connectionTimeout: 5_000,
+      greetingTimeout: 5_000,
+      socketTimeout: 10_000,
     });
   });
 
@@ -95,6 +98,9 @@ describe('SmtpEmailService', () => {
       port: 587,
       secure: false,
       auth: undefined,
+      connectionTimeout: 5_000,
+      greetingTimeout: 5_000,
+      socketTimeout: 10_000,
     });
   });
 });

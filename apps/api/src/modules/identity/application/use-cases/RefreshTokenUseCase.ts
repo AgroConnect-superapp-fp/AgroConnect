@@ -1,9 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { USER_REPOSITORY, TOKEN_SERVICE } from '../tokens';
 import { InvalidTokenError } from '../../domain/errors/AuthErrors';
+import type { PublicUserProfile } from '../../domain/entities/User';
 import type { UserRepository } from '../../domain/interfaces/UserRepository';
 import type { TokenService, TokenPair } from '../../domain/interfaces/TokenService';
 import type { RefreshInput } from '../dtos/authDtos';
+
+export interface RefreshResult {
+  user: PublicUserProfile;
+  tokens: TokenPair;
+}
 
 @Injectable()
 export class RefreshTokenUseCase {
@@ -12,7 +18,7 @@ export class RefreshTokenUseCase {
     @Inject(TOKEN_SERVICE) private readonly tokenService: TokenService,
   ) {}
 
-  async execute(input: RefreshInput): Promise<TokenPair> {
+  async execute(input: RefreshInput): Promise<RefreshResult> {
     const payload = this.tokenService.verifyRefreshToken(input.refreshToken);
     const currentHash = this.tokenService.hashToken(input.refreshToken);
 
@@ -39,6 +45,9 @@ export class RefreshTokenUseCase {
       throw new InvalidTokenError();
     }
 
-    return tokens;
+    return {
+      user: user.toPublicProfile(),
+      tokens,
+    };
   }
 }

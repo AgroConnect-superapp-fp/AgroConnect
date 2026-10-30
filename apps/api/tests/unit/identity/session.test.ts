@@ -21,41 +21,42 @@ function requestWith(options: {
   } as unknown as Request;
 }
 
-describe('extracción de tokens de sesión', () => {
-  it('prioriza la cookie httpOnly sobre la cabecera Authorization', () => {
+describe('extracción de tokens de sesión (solo cookie httpOnly)', () => {
+  it('lee el token de acceso desde la cookie httpOnly', () => {
+    const request = requestWith({ cookies: { [ACCESS_TOKEN_COOKIE]: 'token-de-cookie' } });
+
+    expect(extractAccessToken(request)).toBe('token-de-cookie');
+  });
+
+  it('lee el token de refresco desde la cookie httpOnly', () => {
+    const request = requestWith({ cookies: { [REFRESH_TOKEN_COOKIE]: 'token-de-cookie' } });
+
+    expect(extractRefreshToken(request)).toBe('token-de-cookie');
+  });
+
+  it('IGNORA la cabecera Authorization: la sesión ya no viaja por cabeceras', () => {
     const request = requestWith({
-      cookies: { [ACCESS_TOKEN_COOKIE]: 'token-de-cookie' },
+      cookies: {
+        [ACCESS_TOKEN_COOKIE]: 'token-de-cookie',
+        [REFRESH_TOKEN_COOKIE]: 'token-de-cookie',
+      },
       authorization: 'Bearer token-de-cabecera',
     });
 
     expect(extractAccessToken(request)).toBe('token-de-cookie');
-    expect(extractRefreshToken(request)).toBe('token-de-cabecera');
+    expect(extractRefreshToken(request)).toBe('token-de-cookie');
   });
 
-  it('usa la cabecera Authorization cuando no hay cookie', () => {
+  it('devuelve undefined cuando solo hay cabecera Bearer (fallback eliminado)', () => {
     const request = requestWith({ authorization: 'Bearer token-de-cabecera' });
 
-    expect(extractAccessToken(request)).toBe('token-de-cabecera');
-    expect(extractRefreshToken(request)).toBe('token-de-cabecera');
+    expect(extractAccessToken(request)).toBeUndefined();
+    expect(extractRefreshToken(request)).toBeUndefined();
   });
 
-  it('acepta la cabecera con el prefijo Bearer sin distinguir mayúsculas', () => {
-    expect(extractAccessToken(requestWith({ authorization: 'bearer en-minusculas' }))).toBe(
-      'en-minusculas',
-    );
-  });
-
-  it('devuelve undefined cuando no hay cookie ni cabecera utilizable', () => {
+  it('devuelve undefined cuando no hay cookie', () => {
     expect(extractAccessToken(requestWith({}))).toBeUndefined();
     expect(extractRefreshToken(requestWith({}))).toBeUndefined();
-  });
-
-  it('ignora una cabecera que no es Bearer', () => {
-    expect(extractAccessToken(requestWith({ authorization: 'Basic abc123' }))).toBeUndefined();
-  });
-
-  it('ignora un Bearer vacío', () => {
-    expect(extractAccessToken(requestWith({ authorization: 'Bearer   ' }))).toBeUndefined();
   });
 
   it('ignora una cookie vacía', () => {

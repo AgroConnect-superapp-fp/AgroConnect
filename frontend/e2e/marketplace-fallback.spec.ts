@@ -5,39 +5,21 @@ const PNG_PIXEL = Buffer.from(
   'base64'
 );
 
-const SESSION = {
-  usuario: {
-    id: 'e2e-fallback-user',
-    nombre: 'Prueba Respaldo',
-    correo: 'e2e.fallback@example.com',
-    rol: 'comprador_b2c',
-    estado: 'ACTIVO',
-    verificado: true,
-    fechaRegistro: new Date().toISOString(),
-  },
-  tokens: {
-    accessToken: 'e2e-access-token',
-    refreshToken: 'e2e-refresh-token',
-    expiresIn: 3600,
-  },
-};
-
 test('si la base de datos falla, muestra datos de demostración con aviso', async ({
   page,
 }) => {
-  await page.addInitScript((session) => {
-    window.localStorage.setItem('agroconnect.session', JSON.stringify(session));
-  }, SESSION);
-
+  // El modo demo no consulta ninguna base de datos: se abortan las rutas de
+  // datos (legacy Supabase y apps/api) para demostrarlo.
   await page.route('**/rest/v1/properties*', (route) => route.abort());
+  await page.route('**/api/v1/properties*', (route) => route.abort());
 
-  await page.route(
-    /res\.cloudinary\.com|images\.unsplash\.com|commons\.wikimedia\.org/,
-    (route) => route.fulfill({ status: 200, contentType: 'image/png', body: PNG_PIXEL })
+  // Imágenes demo (Cloudinary) y respaldos (Wikimedia) servidas localmente.
+  await page.route(/res\.cloudinary\.com|commons\.wikimedia\.org/, (route) =>
+    route.fulfill({ status: 200, contentType: 'image/png', body: PNG_PIXEL })
   );
 
   await page.goto('/');
-  await page.getByRole('button', { name: /Explorar prototipo del mercado/i }).click();
+  await page.getByRole('button', { name: /Explorar la demo/i }).click();
 
   await expect(page.getByText(/datos de demostración/i)).toBeVisible();
   await expect(
@@ -45,10 +27,10 @@ test('si la base de datos falla, muestra datos de demostración con aviso', asyn
   ).toBeVisible();
   await expect(page.getByText('Finca La Esperanza')).toBeVisible();
 
-  const mockImage = page.getByRole('img', { name: 'Finca La Esperanza' });
+  const demoImage = page.getByRole('img', { name: 'Finca La Esperanza' });
   await expect
     .poll(() =>
-      mockImage.evaluate((element) => (element as HTMLImageElement).naturalWidth)
+      demoImage.evaluate((element) => (element as HTMLImageElement).naturalWidth)
     )
     .toBeGreaterThan(0);
 });
