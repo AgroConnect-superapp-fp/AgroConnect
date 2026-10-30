@@ -8,7 +8,8 @@ const PNG_PIXEL = Buffer.from(
 test('una imagen rota se reemplaza por el respaldo del cultivo', async ({ page }) => {
   // La primera imagen de Finca La Esperanza (café) falla; el resto de
   // imágenes demo y los respaldos de Wikimedia se sirven localmente.
-  await page.route(/res\.cloudinary\.com|commons\.wikimedia\.org/, (route) => {
+  // Globs con URL absoluta: Playwright los ancla al host exacto.
+  await page.route('https://res.cloudinary.com/**', (route) => {
     const url = route.request().url();
     if (url.includes('cld-sample-4')) {
       return route.fulfill({ status: 404 });
@@ -19,6 +20,9 @@ test('una imagen rota se reemplaza por el respaldo del cultivo', async ({ page }
       body: PNG_PIXEL,
     });
   });
+  await page.route('https://commons.wikimedia.org/**', (route) =>
+    route.fulfill({ status: 200, contentType: 'image/png', body: PNG_PIXEL })
+  );
 
   await page.goto('/');
   await page.getByRole('button', { name: /Explorar la demo/i }).click();

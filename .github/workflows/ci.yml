@@ -239,10 +239,19 @@ jobs:
         run: npm run build -w @agroconnect/contracts
 
       - name: Preparar base de datos de pruebas
-        run: npx prisma generate && npx prisma migrate deploy
+        run: |
+          npx prisma generate
+          npx prisma migrate deploy
         working-directory: backend
         env:
           DATABASE_URL: ${{ env.DATABASE_URL_TEST }}
+
+      # apps/api importa su cliente Prisma desde apps/api/src/generated
+      # (generator con output relativo); sin este paso el servidor no
+      # arranca en CI y el webServer de Playwright expira a los 120s.
+      - name: Generar cliente Prisma de apps/api
+        run: npx prisma generate
+        working-directory: apps/api
 
       - name: Instalar navegador Chromium
         run: npx playwright install --with-deps chromium

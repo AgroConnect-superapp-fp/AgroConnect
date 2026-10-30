@@ -14,7 +14,11 @@ test('si la base de datos falla, muestra datos de demostración con aviso', asyn
   await page.route('**/api/v1/properties*', (route) => route.abort());
 
   // Imágenes demo (Cloudinary) y respaldos (Wikimedia) servidas localmente.
-  await page.route(/res\.cloudinary\.com|commons\.wikimedia\.org/, (route) =>
+  // Globs con URL absoluta: Playwright los ancla al host exacto.
+  await page.route('https://res.cloudinary.com/**', (route) =>
+    route.fulfill({ status: 200, contentType: 'image/png', body: PNG_PIXEL })
+  );
+  await page.route('https://commons.wikimedia.org/**', (route) =>
     route.fulfill({ status: 200, contentType: 'image/png', body: PNG_PIXEL })
   );
 
