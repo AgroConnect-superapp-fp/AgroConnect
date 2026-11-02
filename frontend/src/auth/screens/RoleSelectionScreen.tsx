@@ -1,5 +1,5 @@
 import { AuthShell } from '../components/AuthShell';
-import { ROLE_OPTIONS, type RoleName } from '../types';
+import { SELF_REGISTRATION_ROLE_OPTIONS, type RoleName } from '../types';
 
 interface RoleSelectionScreenProps {
   onSelect: (role: RoleName) => void;
@@ -25,7 +25,7 @@ export function RoleSelectionScreen({
       }
     >
       <div className="flex flex-col gap-3">
-        {ROLE_OPTIONS.map((role) => (
+        {SELF_REGISTRATION_ROLE_OPTIONS.map((role) => (
           <button
             key={role.id}
             type="button"

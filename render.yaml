@@ -1,18 +1,28 @@
 services:
+  # API de producción: @agroconnect/api (NestJS 11), el núcleo que sustituye
+  # al backend Express legacy (ADR-009 / Strangler Fig).
+  #
+  # El build se ejecuta desde la raíz del monorepo porque apps/api consume
+  # @agroconnect/contracts (workspace) y comparte el esquema Prisma de
+  # backend/prisma mediante symlink.
   - type: web
     name: agroconnect-api
     runtime: node
     plan: free
     region: oregon
-    rootDir: backend
-    buildCommand: npm ci --include=dev && npx prisma generate && npm run build
-    startCommand: npm start
+    rootDir: .
+    buildCommand: >-
+      npm ci --include=dev &&
+      npm run build -w @agroconnect/contracts &&
+      npm run prisma:generate -w @agroconnect/api &&
+      npm run build -w @agroconnect/api
+    startCommand: npm run start -w @agroconnect/api
     healthCheckPath: /health
     envVars:
       - key: NODE_ENV
         value: production
       - key: NODE_VERSION
-        value: 22.22.3
+        value: '24'
       - key: DATABASE_URL
         sync: false
       - key: DATABASE_SCHEMA
@@ -25,11 +35,33 @@ services:
         value: 15m
       - key: JWT_REFRESH_EXPIRES_IN
         value: 7d
+      - key: BCRYPT_SALT_ROUNDS
+        value: '12'
       - key: CORS_ORIGIN
-        value: https://agroconnectpreview.vercel.app,http://localhost:5173
+        value: https://agroconnectpreview.vercel.app
       - key: APP_BASE_URL
         value: https://agroconnectpreview.vercel.app
+      - key: RATE_LIMIT_WINDOW_MS
+        value: '900000'
       - key: RATE_LIMIT_MAX_ATTEMPTS
-        value: '30'
+        value: '10'
+      - key: TRUST_PROXY
+        value: '1'
+      - key: MAIL_DIR
+        value: /tmp/agroconnect-mails
       - key: LOG_LEVEL
         value: info
+      # SMTP real: configurar en el dashboard de Render para que la
+      # verificación de correo y el reset de contraseña salgan del servidor.
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        value: '587'
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: SMTP_SECURE
+        value: 'false'
+      - key: SMTP_FROM
+        value: AgroConnect <no-reply@agroconnect.co>

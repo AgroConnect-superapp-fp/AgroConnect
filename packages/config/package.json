@@ -1,0 +1,9 @@
+{
+  "name": "@agroconnect/config",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Configuración compartida de AgroConnect: tsconfig base para todos los workspaces (ADR-015)",
+  "files": [
+    "tsconfig.base.json"
+  ]
+}

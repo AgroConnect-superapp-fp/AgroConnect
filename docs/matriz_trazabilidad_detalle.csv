@@ -1,0 +1,204 @@
+Tipo,Codigo,Titulo,Modulo,Nombre Modulo,Fuente Asignacion,Dudoso
+RF,RF-01,Autenticación de usuarios,M01,Gestión de Inicio y Panel General,PT-ERS-01 (sección de módulo),No
+RF,RF-02,Recuperación de contraseña,M01,Gestión de Inicio y Panel General,PT-ERS-01 (sección de módulo),No
+RF,RF-03,Control de sesiones,M01,Gestión de Inicio y Panel General,PT-ERS-01 (sección de módulo),No
+RF,RF-04,Panel general por rol,M01,Gestión de Inicio y Panel General,PT-ERS-01 (sección de módulo),No
+RF,RF-05,Registro multi-rol de usuarios,M02,Gestión de Usuarios y Perfiles,PT-ERS-01 (sección de módulo),No
+RF,RF-06,Edición de perfil,M02,Gestión de Usuarios y Perfiles,PT-ERS-01 (sección de módulo),No
+RF,RF-07,Gestión de roles y permisos,M02,Gestión de Usuarios y Perfiles,PT-ERS-01 (sección de módulo),No
+RF,RF-08,Búsqueda y consulta de usuarios,M02,Gestión de Usuarios y Perfiles,PT-ERS-01 (sección de módulo),No
+RF,RF-09,Desactivación de usuarios,M02,Gestión de Usuarios y Perfiles,PT-ERS-01 (sección de módulo),No
+RF,RF-10,Reputación de usuarios,M02,Gestión de Usuarios y Perfiles,PT-ERS-01 (sección de módulo),No
+RF,RF-11,Publicación de productos,M03,Marketplace Agropecuario,PT-ERS-01 (sección de módulo),No
+RF,RF-12,Visualización de productos,M03,Marketplace Agropecuario,PT-ERS-01 (sección de módulo),No
+RF,RF-13,Búsqueda avanzada de productos,M03,Marketplace Agropecuario,PT-ERS-01 (sección de módulo),No
+RF,RF-14,Solicitud de compra,M03,Marketplace Agropecuario,PT-ERS-01 (sección de módulo),No
+RF,RF-15,Cierre de transacción,M03,Marketplace Agropecuario,PT-ERS-01 (sección de módulo),No
+RF,RF-16,Calificaciones y comentarios,M03,Marketplace Agropecuario,PT-ERS-01 (sección de módulo),No
+RF,RF-17,Control de inventario,M04,Gestión de Inventarios,PT-ERS-01 (sección de módulo),No
+RF,RF-18,Disponibilidad en tiempo real,M04,Gestión de Inventarios,PT-ERS-01 (sección de módulo),No
+RF,RF-19,Alertas de stock mínimo,M04,Gestión de Inventarios,PT-ERS-01 (sección de módulo),No
+RF,RF-20,Mensajería interna,M05,Comunicación Interna,PT-ERS-01 (sección de módulo),No
+RF,RF-21,Historial de mensajes,M05,Comunicación Interna,PT-ERS-01 (sección de módulo),No
+RF,RF-22,Notificaciones de mensajes,M05,Comunicación Interna,PT-ERS-01 (sección de módulo),No
+RF,RF-23,Registro de transportistas,M06,Gestión Logística,PT-ERS-01 (sección de módulo),No
+RF,RF-24,Asignación de envíos,M06,Gestión Logística,PT-ERS-01 (sección de módulo),No
+RF,RF-25,Seguimiento de envíos,M06,Gestión Logística,PT-ERS-01 (sección de módulo),No
+RF,RF-26,Registro de pedidos,M07,Gestión de Pedidos,PT-ERS-01 (sección de módulo),No
+RF,RF-27,Estados del pedido,M07,Gestión de Pedidos,PT-ERS-01 (sección de módulo),No
+RF,RF-28,Historial de pedidos,M07,Gestión de Pedidos,PT-ERS-01 (sección de módulo),No
+RF,RF-29,Integración de pagos electrónicos,M08,Pagos y Transacciones,PT-ERS-01 (sección de módulo),No
+RF,RF-30,Registro de transacciones,M08,Pagos y Transacciones,PT-ERS-01 (sección de módulo),No
+RF,RF-31,Monitoreo del sistema,M09,Panel Administrativo,PT-ERS-01 (sección de módulo),No
+RF,RF-32,Generación de reportes,M09,Panel Administrativo,PT-ERS-01 (sección de módulo),No
+RF,RF-33,Gestión de incidencias,M09,Panel Administrativo,PT-ERS-01 (sección de módulo),No
+RF,RF-34,Control de accesos RBAC,M10,Seguridad y Control,PT-ERS-01 (sección de módulo),No
+RF,RF-35,Registro de actividad,M10,Seguridad y Control,PT-ERS-01 (sección de módulo),No
+RF,RF-36,Copias de seguridad automáticas,M10,Seguridad y Control,PT-ERS-01 (sección de módulo),No
+RF,RF-37,Centro de ayuda,M11,Soporte y Ayuda,PT-ERS-01 (sección de módulo),No
+RF,RF-38,Sistema de tickets,M11,Soporte y Ayuda,PT-ERS-01 (sección de módulo),No
+RF,RF-39,Chatbot conversacional,M12,Inteligencia Artificial AgroBot,PT-ERS-01 (sección de módulo),No
+RF,RF-40,Respuestas automáticas a preguntas frecuentes,M12,Inteligencia Artificial AgroBot,PT-ERS-01 (sección de módulo),No
+RF,RF-41,Orientación contextual al usuario,M12,Inteligencia Artificial AgroBot,PT-ERS-01 (sección de módulo),No
+RF,RF-42,Escalamiento a soporte humano,M12,Inteligencia Artificial AgroBot,PT-ERS-01 (sección de módulo),No
+RF,RF-43,Gestión del carrito de compras,M13,Gestión de Compras,PT-ERS-01 (sección de módulo),No
+RF,RF-44,Confirmación de pedido,M13,Gestión de Compras,PT-ERS-01 (sección de módulo),No
+RF,RF-45,Historial de compras,M13,Gestión de Compras,PT-ERS-01 (sección de módulo),No
+RF,RF-46,Calificación de productos adquiridos,M13,Gestión de Compras,PT-ERS-01 (sección de módulo),No
+RF,RF-47,Aplicación Web Responsiva,M14,Funcionamiento Multicanal y Sincronización Offline,PT-ERS-01 (sección de módulo),No
+RF,RF-48,Aplicación Móvil Nativa Android,M14,Funcionamiento Multicanal y Sincronización Offline,PT-ERS-01 (sección de módulo),No
+RF,RF-49,Aplicación Móvil Nativa iOS,M14,Funcionamiento Multicanal y Sincronización Offline,PT-ERS-01 (sección de módulo),No
+RF,RF-50,Modo Offline para Productor,M14,Funcionamiento Multicanal y Sincronización Offline,PT-ERS-01 (sección de módulo),No
+RF,RF-51,Modo Offline para Transportista,M14,Funcionamiento Multicanal y Sincronización Offline,PT-ERS-01 (sección de módulo),No
+RF,RF-52,Cola de Sincronización,M14,Funcionamiento Multicanal y Sincronización Offline,PT-ERS-01 (sección de módulo),No
+RF,RF-53,Sincronización Automática,M14,Funcionamiento Multicanal y Sincronización Offline,PT-ERS-01 (sección de módulo),No
+RF,RF-54,Resolución de Conflictos,M14,Funcionamiento Multicanal y Sincronización Offline,PT-ERS-01 (sección de módulo),No
+RF,RF-55,Caché de Catálogo,M14,Funcionamiento Multicanal y Sincronización Offline,PT-ERS-01 (sección de módulo),No
+RF,RF-56,Pago Contra Entrega en Efectivo,M15,Pagos y Métodos Locales,PT-ERS-01 (sección de módulo),No
+RF,RF-57,Transferencia Bancaria Local,M15,Pagos y Métodos Locales,PT-ERS-01 (sección de módulo),No
+RF,RF-58,Pasarela de Tarjetas,M15,Pagos y Métodos Locales,PT-ERS-01 (sección de módulo),No
+RF,RF-59,Liquidación con Comisión Configurable,M15,Pagos y Métodos Locales,PT-ERS-01 (sección de módulo),No
+RF,RF-60,Comprobantes y Facturación Electrónica,M15,Pagos y Métodos Locales,PT-ERS-01 (sección de módulo),No
+RF,RF-61,Geolocalización del Productor,M16,Geolocalización y Logística Rural,PT-ERS-01 (sección de módulo),No
+RF,RF-62,Búsqueda por Proximidad,M16,Geolocalización y Logística Rural,PT-ERS-01 (sección de módulo),No
+RF,RF-63,Mapa de Rutas para Transportistas,M16,Geolocalización y Logística Rural,PT-ERS-01 (sección de módulo),No
+RF,RF-64,Cobertura por Veredas,M16,Geolocalización y Logística Rural,PT-ERS-01 (sección de módulo),No
+RF,RF-65,Clasificación de Perecibilidad,M17,Manejo de Productos Perecederos,PT-ERS-01 (sección de módulo),No
+RF,RF-66,Fechas de Cosecha y Caducidad,M17,Manejo de Productos Perecederos,PT-ERS-01 (sección de módulo),No
+RF,RF-67,Ventana de Entrega Garantizada,M17,Manejo de Productos Perecederos,PT-ERS-01 (sección de módulo),No
+RF,RF-68,Trazabilidad Origen-Destino,M17,Manejo de Productos Perecederos,PT-ERS-01 (sección de módulo),No
+CU,CU#01,Registrar Productor,M02,Gestión de Usuarios y Perfiles,Inferido (manual por contexto RF),Si
+CU,CU#02,Iniciar Sesión,M02,Gestión de Inicio y Panel General,Inferido (keywords),No
+CU,CU#03,Registrar Producto,M04,Marketplace Agropecuario,Inferido (manual por contexto RF),No
+CU,CU#04,Gestionar Inventario Sin Conexión,M14,Funcionamiento Multicanal y Sincronización Offline,Inferido (manual por contexto RF),Si
+CU,CU#05,Realizar Pedido (B2C),M13,Gestión de Compras,Inferido (manual por contexto RF),Si
+CU,CU#06,Publicar Demanda B2B,M03,Marketplace Agropecuario,Inferido (manual por contexto RF),No
+CU,CU#07,Interacción con AgroBot,M12,Inteligencia Artificial AgroBot,Inferido (keywords),No
+CU,CU#08,Calificar Transacción,M03,Marketplace Agropecuario,Inferido (manual por contexto RF),Si
+CU,CU#09,Visualizar Dashboard del Productor,M01,Gestión de Inicio y Panel General,Inferido (keywords),No
+CU,CU#10,Gestionar Pedido (Productor),M07,Gestión de Pedidos,Inferido (manual por contexto RF),Si
+CU,CU#11,Asignar Envío,M06,Gestión Logística,Inferido (keywords),No
+CU,CU#12,Consultar Estado del Envío,M06,Gestión Logística,Inferido (keywords),No
+CU,CU#13,Enviar Mensaje,M05,Comunicación Interna,Inferido (keywords),No
+CU,CU#14,Consultar Historial de Mensajes,M05,Comunicación Interna,Inferido (keywords),No
+CU,CU#15,Gestionar Usuarios (Admin),M09,Gestión de Usuarios y Perfiles,Inferido (keywords),No
+CU,CU#16,Generar Reportes,M09,Panel Administrativo,Inferido (keywords),No
+CU,CU#17,Gestionar Accesos,M10,Seguridad y Control,Inferido (keywords),No
+CU,CU#18,Registrar Actividad del Sistema,M10,Seguridad y Control,Inferido (manual por contexto RF),No
+CU,CU#19,Crear Ticket de Soporte,M11,Soporte y Ayuda,Inferido (keywords),No
+CU,CU#20,Consultar Centro de Ayuda,M11,Soporte y Ayuda,Inferido (keywords),No
+CU,CU#21,Registrar Transacción,M08,Pagos y Transacciones,Inferido (keywords),No
+CU,CU#22,Recuperar Contraseña,M02,Gestión de Inicio y Panel General,Inferido (keywords),No
+CU,CU#23,Editar Perfil de Usuario,M02,Gestión de Usuarios y Perfiles,Inferido (keywords),No
+CU,CU#24,Explorar Productos del Marketplace,M03,Marketplace Agropecuario,Inferido (keywords),No
+CU,CU#25,Buscar Productos con Filtros,M03,Marketplace Agropecuario,Inferido (keywords),No
+CU,CU#26,Gestionar Reputación del Usuario,M02,Gestión de Usuarios y Perfiles,Inferido (keywords),No
+CU,CU#27,Consultar Disponibilidad y Alertas de Inventario,M04,Gestión de Inventarios,Inferido (keywords),No
+CU,CU#28,Recibir Notificaciones del Sistema,M01,Gestión de Inicio y Panel General,Inferido (manual por contexto RF),Si
+CU,CU#29,Registrar Transportista,M06,Gestión Logística,Inferido (keywords),No
+CU,CU#30,Consultar Historial de Pedidos,M07,Gestión de Pedidos,Inferido (keywords),No
+CU,CU#31,Monitorear Sistema (Admin),M09,Panel Administrativo,Inferido (keywords),No
+CU,CU#32,Gestionar Carrito de Compras,M13,Gestión de Compras,Inferido (keywords),No
+CU,CU#33,Confirmar Pedido,M07,Gestión de Pedidos,Inferido (keywords),No
+CU,CU#34,Consultar Historial de Compras,M13,Gestión de Compras,Inferido (keywords),No
+CU,CU#35,Calificar Productos Adquiridos,M13,Marketplace Agropecuario,Inferido (manual por contexto RF),Si
+CU,CU#36,Configurar Preferencias Iniciales del Sistema,M01,Gestión de Inicio y Panel General,Notion: SUB-SISTEMA,No
+CU,CU#37,Configurar Notificaciones por Usuario,M02,Gestión de Usuarios y Perfiles,Notion: SUB-SISTEMA,No
+CU,CU#38,Exportar Datos Personales (Derecho de Acceso Habeas Data),M02,Gestión de Usuarios y Perfiles,Notion: SUB-SISTEMA,No
+CU,CU#39,Filtrar Productos por Geolocalización Cercana,M16,Marketplace Agropecuario,Notion: SUB-SISTEMA,No
+CU,CU#40,Comparar Productos Lado a Lado,M03,Marketplace Agropecuario,Notion: SUB-SISTEMA,No
+CU,CU#41,Sincronizar Inventario con Múltiples Dispositivos,M04,Gestión de Inventarios,Notion: SUB-SISTEMA,No
+CU,CU#42,Crear Grupo de Chat para un Pedido,M05,Comunicación Interna,Notion: SUB-SISTEMA,No
+CU,CU#43,Asignar Transportista con Mejor Rating,M06,Gestión Logística,Notion: SUB-SISTEMA,No
+CU,CU#44,Cancelar Pedido con Reembolso Automático,M07,Gestión de Pedidos,Notion: SUB-SISTEMA,No
+CU,CU#45,Procesar Reembolso por Cancelación,M08,Pagos y Transacciones,Notion: SUB-SISTEMA,No
+CU,CU#46,Generar Reporte de Transacciones para Contabilidad,M08,Pagos y Transacciones,Notion: SUB-SISTEMA,No
+CU,CU#47,Banear Usuario por Violación de Términos,M09,Panel Administrativo,Notion: SUB-SISTEMA,No
+CU,CU#48,Habilitar Autenticación de Dos Factores (2FA),M10,Seguridad y Control,Notion: SUB-SISTEMA,No
+CU,CU#49,Chat con Soporte Humano (Escalamiento de AgroBot),M11,Soporte y Ayuda,Notion: SUB-SISTEMA,No
+CU,CU#50,Consultar a AgroBot sobre un RF Específico,M12,Inteligencia Artificial AgroBot,Notion: SUB-SISTEMA,No
+CU,CU#51,AgroBot Aprende de Feedback del Usuario,M12,Inteligencia Artificial AgroBot,Notion: SUB-SISTEMA,No
+CU,CU#52,AgroBot Detecta Idioma y Responde,M12,Inteligencia Artificial AgroBot,Notion: SUB-SISTEMA,No
+CU,CU#53,Aplicar Código de Descuento en Checkout,M13,Gestión de Compras,Notion: SUB-SISTEMA,No
+CU,CU#54,Recibir Notificación SMS por Alerta Crítica,M14,Funcionamiento Multicanal y Sincronización Offline,Notion: SUB-SISTEMA,No
+CU,CU#55,Consultar Precios vía Código USSD *123#,M14,Funcionamiento Multicanal y Sincronización Offline,Notion: SUB-SISTEMA,No
+CU,CU#56,Sincronizar Cambios Offline al Reconectar,M14,Funcionamiento Multicanal y Sincronización Offline,Notion: SUB-SISTEMA,No
+CU,CU#57,Acceder desde Múltiples Dispositivos,M14,Funcionamiento Multicanal y Sincronización Offline,Notion: SUB-SISTEMA,No
+CU,CU#58,Notificar al Productor cuando Comprador está Sin Conexión,M14,Funcionamiento Multicanal y Sincronización Offline,Notion: SUB-SISTEMA,No
+CU,CU#59,Pagar con PSE (Débito Bancario ACH Colombia),M15,Pagos y Métodos Locales,Notion: SUB-SISTEMA,No
+CU,CU#60,Pagar con Nequi (Código QR),M15,Pagos y Métodos Locales,Notion: SUB-SISTEMA,No
+CU,CU#61,Pagar con Daviplata (Cédula + Código),M15,Pagos y Métodos Locales,Notion: SUB-SISTEMA,No
+CU,CU#62,Generar Factura Electrónica con CUFE (DIAN),M15,Pagos y Métodos Locales,Notion: SUB-SISTEMA,No
+CU,CU#63,Definir Zona de Cobertura Geográfica,M16,Geolocalización y Logística Rural,Notion: SUB-SISTEMA,No
+CU,CU#64,Calcular Ruta Óptima de Entrega Multi-Destino,M16,Geolocalización y Logística Rural,Notion: SUB-SISTEMA,No
+CU,CU#65,Trackear Ubicación en Tiempo Real del Transportista,M16,Geolocalización y Logística Rural,Notion: SUB-SISTEMA,No
+CU,CU#66,Auditar Cumplimiento de Cadena de Frío para ICA,M17,Manejo de Productos Perecederos,Notion: SUB-SISTEMA,No
+HU,HU01,Registro de usuario,M02,Gestión de Usuarios y Perfiles,Inferido (manual por contexto RF),No
+HU,HU02,Inicio de sesión,M02,Gestión de Inicio y Panel General,Inferido (manual por contexto RF),No
+HU,HU03,Gestión de perfil,M02,Gestión de Usuarios y Perfiles,Inferido (manual por contexto RF),No
+HU,HU04,Publicar productos,M04,Marketplace Agropecuario,Inferido (keywords),No
+HU,HU05,Visualización de productos,M03,Marketplace Agropecuario,Inferido (keywords),No
+HU,HU06,Solicitud de compra,M03,Marketplace Agropecuario,Inferido (manual por contexto RF),Si
+HU,HU07,Registro de pedidos,M07,Gestión de Pedidos,Inferido (keywords),No
+HU,HU08,Control de inventario,M04,Gestión de Inventarios,Inferido (keywords),No
+HU,HU09,Gestión de roles,M02,Gestión de Usuarios y Perfiles,Inferido (keywords),No
+HU,HU10,Generar reportes,M09,Panel Administrativo,Inferido (keywords),No
+HU,HU11,Negociación empresarial,M03,Marketplace Agropecuario,Inferido (manual por contexto RF),Si
+HU,HU12,Recuperación de contraseña,M02,Gestión de Inicio y Panel General,Inferido (manual por contexto RF),No
+HU,HU13,Control de sesiones,M02,Gestión de Inicio y Panel General,Inferido (keywords),No
+HU,HU14,Panel general,M01,Gestión de Inicio y Panel General,Inferido (keywords),No
+HU,HU15,Búsqueda de usuarios,M02,Gestión de Usuarios y Perfiles,Inferido (keywords),No
+HU,HU16,Desactivación de usuarios,M02,Gestión de Usuarios y Perfiles,Inferido (keywords),No
+HU,HU17,Reputación,M02,Gestión de Usuarios y Perfiles,Inferido (manual por contexto RF),Si
+HU,HU18,Búsqueda avanzada de productos,M03,Marketplace Agropecuario,Inferido (keywords),No
+HU,HU19,Calificaciones,M03,Marketplace Agropecuario,Inferido (manual por contexto RF),Si
+HU,HU20,Disponibilidad en tiempo real,M04,Gestión de Inventarios,Inferido (keywords),No
+HU,HU21,Alertas de stock,M04,Gestión de Inventarios,Inferido (keywords),No
+HU,HU22,Mensajería interna,M05,Comunicación Interna,Inferido (keywords),No
+HU,HU23,Historial de mensajes,M05,Comunicación Interna,Inferido (keywords),No
+HU,HU24,Notificaciones de mensajes,M05,Comunicación Interna,Inferido (keywords),No
+HU,HU25,Registro de transportistas,M06,Gestión Logística,Inferido (keywords),No
+HU,HU26,Asignación de envíos,M06,Gestión Logística,Inferido (keywords),No
+HU,HU27,Seguimiento de envíos,M06,Gestión Logística,Inferido (keywords),No
+HU,HU28,Estados del pedido,M07,Gestión de Pedidos,Inferido (keywords),No
+HU,HU29,Historial de pedidos,M07,Gestión de Pedidos,Inferido (keywords),No
+HU,HU30,Integración de pagos,M08,Pagos y Transacciones,Inferido (keywords),No
+HU,HU31,Registro de transacciones,M08,Pagos y Transacciones,Inferido (manual por contexto RF),Si
+HU,HU32,Monitoreo del sistema,M09,Panel Administrativo,Inferido (keywords),No
+HU,HU33,Gestión de incidencias,M09,Panel Administrativo,Inferido (manual por contexto RF),Si
+HU,HU34,Control de accesos,M10,Seguridad y Control,Inferido (keywords),No
+HU,HU35,Registro de actividad,M10,Seguridad y Control,Inferido (manual por contexto RF),No
+HU,HU36,Copias de seguridad,M10,Seguridad y Control,Inferido (keywords),No
+HU,HU37,Centro de ayuda,M11,Soporte y Ayuda,Inferido (keywords),No
+HU,HU38,Gestión de tickets,M11,Soporte y Ayuda,Inferido (keywords),No
+HU,HU39,Chatbot IA (AgroBot),M12,Inteligencia Artificial AgroBot,Inferido (keywords),No
+HU,HU40,Respuestas automáticas,M12,Inteligencia Artificial AgroBot,Inferido (keywords),No
+HU,HU41,Orientación al usuario,M12,Inteligencia Artificial AgroBot,Inferido (manual por contexto RF),Si
+HU,HU42,Soporte inicial,M11,Soporte y Ayuda,Inferido (manual por contexto RF),Si
+HU,HU43,Gestionar carrito de compras,M13,Gestión de Compras,Inferido (keywords),No
+HU,HU44,Confirmar pedido,M07,Gestión de Pedidos,Inferido (keywords),No
+HU,HU45,Historial de compras,M13,Gestión de Compras,Inferido (keywords),No
+HU,HU46,Calificar Productos Adquiridos,M13,Marketplace Agropecuario,Inferido (keywords),Si
+HU,HU47,Seguimiento de pedido,M07,Gestión de Pedidos,Inferido (keywords),No
+HU,HU48,Cierre de transacción,M08,Pagos y Transacciones,Inferido (keywords),No
+HU,HU49,Recibir Alertas Críticas por SMS Rural,M14,Funcionamiento Multicanal y Sincronización Offline,Notion: Modulo,No
+HU,HU50,Consultar Precios vía Código USSD *123#,M14,Funcionamiento Multicanal y Sincronización Offline,Notion: Modulo,No
+HU,HU51,Sincronizar Cambios Offline al Reconectar,M14,Funcionamiento Multicanal y Sincronización Offline,Notion: Modulo,No
+HU,HU52,Acceder desde Múltiples Dispositivos,M14,Funcionamiento Multicanal y Sincronización Offline,Notion: Modulo,No
+HU,HU53,Verificar Estado Online de Otros Usuarios,M14,Funcionamiento Multicanal y Sincronización Offline,Notion: Modulo,No
+HU,HU54,Pagar con PSE-ACH Colombia,M15,Pagos y Métodos Locales,Notion: Modulo,No
+HU,HU55,Pagar con Nequi,M15,Pagos y Métodos Locales,Notion: Modulo,No
+HU,HU56,Pagar con Daviplata,M15,Pagos y Métodos Locales,Notion: Modulo,No
+HU,HU57,Generar Factura Electrónica con CUFE (DIAN),M15,Pagos y Métodos Locales,Notion: Modulo,No
+HU,HU58,Definir Zona de Cobertura Geográfica,M16,Geolocalización y Logística Rural,Notion: Modulo,No
+HU,HU59,Calcular Ruta Óptima Multi-Destino,M16,Geolocalización y Logística Rural,Notion: Modulo,No
+HU,HU60,Trackear Ubicación en Tiempo Real del Transportista,M16,Geolocalización y Logística Rural,Notion: Modulo,No
+HU,HU61,Registrar Lote Perecedero con ICA,M17,Manejo de Productos Perecederos,Notion: Modulo,No
+HU,HU62,Monitorear Cadena de Frío,M17,Manejo de Productos Perecederos,Notion: Modulo,No
+HU,HU63,Registrar Incidencia en Transporte (Humedad/Golpe),M17,Manejo de Productos Perecederos,Notion: Modulo,No
+HU,HU64,Recibir Alertas Escalonadas de Vencimiento,M17,Manejo de Productos Perecederos,Notion: Modulo,No
+HU,HU65,Rastrear Lote desde Productor a Consumidor,M17,Manejo de Productos Perecederos,Notion: Modulo,No
+HU,HU66,Priorizar Lotes por Urgencia de Venta,M17,Manejo de Productos Perecederos,Notion: Modulo,No
+HU,HU67,Generar Reportes de Vencimiento,M17,Manejo de Productos Perecederos,Notion: Modulo,No
+HU,HU68,Cumplir Auditoría de Cadena de Frío para ICA,M17,Manejo de Productos Perecederos,Notion: Modulo,No
+HU,HU69,Historial de Cumplimiento de Cadena de Frío,M17,Manejo de Productos Perecederos,Notion: Modulo,No

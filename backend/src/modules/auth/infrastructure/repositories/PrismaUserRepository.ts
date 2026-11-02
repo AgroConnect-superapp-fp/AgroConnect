@@ -5,6 +5,14 @@ import { RefreshToken } from '../../domain/entities/RefreshToken';
 import type { RoleName } from '../../domain/entities/Role';
 import type { RegisterUserData, UserRepository } from '../../domain/interfaces/UserRepository';
 import { InfrastructureError } from '../../../../shared/domain/errors';
+import { uniqueViolationTarget } from '../../../../shared/infrastructure/prismaErrors';
+import {
+  DocumentAlreadyExistsError,
+  EmailAlreadyExistsError,
+  NitAlreadyExistsError,
+  PhoneAlreadyExistsError,
+  UserAlreadyExistsError,
+} from '../../domain/errors/AuthErrors';
 
 type UserRecord = Prisma.UserGetPayload<{ include: { role: true } }>;
 
@@ -117,7 +125,7 @@ export class PrismaUserRepository implements UserRepository {
 
       return this.toDomain(created);
     } catch (error) {
-      throw new InfrastructureError('No fue posible completar el registro', error);
+      throw this.mapRegisterError(error);
     }
   }
 
@@ -168,28 +176,32 @@ export class PrismaUserRepository implements UserRepository {
   async rotateRefreshToken(
     currentTokenHash: string,
     nextToken: { tokenHash: string; expiresAt: Date },
-  ): Promise<void> {
-    const current = await this.prisma.refreshToken.findUnique({
-      where: { tokenHash: currentTokenHash },
-    });
+  ): Promise<boolean> {
+    return this.prisma.$transaction(async (tx) => {
+      const current = await tx.refreshToken.findUnique({
+        where: { tokenHash: currentTokenHash },
+      });
+      if (!current) {
+        return false;
+      }
 
-    if (!current) {
-      return;
-    }
-
-    await this.prisma.$transaction([
-      this.prisma.refreshToken.update({
-        where: { id: current.id },
+      const revoked = await tx.refreshToken.updateMany({
+        where: { id: current.id, revoked: false },
         data: { revoked: true },
-      }),
-      this.prisma.refreshToken.create({
+      });
+      if (revoked.count !== 1) {
+        return false;
+      }
+
+      await tx.refreshToken.create({
         data: {
           userId: current.userId,
           tokenHash: nextToken.tokenHash,
           expiresAt: nextToken.expiresAt,
         },
-      }),
-    ]);
+      });
+      return true;
+    });
   }
 
   async updatePassword(userId: string, passwordHash: string): Promise<void> {
@@ -204,6 +216,21 @@ export class PrismaUserRepository implements UserRepository {
       where: { id: userId },
       data: { emailVerifiedAt: new Date() },
     });
+  }
+
+  /** Una carrera entre dos registros llega aquí como P2002: se traduce a 409, no a 500. */
+  private mapRegisterError(error: unknown): Error {
+    const target = uniqueViolationTarget(error);
+    if (target === null) {
+      return new InfrastructureError('No fue posible completar el registro', error);
+    }
+    if (target.includes('correo') || target.includes('email')) return new EmailAlreadyExistsError();
+    if (target.includes('documento') || target.includes('document')) {
+      return new DocumentAlreadyExistsError();
+    }
+    if (target.includes('celular') || target.includes('phone')) return new PhoneAlreadyExistsError();
+    if (target.includes('nit')) return new NitAlreadyExistsError();
+    return new UserAlreadyExistsError();
   }
 
   private toDomain(record: UserRecord): User {

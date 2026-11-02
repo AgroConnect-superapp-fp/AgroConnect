@@ -1,0 +1,69 @@
+RF_Codigo,RF_Titulo,RF_Modulo,CU_Codigo,CU_Titulo,Score,Calidad
+RF-01,Autenticación de usuarios,M01,CU#09,Visualizar Dashboard del Productor,1.0,Fuerte
+RF-02,Recuperación de contraseña,M01,CU#09,Visualizar Dashboard del Productor,1.0,Fuerte
+RF-03,Control de sesiones,M01,CU#36,Configurar Preferencias Iniciales del Sistema,1.0,Fuerte
+RF-04,Panel general por rol,M01,CU#09,Visualizar Dashboard del Productor,1.0,Fuerte
+RF-05,Registro multi-rol de usuarios,M02,CU#01,Registrar Productor,1.0,Fuerte
+RF-06,Edición de perfil,M02,CU#23,Editar Perfil de Usuario,0.5,Fuerte
+RF-07,Gestión de roles y permisos,M02,CU#15,Gestionar Usuarios (Admin),1.0,Fuerte
+RF-08,Búsqueda y consulta de usuarios,M02,CU#15,Gestionar Usuarios (Admin),1.0,Fuerte
+RF-09,Desactivación de usuarios,M02,CU#23,Editar Perfil de Usuario,0.25,Fuerte
+RF-10,Reputación de usuarios,M02,CU#23,Editar Perfil de Usuario,0.25,Fuerte
+RF-11,Publicación de productos,M03,CU#24,Explorar Productos del Marketplace,0.25,Fuerte
+RF-12,Visualización de productos,M03,CU#24,Explorar Productos del Marketplace,0.25,Fuerte
+RF-13,Búsqueda avanzada de productos,M03,CU#24,Explorar Productos del Marketplace,0.25,Fuerte
+RF-14,Solicitud de compra,M03,CU#06,Publicar Demanda B2B,1.0,Fuerte
+RF-15,Cierre de transacción,M03,CU#08,Calificar Transacción,0.33,Fuerte
+RF-16,Calificaciones y comentarios,M03,CU#08,Calificar Transacción,1.0,Fuerte
+RF-17,Control de inventario,M04,CU#27,Consultar Disponibilidad y Alertas de Inventario,0.33,Fuerte
+RF-18,Disponibilidad en tiempo real,M04,CU#27,Consultar Disponibilidad y Alertas de Inventario,1.0,Fuerte
+RF-19,Alertas de stock mínimo,M04,CU#27,Consultar Disponibilidad y Alertas de Inventario,0.33,Fuerte
+RF-20,Mensajería interna,M05,CU#13,Enviar Mensaje,1.0,Fuerte
+RF-21,Historial de mensajes,M05,CU#14,Consultar Historial de Mensajes,0.75,Fuerte
+RF-22,Notificaciones de mensajes,M05,CU#14,Consultar Historial de Mensajes,0.5,Fuerte
+RF-23,Registro de transportistas,M06,CU#29,Registrar Transportista,1.0,Fuerte
+RF-24,Asignación de envíos,M06,CU#11,Asignar Envío,1.0,Fuerte
+RF-25,Seguimiento de envíos,M06,CU#12,Consultar Estado del Envío,1.0,Fuerte
+RF-26,Registro de pedidos,M07,CU#30,Consultar Historial de Pedidos,0.5,Fuerte
+RF-27,Estados del pedido,M07,CU#10,Gestionar Pedido (Productor),0.33,Fuerte
+RF-28,Historial de pedidos,M07,CU#30,Consultar Historial de Pedidos,0.75,Fuerte
+RF-29,Integración de pagos electrónicos,M08,CU#21,Registrar Transacción,1.0,Fuerte
+RF-30,Registro de transacciones,M08,CU#46,Generar Reporte de Transacciones para Contabilidad,0.33,Fuerte
+RF-31,Monitoreo del sistema,M09,CU#31,Monitorear Sistema (Admin),0.33,Fuerte
+RF-32,Generación de reportes,M09,CU#16,Generar Reportes,0.33,Fuerte
+RF-33,Gestión de incidencias,M09,CU#31,Monitorear Sistema (Admin),1.0,Fuerte
+RF-34,Control de accesos RBAC,M10,CU#17,Gestionar Accesos,0.25,Fuerte
+RF-35,Registro de actividad,M10,CU#18,Registrar Actividad del Sistema,0.25,Fuerte
+RF-36,Copias de seguridad automáticas,M10,CU#48,Habilitar Autenticación de Dos Factores (2FA),1.0,Fuerte
+RF-37,Centro de ayuda,M11,CU#20,Consultar Centro de Ayuda,0.75,Fuerte
+RF-38,Sistema de tickets,M11,CU#19,Crear Ticket de Soporte,0.25,Fuerte
+RF-39,Chatbot conversacional,M12,CU#07,Interacción con AgroBot,1.0,Fuerte
+RF-40,Respuestas automáticas a preguntas frecuentes,M12,CU#50,Consultar a AgroBot sobre un RF Específico,1.0,Fuerte
+RF-41,Orientación contextual al usuario,M12,CU#51,AgroBot Aprende de Feedback del Usuario,1.0,Fuerte
+RF-42,Escalamiento a soporte humano,M12,CU#49,Chat con Soporte Humano (Escalamiento de AgroBot),1.0,Fuerte
+RF-43,Gestión del carrito de compras,M13,CU#32,Gestionar Carrito de Compras,0.6,Fuerte
+RF-44,Confirmación de pedido,M13,CU#05,Realizar Pedido (B2C),0.33,Fuerte
+RF-45,Historial de compras,M13,CU#34,Consultar Historial de Compras,0.75,Fuerte
+RF-46,Calificación de productos adquiridos,M13,CU#35,Calificar Productos Adquiridos,0.5,Fuerte
+RF-47,Aplicación Web Responsiva,M14,CU#57,Acceder desde Múltiples Dispositivos,1.0,Fuerte
+RF-48,Aplicación Móvil Nativa Android,M14,CU#57,Acceder desde Múltiples Dispositivos,1.0,Fuerte
+RF-49,Aplicación Móvil Nativa iOS,M14,CU#57,Acceder desde Múltiples Dispositivos,1.0,Fuerte
+RF-50,Modo Offline para Productor,M14,CU#56,Sincronizar Cambios Offline al Reconectar,1.0,Fuerte
+RF-51,Modo Offline para Transportista,M14,CU#56,Sincronizar Cambios Offline al Reconectar,1.0,Fuerte
+RF-52,Cola de Sincronización,M14,CU#56,Sincronizar Cambios Offline al Reconectar,1.0,Fuerte
+RF-53,Sincronización Automática,M14,CU#56,Sincronizar Cambios Offline al Reconectar,1.0,Fuerte
+RF-54,Resolución de Conflictos,M14,CU#56,Sincronizar Cambios Offline al Reconectar,1.0,Fuerte
+RF-55,Caché de Catálogo,M14,CU#56,Sincronizar Cambios Offline al Reconectar,1.0,Fuerte
+RF-56,Pago Contra Entrega en Efectivo,M15,CU#59,Pagar con PSE (Débito Bancario ACH Colombia),1.0,Fuerte
+RF-57,Transferencia Bancaria Local,M15,CU#59,Pagar con PSE (Débito Bancario ACH Colombia),1.0,Fuerte
+RF-58,Pasarela de Tarjetas,M15,CU#59,Pagar con PSE (Débito Bancario ACH Colombia),1.0,Fuerte
+RF-59,Liquidación con Comisión Configurable,M15,CU#59,Pagar con PSE (Débito Bancario ACH Colombia),1.0,Fuerte
+RF-60,Comprobantes y Facturación Electrónica,M15,CU#62,Generar Factura Electrónica con CUFE (DIAN),1.0,Fuerte
+RF-61,Geolocalización del Productor,M16,CU#63,Definir Zona de Cobertura Geográfica,1.0,Fuerte
+RF-62,Búsqueda por Proximidad,M16,CU#63,Definir Zona de Cobertura Geográfica,1.0,Fuerte
+RF-63,Mapa de Rutas para Transportistas,M16,CU#64,Calcular Ruta Óptima de Entrega Multi-Destino,1.0,Fuerte
+RF-64,Cobertura por Veredas,M16,CU#63,Definir Zona de Cobertura Geográfica,1.0,Fuerte
+RF-65,Clasificación de Perecibilidad,M17,CU#66,Auditar Cumplimiento de Cadena de Frío para ICA,1.0,Fuerte
+RF-66,Fechas de Cosecha y Caducidad,M17,CU#66,Auditar Cumplimiento de Cadena de Frío para ICA,1.0,Fuerte
+RF-67,Ventana de Entrega Garantizada,M17,CU#66,Auditar Cumplimiento de Cadena de Frío para ICA,1.0,Fuerte
+RF-68,Trazabilidad Origen-Destino,M17,CU#66,Auditar Cumplimiento de Cadena de Frío para ICA,1.0,Fuerte

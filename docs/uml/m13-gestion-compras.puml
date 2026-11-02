@@ -1,0 +1,28 @@
+@startuml M13-gestion-compras
+' AgroConnect — M13 Gestión de Compras (RF-43 a RF-46)
+' Generado para cubrir la deuda documental H11 de PT-ECU-01 v1.1 (Sprint de modelado 2026-10-03)
+!theme plain
+left to right direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam actorStyle awesome
+
+actor "Comprador\n(B2C / B2B)" as Comprador
+
+rectangle "M13 — Gestión de Compras" {
+  usecase "Realizar Pedido (B2C)" as UC05
+  usecase "Gestionar Carrito de Compras" as UC32
+  usecase "Consultar Historial de Compras" as UC34
+  usecase "Calificar Productos Adquiridos" as UC35
+  usecase "Aplicar Código de Descuento\nen Checkout" as UC53
+}
+
+Comprador --> UC05
+Comprador --> UC32
+Comprador --> UC34
+Comprador --> UC35
+Comprador --> UC53
+
+UC05 ..> UC32 : <<include>>
+UC53 ..> UC05 : <<extend>>
+@enduml

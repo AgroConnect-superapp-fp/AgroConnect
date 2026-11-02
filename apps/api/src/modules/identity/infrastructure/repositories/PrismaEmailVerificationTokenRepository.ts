@@ -1,0 +1,54 @@
+import { Injectable } from '@nestjs/common';
+import { PrismaClient } from '../../../../generated/prisma/client';
+import { EmailVerificationToken } from '../../domain/entities/EmailVerificationToken';
+import type {
+  NewEmailVerificationTokenData,
+  EmailVerificationTokenRepository,
+} from '../../domain/interfaces/EmailVerificationTokenRepository';
+
+@Injectable()
+export class PrismaEmailVerificationTokenRepository implements EmailVerificationTokenRepository {
+  constructor(private readonly prisma: PrismaClient) {}
+
+  async create(data: NewEmailVerificationTokenData): Promise<void> {
+    await this.prisma.emailVerificationToken.create({
+      data: {
+        id: data.id,
+        userId: data.userId,
+        tokenHash: data.tokenHash,
+        expiresAt: data.expiresAt,
+      },
+    });
+  }
+
+  async findByHash(tokenHash: string): Promise<EmailVerificationToken | null> {
+    const record = await this.prisma.emailVerificationToken.findUnique({ where: { tokenHash } });
+    if (!record) {
+      return null;
+    }
+
+    return EmailVerificationToken.create({
+      id: record.id,
+      userId: record.userId,
+      tokenHash: record.tokenHash,
+      expiresAt: record.expiresAt,
+      usedAt: record.usedAt,
+      createdAt: record.createdAt,
+    });
+  }
+
+  async consume(id: string): Promise<boolean> {
+    const result = await this.prisma.emailVerificationToken.updateMany({
+      where: { id, usedAt: null },
+      data: { usedAt: new Date() },
+    });
+    return result.count === 1;
+  }
+
+  async invalidateUserTokens(userId: string): Promise<void> {
+    await this.prisma.emailVerificationToken.updateMany({
+      where: { userId, usedAt: null },
+      data: { usedAt: new Date() },
+    });
+  }
+}

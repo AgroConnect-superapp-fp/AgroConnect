@@ -14,46 +14,65 @@ import {
   verifyEmailSchema,
 } from '../schemas/authSchemas';
 
+export type AuthRateLimitScope =
+  | 'register'
+  | 'login'
+  | 'refresh'
+  | 'forgotPassword'
+  | 'resetPassword'
+  | 'verifyEmail'
+  | 'resendVerification';
+
 export interface AuthRouterDependencies {
   controller: AuthController;
-  loginRateLimiter: RequestHandler;
-  forgotPasswordRateLimiter: RequestHandler;
+  /** Un limitador independiente por ruta: los contadores no se comparten entre endpoints. */
+  rateLimiters: Record<AuthRateLimitScope, RequestHandler>;
 }
 
 export function createAuthRouter(dependencies: AuthRouterDependencies): Router {
   const router = Router();
-  const { controller } = dependencies;
+  const { controller, rateLimiters } = dependencies;
 
-  router.post('/register', validateBody(registerSchema), asyncHandler(controller.register));
+  router.post(
+    '/register',
+    rateLimiters.register,
+    validateBody(registerSchema),
+    asyncHandler(controller.register),
+  );
   router.post(
     '/login',
-    dependencies.loginRateLimiter,
+    rateLimiters.login,
     validateBody(loginSchema),
     asyncHandler(controller.login),
   );
-  router.post('/refresh', validateBody(refreshSchema), asyncHandler(controller.refresh));
+  router.post(
+    '/refresh',
+    rateLimiters.refresh,
+    validateBody(refreshSchema),
+    asyncHandler(controller.refresh),
+  );
   router.post('/logout', validateBody(logoutSchema), asyncHandler(controller.logout));
   router.post(
     '/forgot-password',
-    dependencies.forgotPasswordRateLimiter,
+    rateLimiters.forgotPassword,
     validateBody(forgotPasswordSchema),
     asyncHandler(controller.forgotPassword),
   );
   router.post(
     '/reset-password',
-    dependencies.forgotPasswordRateLimiter,
+    rateLimiters.resetPassword,
     validateBody(resetPasswordSchema),
     asyncHandler(controller.resetPassword),
   );
   router.post(
     '/verify-email',
-    dependencies.forgotPasswordRateLimiter,
+    rateLimiters.verifyEmail,
     validateBody(verifyEmailSchema),
     asyncHandler(controller.verifyEmail),
   );
   router.post(
     '/resend-verification',
-    dependencies.forgotPasswordRateLimiter,
+    rateLimiters.resendVerification,
     validateBody(resendVerificationSchema),
     asyncHandler(controller.resendVerification),
   );

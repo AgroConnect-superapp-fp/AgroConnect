@@ -1,0 +1,30 @@
+name: Verify Vercel token
+
+# Diagnóstico manual: comprueba que el secret VERCEL_TOKEN autentica y que
+# tiene acceso al team/proyecto agroconnectpreview. No despliega nada.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Verificar VERCEL_TOKEN
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+
+      - name: Autenticación (whoami)
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: npx --yes vercel@64.3.1 whoami --token="$VERCEL_TOKEN"
+
+      - name: Acceso al team y proyectos
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: npx --yes vercel@64.3.1 projects ls --token="$VERCEL_TOKEN"

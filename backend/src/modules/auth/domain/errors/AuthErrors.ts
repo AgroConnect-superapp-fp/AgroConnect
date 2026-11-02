@@ -30,6 +30,18 @@ export class RoleNotFoundError extends DomainError {
   }
 }
 
+export class RoleNotAllowedError extends DomainError {
+  constructor(role: string) {
+    super('ROLE_NOT_ALLOWED', `El rol "${role}" no está disponible para auto-registro`, 403);
+  }
+}
+
+export class UserAlreadyExistsError extends DomainError {
+  constructor() {
+    super('USER_ALREADY_EXISTS', 'Ya existe un usuario con los datos suministrados', 409);
+  }
+}
+
 export class InvalidCredentialsError extends DomainError {
   constructor() {
     super('INVALID_CREDENTIALS', 'Correo o contraseña incorrectos', 401);

@@ -1,0 +1,54 @@
+import { Injectable } from '@nestjs/common';
+import { PrismaClient } from '../../../../generated/prisma/client';
+import { PasswordResetToken } from '../../domain/entities/PasswordResetToken';
+import type {
+  NewPasswordResetTokenData,
+  PasswordResetTokenRepository,
+} from '../../domain/interfaces/PasswordResetTokenRepository';
+
+@Injectable()
+export class PrismaPasswordResetTokenRepository implements PasswordResetTokenRepository {
+  constructor(private readonly prisma: PrismaClient) {}
+
+  async create(data: NewPasswordResetTokenData): Promise<void> {
+    await this.prisma.passwordResetToken.create({
+      data: {
+        id: data.id,
+        userId: data.userId,
+        tokenHash: data.tokenHash,
+        expiresAt: data.expiresAt,
+      },
+    });
+  }
+
+  async findByHash(tokenHash: string): Promise<PasswordResetToken | null> {
+    const record = await this.prisma.passwordResetToken.findUnique({ where: { tokenHash } });
+    if (!record) {
+      return null;
+    }
+
+    return PasswordResetToken.create({
+      id: record.id,
+      userId: record.userId,
+      tokenHash: record.tokenHash,
+      expiresAt: record.expiresAt,
+      usedAt: record.usedAt,
+      createdAt: record.createdAt,
+    });
+  }
+
+  async consume(id: string): Promise<boolean> {
+    const result = await this.prisma.passwordResetToken.updateMany({
+      where: { id, usedAt: null },
+      data: { usedAt: new Date() },
+    });
+    return result.count === 1;
+  }
+
+  async invalidateUserTokens(userId: string): Promise<void> {
+    await this.prisma.passwordResetToken.updateMany({
+      where: { userId, usedAt: null },
+      data: { usedAt: new Date() },
+    });
+  }
+}

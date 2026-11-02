@@ -13,6 +13,8 @@ const envSchema = z.object({
   RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(900_000),
   RATE_LIMIT_MAX_ATTEMPTS: z.coerce.number().int().positive().default(5),
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
+  // Saltos de proxy confiables (Render = 1). Con 0, req.ip es la IP del socket.
+  TRUST_PROXY: z.coerce.number().int().min(0).max(5).default(0),
   APP_BASE_URL: z.string().url().default('http://localhost:5173'),
   MAIL_DIR: z.string().default('/tmp/agroconnect-mails'),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),

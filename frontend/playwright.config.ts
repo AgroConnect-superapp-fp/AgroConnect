@@ -22,7 +22,9 @@ export default defineConfig({
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: [
     {
-      command: 'npm --prefix ../backend run dev',
+      // apps/api (NestJS) — sucesor del backend legacy (ADR-009). La sesión es
+      // cookie-only: el E2E valida el flujo completo con cookies httpOnly.
+      command: 'npm --prefix ../apps/api run dev',
       url: `${BACKEND_URL}/health`,
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,
@@ -34,6 +36,9 @@ export default defineConfig({
         LOG_LEVEL: 'fatal',
         JWT_ACCESS_SECRET: 'e2e_access_secret_with_at_least_32_characters_ok',
         JWT_REFRESH_SECRET: 'e2e_refresh_secret_with_at_least_32_characters_ok',
+        // Sin SMTP el correo de verificación se escribe en disco
+        // (FileEmailService): el E2E no depende de un servidor de correo real.
+        SMTP_HOST: '',
       },
     },
     {

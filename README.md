@@ -8,7 +8,7 @@ Centro de Comercio y Turismo · Regional Quindío · Programa Análisis y Desarr
 
 [![CI](https://github.com/AgroConnect-superapp-fp/AgroConnect/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/AgroConnect-superapp-fp/AgroConnect/actions/workflows/ci.yml)
 [![Node](https://img.shields.io/badge/node-%E2%89%A5%2020-339933?logo=node.js&logoColor=white)](.nvmrc)
-[![Pruebas](https://img.shields.io/badge/pruebas-178%20backend%20%C2%B7%2014%20unit%20%C2%B7%2010%20E2E-brightgreen)](https://github.com/AgroConnect-superapp-fp/AgroConnect/actions/workflows/ci.yml)
+[![Pruebas](https://img.shields.io/badge/pruebas-382%20backend%20%C2%B7%2021%20unit%20%C2%B7%2010%20E2E-brightgreen)](https://github.com/AgroConnect-superapp-fp/AgroConnect/actions/workflows/ci.yml)
 [![Deploy](https://img.shields.io/badge/producci%C3%B3n-Vercel%20%C2%B7%20Render-000000?logo=vercel&logoColor=white)](https://agroconnectpreview.vercel.app)
 [![Licencia](https://img.shields.io/badge/licencia-Todos%20los%20derechos%20reservados-red)](LICENSE)
 
@@ -114,7 +114,7 @@ Reglas clave del diseño:
 | Capa | Tecnologías |
 |---|---|
 | Frontend | React 19 + Vite 8 + TypeScript 6 (strict) + Tailwind CSS 4 + Leaflet 1.9 (OpenStreetMap) |
-| Backend | Node.js 22 (CI · Render) — local en 24 (`.nvmrc`) + Express 4 + TypeScript 5 (strict) + Zod |
+| Backend | Node.js 24 + NestJS 11 + Prisma 7 (núcleo) — Express 4 legacy en retiro — TypeScript 5/6 (strict) + Zod |
 | Persistencia | PostgreSQL 16 + PostGIS 3.4 + Prisma 7 (driver adapter `@prisma/adapter-pg`) |
 | Seguridad | JWT + refresh tokens rotativos, bcrypt (12 rondas), Helmet, rate limiting, Pino con redacción de PII |
 | Pruebas | Jest 30 + Supertest (backend) · Vitest (frontend unitarias) · Playwright (E2E) |
@@ -173,7 +173,7 @@ Características: contraseñas con bcrypt, unicidad de correo/documento/celular 
 
 ### Calidad
 
-- 178 pruebas backend (Jest + Supertest, cobertura 97 % en líneas) · 14 pruebas unitarias de frontend (Vitest) · 10 pruebas E2E (Playwright: autenticación real, modo demo y marketplace).
+- 382 pruebas backend (188 legacy + 194 NestJS; cobertura >95 % en líneas) · 21 pruebas unitarias de frontend (Vitest) · 10 pruebas E2E (Playwright: autenticación real, modo demo y marketplace).
 
 ---
 
@@ -243,14 +243,14 @@ npx vercel deploy --prod --yes --archive=tgz
 
 ### Backend de autenticación (Render)
 
-El backend Express + Prisma + PostgreSQL se despliega como **Web Service en Render** (plan free) con el Blueprint `render.yaml` de la raíz (Infraestructura como Código):
+El backend NestJS (`apps/api`) + Prisma + PostgreSQL se despliega como **Web Service en Render** (plan free) con el Blueprint `render.yaml` de la raíz (Infraestructura como Código). El backend Express de `backend/` queda como legado en retiro (Strangler Fig):
 
 - **URL del servicio (producción):** https://agroconnect-api-5t7n.onrender.com — `GET /health` → 200
 - **Base de datos:** PostgreSQL de Supabase, esquema `agroconnect` (migraciones aplicadas; el runtime usa `DATABASE_SCHEMA=agroconnect`).
 - **Registro e inicio de sesión reales verificados** desde la app pública (2026-10-04).
 - En Vercel: `VITE_API_URL=https://agroconnect-api-5t7n.onrender.com` (Production).
 
-Despliegue (resumen): Blueprint `render.yaml` → `DATABASE_URL` con la connection string de Supabase (*Session pooler*) → `DATABASE_SCHEMA=agroconnect` → Manual Deploy. Migraciones: `cd backend && DATABASE_URL="<supabase-url>" npx prisma migrate deploy`.
+Despliegue (resumen): Blueprint `render.yaml` → `DATABASE_URL` con la connection string de Supabase (*Session pooler*) → `DATABASE_SCHEMA=agroconnect` → Manual Deploy. Migraciones: `cd apps/api && DATABASE_URL="<supabase-url>" npx prisma migrate deploy`.
 
 > Nota free tier: el servicio se suspende tras ~15 min de inactividad y despierta en ~1 min en la primera petición.
 
@@ -260,7 +260,7 @@ Despliegue (resumen): Blueprint `render.yaml` → `DATABASE_URL` con la connecti
 
 ## Sincronización entre entornos (local · GitHub · Notion · Obsidian)
 
-Un **manifiesto de hechos canónicos** (`tools/alignment-check/manifest.json`) centraliza los datos compartidos —URLs, stack, cifras de trazabilidad (17·68·30·66·69·6), conteos de pruebas (178 · 14 · 10), visibilidad del repositorio y última release— y un verificador comprueba que los cuatro entornos manejen la misma información **sin incongruencias**. No son espejos: cada entorno conserva su rol; el mecanismo garantiza que los hechos compartidos sean idénticos y, ante cada ❌, indica exactamente **qué actualizar** (`→ hint`).
+Un **manifiesto de hechos canónicos** (`tools/alignment-check/manifest.json`) centraliza los datos compartidos —URLs, stack, cifras de trazabilidad (17·68·30·66·69·6), conteos de pruebas (382 · 21 · 10), visibilidad del repositorio y última release— y un verificador comprueba que los cuatro entornos manejen la misma información **sin incongruencias**. No son espejos: cada entorno conserva su rol; el mecanismo garantiza que los hechos compartidos sean idénticos y, ante cada ❌, indica exactamente **qué actualizar** (`→ hint`).
 
 ```bash
 node tools/alignment-check/check-alignment.mjs        # local + GitHub (+ API) + Obsidian

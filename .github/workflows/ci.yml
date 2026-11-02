@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: '22'
+  NODE_VERSION: '24'
   DATABASE_URL_TEST: postgresql://agroconnect:agroconnect_dev@localhost:5432/agroconnect_test?schema=public
 
 jobs:
@@ -43,10 +43,15 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
-          cache-dependency-path: backend/package-lock.json
+          cache-dependency-path: package-lock.json
 
-      - name: Instalar dependencias
+      - name: Instalar dependencias (monorepo)
         run: npm ci
+        working-directory: .
+
+      - name: Build de contratos compartidos
+        run: npm run build -w @agroconnect/contracts
+        working-directory: .
 
       - name: Generar cliente Prisma
         run: npx prisma generate
@@ -88,6 +93,77 @@ jobs:
           path: backend/coverage/
           retention-days: 7
 
+  api:
+    name: API (NestJS) — lint, tipos y pruebas
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_USER: agroconnect
+          POSTGRES_PASSWORD: agroconnect_dev
+          POSTGRES_DB: agroconnect_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U agroconnect"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    defaults:
+      run:
+        working-directory: apps/api
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Instalar dependencias (monorepo)
+        run: npm ci
+        working-directory: .
+
+      - name: Build de contratos compartidos
+        run: npm run build -w @agroconnect/contracts
+        working-directory: .
+
+      - name: Generar cliente Prisma
+        run: npm run prisma:generate
+
+      - name: Lint (0 errores permitidos)
+        run: npm run lint
+
+      - name: Type check (0 errores permitidos)
+        run: npm run typecheck
+
+      # El módulo identity sí toca la base de datos (registro, login, rotación
+      # de tokens), así que este job levanta PostGIS y aplica las migraciones.
+      - name: Aplicar migraciones en la base de pruebas
+        run: npm run prisma:deploy
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL_TEST }}
+
+      - name: Pruebas unitarias e integración con cobertura
+        run: npm run test:coverage
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL_TEST }}
+          TEST_DATABASE_URL: ${{ env.DATABASE_URL_TEST }}
+          JWT_ACCESS_SECRET: ci_access_secret_with_at_least_32_characters_ok
+          JWT_REFRESH_SECRET: ci_refresh_secret_with_at_least_32_characters_ok
+          LOG_LEVEL: fatal
+
+      - name: Publicar reporte de cobertura
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: api-coverage
+          path: apps/api/coverage/
+          retention-days: 7
+
   frontend:
     name: Frontend — lint, tipos y build
     runs-on: ubuntu-latest
@@ -102,10 +178,15 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
-          cache-dependency-path: frontend/package-lock.json
+          cache-dependency-path: package-lock.json
 
-      - name: Instalar dependencias
+      - name: Instalar dependencias (monorepo)
         run: npm ci
+        working-directory: .
+
+      - name: Build de contratos compartidos
+        run: npm run build -w @agroconnect/contracts
+        working-directory: .
 
       - name: Lint (0 errores permitidos)
         run: npm run lint
@@ -149,23 +230,28 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
-          cache-dependency-path: |
-            backend/package-lock.json
-            frontend/package-lock.json
+          cache-dependency-path: package-lock.json
 
-      - name: Instalar dependencias del backend
+      - name: Instalar dependencias (monorepo)
         run: npm ci
-        working-directory: backend
 
-      - name: Instalar dependencias del frontend
-        run: npm ci
-        working-directory: frontend
+      - name: Build de contratos compartidos
+        run: npm run build -w @agroconnect/contracts
 
       - name: Preparar base de datos de pruebas
-        run: npx prisma generate && npx prisma migrate deploy
+        run: |
+          npx prisma generate
+          npx prisma migrate deploy
         working-directory: backend
         env:
           DATABASE_URL: ${{ env.DATABASE_URL_TEST }}
+
+      # apps/api importa su cliente Prisma desde apps/api/src/generated
+      # (generator con output relativo); sin este paso el servidor no
+      # arranca en CI y el webServer de Playwright expira a los 120s.
+      - name: Generar cliente Prisma de apps/api
+        run: npx prisma generate
+        working-directory: apps/api
 
       - name: Instalar navegador Chromium
         run: npx playwright install --with-deps chromium
@@ -195,49 +281,27 @@ jobs:
       VERCEL_ORG_ID: team_IPTpVtm8CrxhxB4qo8AFvV4j
       VERCEL_PROJECT_ID: prj_B1w9PUpDOqV9P104MgoVk61vDnab
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-    defaults:
-      run:
-        working-directory: frontend
     steps:
       - uses: actions/checkout@v7
 
-      - name: Aviso si falta VERCEL_TOKEN
+      - name: Verificar VERCEL_TOKEN
         if: env.VERCEL_TOKEN == ''
-        run: echo "::warning::VERCEL_TOKEN no configurado. Agrega el secret para habilitar el deploy automatico."
+        run: |
+          echo "::error::VERCEL_TOKEN no configurado. El deploy automático es obligatorio para publicar en producción."
+          exit 1
 
       - name: Configurar Node.js
         if: env.VERCEL_TOKEN != ''
         uses: actions/setup-node@v7
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-          cache-dependency-path: frontend/package-lock.json
 
-      - name: Instalar dependencias
-        if: env.VERCEL_TOKEN != ''
-        run: npm ci
-
-      - name: Pull de configuración y entorno (Vercel)
-        id: vercel_pull
-        if: env.VERCEL_TOKEN != ''
-        run: |
-          if npx --yes vercel@54 pull --yes --environment=production --token="$VERCEL_TOKEN" >/dev/null 2>&1; then
-            echo "access=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "access=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::VERCEL_TOKEN sin acceso al equipo AgroConnect - deploy automatico omitido. Usa el deploy manual documentado (npx vercel deploy --prod --yes --archive=tgz)."
-          fi
-        working-directory: .
-
-      - name: Build de producción (Vercel)
-        if: steps.vercel_pull.outputs.access == 'true'
-        run: npx --yes vercel@54 build --prod --token="$VERCEL_TOKEN"
-        working-directory: .
-
+      # Se despliega desde la RAÍZ: el proyecto Vercel tiene Root Directory
+      # `frontend`, pero el build necesita el monorepo completo (contratos).
+      # Este es el procedimiento validado con un preview el 2026-11-02.
       - name: Deploy a producción
-        if: steps.vercel_pull.outputs.access == 'true'
-        run: npx --yes vercel@54 deploy --prebuilt --prod --yes --token="$VERCEL_TOKEN"
-        working-directory: .
+        if: env.VERCEL_TOKEN != ''
+        run: npx --yes vercel@64.3.1 deploy --prod --yes --archive=tgz --token="$VERCEL_TOKEN"
 
   alignment:
     name: Alineación de entornos (manifiesto)
@@ -252,3 +316,22 @@ jobs:
 
       - name: Verificar README contra el manifiesto de sincronización
         run: node tools/alignment-check/check-alignment.mjs --ci
+
+  contracts:
+    name: Contratos — sincronía OpenAPI ↔ Zod
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Instalar dependencias (monorepo)
+        run: npm ci
+
+      - name: Verificar que openapi.json coincide con los esquemas Zod
+        run: npm run check:drift -w @agroconnect/contracts

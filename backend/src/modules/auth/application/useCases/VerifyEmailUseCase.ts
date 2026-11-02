@@ -24,7 +24,11 @@ export class VerifyEmailUseCase {
       throw new InvalidTokenError('El enlace de verificación es inválido o expiró');
     }
 
+    const consumed = await this.emailVerificationTokenRepository.consume(storedToken.id);
+    if (!consumed) {
+      throw new InvalidTokenError('El enlace de verificación es inválido o expiró');
+    }
+
     await this.userRepository.markEmailVerified(user.id);
-    await this.emailVerificationTokenRepository.markUsed(storedToken.id);
   }
 }

@@ -6,6 +6,7 @@ dist/
 dist-ssr/
 frontend/dist/
 backend/src/generated/
+apps/api/src/generated/
 
 # Pruebas y cobertura
 coverage/
@@ -21,11 +22,12 @@ playwright-report/
 backend/.env
 frontend/.env.local
 
-# Material interno del proyecto formativo (no se versiona en este repositorio)
-docs/
+# Material interno del proyecto formativo
+# Decisión 2026-11-02: docs/ y scripts/ SÍ se versionan (auditorías, matrices,
+# matrices de trazabilidad y herramientas de verificación son reproducibles).
+# Los PDFs siguen fuera del repositorio por tamaño.
 obsidian-vault/
 mcp-servers/
-scripts/
 *.pdf
 opencode.json
 AGENTS.md*
@@ -34,11 +36,13 @@ AGENTS.md*
 # Configuración local
 .envrc
 .vercel/
+.open-design.json
 
 # Cachés
 .ruff_cache/
 __pycache__/
 *.pyc
+.turbo/
 
 # IDE
 .vscode/
@@ -56,3 +60,4 @@ Thumbs.db
 npm-debug.log*
 .vercel
 .env*
+!.env.example
