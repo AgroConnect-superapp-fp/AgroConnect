@@ -88,14 +88,13 @@ que requieren criterio de producto o arquitectura.
 
 ### D8. Release y dependencias
 
-- **Situación:** el CHANGELOG ya tiene `1.1.0`, pero no hay tag/release; hay 10
-  alertas de Dependabot en la rama por defecto (7 moderate, 3 low) y el lockfile
-  es único.
-- **Recomendación:** crear `v1.1.0` con las notas del CHANGELOG; actualizar
-  Dependabot en un PR separado, empezando por parches de seguridad y evitando
-  majors de Vite/React sin ventana de pruebas.
+- **Estado:** tag y **release `v1.1.0` publicados** (2026-11-02) con las notas
+  del CHANGELOG. Quedan **2 alertas** de Dependabot (minimatch medium,
+  deepmerge low), ambas en dependencias de desarrollo; sus fixes exigen
+  `@nestjs/cli@12` y `typescript-eslint` con cambio mayor, así que requieren
+  una ventana de pruebas (`npm audit fix --force` no se aplicó).
 - **Criterio:** release publicada, `npm audit --audit-level=high` verde y CI
-  estable.
+  estable. El último punto queda pendiente de la ventana de Dependabot.
 
 ### D9. Contraste del accent yellow
 
