@@ -71,15 +71,15 @@ function LoadingScreen(): React.ReactElement {
         </p>
         <div className="mt-6 flex justify-center gap-1">
           <div
-            className="w-2 h-2 bg-agro-green rounded-full animate-bounce"
+            className="w-2 h-2 bg-agro-green rounded-full animate-pulse"
             style={{ animationDelay: '0s' }}
           ></div>
           <div
-            className="w-2 h-2 bg-agro-green rounded-full animate-bounce"
+            className="w-2 h-2 bg-agro-green rounded-full animate-pulse"
             style={{ animationDelay: '0.2s' }}
           ></div>
           <div
-            className="w-2 h-2 bg-agro-green rounded-full animate-bounce"
+            className="w-2 h-2 bg-agro-green rounded-full animate-pulse"
             style={{ animationDelay: '0.4s' }}
           ></div>
         </div>
@@ -106,7 +106,7 @@ function ErrorScreen({
         <p className="text-gray-700 mb-2 font-medium">
           No se pudo conectar con la base de datos
         </p>
-        <p className="text-sm text-gray-500 mb-6 bg-red-50 rounded-lg p-3 border border-red-100">
+        <p className="text-sm text-red-800 mb-6 bg-red-50 rounded-lg p-3 border border-red-100">
           {error}
         </p>
         <div className="space-y-2 text-left text-xs text-gray-600 mb-6 bg-gray-50 rounded-lg p-4">
@@ -302,6 +302,11 @@ function App(): React.ReactElement {
           to { opacity: 1; transform: translateX(0); }
         }
 
+        @keyframes softFloatIn {
+          from { opacity: 0; transform: translateY(4px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
         @keyframes pulseGlowGreen {
           0%, 100% { box-shadow: 0 0 0 0 rgba(46, 125, 50, 0.4); }
           50% { box-shadow: 0 0 20px 5px rgba(46, 125, 50, 0.2); }
@@ -317,6 +322,7 @@ function App(): React.ReactElement {
         .animate-fadeInLeft { animation: fadeInLeft 0.6s ease-out both; }
         .animate-scaleIn { animation: scaleIn 0.7s ease-out both; }
         .animate-slideInRight { animation: slideInRight 0.5s ease-out both; }
+        .animate-soft-float-in { animation: softFloatIn 0.45s ease-out both; }
         .animate-pulseGlowGreen { animation: pulseGlowGreen 2s ease-in-out infinite; }
         .animate-pulseGlowBlue { animation: pulseGlowBlue 2s ease-in-out infinite; }
 
@@ -343,6 +349,7 @@ function App(): React.ReactElement {
           .animate-fadeInLeft,
           .animate-scaleIn,
           .animate-slideInRight,
+          .animate-soft-float-in,
           .animate-pulseGlowGreen,
           .animate-pulseGlowBlue {
             animation: none !important;
@@ -495,9 +502,9 @@ function App(): React.ReactElement {
               return (
                 <div
                   key={crop}
-                  className={`bg-white rounded-xl shadow-sm p-4 border-l-4 flex items-center gap-3 hover:shadow-xl hover:scale-105 hover:-translate-y-1 interactive-transition cursor-default animate-fadeInUp ${delayClass} group relative overflow-hidden`}
+                  className={`bg-white rounded-xl shadow-sm p-4 border flex items-center gap-3 hover:shadow-xl hover:scale-105 hover:-translate-y-1 interactive-transition cursor-default animate-fadeInUp ${delayClass} group relative overflow-hidden`}
                   style={{
-                    borderColor: info.color,
+                    borderColor: `${info.color}55`,
                     animation: isTopCrop
                       ? `pulseGlow_${crop.replace(/\s+/g, '_')} 2s ease-in-out infinite, fadeInUp 0.6s ease-out both`
                       : undefined,
@@ -526,7 +533,7 @@ function App(): React.ReactElement {
                   </div>
 
                   {isTopCrop && (
-                    <div className="absolute top-2 right-2 bg-gradient-to-r from-yellow-400 to-orange-400 text-white text-xs font-bold px-2 py-1 rounded-full shadow-md animate-bounce">
+                    <div className="absolute top-2 right-2 bg-gradient-to-r from-yellow-400 to-orange-400 text-amber-950 text-xs font-bold px-2 py-1 rounded-full shadow-md animate-soft-float-in">
                       ⭐ Top
                     </div>
                   )}

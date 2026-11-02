@@ -1174,7 +1174,7 @@ export function PropertyMap({
           font-size: 12px !important;
           font-weight: bold !important;
           line-height: 1 !important;
-          font-family: Arial, sans-serif !important;
+          font-family: inherit !important;
           z-index: 10 !important;
           flex-shrink: 0 !important;
           box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
@@ -1732,7 +1732,7 @@ export function PropertyMap({
                           <div
                             style={{
                               height: '100%',
-                              width: `${property.productivity}%`,
+                              width: '100%',
                               background:
                                 property.productivity >= 70
                                   ? 'linear-gradient(90deg, #16A34A, #22C55E)'
@@ -1740,7 +1740,10 @@ export function PropertyMap({
                                     ? 'linear-gradient(90deg, #CA8A04, #EAB308)'
                                     : 'linear-gradient(90deg, #DC2626, #EF4444)',
                               borderRadius: '3px',
-                              transition: 'width 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
+                              transform: `scaleX(${property.productivity / 100})`,
+                              transformOrigin: 'left center',
+                              willChange: 'transform',
+                              transition: 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
                             }}
                           />
                         </div>

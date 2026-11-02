@@ -42,3 +42,21 @@ body {
   background-clip: padding-box;
   border-radius: 50%;
 }
+
+/*
+ * Accesibilidad: si el usuario pide menos movimiento, neutraliza animaciones y
+ * transiciones decorativas sin tocar transforms estáticos (Leaflet, layout).
+ * Los delays a 0 evitan que contenidos con `both` queden invisibles durante la espera.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+}
