@@ -281,9 +281,6 @@ jobs:
       VERCEL_ORG_ID: team_IPTpVtm8CrxhxB4qo8AFvV4j
       VERCEL_PROJECT_ID: prj_B1w9PUpDOqV9P104MgoVk61vDnab
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-    defaults:
-      run:
-        working-directory: frontend
     steps:
       - uses: actions/checkout@v7
 
@@ -298,25 +295,13 @@ jobs:
         uses: actions/setup-node@v7
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-          cache-dependency-path: package-lock.json
 
-      - name: Instalar dependencias
-        if: env.VERCEL_TOKEN != ''
-        run: npm ci
-        working-directory: .
-
-      - name: Pull de configuración y entorno (Vercel)
-        if: env.VERCEL_TOKEN != ''
-        run: npx --yes vercel@64.3.1 pull --yes --environment=production --token="$VERCEL_TOKEN"
-
-      - name: Build de producción (Vercel)
-        if: env.VERCEL_TOKEN != ''
-        run: npx --yes vercel@64.3.1 build --prod --token="$VERCEL_TOKEN"
-
+      # Se despliega desde la RAÍZ: el proyecto Vercel tiene Root Directory
+      # `frontend`, pero el build necesita el monorepo completo (contratos).
+      # Este es el procedimiento validado con un preview el 2026-11-02.
       - name: Deploy a producción
         if: env.VERCEL_TOKEN != ''
-        run: npx --yes vercel@64.3.1 deploy --prebuilt --prod --yes --token="$VERCEL_TOKEN"
+        run: npx --yes vercel@64.3.1 deploy --prod --yes --archive=tgz --token="$VERCEL_TOKEN"
 
   alignment:
     name: Alineación de entornos (manifiesto)

@@ -103,11 +103,20 @@ Variables clave del frontend (`frontend/.env.local`):
 - Cabeceras: CSP, XFO, XCTO, Referrer-Policy, Permissions-Policy y HSTS en
   ambos `vercel.json` (raíz y `frontend/`).
 
-Despliegue manual (si el CI no lo hace):
+Despliegue manual (si el CI no lo hace). **Ejecutar siempre desde la raíz del repo**:
 
 ```bash
 npx vercel deploy --prod --yes --archive=tgz
 ```
+
+- El proyecto Vercel tiene Root Directory `frontend`, pero el build necesita el
+  monorepo completo (contratos). Desplegar desde `frontend` sube solo esa
+  carpeta y `cd ..` no encuentra el `package.json` raíz; por eso el comando va
+  desde la raíz.
+- **Preview validado (2026-11-02):**
+  `https://agroconnectpreview-kchv56jw2-agro-connect.vercel.app` → READY, HTTP
+  200 con CSP, XCTO, XFO, Referrer-Policy, Permissions-Policy y HSTS.
+- `--archive=tgz` evita el cuelgue de subida del CLI con muchos archivos.
 
 ### Backend (Render)
 
@@ -121,8 +130,10 @@ npx vercel deploy --prod --yes --archive=tgz
 
 - `CI — AgroConnect` corre backend legacy, API NestJS, frontend, E2E,
   contratos, alineación y CodeQL.
-- El job `deploy` es **fail-closed**: si falta `VERCEL_TOKEN` o `vercel pull`
-  falla, el pipeline falla (no se publica una versión distinta a la validada).
+- El job `deploy` es **fail-closed**: si falta `VERCEL_TOKEN`, el pipeline falla
+  (no se publica una versión distinta a la validada).
+- El job ejecuta `vercel deploy --prod --yes --archive=tgz` **desde la raíz**
+  (mismo procedimiento validado en preview).
 - Tras merge a `main`: verificar deployment Ready y probar login real.
 
 ### Verificación post-deploy
@@ -148,7 +159,7 @@ aparecer `access_token` y `refresh_token` con `HttpOnly`, `Secure` y
 | Cold start de ~20 s | Free tier de Render suspende por inactividad | La primera petición despierta el servicio |
 | 403 `FORBIDDEN` en login/registro | Falta `Origin` permitido o `X-Requested-With` | Verificar `CORS_ORIGIN` y que el cliente envíe el header |
 | Cookies no se guardan en el navegador | `SameSite=None` sin `Secure`, o dominio cruzado mal configurado | Servir todo por HTTPS y revisar `Path`/`Secure` |
-| Build de Vercel no encuentra `@agroconnect/contracts` | Root Directory `frontend` sin build del monorepo | Verificar `installCommand`/`buildCommand` de `frontend/vercel.json` |
+| Build de Vercel no encuentra `@agroconnect/contracts` | Root Directory `frontend` sin build del monorepo, o despliegue lanzado desde `frontend` (sube solo esa carpeta) | Desplegar desde la raíz; verificar `installCommand`/`buildCommand` de `frontend/vercel.json` |
 | `DATABASE_SCHEMA` ignorado | Prisma 7 usa la variable, no `?schema=` | Definir `DATABASE_SCHEMA` en el entorno |
 | `.env.local` modificado tras `vercel link` | El CLI añade `VERCEL_OIDC_TOKEN` | Es normal; no afecta las claves `VITE_*` |
 
