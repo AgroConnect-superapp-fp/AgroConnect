@@ -36,6 +36,8 @@ export class JwtTokenService implements TokenService {
     private readonly refreshSecret: string,
     private readonly accessExpiresIn: string,
     private readonly refreshExpiresIn: string,
+    private readonly issuer = 'agroconnect-api',
+    private readonly audience = 'agroconnect-web',
   ) {}
 
   generateTokens(payload: TokenPayload): TokenPair {
@@ -43,6 +45,8 @@ export class JwtTokenService implements TokenService {
       algorithm: ALGORITHM,
       subject: payload.userId,
       expiresIn: parseDurationToSeconds(this.accessExpiresIn),
+      issuer: this.issuer,
+      audience: this.audience,
     });
 
     const refreshToken = jwt.sign({ role: payload.role, type: 'refresh' }, this.refreshSecret, {
@@ -50,6 +54,8 @@ export class JwtTokenService implements TokenService {
       subject: payload.userId,
       expiresIn: parseDurationToSeconds(this.refreshExpiresIn),
       jwtid: randomUUID(),
+      issuer: this.issuer,
+      audience: this.audience,
     });
 
     return {
@@ -85,7 +91,11 @@ export class JwtTokenService implements TokenService {
 
   private verify(token: string, secret: string): JwtClaims {
     try {
-      const decoded = jwt.verify(token, secret, { algorithms: [ALGORITHM] });
+      const decoded = jwt.verify(token, secret, {
+        algorithms: [ALGORITHM],
+        issuer: this.issuer,
+        audience: this.audience,
+      });
 
       if (typeof decoded === 'string' || typeof decoded.sub !== 'string') {
         throw new InvalidTokenError();

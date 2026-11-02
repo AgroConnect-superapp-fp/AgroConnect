@@ -36,7 +36,7 @@ function buildSut() {
     userRepository,
     resetRepository,
     emailService,
-    register: new RegisterUserUseCase(userRepository, hasher, tokens),
+    register: new RegisterUserUseCase(userRepository, hasher),
     requestReset: new RequestPasswordResetUseCase(
       userRepository,
       resetRepository,

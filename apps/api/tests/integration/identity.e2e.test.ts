@@ -6,6 +6,7 @@ import { readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { AppModule } from '../../src/app.module';
 import { configureApp } from '../../src/app.setup';
+import { PrismaService } from '../../src/prisma/prisma.service';
 
 /**
  * Prueba e2e del módulo de identidad contra la base de datos real.
@@ -36,6 +37,12 @@ describe('Identity (e2e)', () => {
       throw new Error(`El correo de ${kind} no contiene el parámetro ${param}`);
     }
     return token;
+  };
+
+  /** D5: el registro no emite sesión; la prueba marca el correo como verificado. */
+  const verifyUser = async (email: string): Promise<void> => {
+    const prisma = app.get(PrismaService);
+    await prisma.user.update({ where: { email }, data: { emailVerifiedAt: new Date() } });
   };
 
   const registerPayload = (overrides: Record<string, unknown> = {}): Record<string, unknown> => ({
@@ -75,7 +82,7 @@ describe('Identity (e2e)', () => {
     await app.close();
   });
 
-  it('registra un usuario y entrega la sesión en cookies httpOnly', async () => {
+  it('registra un usuario sin emitir sesión hasta verificar el correo', async () => {
     const payload = registerPayload();
 
     const response = await request(server).post('/api/v1/auth/register').send(payload);
@@ -83,7 +90,7 @@ describe('Identity (e2e)', () => {
     expect(response.status).toBe(201);
     expect(response.body).toMatchObject({
       success: true,
-      message: 'Registro exitoso',
+      message: 'Registro exitoso. Revisa tu correo para verificar la cuenta.',
       data: {
         usuario: { correo: payload.correo, rol: 'productor' },
       },
@@ -91,10 +98,8 @@ describe('Identity (e2e)', () => {
     // Cookie-only puro: el cuerpo NUNCA debe exponer los tokens a JavaScript.
     expect(response.body.data).not.toHaveProperty('tokens');
 
-    const cookies = response.headers['set-cookie'] as unknown as string[];
-    expect(cookies.some((cookie) => cookie.startsWith('access_token='))).toBe(true);
-    expect(cookies.some((cookie) => cookie.startsWith('refresh_token='))).toBe(true);
-    expect(cookies.every((cookie) => cookie.includes('HttpOnly'))).toBe(true);
+    const cookies = response.headers['set-cookie'] as unknown as string[] | undefined;
+    expect(cookies ?? []).toHaveLength(0);
   });
 
   it('rechaza con 409 un correo ya registrado', async () => {
@@ -134,6 +139,12 @@ describe('Identity (e2e)', () => {
 
     const registered = await agent.post('/api/v1/auth/register').send(payload);
     expect(registered.status).toBe(201);
+    await verifyUser(payload.correo as string);
+
+    const login = await agent
+      .post('/api/v1/auth/login')
+      .send({ correo: payload.correo, password: 'ClaveSegura1' });
+    expect(login.status).toBe(200);
 
     // Sin refreshToken en el cuerpo: el interceptor lo toma de la cookie.
     const refreshed = await agent.post('/api/v1/auth/refresh').send({});
@@ -150,6 +161,12 @@ describe('Identity (e2e)', () => {
 
     const registered = await agent.post('/api/v1/auth/register').send(payload);
     expect(registered.status).toBe(201);
+    await verifyUser(payload.correo as string);
+
+    const login = await agent
+      .post('/api/v1/auth/login')
+      .send({ correo: payload.correo, password: 'ClaveSegura1' });
+    expect(login.status).toBe(200);
 
     const loggedOut = await agent.post('/api/v1/auth/logout').send({});
 
@@ -254,6 +271,8 @@ describe('Identity (e2e)', () => {
       .send({ token, password: 'NuevaClaveSegura2' });
     expect(reset.status).toBe(200);
     expect(reset.body).toMatchObject({ success: true, message: 'Contraseña actualizada correctamente' });
+
+    await verifyUser(payload.correo as string);
 
     const login = await request(server)
       .post('/api/v1/auth/login')

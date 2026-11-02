@@ -52,7 +52,6 @@ function AppContent(): React.ReactElement {
     return 'welcome';
   });
   const [selectedRole, setSelectedRole] = useState<RoleName>('productor');
-  const [justRegistered, setJustRegistered] = useState(false);
 
   function clearResetToken(): void {
     window.history.replaceState({}, '', window.location.pathname);
@@ -86,13 +85,7 @@ function AppContent(): React.ReactElement {
       );
     }
 
-    return (
-      <DashboardScreen
-        onOpenMarketplace={() => setView('marketplace')}
-        showSuccessBanner={justRegistered}
-        onDismissSuccessBanner={() => setJustRegistered(false)}
-      />
-    );
+    return <DashboardScreen onOpenMarketplace={() => setView('marketplace')} />;
   }
 
   if (view === 'roles') {
@@ -113,10 +106,6 @@ function AppContent(): React.ReactElement {
         role={selectedRole}
         onBack={() => setView('roles')}
         onGoToLogin={() => setView('login')}
-        onSuccess={() => {
-          setJustRegistered(true);
-          setView('dashboard');
-        }}
       />
     );
   }

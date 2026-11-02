@@ -10,4 +10,8 @@ export class FakePasswordHasher implements PasswordHasher {
       passwordHash === `hashed:${Buffer.from(plainPassword).toString('base64')}`,
     );
   }
+
+  needsRehash(): boolean {
+    return false;
+  }
 }

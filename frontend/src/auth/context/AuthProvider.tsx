@@ -55,13 +55,11 @@ export function AuthProvider({ children }: { children: ReactNode }): React.React
     [applySession]
   );
 
-  const register = useCallback(
-    async (payload: RegisterPayload) => {
-      const session = await authApi.register(payload);
-      applySession(session);
-    },
-    [applySession]
-  );
+  const register = useCallback(async (payload: RegisterPayload) => {
+    // D5: el registro no emite sesión. La cuenta debe verificar el correo
+    // antes de poder iniciar sesión.
+    await authApi.register(payload);
+  }, []);
 
   const loginDemo = useCallback(() => {
     // Sesión demo SOLO en memoria: no toca la API ni persiste nada.

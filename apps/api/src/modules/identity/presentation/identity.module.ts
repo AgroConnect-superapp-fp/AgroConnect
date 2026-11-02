@@ -20,7 +20,7 @@ import { VerifyEmailUseCase } from '../application/use-cases/VerifyEmailUseCase'
 import { PrismaUserRepository } from '../infrastructure/repositories/PrismaUserRepository';
 import { PrismaEmailVerificationTokenRepository } from '../infrastructure/repositories/PrismaEmailVerificationTokenRepository';
 import { PrismaPasswordResetTokenRepository } from '../infrastructure/repositories/PrismaPasswordResetTokenRepository';
-import { BcryptPasswordHasher } from '../infrastructure/services/BcryptPasswordHasher';
+import { Argon2PasswordHasher } from '../infrastructure/services/Argon2PasswordHasher';
 import { JwtTokenService } from '../infrastructure/services/JwtTokenService';
 import { FileEmailService } from '../infrastructure/services/FileEmailService';
 import { SmtpEmailService } from '../infrastructure/services/SmtpEmailService';
@@ -65,7 +65,7 @@ import { env } from '../../../shared/config/env';
     },
     {
       provide: PASSWORD_HASHER,
-      useFactory: () => new BcryptPasswordHasher(env.BCRYPT_SALT_ROUNDS),
+      useFactory: () => new Argon2PasswordHasher(),
     },
     {
       provide: TOKEN_SERVICE,
@@ -75,6 +75,8 @@ import { env } from '../../../shared/config/env';
           env.JWT_REFRESH_SECRET,
           env.JWT_ACCESS_EXPIRES_IN,
           env.JWT_REFRESH_EXPIRES_IN,
+          env.JWT_ISSUER,
+          env.JWT_AUDIENCE,
         ),
     },
     {

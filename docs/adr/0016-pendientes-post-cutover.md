@@ -48,36 +48,32 @@ que requieren criterio de producto o arquitectura.
 
 - **Situación:** `refresh_tokens` no tiene `family_id`/`generation`; un token
   rotado reutilizado no revoca la familia.
-- **Recomendación:** añadir `family_id` (UUID), `generation` (int) y
-  `rotated_at`; al detectar reuso, revocar toda la familia en una transacción.
-- **Criterio:** migración reversible, prueba de reuso concurrente y alerta de
-  seguridad cuando se detecte.
+- **Estado:** implementada el 2026-11-02 con migración
+  `20261103000000_add_refresh_token_family`, revocación de familia y prueba de
+  reuso. La migración debe aplicarse en la base nueva con `prisma migrate deploy`.
 
 ### D4. Argon2id
 
 - **Situación:** el ADR-010 lo exige, pero los 11 usuarios de desarrollo usan
   bcrypt (`$2b$`).
-- **Recomendación:** Argon2id para hashes nuevos y rehash transparente en el
-  login exitoso; mantener bcrypt para verificar los existentes.
-- **Criterio:** dependencia `argon2` con binario prebuilt, pruebas de rehash y
-  migración sin bloquear el login.
+- **Estado:** implementada el 2026-11-02 con `@node-rs/argon2`, fallback bcrypt
+  y rehash transparente en el login. Pruebas de hash, comparación y migración.
 
 ### D5. Verificación de correo antes de emitir sesión
 
 - **Situación:** el registro emite cookies sin esperar `emailVerifiedAt`.
 - **Opciones:** bloquear la sesión hasta verificar o permitir una sesión
   limitada (solo perfil y reenvío).
-- **Recomendación:** sesión limitada; no romper el flujo de registro ni los
-  E2E, pero impedir operaciones sensibles (publicar, comprar, cambiar rol).
-- **Criterio:** matriz de permisos por `verificado` y prueba E2E.
+- **Estado:** implementada el 2026-11-02 con **bloqueo total**: el registro no
+  emite cookies; login y refresh devuelven 403 `EMAIL_NOT_VERIFIED` hasta que
+  `emailVerifiedAt` exista. El E2E verifica el correo antes del login.
 
 ### D6. `iss`/`aud` en JWT
 
 - **Situación:** los tokens no llevan emisor ni audiencia.
-- **Recomendación:** añadirlos y aceptar una ventana de transición con
-  `issuer`/`audience` opcionales; invalidar sesiones fuera de la ventana.
-- **Criterio:** tokens viejos siguen funcionando durante el despliegue; los
-  nuevos se validan estrictamente.
+- **Estado:** implementada el 2026-11-02. Los tokens nuevos llevan `iss` y
+  `aud`; los antiguos (sin claims) dejan de ser válidos, por lo que los usuarios
+  deben iniciar sesión de nuevo.
 
 ### D7. Matrices de trazabilidad
 

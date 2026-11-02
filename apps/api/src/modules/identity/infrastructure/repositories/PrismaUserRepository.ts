@@ -115,13 +115,17 @@ export class PrismaUserRepository implements UserRepository {
           });
         }
 
-        await tx.refreshToken.create({
-          data: {
-            userId: user.id,
-            tokenHash: data.refreshToken.tokenHash,
-            expiresAt: data.refreshToken.expiresAt,
-          },
-        });
+        if (data.refreshToken) {
+          await tx.refreshToken.create({
+            data: {
+              userId: user.id,
+              tokenHash: data.refreshToken.tokenHash,
+              expiresAt: data.refreshToken.expiresAt,
+              familyId: data.refreshToken.familyId,
+              generation: data.refreshToken.generation,
+            },
+          });
+        }
 
         return user;
       });
@@ -136,12 +140,16 @@ export class PrismaUserRepository implements UserRepository {
     userId: string;
     tokenHash: string;
     expiresAt: Date;
+    familyId: string;
+    generation: number;
   }): Promise<void> {
     await this.prisma.refreshToken.create({
       data: {
         userId: data.userId,
         tokenHash: data.tokenHash,
         expiresAt: data.expiresAt,
+        familyId: data.familyId,
+        generation: data.generation,
       },
     });
   }
@@ -156,8 +164,11 @@ export class PrismaUserRepository implements UserRepository {
       id: record.id,
       userId: record.userId,
       tokenHash: record.tokenHash,
+      familyId: record.familyId,
+      generation: record.generation,
       expiresAt: record.expiresAt,
       revoked: record.revoked,
+      rotatedAt: record.rotatedAt,
       createdAt: record.createdAt,
     });
   }
@@ -165,6 +176,13 @@ export class PrismaUserRepository implements UserRepository {
   async revokeRefreshToken(tokenHash: string): Promise<void> {
     await this.prisma.refreshToken.updateMany({
       where: { tokenHash, revoked: false },
+      data: { revoked: true },
+    });
+  }
+
+  async revokeRefreshTokenFamily(familyId: string): Promise<void> {
+    await this.prisma.refreshToken.updateMany({
+      where: { familyId, revoked: false },
       data: { revoked: true },
     });
   }
@@ -178,7 +196,12 @@ export class PrismaUserRepository implements UserRepository {
 
   async rotateRefreshToken(
     currentTokenHash: string,
-    nextToken: { tokenHash: string; expiresAt: Date },
+    nextToken: {
+      tokenHash: string;
+      expiresAt: Date;
+      familyId: string;
+      generation: number;
+    },
   ): Promise<boolean> {
     return this.prisma.$transaction(async (tx) => {
       const current = await tx.refreshToken.findUnique({
@@ -188,11 +211,29 @@ export class PrismaUserRepository implements UserRepository {
         return false;
       }
 
+      // Reuso: el token ya fue rotado o revocado. Se revoca la familia
+      // completa para cortar una posible cadena robada.
+      if (current.revoked || current.rotatedAt !== null) {
+        await tx.refreshToken.updateMany({
+          where: { familyId: current.familyId, revoked: false },
+          data: { revoked: true },
+        });
+        return false;
+      }
+
+      if (current.expiresAt.getTime() <= Date.now()) {
+        return false;
+      }
+
       const revoked = await tx.refreshToken.updateMany({
-        where: { id: current.id, revoked: false },
-        data: { revoked: true },
+        where: { id: current.id, revoked: false, rotatedAt: null },
+        data: { revoked: true, rotatedAt: new Date() },
       });
       if (revoked.count !== 1) {
+        await tx.refreshToken.updateMany({
+          where: { familyId: current.familyId, revoked: false },
+          data: { revoked: true },
+        });
         return false;
       }
 
@@ -201,6 +242,8 @@ export class PrismaUserRepository implements UserRepository {
           userId: current.userId,
           tokenHash: nextToken.tokenHash,
           expiresAt: nextToken.expiresAt,
+          familyId: nextToken.familyId,
+          generation: nextToken.generation,
         },
       });
       return true;

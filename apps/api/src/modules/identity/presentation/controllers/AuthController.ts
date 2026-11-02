@@ -83,7 +83,6 @@ export class AuthController {
   @Throttle({ default: RATE_LIMIT })
   async register(
     @Body(new ZodValidationPipe(registerSchema)) body: RegisterUserInput,
-    @Res({ passthrough: true }) response: Response,
   ): Promise<unknown> {
     const result = await this.registerUserUseCase.execute(body);
 
@@ -96,13 +95,11 @@ export class AuthController {
         logger.warn({ err: error }, 'No fue posible enviar el correo de verificación');
       });
 
-    this.sessionCookies.setSessionCookies(response, result.tokens);
-
     return success(
       {
         usuario: result.user,
       },
-      'Registro exitoso',
+      'Registro exitoso. Revisa tu correo para verificar la cuenta.',
     );
   }
 

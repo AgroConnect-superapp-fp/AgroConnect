@@ -333,6 +333,16 @@ Los cambios se validaron con typecheck, lint, Jest, Vitest, build, E2E,
 `alignment --ci` y `security-audit.mjs`. El detalle y los criterios del Lote B
 están en `docs/adr/0016-pendientes-post-cutover.md`.
 
+### Lote B — D3/D4/D5/D6 Seguridad de sesión (2026-11-02)
+
+- **D3:** familias/generaciones de refresh con revocación en cascada y
+  migración `20261103000000_add_refresh_token_family`.
+- **D4:** Argon2id con fallback bcrypt y rehash transparente.
+- **D5:** registro sin sesión, verificación de correo obligatoria y 403
+  `EMAIL_NOT_VERIFIED` en login/refresh.
+- **D6:** `iss`/`aud` en JWT.
+- **Pruebas:** 205 backend · 21 unit · 10 E2E.
+
 ### Lote B — D2 Retiro del backend legacy (2026-11-02)
 
 - `backend/` eliminado; el esquema y las migraciones Prisma se movieron a

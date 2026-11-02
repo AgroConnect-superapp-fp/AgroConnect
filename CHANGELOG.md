@@ -50,6 +50,14 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 - **Runbook de recuperación** (`docs/runbook-recuperacion-supabase.md`):
   reactivar/crear el proyecto, actualizar el pooler, migrar, verificar RLS y
   cookies.
+- **D3 — familias de refresh:** `family_id`, `generation` y `rotated_at`; la
+  reutilización de un token rotado revoca toda la familia.
+- **D4 — Argon2id:** hashes nuevos con Argon2id, fallback bcrypt y rehash
+  transparente en el siguiente login válido.
+- **D5 — verificación de correo obligatoria:** el registro ya no emite sesión;
+  login y refresh responden 403 `EMAIL_NOT_VERIFIED` hasta verificar.
+- **D6 — `iss`/`aud` en JWT:** emisor y audiencia configurables; los tokens de
+  otro emisor se rechazan.
 - **D2 — retiro del backend legacy:** `backend/` eliminado; Prisma movido a
   `apps/api/prisma`; CI, rulesets y documentación con un único backend.
 - **PWA real** con `vite-plugin-pwa`: manifest, iconos 192/512/maskable, precache

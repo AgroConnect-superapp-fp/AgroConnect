@@ -62,6 +62,12 @@ export class InvalidCredentialsError extends DomainError {
   }
 }
 
+export class EmailNotVerifiedError extends DomainError {
+  constructor() {
+    super('EMAIL_NOT_VERIFIED', 'Debes verificar tu correo antes de iniciar sesión', 403);
+  }
+}
+
 export class InvalidTokenError extends DomainError {
   constructor(message = 'Token inválido o expirado') {
     super('TOKEN_INVALID', message, 401);

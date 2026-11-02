@@ -260,8 +260,11 @@ describe('RefreshToken', () => {
     id: randomUUID(),
     userId: randomUUID(),
     tokenHash: 'hash',
+    familyId: randomUUID(),
+    generation: 0,
     expiresAt: new Date(Date.now() + 60_000),
     revoked: false,
+    rotatedAt: null,
     createdAt: new Date(),
   };
 
@@ -277,5 +280,11 @@ describe('RefreshToken', () => {
     const expired = RefreshToken.create({ ...base, expiresAt: new Date(Date.now() - 1_000) });
     expect(expired.isExpired()).toBe(true);
     expect(expired.isUsable()).toBe(false);
+  });
+
+  it('no está vigente cuando ya fue rotado', () => {
+    const rotated = RefreshToken.create({ ...base, rotatedAt: new Date() });
+    expect(rotated.isRotated()).toBe(true);
+    expect(rotated.isUsable()).toBe(false);
   });
 });
