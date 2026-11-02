@@ -46,6 +46,8 @@
 
 ## 3. Hallazgos P0 (corregir antes de cualquier release)
 
+> **Estado de ejecución (2026-11-02):** P0-01 a P0-05 están corregidos en la rama `release/p0-nestjs-cutover` (PR #63). Producción sigue vulnerable hasta que el PR se mergee y Render/Vercel desplieguen. P0-06 (RLS de Supabase) requiere verificación manual con `scripts/verify-supabase-rls.sql`.
+
 ### P0-01 — Auto-registro como administrador en producción
 - **Evidencia:** `main:backend/src/modules/auth/domain/entities/Role.ts:3-9` incluye `administrador`; `main:backend/src/modules/auth/presentation/schemas/authSchemas.ts:4` usa `z.enum(ROLE_NAMES)`; `main:backend/src/modules/auth/application/useCases/RegisterUserUseCase.ts:48-51` solo valida que el rol exista. En `main` hay **0** coincidencias de `isSelfRegistrable`/`ROLE_NOT_ALLOWED`.
 - **Impacto:** cualquier visitante puede crear una cuenta con rol administrador y acceder a funciones privilegiadas. Es explotable hoy.
@@ -72,7 +74,7 @@
 
 ### P0-05 — Despliegue frágil: IaC divergente, dos configuraciones de Vercel y deploy tolerante a fallo
 - **Evidencia:**
-  - `render.yaml:3` declara `agroconnect-api`, pero el servicio real es `agroconnect-api-5t7n.onrender.com`; `https://agroconnect-api.onrender.com/health` responde **404 `x-render-routing: no-server`**.
+  - `render.yaml:3` declara el servicio `agroconnect-api`, pero la URL canónica es `agroconnect-api-5t7n.onrender.com` (Render añade un sufijo al subdominio; no implica un nombre de servicio distinto). Lo relevante es que el `rootDir`/build apuntaba al backend Express legacy y no a `apps/api`.
   - Existen `vercel.json` raíz (`build -w agroconnect-frontend`) y `frontend/vercel.json` (root `frontend`, `npm install`, `npm run build`). El proyecto Vercel usa el segundo.
   - El job de deploy (`ci.yml:309-326`) hace `vercel pull` y, si falla, emite warning y **omite** el deploy: un release puede “pasar” sin desplegar.
   - `frontend` depende de `@agroconnect/contracts`, que requiere build previo; el `npm install` aislado en `frontend` no garantiza el `dist` del contrato.
@@ -248,4 +250,46 @@ docker exec agroconnect-postgres psql -U agroconnect -d agroconnect_dev -Atc \
 
 ---
 
-**Nota de ubicación:** este informe se guardó en `docs/`, que está en `.gitignore` (política actual: solo `docs/adr/` se versiona). Si se quiere conservar en GitHub, moverlo a `docs/adr/` o ajustar la regla del `.gitignore`.
+**Ubicación:** `docs/auditoria-2026-11-02.md`, versionado en el repositorio desde el 2026-11-02.
+
+---
+
+## 11. Ejecución de la Fase 0 (2026-11-02)
+
+**Decisión del owner:** promover `apps/api` (NestJS), `SameSite=None` + `Origin` + CSRF con los dominios actuales, y versionar `docs/` y `scripts/`.
+
+**Rama:** `release/p0-nestjs-cutover` · **PR:** https://github.com/AgroConnect-superapp-fp/AgroConnect/pull/63 · **Commit:** `786b1d0` (85 archivos, +7 678/−120).
+
+### Cambios aplicados
+
+| Área | Cambio |
+|---|---|
+| Sesión | Cookies `httpOnly`; `SameSite=None; Secure` en producción; `Path=/api/v1` (access) y `/api/v1/auth` (refresh); tokens fuera del cuerpo de auth |
+| CSRF | `CsrfGuard` global: `Origin`/`Referer` contra `CORS_ORIGIN` + `X-Requested-With`; test de regresión |
+| Frontend | `authClient` envía `X-Requested-With`; `AuthSession` ya no modela tokens |
+| Cutover | `render.yaml` construye el monorepo y arranca `@agroconnect/api`; `TRUST_PROXY=1`; rate limit 10 |
+| Vercel | Build de contratos + frontend; CSP, XFO, XCTO, Referrer-Policy, Permissions-Policy y HSTS |
+| CI | Deploy fail-closed; `vercel@64.3.1` |
+| Higiene | `docs/` y `scripts/` versionados; `.open-design.json` ignorado; Postgres local solo en loopback (config) |
+| Documentación | ADR-010, runbook, README, CHANGELOG y manifiesto sincronizados |
+
+### Gates ejecutados tras los cambios
+
+| Gate | Resultado |
+|---|---|
+| `turbo run typecheck` | 5/5 |
+| `turbo run lint` | 3/3 |
+| `turbo run test` | 188 legacy + 194 NestJS |
+| Frontend unit | 21/21 |
+| Frontend build | OK |
+| E2E Playwright | 10/10 |
+| `alignment-check --ci` | OK |
+
+### Pendiente de ejecución manual (permisos del agente)
+
+1. `chmod 600 .env .env.local backend/.env backend/.env.local frontend/.env.local .vercel/.env.production.local` (la regla de permisos bloquea `*.env*`).
+2. Recrear Postgres para aplicar `127.0.0.1:5434`: `docker rm -f agroconnect-postgres && docker compose up -d` (los datos viven en el volumen `agroconnect_pgdata`).
+3. Configurar `VERCEL_TOKEN` en GitHub Secrets; sin él el deploy falla por diseño.
+4. Verificar RLS de Supabase y auditar cuentas administradoras con los scripts versionados.
+5. Sincronizar Obsidian y Notion (siguen con los conteos anteriores).
+
