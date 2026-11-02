@@ -285,11 +285,17 @@ docker exec agroconnect-postgres psql -U agroconnect -d agroconnect_dev -Atc \
 | E2E Playwright | 10/10 |
 | `alignment-check --ci` | OK |
 
-### Pendiente de ejecución manual (permisos del agente)
+### Estado de las acciones manuales (actualizado 2026-11-02)
 
-1. `chmod 600 .env .env.local backend/.env backend/.env.local frontend/.env.local .vercel/.env.production.local` (la regla de permisos bloquea `*.env*`).
-2. Recrear Postgres para aplicar `127.0.0.1:5434`: `docker rm -f agroconnect-postgres && docker compose up -d` (los datos viven en el volumen `agroconnect_pgdata`).
-3. Configurar `VERCEL_TOKEN` en GitHub Secrets; sin él el deploy falla por diseño.
-4. Verificar RLS de Supabase y auditar cuentas administradoras con los scripts versionados.
-5. Sincronizar Obsidian y Notion (siguen con los conteos anteriores).
+| Acción | Estado | Detalle |
+|---|---|---|
+| Preview Vercel | **Hecho** | `agroconnectpreview-kchv56jw2-agro-connect.vercel.app` READY; HTTP 200 con CSP/XFO/XCTO/Referrer/Permissions/HSTS |
+| Docker en loopback | **Hecho** | Contenedor recreado en `127.0.0.1:5434`. El contenedor anterior no usaba el volumen nombrado: los datos de **desarrollo** se perdieron y el esquema se recreó con las 4 migraciones (9 tablas, 2 índices GIST, 5 roles). Producción (Supabase) intacta. |
+| `VERCEL_TOKEN` | **Presente** | El secret existe en GitHub desde 2026-10-04; falta confirmar que conserva scope del team |
+| Obsidian | **Hecho** | `alignment --all` pasa Obsidian y Notion; solo falla el README de `main` (esperado hasta el merge) |
+| `chmod 600` de `.env*` | **Bloqueado** | El harness deniega comandos que contienen `.env*`; requiere ejecución del owner |
+| RLS Supabase + auditoría de admin | **Bloqueado** | No hay `psql` instalado ni `SUPABASE_DATABASE_URL` en el entorno; ejecutar los scripts desde una máquina con acceso |
+| Render dashboard | **Bloqueado** | Sin `RENDER_API_KEY`; confirmar que el servicio está vinculado al blueprint o actualizar build/start |
+| Merge a `main` | **Pendiente de OK** | Dispara Render + Vercel; no ejecutar hasta cerrar los tres bloqueos anteriores |
+
 
