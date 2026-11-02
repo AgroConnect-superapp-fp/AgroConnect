@@ -96,11 +96,27 @@ export async function fetchProperties(): Promise<Property[]> {
 
 export async function searchProperties(query: string): Promise<Property[]> {
   try {
-    const q = query.toLowerCase().trim();
+    // PostgREST usa comas, paréntesis y comillas como sintaxis de filtros.
+    // Se eliminan junto con los wildcards de ILIKE y se limita la longitud
+    // para que la entrada del usuario no altere la consulta.
+    const term = query
+      .toLowerCase()
+      .trim()
+      .replace(/[%_,()'"]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .slice(0, 80);
+
+    if (term.length === 0) {
+      return [];
+    }
+
+    const pattern = `%${term}%`;
     const { data, error } = await supabase
       .from('properties')
       .select('*')
-      .or(`name.ilike.%${q}%,municipality.ilike.%${q}%,department.ilike.%${q}%`)
+      .or(
+        `name.ilike.${pattern},municipality.ilike.${pattern},department.ilike.${pattern}`
+      )
       .order('created_at', { ascending: false });
     if (error) throw error;
     return (data as PropertyRow[]).map(mapRowToProperty);

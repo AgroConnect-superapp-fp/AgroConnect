@@ -108,24 +108,24 @@ export function buildOpenApiDocument(): OpenApiDocument {
     servers: [{ url: '/api/v1' }],
     paths: {
       '/auth/register': authOperation('Registra un nuevo usuario (productor, comprador o transportista)', 'RegisterRequestBody', {
-        '201': response('Usuario creado; se envía correo de verificación'),
+        '201': response('Usuario creado; sesión en cookies httpOnly y correo de verificación'),
         '409': response('Correo o documento ya registrados'),
         ...validationErrors,
         ...rateLimited,
       }),
-      '/auth/login': authOperation('Autentica un usuario y emite tokens JWT', 'LoginRequestBody', {
-        '200': response('Tokens de acceso y refresco emitidos'),
+      '/auth/login': authOperation('Autentica un usuario; la sesión se entrega en cookies httpOnly', 'LoginRequestBody', {
+        '200': response('Sesión creada; cookies httpOnly emitidas'),
         '401': response('Credenciales inválidas o correo sin verificar'),
         ...validationErrors,
         ...rateLimited,
       }),
-      '/auth/refresh': authOperation('Renueva el par de tokens con un refresh token válido', 'RefreshRequestBody', {
-        '200': response('Nuevos tokens emitidos'),
+      '/auth/refresh': authOperation('Renueva la sesión con la cookie httpOnly de refresh', 'RefreshRequestBody', {
+        '200': response('Sesión renovada; cookies httpOnly rotadas'),
         '401': response('Refresh token inválido, expirado o revocado'),
         ...validationErrors,
         ...rateLimited,
       }),
-      '/auth/logout': authOperation('Revoca la sesión del refresh token entregado', 'LogoutRequestBody', {
+      '/auth/logout': authOperation('Revoca la sesión y limpia las cookies', 'LogoutRequestBody', {
         '204': response('Sesión revocada'),
         ...validationErrors,
       }),

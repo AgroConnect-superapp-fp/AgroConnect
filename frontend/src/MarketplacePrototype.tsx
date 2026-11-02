@@ -13,6 +13,7 @@
 
 import { useState, lazy, Suspense, useMemo, useEffect } from 'react';
 import { fetchProperties } from './services/supabase';
+import { devLog } from './utils/devLog';
 import { resolveImageUrl } from './services/cloudinary';
 import { MOCK_PROPERTIES } from './data/mockProperties';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
@@ -466,7 +467,7 @@ function App(): React.ReactElement {
                 showProductiveZones={showProductiveZones}
                 enableDrawing={enableDrawing}
                 onPolygonCreated={(coords) => {
-                  console.log('[App] 🎯 New parcel created:', coords);
+                  devLog('[App] 🎯 New parcel created:', coords);
                 }}
               />
             </Suspense>

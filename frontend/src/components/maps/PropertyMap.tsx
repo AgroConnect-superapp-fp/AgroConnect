@@ -11,6 +11,7 @@
  */
 
 import React, { useEffect, useCallback, useState, useRef } from 'react';
+import { devLog } from '../../utils/devLog';
 import {
   MapContainer,
   TileLayer,
@@ -202,11 +203,11 @@ function clearSearchInput(mapContainer: HTMLElement): void {
   setTimeout(() => {
     if (resultsContainer) {
       resultsContainer.innerHTML = '';
-      console.log('[AgroConnect] 🧹 Results container cleared');
+      devLog('[AgroConnect] 🧹 Results container cleared');
     }
   }, 50);
 
-  console.log('[AgroConnect] 🧹 Search input cleared');
+  devLog('[AgroConnect] 🧹 Search input cleared');
 }
 
 /**
@@ -218,7 +219,7 @@ function flyToAndOpenPopup(
   isMounted: { current: boolean },
   onPopupOpen?: (propertyId: string) => void
 ): void {
-  console.log('[AgroConnect] 🎯 Flying to property:', property.name);
+  devLog('[AgroConnect] 🎯 Flying to property:', property.name);
 
   const mapContainer = map.getContainer();
   const targetLatLng: L.LatLngExpression = [property.lat, property.lng];
@@ -241,14 +242,14 @@ function flyToAndOpenPopup(
 
     if (targetMarker !== null) {
       const markerRef: L.Marker = targetMarker;
-      console.log('[AgroConnect] ✅ Marker found, opening popup');
+      devLog('[AgroConnect] ✅ Marker found, opening popup');
 
       map.closePopup();
 
       setTimeout(() => {
         try {
           markerRef.openPopup();
-          console.log('[AgroConnect] ✅ Popup opened successfully for:', property.name);
+          devLog('[AgroConnect] ✅ Popup opened successfully for:', property.name);
 
           if (onPopupOpen) {
             onPopupOpen(property.id);
@@ -272,7 +273,7 @@ function flyToAndOpenPopup(
  * Helper function: fly to geographic place (no popup)
  */
 function flyToPlace(map: L.Map, lat: number, lng: number, zoom: number = 13): void {
-  console.log('[AgroConnect] 📍 Flying to place:', lat, lng);
+  devLog('[AgroConnect] 📍 Flying to place:', lat, lng);
 
   const mapContainer = map.getContainer();
   clearSearchInput(mapContainer);
@@ -292,7 +293,7 @@ function MapInstanceCapture({
 
   useEffect(() => {
     mapRef.current = map;
-    console.log('[AgroConnect] 🗺️ Map instance captured');
+    devLog('[AgroConnect] 🗺️ Map instance captured');
   }, [map, mapRef]);
 
   return null;
@@ -308,7 +309,7 @@ function ZoomLockOnPopup(): null {
     const mapContainer = map.getContainer();
 
     const disableZoom = (): void => {
-      console.log('[AgroConnect] 🔒 Zoom disabled (popup open)');
+      devLog('[AgroConnect] 🔒 Zoom disabled (popup open)');
 
       if (map.scrollWheelZoom) map.scrollWheelZoom.disable();
       if (map.doubleClickZoom) map.doubleClickZoom.disable();
@@ -319,7 +320,7 @@ function ZoomLockOnPopup(): null {
     };
 
     const enableZoom = (): void => {
-      console.log('[AgroConnect] 🔓 Zoom enabled (popup closed)');
+      devLog('[AgroConnect] 🔓 Zoom enabled (popup closed)');
 
       if (map.scrollWheelZoom) map.scrollWheelZoom.enable();
       if (map.doubleClickZoom) map.doubleClickZoom.enable();
@@ -355,14 +356,14 @@ function SearchControl({
   const map = useMap();
 
   useEffect(() => {
-    console.log('[AgroConnect] 🔧 SearchControl useEffect started');
+    devLog('[AgroConnect] 🔧 SearchControl useEffect started');
 
     const mapContainer = map.getContainer();
     const existingControl = mapContainer.querySelector(
       `.${MAP_CONSTANTS.SEARCH_CONTROL_CSS_CLASS}`
     );
     if (existingControl) {
-      console.log('[AgroConnect] ⚠️ Control already exists, skipping');
+      devLog('[AgroConnect] ⚠️ Control already exists, skipping');
       return;
     }
 
@@ -385,18 +386,18 @@ function SearchControl({
       e.stopPropagation();
 
       const resultText = resultItem.textContent || '';
-      console.log('[AgroConnect] 🖱️ Result clicked:', resultText);
+      devLog('[AgroConnect] 🖱️ Result clicked:', resultText);
 
       if (resultText.startsWith('🌱')) {
         const selectedProperty = findPropertyByName(resultText, properties);
 
         if (selectedProperty) {
-          console.log('[AgroConnect] ✅ Property found:', selectedProperty.name);
+          devLog('[AgroConnect] ✅ Property found:', selectedProperty.name);
           flyToAndOpenPopup(map, selectedProperty, isMounted, onPopupOpen);
         }
       } else if (resultText.startsWith('📍')) {
         const placeName = resultText.substring(2).trim();
-        console.log('[AgroConnect] 📍 Place selected:', placeName);
+        devLog('[AgroConnect] 📍 Place selected:', placeName);
 
         fetch(
           `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(placeName)}&limit=1&countrycodes=co`,
@@ -420,11 +421,11 @@ function SearchControl({
     };
 
     mapContainer.addEventListener('click', globalClickHandler, true);
-    console.log('[AgroConnect] 👂 Global click handler attached');
+    devLog('[AgroConnect] 👂 Global click handler attached');
 
     const init = async (): Promise<void> => {
       try {
-        console.log('[AgroConnect] 📦 Importing leaflet-geosearch...');
+        devLog('[AgroConnect] 📦 Importing leaflet-geosearch...');
         const { SearchControl: SearchControlClass } = await import('leaflet-geosearch');
         if (!isMounted.current) return;
 
@@ -449,7 +450,7 @@ function SearchControl({
         });
 
         map.addControl(control as unknown as L.Control);
-        console.log('[AgroConnect] ✅ SearchControl added to map');
+        devLog('[AgroConnect] ✅ SearchControl added to map');
 
         observer = new MutationObserver(() => {
           if (!isMounted.current) return;
@@ -459,7 +460,7 @@ function SearchControl({
           );
 
           if (form && !formSubmitHandler) {
-            console.log('[AgroConnect] 📋 Form detected');
+            devLog('[AgroConnect] 📋 Form detected');
 
             formSubmitHandler = (e: Event) => {
               e.preventDefault();
@@ -468,16 +469,16 @@ function SearchControl({
               const input = form.querySelector<HTMLInputElement>('input');
               const queryValue = input?.value.trim() || '';
 
-              console.log('[AgroConnect] 📝 Form submitted:', queryValue);
+              devLog('[AgroConnect] 📝 Form submitted:', queryValue);
               if (!queryValue) return;
 
               const matchedProperty = findPropertyByName(queryValue, properties);
 
               if (matchedProperty) {
-                console.log('[AgroConnect] ✅ Enter matched:', matchedProperty.name);
+                devLog('[AgroConnect] ✅ Enter matched:', matchedProperty.name);
                 flyToAndOpenPopup(map, matchedProperty, isMounted, onPopupOpen);
               } else {
-                console.log('[AgroConnect] 🔍 Searching place:', queryValue);
+                devLog('[AgroConnect] 🔍 Searching place:', queryValue);
 
                 fetch(
                   `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(queryValue)}&limit=1&countrycodes=co`,
@@ -516,7 +517,7 @@ function SearchControl({
     void init();
 
     return () => {
-      console.log('[AgroConnect] 🧹 SearchControl cleanup');
+      devLog('[AgroConnect] 🧹 SearchControl cleanup');
       isMounted.current = false;
 
       mapContainer.removeEventListener('click', globalClickHandler, true);
@@ -970,7 +971,7 @@ export function PropertyMap({
       if (marker) {
         try {
           marker.openPopup();
-          console.log('[AgroConnect] ✅ Popup restored for:', property.name);
+          devLog('[AgroConnect] ✅ Popup restored for:', property.name);
         } catch (err) {
           console.warn('[AgroConnect] ⚠️ Could not restore popup:', err);
         }
@@ -980,12 +981,12 @@ export function PropertyMap({
 
   const handlePopupOpen = useCallback((propertyId: string) => {
     openPopupPropertyIdRef.current = propertyId;
-    console.log('[AgroConnect] 📌 Popup state saved for property:', propertyId);
+    devLog('[AgroConnect] 📌 Popup state saved for property:', propertyId);
   }, []);
 
   const handlePopupClose = useCallback(() => {
     openPopupPropertyIdRef.current = null;
-    console.log('[AgroConnect] 📌 Popup state cleared');
+    devLog('[AgroConnect] 📌 Popup state cleared');
   }, []);
 
   return (

@@ -8,7 +8,7 @@ Centro de Comercio y Turismo · Regional Quindío · Programa Análisis y Desarr
 
 [![CI](https://github.com/AgroConnect-superapp-fp/AgroConnect/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/AgroConnect-superapp-fp/AgroConnect/actions/workflows/ci.yml)
 [![Node](https://img.shields.io/badge/node-%E2%89%A5%2020-339933?logo=node.js&logoColor=white)](.nvmrc)
-[![Pruebas](https://img.shields.io/badge/pruebas-384%20backend%20%C2%B7%2021%20unit%20%C2%B7%2010%20E2E-brightgreen)](https://github.com/AgroConnect-superapp-fp/AgroConnect/actions/workflows/ci.yml)
+[![Pruebas](https://img.shields.io/badge/pruebas-386%20backend%20%C2%B7%2021%20unit%20%C2%B7%2010%20E2E-brightgreen)](https://github.com/AgroConnect-superapp-fp/AgroConnect/actions/workflows/ci.yml)
 [![Deploy](https://img.shields.io/badge/producci%C3%B3n-Vercel%20%C2%B7%20Render-000000?logo=vercel&logoColor=white)](https://agroconnectpreview.vercel.app)
 [![Licencia](https://img.shields.io/badge/licencia-Todos%20los%20derechos%20reservados-red)](LICENSE)
 
@@ -132,9 +132,9 @@ AgroConnect/
 │   ├── prisma/  # Esquema y migraciones (PostgreSQL 16 + PostGIS)
 │   ├── src/     # config, shared y módulos (auth, geography)
 │   └── tests/   # unitarias, integración y dobles de prueba
-└── frontend/    # SPA React — PWA con Service Worker
+└── frontend/    # SPA React (PWA pendiente: SW sin registrar)
     ├── src/     # auth (M02), componentes de mapa y UI, servicios
-    ├── public/  # Service Worker e iconografía
+    ├── public/  # SW (sin registrar) e iconografía
     └── e2e/     # Pruebas end-to-end con Playwright
 ```
 
@@ -164,16 +164,16 @@ Características: contraseñas con bcrypt, unicidad de correo/documento/celular 
 - Parcelas almacenadas como `geography(Point, 4326)` con índice GiST y búsqueda por radio con `ST_DWithin` en `/api/v1/plots`.
 - Frontend: mapa Leaflet + OpenStreetMap con 4 capas base (OSM, satélite Esri, topográfico, CartoDB), clustering de fincas, heatmap de productividad y herramientas de dibujo de parcelas.
 
-### M03 — Prototipo del mercado (Supabase) y PWA
+### M03 — Prototipo del mercado (Supabase)
 
 - Marketplace React sobre datos de Supabase (PostgreSQL + PostgREST): mapa, KPIs, distribución por cultivo y tarjetas de fincas.
 - Imágenes de cultivos con créditos (autor · licencia) en la galería, fallback automático por cultivo (`SafeImage`) y LQIP por proveedor (Unsplash/Wikimedia/Cloudinary).
 - Respaldo de datos de demostración con aviso visible cuando Supabase no responde.
-- PWA: service worker con caché *stale-while-revalidate* de imágenes externas.
+- PWA: pendiente. El `sw.js` existe pero no está registrado ni hay manifest enlazado; no se promete instalación offline.
 
 ### Calidad
 
-- 384 pruebas backend (188 legacy + 196 NestJS; cobertura >95 % en líneas) · 21 pruebas unitarias de frontend (Vitest) · 10 pruebas E2E (Playwright: autenticación real, modo demo y marketplace).
+- 386 pruebas backend (188 legacy + 198 NestJS; cobertura >95 % en líneas) · 21 pruebas unitarias de frontend (Vitest) · 10 pruebas E2E (Playwright: autenticación real, modo demo y marketplace).
 
 ---
 
@@ -260,7 +260,7 @@ Despliegue (resumen): Blueprint `render.yaml` → `DATABASE_URL` con la connecti
 
 ## Sincronización entre entornos (local · GitHub · Notion · Obsidian)
 
-Un **manifiesto de hechos canónicos** (`tools/alignment-check/manifest.json`) centraliza los datos compartidos —URLs, stack, cifras de trazabilidad (17·68·30·66·69·6), conteos de pruebas (384 · 21 · 10), visibilidad del repositorio y última release— y un verificador comprueba que los cuatro entornos manejen la misma información **sin incongruencias**. No son espejos: cada entorno conserva su rol; el mecanismo garantiza que los hechos compartidos sean idénticos y, ante cada ❌, indica exactamente **qué actualizar** (`→ hint`).
+Un **manifiesto de hechos canónicos** (`tools/alignment-check/manifest.json`) centraliza los datos compartidos —URLs, stack, cifras de trazabilidad (17·68·30·66·69·6), conteos de pruebas (386 · 21 · 10), visibilidad del repositorio y última release— y un verificador comprueba que los cuatro entornos manejen la misma información **sin incongruencias**. No son espejos: cada entorno conserva su rol; el mecanismo garantiza que los hechos compartidos sean idénticos y, ante cada ❌, indica exactamente **qué actualizar** (`→ hint`).
 
 ```bash
 node tools/alignment-check/check-alignment.mjs        # local + GitHub (+ API) + Obsidian
