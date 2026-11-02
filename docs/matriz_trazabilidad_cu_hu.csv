@@ -64,12 +64,12 @@ CU#62,Generar Factura Electrónica con CUFE (DIAN),M15,HU57,Generar Factura Elec
 CU#63,Definir Zona de Cobertura Geográfica,M16,HU58,Definir Zona de Cobertura Geográfica,1.0,Fuerte
 CU#64,Calcular Ruta Óptima de Entrega Multi-Destino,M16,HU59,Calcular Ruta Óptima Multi-Destino,1.0,Fuerte
 CU#65,Trackear Ubicación en Tiempo Real del Transportista,M16,HU60,Trackear Ubicación en Tiempo Real del Transportista,1.0,Fuerte
+CU#66,Auditar Cumplimiento de Cadena de Frío para ICA,M17,HU61,Registrar Lote Perecedero con ICA,1.0,Fuerte
+CU#66,Auditar Cumplimiento de Cadena de Frío para ICA,M17,HU62,Monitorear Cadena de Frío,1.0,Fuerte
+CU#66,Auditar Cumplimiento de Cadena de Frío para ICA,M17,HU63,Registrar Incidencia en Transporte (Humedad/Golpe),1.0,Fuerte
+CU#66,Auditar Cumplimiento de Cadena de Frío para ICA,M17,HU64,Recibir Alertas Escalonadas de Vencimiento,1.0,Fuerte
+CU#66,Auditar Cumplimiento de Cadena de Frío para ICA,M17,HU65,Rastrear Lote desde Productor a Consumidor,1.0,Fuerte
+CU#66,Auditar Cumplimiento de Cadena de Frío para ICA,M17,HU66,Priorizar Lotes por Urgencia de Venta,1.0,Fuerte
+CU#66,Auditar Cumplimiento de Cadena de Frío para ICA,M17,HU67,Generar Reportes de Vencimiento,1.0,Fuerte
 CU#66,Auditar Cumplimiento de Cadena de Frío para ICA,M17,HU68,Cumplir Auditoría de Cadena de Frío para ICA,1.0,Fuerte
 CU#66,Auditar Cumplimiento de Cadena de Frío para ICA,M17,HU69,Clasificar Producto como Perecedero,0.9,Provisional
-CU#66,Auditar Cumplimiento de Cadena de Frío para ICA,M17,HU70,Registrar Fecha de Cosecha,0.8,Provisional
-CU#66,Auditar Cumplimiento de Cadena de Frío para ICA,M17,HU71,Registrar Fecha de Caducidad,0.9,Provisional
-CU#66,Auditar Cumplimiento de Cadena de Frío para ICA,M17,HU72,Configurar Ventana de Entrega por Tipo de Producto,0.6,Provisional
-CU#66,Auditar Cumplimiento de Cadena de Frío para ICA,M17,HU73,Rastrear Origen del Producto,0.9,Provisional
-CU#66,Auditar Cumplimiento de Cadena de Frío para ICA,M17,HU74,Registrar Condiciones de Almacenamiento,0.8,Provisional
-CU#66,Auditar Cumplimiento de Cadena de Frío para ICA,M17,HU75,Notificar Vencimiento Próximo,0.5,Provisional
-CU#66,Auditar Cumplimiento de Cadena de Frío para ICA,M17,HU76,Generar Reporte de Cadena de Frío,1.0,Provisional

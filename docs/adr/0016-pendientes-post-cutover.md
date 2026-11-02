@@ -80,8 +80,11 @@ que requieren criterio de producto o arquitectura.
 
 ### D7. Matrices de trazabilidad
 
-- **Situación:** `matriz_trazabilidad_cu_hu.csv` tiene 74 filas y el total
-  oficial es 69 HU/66 CU; `detalle` tiene 203 filas.
+- **Situación:** `matriz_trazabilidad_cu_hu.csv` tiene 74 relaciones y el
+  total oficial es 69 HU/66 CU; `detalle` tiene 203 filas.
+- **Estado:** parcialmente implementada (2026-11-02). M17 corregido:
+  HU70–HU76 (inexistentes) reemplazadas por HU61–HU67 con CU#66. Quedan 6 HU
+  sin CU (HU06, HU08, HU15, HU28, HU30, HU33) para validar en Notion.
 - **Recomendación:** reconciliar contra Notion (fuente SSOT), marcar duplicados
   o HU mal clasificadas y regenerar los CSV con el script.
 - **Criterio:** `traceability-check` sin discrepancias y matriz firmada.

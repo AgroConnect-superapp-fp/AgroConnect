@@ -2,7 +2,7 @@
 **Fecha de generación:** 2026-07-03T10:35:29.992345
 **Fuentes:** Notion PT-ERS-01 (RF), Notion Base de Casos de Uso (CU), Notion Base de Historias de Usuario (HU).
 **Totales oficiales SENA:** 17 módulos, 68 RF, 66 CU, 69 HU.
-**Estado:** ✅ 100% de artefactos mapeados; 84 propiedades de módulo actualizadas en Notion; 0 relaciones débiles RF→CU y CU→HU.
+**Estado:** 100% de artefactos identificados (68 RF, 66 CU, 69 HU). **6 HU sin relación CU↔HU** (HU06, HU08, HU15, HU28, HU30, HU33) pendientes de validar en Notion; ver `matriz_trazabilidad_hallazgos.md`.
 
 ## Resumen de Totales
 | Artefacto | Esperado | Mapeados | Estado |
@@ -133,13 +133,13 @@
 | RF-67 | Ventana de Entrega Garantizada | CU#66 | Auditar Cumplimiento de Cadena de Frío para ICA | HU68 | Cumplir Auditoría de Cadena de Frío para ICA |
 | RF-68 | Trazabilidad Origen-Destino | CU#66 | Auditar Cumplimiento de Cadena de Frío para ICA | HU68 | Cumplir Auditoría de Cadena de Frío para ICA |
 | — | — | CU#66 | Auditar Cumplimiento de Cadena de Frío para ICA | HU69 | Clasificar Producto como Perecedero |
-| — | — | CU#66 | Auditar Cumplimiento de Cadena de Frío para ICA | HU70 | Registrar Fecha de Cosecha |
-| — | — | CU#66 | Auditar Cumplimiento de Cadena de Frío para ICA | HU71 | Registrar Fecha de Caducidad |
-| — | — | CU#66 | Auditar Cumplimiento de Cadena de Frío para ICA | HU72 | Configurar Ventana de Entrega por Tipo de Producto |
-| — | — | CU#66 | Auditar Cumplimiento de Cadena de Frío para ICA | HU73 | Rastrear Origen del Producto |
-| — | — | CU#66 | Auditar Cumplimiento de Cadena de Frío para ICA | HU74 | Registrar Condiciones de Almacenamiento |
-| — | — | CU#66 | Auditar Cumplimiento de Cadena de Frío para ICA | HU75 | Notificar Vencimiento Próximo |
-| — | — | CU#66 | Auditar Cumplimiento de Cadena de Frío para ICA | HU76 | Generar Reporte de Cadena de Frío |
+| — | — | CU#66 | Auditar Cumplimiento de Cadena de Frío para ICA | HU61 | Registrar Lote Perecedero con ICA |
+| — | — | CU#66 | Auditar Cumplimiento de Cadena de Frío para ICA | HU62 | Monitorear Cadena de Frío |
+| — | — | CU#66 | Auditar Cumplimiento de Cadena de Frío para ICA | HU63 | Registrar Incidencia en Transporte (Humedad/Golpe) |
+| — | — | CU#66 | Auditar Cumplimiento de Cadena de Frío para ICA | HU64 | Recibir Alertas Escalonadas de Vencimiento |
+| — | — | CU#66 | Auditar Cumplimiento de Cadena de Frío para ICA | HU65 | Rastrear Lote desde Productor a Consumidor |
+| — | — | CU#66 | Auditar Cumplimiento de Cadena de Frío para ICA | HU66 | Priorizar Lotes por Urgencia de Venta |
+| — | — | CU#66 | Auditar Cumplimiento de Cadena de Frío para ICA | HU67 | Generar Reportes de Vencimiento |
 
 ## Validación de Cobertura
 - Cada RF tiene al menos un CU asignado dentro de su módulo.

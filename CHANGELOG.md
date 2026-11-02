@@ -110,6 +110,9 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
   comillas) y limita la longitud de la búsqueda.
 - **Frontend:** las trazas de debug de `PropertyMap`, `MarketplacePrototype` y
   `PropertyDetailModal` usan `devLog` y desaparecen en producción.
+- **Matriz CU↔HU:** M17 corregido (HU70–HU76 inexistentes reemplazadas por
+  HU61–HU67 con CU#66); las 6 HU sin CU quedan documentadas en
+  `docs/matriz_trazabilidad_hallazgos.md`.
 
 ## [1.0.1] — 2026-10-06
 
