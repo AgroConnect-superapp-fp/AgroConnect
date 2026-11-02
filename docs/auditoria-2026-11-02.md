@@ -358,6 +358,20 @@ están en `docs/adr/0016-pendientes-post-cutover.md`.
 - **Totales:** `detalle` 68 RF + 66 CU + 69 HU = 203; `cu_hu` 74 relaciones,
   63 HU con CU y 6 pendientes de validar en Notion.
 
+### UI — anti-patrones de Impeccable corregidos (2026-11-02)
+
+| Anti-patrón | Corrección |
+|---|---|
+| `Arial` en el control del mapa | `font-family: inherit` (Inter/system) |
+| `transition: width` en la barra de productividad | `transform: scaleX()` con `transform-origin: left` |
+| `border-l-4` en las tarjetas de cultivo | Borde completo de 1px con el color del cultivo al 33 % |
+| `text-gray-500` sobre `bg-red-50` | `text-red-800` (7.67:1) |
+| `animate-bounce` en dots, badge y estado vacío | `animate-pulse` o `softFloatIn` con `ease-out` |
+| `prefers-reduced-motion` local con `*` | Regla global en `index.css` que no rompe transforms de Leaflet |
+
+La excepción de Inter (design system) y la deuda de contraste del accent yellow
+quedan documentadas en ADR-016 (D9).
+
 
 
 
