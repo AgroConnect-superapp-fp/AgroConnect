@@ -19,7 +19,6 @@ interface RegisterScreenProps {
   role: RoleName;
   onBack: () => void;
   onGoToLogin: () => void;
-  onSuccess: () => void;
 }
 
 const TOTAL_STEPS = 3;
@@ -28,7 +27,6 @@ export function RegisterScreen({
   role,
   onBack,
   onGoToLogin,
-  onSuccess,
 }: RegisterScreenProps): React.ReactElement {
   const { register } = useAuth();
   const roleOption = getRoleOption(role);
@@ -50,6 +48,7 @@ export function RegisterScreen({
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [generalError, setGeneralError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [registered, setRegistered] = useState(false);
 
   const requiresFarm = role === 'productor';
   const requiresCompany = role === 'comprador_b2b';
@@ -137,7 +136,7 @@ export function RegisterScreen({
           : undefined,
         aceptaTratamientoDatos: true,
       });
-      onSuccess();
+      setRegistered(true);
     } catch (error) {
       if (error instanceof ApiError) {
         if (error.code === 'EMAIL_ALREADY_EXISTS') {
@@ -163,6 +162,33 @@ export function RegisterScreen({
     } finally {
       setSubmitting(false);
     }
+  }
+
+  if (registered) {
+    return (
+      <AuthShell title="Revisa tu correo" subtitle="Tu cuenta fue creada correctamente">
+        <div
+          data-testid="register-success"
+          className="rounded-xl border border-green-200 bg-green-50 p-5 text-sm text-green-900"
+        >
+          <p className="mb-2 font-semibold">Te enviamos un enlace de verificación.</p>
+          <p>
+            Abre el correo que enviamos a <strong>{personal.correo}</strong> y confirma tu
+            cuenta. Por seguridad, no podrás iniciar sesión hasta verificarla.
+          </p>
+        </div>
+        <div className="mt-5">
+          <Button
+            type="button"
+            fullWidth
+            data-testid="register-go-login"
+            onClick={onGoToLogin}
+          >
+            Ir a iniciar sesión
+          </Button>
+        </div>
+      </AuthShell>
+    );
   }
 
   return (

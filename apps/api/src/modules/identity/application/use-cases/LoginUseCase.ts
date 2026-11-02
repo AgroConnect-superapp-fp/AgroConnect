@@ -1,6 +1,7 @@
+import { randomUUID } from 'node:crypto';
 import { Inject, Injectable } from '@nestjs/common';
 import { USER_REPOSITORY, PASSWORD_HASHER, TOKEN_SERVICE } from '../tokens';
-import { InvalidCredentialsError } from '../../domain/errors/AuthErrors';
+import { EmailNotVerifiedError, InvalidCredentialsError } from '../../domain/errors/AuthErrors';
 import { Email } from '../../domain/value-objects/Email';
 import type { PublicUserProfile } from '../../domain/entities/User';
 import type { UserRepository } from '../../domain/interfaces/UserRepository';
@@ -34,6 +35,25 @@ export class LoginUseCase {
       throw new InvalidCredentialsError();
     }
 
+    // Bloqueo total (D5): sin correo verificado no se emite sesión.
+    if (!user.isEmailVerified()) {
+      throw new EmailNotVerifiedError();
+    }
+
+    // Rehash transparente: los hashes bcrypt existentes se migran a Argon2id
+    // en el siguiente login válido. Es best-effort: un fallo aquí no debe
+    // impedir que el usuario entre.
+    if (this.passwordHasher.needsRehash(user.passwordHash)) {
+      try {
+        await this.userRepository.updatePassword(
+          user.id,
+          await this.passwordHasher.hash(input.password),
+        );
+      } catch {
+        // Se reintentará en el próximo login.
+      }
+    }
+
     const tokens = this.tokenService.generateTokens({
       userId: user.id,
       role: user.roleName,
@@ -43,6 +63,8 @@ export class LoginUseCase {
       userId: user.id,
       tokenHash: this.tokenService.hashToken(tokens.refreshToken),
       expiresAt: this.tokenService.refreshExpirationDate(),
+      familyId: randomUUID(),
+      generation: 0,
     });
 
     return {

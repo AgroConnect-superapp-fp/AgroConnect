@@ -40,6 +40,9 @@
   access en `Path=/api/v1` y refresh en `Path=/api/v1/auth`.
 - **CSRF:** `CsrfGuard` exige `Origin`/`Referer` permitido y
   `X-Requested-With: XMLHttpRequest` en métodos mutantes.
+- **Sesión:** refresh token con familia/generación (reuso revoca la familia),
+  Argon2id con rehash desde bcrypt y verificación de correo obligatoria.
+- **JWT:** `JWT_ISSUER`/`JWT_AUDIENCE`; los tokens sin `iss`/`aud` se rechazan.
 - **Correo:** con `SMTP_HOST` configurado se usa SMTP real; sin él, los correos
   se escriben en `MAIL_DIR` (solo desarrollo/pruebas).
 

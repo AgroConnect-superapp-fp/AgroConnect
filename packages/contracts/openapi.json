@@ -29,7 +29,7 @@
         },
         "responses": {
           "201": {
-            "description": "Usuario creado; sesión en cookies httpOnly y correo de verificación"
+            "description": "Usuario creado; revisa el correo para verificar la cuenta"
           },
           "400": {
             "description": "Solicitud malformada o cuerpo inválido"
@@ -73,7 +73,10 @@
             "description": "Solicitud malformada o cuerpo inválido"
           },
           "401": {
-            "description": "Credenciales inválidas o correo sin verificar"
+            "description": "Credenciales inválidas"
+          },
+          "403": {
+            "description": "Correo sin verificar (EMAIL_NOT_VERIFIED)"
           },
           "422": {
             "description": "Reglas de negocio incumplidas (detalles por campo)"
@@ -112,6 +115,9 @@
           },
           "401": {
             "description": "Refresh token inválido, expirado o revocado"
+          },
+          "403": {
+            "description": "Correo sin verificar (EMAIL_NOT_VERIFIED)"
           },
           "422": {
             "description": "Reglas de negocio incumplidas (detalles por campo)"

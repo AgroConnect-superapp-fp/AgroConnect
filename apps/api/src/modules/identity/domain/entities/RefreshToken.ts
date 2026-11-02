@@ -2,8 +2,11 @@ export interface RefreshTokenProps {
   id: string;
   userId: string;
   tokenHash: string;
+  familyId: string;
+  generation: number;
   expiresAt: Date;
   revoked: boolean;
+  rotatedAt: Date | null;
   createdAt: Date;
 }
 
@@ -26,6 +29,14 @@ export class RefreshToken {
     return this.props.tokenHash;
   }
 
+  get familyId(): string {
+    return this.props.familyId;
+  }
+
+  get generation(): number {
+    return this.props.generation;
+  }
+
   get expiresAt(): Date {
     return this.props.expiresAt;
   }
@@ -34,8 +45,16 @@ export class RefreshToken {
     return this.props.revoked;
   }
 
+  get rotatedAt(): Date | null {
+    return this.props.rotatedAt;
+  }
+
   get createdAt(): Date {
     return this.props.createdAt;
+  }
+
+  isRotated(): boolean {
+    return this.props.rotatedAt !== null;
   }
 
   isExpired(now: Date = new Date()): boolean {
@@ -43,6 +62,6 @@ export class RefreshToken {
   }
 
   isUsable(now: Date = new Date()): boolean {
-    return !this.props.revoked && !this.isExpired(now);
+    return !this.props.revoked && !this.isRotated() && !this.isExpired(now);
   }
 }

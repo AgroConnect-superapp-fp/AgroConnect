@@ -36,6 +36,26 @@ describe('JwtTokenService', () => {
     });
   });
 
+  it('incluye issuer/audience y rechaza un token de otro emisor', () => {
+    const tokens = service.generateTokens({ userId: 'usuario-1', role: 'productor' });
+    const decoded = jwt.decode(tokens.accessToken) as { iss: string; aud: string };
+
+    expect(decoded.iss).toBe('agroconnect-api');
+    expect(decoded.aud).toBe('agroconnect-web');
+
+    const otroEmisor = new JwtTokenService(
+      ACCESS_SECRET,
+      REFRESH_SECRET,
+      '15m',
+      '7d',
+      'otro-emisor',
+      'agroconnect-web',
+    );
+    const ajeno = otroEmisor.generateTokens({ userId: 'usuario-1', role: 'productor' });
+
+    expect(() => service.verifyAccessToken(ajeno.accessToken)).toThrow(InvalidTokenError);
+  });
+
   it('rechaza un token de acceso firmado con otro secreto', () => {
     const otro = new JwtTokenService('c'.repeat(32), REFRESH_SECRET, '15m', '7d');
     const { accessToken } = otro.generateTokens({ userId: 'usuario-1', role: 'productor' });

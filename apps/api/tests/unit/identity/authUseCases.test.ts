@@ -33,7 +33,7 @@ function buildSut() {
     repository,
     hasher,
     tokens,
-    register: new RegisterUserUseCase(repository, hasher, tokens),
+    register: new RegisterUserUseCase(repository, hasher),
     login: new LoginUseCase(repository, hasher, tokens),
     refresh: new RefreshTokenUseCase(repository, tokens),
     logout: new LogoutUseCase(repository, tokens),
@@ -41,7 +41,7 @@ function buildSut() {
 }
 
 describe('RegisterUserUseCase', () => {
-  it('registra un productor con su finca, cifra la contraseña y emite tokens', async () => {
+  it('registra un productor con su finca y cifra la contraseña, sin emitir sesión', async () => {
     const sut = buildSut();
 
     const result = await sut.register.execute(validProducerInput);
@@ -49,14 +49,12 @@ describe('RegisterUserUseCase', () => {
     expect(result.user.nombre).toBe('María Fernanda López');
     expect(result.user.rol).toBe('productor');
     expect(result.user.correo).toBe('maria.lopez@example.com');
-    expect(result.tokens.accessToken).toBeTruthy();
-    expect(result.tokens.refreshToken).toBeTruthy();
 
     const stored = sut.repository.users[0];
     expect(stored?.passwordHash.startsWith('hashed:')).toBe(true);
     expect(stored?.passwordHash).not.toContain('Agro2026*');
     expect(sut.repository.producerProfiles.get(result.user.id)?.farmName).toBe('El Mirador');
-    expect(sut.repository.refreshTokens).toHaveLength(1);
+    expect(sut.repository.refreshTokens).toHaveLength(0);
   });
 
   it('normaliza el correo a minúsculas', async () => {
@@ -191,9 +189,22 @@ describe('RegisterUserUseCase', () => {
 describe('LoginUseCase', () => {
   async function seedRegisteredUser() {
     const sut = buildSut();
-    await sut.register.execute(validProducerInput);
+    const registered = await sut.register.execute(validProducerInput);
+    const user = await sut.repository.findByEmail(registered.user.correo);
+    if (user) {
+      await sut.repository.markEmailVerified(user.id);
+    }
     return sut;
   }
+
+  it('rechaza el login de una cuenta sin verificar', async () => {
+    const sut = buildSut();
+    await sut.register.execute(validProducerInput);
+
+    await expect(
+      sut.login.execute({ correo: 'maria.lopez@example.com', password: 'Agro2026*' }),
+    ).rejects.toMatchObject({ code: 'EMAIL_NOT_VERIFIED', statusCode: 403 });
+  });
 
   it('autentica con credenciales válidas y registra el refresh token', async () => {
     const sut = await seedRegisteredUser();
@@ -205,7 +216,25 @@ describe('LoginUseCase', () => {
 
     expect(result.user.rol).toBe('productor');
     expect(result.tokens.accessToken).toContain(result.user.id);
-    expect(sut.repository.refreshTokens).toHaveLength(2);
+    expect(sut.repository.refreshTokens).toHaveLength(1);
+  });
+
+  it('rehashea un hash legacy y no falla si la actualización del hash falla', async () => {
+    const sut = await seedRegisteredUser();
+    sut.hasher.needsRehashResult = true;
+
+    const before = sut.hasher.hashCalls;
+    await sut.login.execute({
+      correo: 'maria.lopez@example.com',
+      password: 'Agro2026*',
+    });
+    expect(sut.hasher.hashCalls).toBe(before + 1);
+
+    // El rehash es best-effort: si la BD falla, el login debe continuar.
+    sut.repository.failUpdatePassword = true;
+    await expect(
+      sut.login.execute({ correo: 'maria.lopez@example.com', password: 'Agro2026*' }),
+    ).resolves.toBeDefined();
   });
 
   it('rechaza credenciales con correo inexistente', async () => {
@@ -249,7 +278,11 @@ describe('LoginUseCase', () => {
 describe('RefreshTokenUseCase', () => {
   async function seedLoggedUser() {
     const sut = buildSut();
-    await sut.register.execute(validProducerInput);
+    const registered = await sut.register.execute(validProducerInput);
+    const user = await sut.repository.findByEmail(registered.user.correo);
+    if (user) {
+      await sut.repository.markEmailVerified(user.id);
+    }
     const login = await sut.login.execute({
       correo: 'maria.lopez@example.com',
       password: 'Agro2026*',
@@ -318,6 +351,26 @@ describe('RefreshTokenUseCase', () => {
     });
   });
 
+  it('revoca la familia completa al reutilizar un token ya rotado', async () => {
+    const { sut, refreshToken } = await seedLoggedUser();
+
+    await sut.refresh.execute({ refreshToken });
+    const rotated = sut.repository.refreshTokens.find(
+      (token) => token.tokenHash === `hash:${refreshToken}`,
+    );
+    const familyId = rotated?.familyId;
+    expect(familyId).toBeTruthy();
+
+    await expect(sut.refresh.execute({ refreshToken })).rejects.toMatchObject({
+      code: 'TOKEN_INVALID',
+      statusCode: 401,
+    });
+
+    const family = sut.repository.refreshTokens.filter((token) => token.familyId === familyId);
+    expect(family.length).toBeGreaterThan(1);
+    expect(family.every((token) => token.revoked)).toBe(true);
+  });
+
   it('rechaza un refresh token expirado', async () => {
     const { sut, refreshToken } = await seedLoggedUser();
     const stored = sut.repository.refreshTokens.find(
@@ -359,7 +412,11 @@ describe('RefreshTokenUseCase', () => {
 describe('LogoutUseCase', () => {
   it('revoca el refresh token emitido', async () => {
     const sut = buildSut();
-    await sut.register.execute(validProducerInput);
+    const registered = await sut.register.execute(validProducerInput);
+    const user = await sut.repository.findByEmail(registered.user.correo);
+    if (user) {
+      await sut.repository.markEmailVerified(user.id);
+    }
     const login = await sut.login.execute({
       correo: 'maria.lopez@example.com',
       password: 'Agro2026*',
