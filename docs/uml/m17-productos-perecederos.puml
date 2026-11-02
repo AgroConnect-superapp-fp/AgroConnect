@@ -1,0 +1,38 @@
+@startuml M17-productos-perecederos
+' AgroConnect — M17 Manejo de Productos Perecederos (RF-65 a RF-68)
+' CU#66 cubre 9 HU (HU61–HU69). Sub-casos derivados de las HU, sin numeración CU propia.
+' Generado para cubrir la deuda documental H11 de PT-ECU-01 v1.1 (Sprint de modelado 2026-10-03)
+!theme plain
+left to right direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam actorStyle awesome
+
+actor "Productor" as Productor
+actor "Transportista" as Transportista
+actor "Administrador" as Admin
+actor "ICA\n(Autoridad sanitaria)" as ICA
+
+rectangle "M17 — Manejo de Productos Perecederos" {
+  usecase "Auditar Cumplimiento de\nCadena de Frío para ICA" as UC66
+  usecase "Registrar Lote Perecedero\ncon Código ICA" as Lote
+  usecase "Registrar Fecha de Cosecha\ny Caducidad" as Fechas
+  usecase "Calcular Ventana de\nEntrega Garantizada" as Ventana
+  usecase "Registrar Temperatura\ncada 30 Minutos" as Temperatura
+  usecase "Rastrear Origen-Destino\ndel Lote" as Trazabilidad
+  usecase "Recibir Alertas Escalonadas\nde Vencimiento" as Alertas
+}
+
+Productor --> Lote
+Productor --> Fechas
+Transportista --> Temperatura
+Admin --> UC66
+ICA --> UC66
+
+UC66 ..> Lote : <<include>>
+UC66 ..> Fechas : <<include>>
+UC66 ..> Ventana : <<include>>
+UC66 ..> Temperatura : <<include>>
+UC66 ..> Trazabilidad : <<include>>
+Alertas ..> UC66 : <<extend>>
+@enduml

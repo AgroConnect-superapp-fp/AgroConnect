@@ -11,15 +11,8 @@ export interface PublicUser {
   fechaRegistro: string;
 }
 
-export interface SessionTokens {
-  accessToken: string;
-  refreshToken: string;
-  expiresIn: number;
-}
-
 export interface AuthSession {
   usuario: PublicUser;
-  tokens: SessionTokens;
 }
 
 export interface ProducerFarmInput {

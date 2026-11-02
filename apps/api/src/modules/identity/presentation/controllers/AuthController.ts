@@ -58,9 +58,10 @@ const RATE_LIMIT = {
  * mismas rutas bajo `/api/v1/auth`, mismos códigos de estado y mismo cuerpo
  * `{ success, data, message }`.
  *
- * Diferencia intencionada: la sesión se entrega además en cookies `httpOnly`
- * (la vía segura). El cuerpo de la respuesta se conserva para no romper al
- * frontend legacy durante la migración progresiva.
+ * Diferencia intencionada: la sesión se entrega SOLO en cookies `httpOnly`.
+ * El cuerpo de la respuesta ya no incluye `tokens`: si los tokens viajaran en
+ * un cuerpo legible por JavaScript, un XSS podría extraerlos y la cookie
+ * httpOnly dejaría de aportar protección real.
  */
 @Controller('auth')
 export class AuthController {
@@ -100,7 +101,6 @@ export class AuthController {
     return success(
       {
         usuario: result.user,
-        tokens: result.tokens,
       },
       'Registro exitoso',
     );
@@ -121,7 +121,6 @@ export class AuthController {
     return success(
       {
         usuario: result.user,
-        tokens: result.tokens,
       },
       'Inicio de sesión exitoso',
     );
@@ -142,12 +141,10 @@ export class AuthController {
     this.sessionCookies.setSessionCookies(response, result.tokens);
 
     // Mismo shape que login/register: el frontend restaura la sesión completa
-    // con el usuario renovado. El refreshToken del cuerpo se ignora en el
-    // frontend nuevo (la cookie httpOnly es la única vía legítima).
+    // con el usuario renovado. Los tokens viajan solo en las cookies httpOnly.
     return success(
       {
         usuario: result.user,
-        tokens: result.tokens,
       },
       'Token renovado',
     );

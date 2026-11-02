@@ -1,6 +1,6 @@
 {
   "project": "AgroConnect",
-  "updated": "2026-10-06",
+  "updated": "2026-11-02",
   "urls": {
     "app": "https://agroconnectpreview.vercel.app",
     "api": "https://agroconnect-api-5t7n.onrender.com",
@@ -23,12 +23,12 @@
   },
   "stack": {
     "frontend": "Tailwind CSS 4",
-    "backend": "Prisma 7",
+    "backend": "NestJS 11 + Prisma 7",
     "database": "PostgreSQL 16 + PostGIS 3.4"
   },
   "tests": {
-    "backend": 178,
-    "frontendUnit": 14,
+    "backend": 382,
+    "frontendUnit": 21,
     "e2e": 10
   },
   "sources": {

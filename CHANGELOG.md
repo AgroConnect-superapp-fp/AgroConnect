@@ -5,7 +5,7 @@ Todos los cambios notables de este proyecto se documentan en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/)
 y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 
-## [Unreleased]
+## [1.1.0] — 2026-11-02
 
 ### Seguridad
 
@@ -22,6 +22,52 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 - **XSS en la búsqueda del mapa:** los resultados de `leaflet-geosearch` se escapan
   antes de insertarse con `innerHTML`.
 - `CORS_ORIGIN` de producción sin `localhost`.
+
+### Añadido
+
+- **Monorepo npm workspaces + Turborepo** (ADR-015): `apps/*`, `backend/`,
+  `frontend/`, `packages/contracts` y `packages/config`, con lockfile único y
+  build cacheado.
+- **Núcleo NestJS 11** (`apps/api`, ADR-009): identidad y geografía migradas
+  desde Express, con pruebas de integración contra PostgreSQL/PostGIS.
+- **Contratos compartidos** (`@agroconnect/contracts`): esquemas Zod y OpenAPI
+  con verificación de drift en CI.
+- **Sesión cookie-only** en el frontend: access y refresh en cookies
+  `httpOnly`; ningún token en JavaScript.
+- **CSRF de despliegue cross-site**: `CsrfGuard` valida `Origin`/`Referer`
+  contra `CORS_ORIGIN` y exige `X-Requested-With: XMLHttpRequest`.
+- **Cookies endurecidas**: `SameSite=None; Secure` en producción, access en
+  `Path=/api/v1` y refresh en `Path=/api/v1/auth`.
+- **Cabeceras de seguridad en Vercel**: CSP, `X-Frame-Options`,
+  `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy` y HSTS.
+- **Auditoría integral 2026-11-02** (`docs/auditoria-2026-11-02.md`) y scripts
+  reproducibles de auditoría de administradores y RLS de Supabase.
+- **`docs/` y `scripts/` versionados** en el repositorio (antes ignorados).
+
+### Cambiado
+
+- **Producción pasa a `apps/api` (NestJS)**: `render.yaml` construye el
+  monorepo, genera Prisma y arranca `@agroconnect/api`; el backend Express
+  queda como legado en retiro.
+- **El cuerpo de las respuestas de auth ya no incluye tokens** (solo
+  `usuario`); las cookies httpOnly son la única vía de sesión.
+- **Vercel**: build del monorepo (contratos + frontend) desde el proyecto con
+  Root Directory `frontend`; una sola configuración coherente con la raíz.
+- **Deploy de CI fail-closed**: si falta `VERCEL_TOKEN` o `vercel pull` falla,
+  el pipeline falla en lugar de omitir el despliegue con un warning.
+- **PostgreSQL local** escucha solo en `127.0.0.1:5434` (antes `0.0.0.0`).
+- **`DATABASE_SCHEMA` documentado** en los `.env.example` (Prisma 7 lo exige).
+- **ADR-010 actualizado** al estado real: cookies `SameSite=None`, `Origin` +
+  `X-Requested-With`; familias de refresh y Argon2id quedan planificadas.
+
+### Pendiente
+
+- Familias/generaciones de refresh tokens con revocación en cascada.
+- Argon2id con rehash transparente desde bcrypt.
+- Implementación real de PWA (manifest + registro de service worker) o retiro
+  del `sw.js` actual.
+- Sincronización de Obsidian y Notion con los conteos y el stack de esta
+  versión.
 
 ## [1.0.1] — 2026-10-06
 

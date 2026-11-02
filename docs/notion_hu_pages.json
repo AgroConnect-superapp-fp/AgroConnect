@@ -1,0 +1,347 @@
+[
+  {
+    "page_id": "2a8bdc33-f294-83fa-bffa-81a25f9839f2",
+    "title": "HU01 - Registro de usuario",
+    "module": null
+  },
+  {
+    "page_id": "348bdc33-f294-8162-bfe1-c8ceb9e7d11a",
+    "title": "HU02 - Inicio de sesión",
+    "module": null
+  },
+  {
+    "page_id": "32abdc33-f294-80f2-8548-dd241b83a980",
+    "title": "HU03 - Gestión de perfil",
+    "module": null
+  },
+  {
+    "page_id": "32abdc33-f294-80a5-b408-ff2b673d6240",
+    "title": "HU04 - Publicar productos",
+    "module": null
+  },
+  {
+    "page_id": "348bdc33-f294-8134-b78d-d1fd479548d6",
+    "title": "HU05 - Visualización de productos",
+    "module": null
+  },
+  {
+    "page_id": "32abdc33-f294-80e2-9264-e93871749ee2",
+    "title": "HU06 - Solicitud de compra",
+    "module": null
+  },
+  {
+    "page_id": "32abdc33-f294-8022-b168-fbc9fd57c978",
+    "title": "HU07 - Registro de pedidos",
+    "module": null
+  },
+  {
+    "page_id": "348bdc33-f294-81be-8188-f8e0b5e567d7",
+    "title": "HU08 - Control de inventario",
+    "module": null
+  },
+  {
+    "page_id": "32abdc33-f294-80f8-8dfe-d893a3bee3ce",
+    "title": "HU09 - Gestión de roles",
+    "module": null
+  },
+  {
+    "page_id": "348bdc33-f294-81b4-8d25-c63af60adf4f",
+    "title": "HU10 - Generar reportes",
+    "module": null
+  },
+  {
+    "page_id": "32abdc33-f294-804a-9842-d583898e4495",
+    "title": "HU11 - Negociación empresarial",
+    "module": null
+  },
+  {
+    "page_id": "343bdc33-f294-810c-aa85-eae7425c6e5f",
+    "title": "HU12 - Recuperación de contraseña",
+    "module": null
+  },
+  {
+    "page_id": "343bdc33-f294-813b-be8d-da859d348b4c",
+    "title": "HU13 - Control de sesiones",
+    "module": null
+  },
+  {
+    "page_id": "343bdc33-f294-81de-9b6f-c751f3218cf6",
+    "title": "HU14 - Panel general",
+    "module": null
+  },
+  {
+    "page_id": "343bdc33-f294-81fc-b7a7-ee0071562a3e",
+    "title": "HU15 - Búsqueda de usuarios",
+    "module": null
+  },
+  {
+    "page_id": "343bdc33-f294-81f6-be91-e443f001f8c4",
+    "title": "HU16 - Desactivación de usuarios",
+    "module": null
+  },
+  {
+    "page_id": "343bdc33-f294-8173-9cea-d0f549e9d5da",
+    "title": "HU17 - Reputación",
+    "module": null
+  },
+  {
+    "page_id": "343bdc33-f294-817c-8d5d-c7bf6120b7a2",
+    "title": "HU18 - Búsqueda avanzada de productos",
+    "module": null
+  },
+  {
+    "page_id": "343bdc33-f294-8117-8116-dff7528e4649",
+    "title": "HU19 - Calificaciones",
+    "module": null
+  },
+  {
+    "page_id": "343bdc33-f294-8102-8888-cbb185559606",
+    "title": "HU20 - Disponibilidad en tiempo real",
+    "module": null
+  },
+  {
+    "page_id": "343bdc33-f294-81c6-a32a-eedb2d86ad26",
+    "title": "HU21 - Alertas de stock",
+    "module": null
+  },
+  {
+    "page_id": "343bdc33-f294-81a1-b3a8-cab8aad30408",
+    "title": "HU22 - Mensajería interna",
+    "module": null
+  },
+  {
+    "page_id": "343bdc33-f294-81e1-a311-ca3a71487431",
+    "title": "HU23 - Historial de mensajes",
+    "module": null
+  },
+  {
+    "page_id": "343bdc33-f294-81ea-8428-d18d617f245a",
+    "title": "HU24 - Notificaciones de mensajes",
+    "module": null
+  },
+  {
+    "page_id": "343bdc33-f294-8159-a283-d20ad18fadbe",
+    "title": "HU25 - Registro de transportistas",
+    "module": null
+  },
+  {
+    "page_id": "343bdc33-f294-8176-b19a-cdda383ca7b6",
+    "title": "HU26 - Asignación de envíos",
+    "module": null
+  },
+  {
+    "page_id": "343bdc33-f294-81d9-94a9-d8432bbd6efc",
+    "title": "HU27 - Seguimiento de envíos",
+    "module": null
+  },
+  {
+    "page_id": "343bdc33-f294-815c-9310-f1c8aab58bca",
+    "title": "HU28 - Estados del pedido",
+    "module": null
+  },
+  {
+    "page_id": "343bdc33-f294-8190-9e8f-c900ffe61713",
+    "title": "HU29 - Historial de pedidos",
+    "module": null
+  },
+  {
+    "page_id": "348bdc33-f294-81f8-8171-f0a0f58a88ad",
+    "title": "HU30 - Integración de pagos",
+    "module": null
+  },
+  {
+    "page_id": "343bdc33-f294-81f8-8b06-f81fef2457e8",
+    "title": "HU31 - Registro de transacciones",
+    "module": null
+  },
+  {
+    "page_id": "343bdc33-f294-8137-b54e-fce5753f0c37",
+    "title": "HU32 - Monitoreo del sistema",
+    "module": null
+  },
+  {
+    "page_id": "343bdc33-f294-8182-85f3-c526fa89c159",
+    "title": "HU33 - Gestión de incidencias",
+    "module": null
+  },
+  {
+    "page_id": "343bdc33-f294-81c2-9f42-d94382bfc4ea",
+    "title": "HU34 - Control de accesos",
+    "module": null
+  },
+  {
+    "page_id": "343bdc33-f294-8152-818f-c4b513280047",
+    "title": "HU35 - Registro de actividad",
+    "module": null
+  },
+  {
+    "page_id": "343bdc33-f294-818d-aecd-c624366ed989",
+    "title": "HU36 - Copias de seguridad",
+    "module": null
+  },
+  {
+    "page_id": "343bdc33-f294-81b7-b05d-e3f5472124ad",
+    "title": "HU37 - Centro de ayuda",
+    "module": null
+  },
+  {
+    "page_id": "343bdc33-f294-81b8-be69-d6e26cdc1e86",
+    "title": "HU38 - Gestión de tickets",
+    "module": null
+  },
+  {
+    "page_id": "348bdc33-f294-81af-8e1a-d0ff31571d9d",
+    "title": "HU39 - Chatbot IA (AgroBot)",
+    "module": null
+  },
+  {
+    "page_id": "343bdc33-f294-81eb-b0d9-ecdb3a3045e7",
+    "title": "HU40 - Respuestas automáticas",
+    "module": null
+  },
+  {
+    "page_id": "343bdc33-f294-81d4-81ba-e8c2cfe4931a",
+    "title": "HU41 - Orientación al usuario",
+    "module": null
+  },
+  {
+    "page_id": "343bdc33-f294-8122-a6c4-c621c5b1a461",
+    "title": "HU42 - Soporte inicial",
+    "module": null
+  },
+  {
+    "page_id": "33bbdc33-f294-81aa-b9a4-ee0bd77ef751",
+    "title": "HU43 - Gestionar carrito de compras",
+    "module": null
+  },
+  {
+    "page_id": "33bbdc33-f294-814a-8510-cc92a99188e0",
+    "title": "HU44 - Confirmar pedido",
+    "module": null
+  },
+  {
+    "page_id": "33bbdc33-f294-81c1-9cbb-f56fbdc18a27",
+    "title": "HU45 - Historial de compras",
+    "module": null
+  },
+  {
+    "page_id": "33bbdc33-f294-81f6-b437-c2ed857239c7",
+    "title": "HU46 - Calificar Productos Adquiridos",
+    "module": null
+  },
+  {
+    "page_id": "33bbdc33-f294-818d-8bef-d7ed19c544c1",
+    "title": "HU47 - Seguimiento de pedido",
+    "module": null
+  },
+  {
+    "page_id": "348bdc33-f294-817f-bceb-e4dd332748fb",
+    "title": "HU48 - Cierre de transacción",
+    "module": null
+  },
+  {
+    "page_id": "38ebdc33-f294-81f1-9251-eec46a9f3380",
+    "title": "HU49 — Recibir Alertas Críticas por SMS Rural",
+    "module": "M14 — Multicanal y Operación Offline"
+  },
+  {
+    "page_id": "38ebdc33-f294-8152-a601-c6f5cd8e7367",
+    "title": "HU50 — Consultar Precios vía Código USSD *123#",
+    "module": "M14 — Multicanal y Operación Offline"
+  },
+  {
+    "page_id": "38ebdc33-f294-81aa-990f-cbfe27d16875",
+    "title": "HU51 — Sincronizar Cambios Offline al Reconectar",
+    "module": "M14 — Multicanal y Operación Offline"
+  },
+  {
+    "page_id": "38ebdc33-f294-8103-a940-d1e5523ae62a",
+    "title": "HU52 — Acceder desde Múltiples Dispositivos",
+    "module": "M14 — Multicanal y Operación Offline"
+  },
+  {
+    "page_id": "38ebdc33-f294-8168-ba28-c2f1c3b5527a",
+    "title": "HU53 — Verificar Estado Online de Otros Usuarios",
+    "module": "M14 — Multicanal y Operación Offline"
+  },
+  {
+    "page_id": "38ebdc33-f294-8132-a8d1-f2b6463a45a1",
+    "title": "HU54 — Pagar con PSE-ACH Colombia",
+    "module": "M15 — Pagos Locales Colombianos"
+  },
+  {
+    "page_id": "38ebdc33-f294-814c-83a9-ee988badbdad",
+    "title": "HU55 — Pagar con Nequi",
+    "module": "M15 — Pagos Locales Colombianos"
+  },
+  {
+    "page_id": "38ebdc33-f294-8160-b5a7-e0029a0b10c7",
+    "title": "HU56 — Pagar con Daviplata",
+    "module": "M15 — Pagos Locales Colombianos"
+  },
+  {
+    "page_id": "38ebdc33-f294-81db-bd4b-ebf63727cec3",
+    "title": "HU57 — Generar Factura Electrónica con CUFE (DIAN)",
+    "module": "M15 — Pagos Locales Colombianos"
+  },
+  {
+    "page_id": "38ebdc33-f294-81b1-bd31-c30f0618246a",
+    "title": "HU58 — Definir Zona de Cobertura Geográfica",
+    "module": "M16 — Geolocalización Rural"
+  },
+  {
+    "page_id": "38ebdc33-f294-81aa-9858-c22ec185eac7",
+    "title": "HU59 — Calcular Ruta Óptima Multi-Destino",
+    "module": "M16 — Geolocalización Rural"
+  },
+  {
+    "page_id": "38ebdc33-f294-81af-8a2b-d1c24feabca5",
+    "title": "HU60 — Trackear Ubicación en Tiempo Real del Transportista",
+    "module": "M16 — Geolocalización Rural"
+  },
+  {
+    "page_id": "38ebdc33-f294-8133-81fc-c5a5089e273c",
+    "title": "HU61 — Registrar Lote Perecedero con ICA",
+    "module": "M17 — Productos Perecederos"
+  },
+  {
+    "page_id": "38ebdc33-f294-8116-a1b3-f5dd95fc851b",
+    "title": "HU62 — Monitorear Cadena de Frío",
+    "module": "M17 — Productos Perecederos"
+  },
+  {
+    "page_id": "38ebdc33-f294-813e-a657-f7e3ef53940e",
+    "title": "HU63 — Registrar Incidencia en Transporte (Humedad/Golpe)",
+    "module": "M17 — Productos Perecederos"
+  },
+  {
+    "page_id": "38ebdc33-f294-81bd-85a3-f519947a6dd0",
+    "title": "HU64 — Recibir Alertas Escalonadas de Vencimiento",
+    "module": "M17 — Productos Perecederos"
+  },
+  {
+    "page_id": "38ebdc33-f294-81ca-bc1b-c8173fd158de",
+    "title": "HU65 — Rastrear Lote desde Productor a Consumidor",
+    "module": "M17 — Productos Perecederos"
+  },
+  {
+    "page_id": "38ebdc33-f294-8189-839e-e422f71e1454",
+    "title": "HU66 — Priorizar Lotes por Urgencia de Venta",
+    "module": "M17 — Productos Perecederos"
+  },
+  {
+    "page_id": "38ebdc33-f294-814c-ad4c-ff46b3296b24",
+    "title": "HU67 — Generar Reportes de Vencimiento",
+    "module": "M17 — Productos Perecederos"
+  },
+  {
+    "page_id": "38ebdc33-f294-8177-8670-e66a7bdf44b7",
+    "title": "HU68 — Cumplir Auditoría de Cadena de Frío para ICA",
+    "module": "M17 — Productos Perecederos"
+  },
+  {
+    "page_id": "38ebdc33-f294-8145-9b6b-f56a931bb090",
+    "title": "HU69 — Historial de Cumplimiento de Cadena de Frío",
+    "module": "M17 — Productos Perecederos"
+  }
+]

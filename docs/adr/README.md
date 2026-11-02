@@ -18,7 +18,7 @@ Hay dos series de ADR:
 | [ADR-0001](0001-estrategia-imagenes-externas.md) | Estrategia de imágenes externas | Aceptada — implementada |
 | [ADR-008](0008-monolito-modular.md) | Monolito modular | Aceptada |
 | [ADR-009](0009-stack-backend-nestjs.md) | Núcleo backend NestJS 11 + Prisma 7 + Node 24 | Aceptada |
-| [ADR-010](0010-estrategia-de-sesion.md) | Access token en memoria + refresh en cookie httpOnly | Aceptada |
+| [ADR-010](0010-estrategia-de-sesion.md) | Sesión 100 % cookie httpOnly + CSRF de origen (familias/Argon2id pendientes) | Aceptada — implementación parcial |
 | [ADR-011](0011-politica-poliglota.md) | Política políglota: núcleo homogéneo, bordes políglotas | Aceptada |
 | [ADR-012](0012-app-movil-expo.md) | App móvil con Expo / React Native | Aceptada (sustituye a ADR-001) |
 | [ADR-013](0013-motor-de-rutas-externo.md) | Rutas óptimas con motor externo (`RouteOptimizer`) | Aceptada |

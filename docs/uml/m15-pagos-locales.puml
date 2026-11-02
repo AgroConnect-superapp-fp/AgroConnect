@@ -1,0 +1,33 @@
+@startuml M15-pagos-locales
+' AgroConnect — M15 Pagos y Métodos Locales Colombianos (RF-56 a RF-60)
+' Generado para cubrir la deuda documental H11 de PT-ECU-01 v1.1 (Sprint de modelado 2026-10-03)
+!theme plain
+left to right direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam actorStyle awesome
+
+actor "Comprador" as Comprador
+actor "Administrador" as Admin
+actor "Pasarela PSE\n(Sistema externo)" as PSE
+actor "DIAN\n(Sistema externo)" as DIAN
+
+rectangle "M15 — Pagos y Métodos Locales" {
+  usecase "Pagar con PSE\n(Débito Bancario ACH)" as UC59
+  usecase "Pagar con Nequi\n(Código QR)" as UC60
+  usecase "Pagar con Daviplata\n(Cédula + Código)" as UC61
+  usecase "Generar Factura Electrónica\ncon CUFE (DIAN)" as UC62
+  usecase "Liquidar Comisión\nConfigurable" as Comision
+}
+
+Comprador --> UC59
+Comprador --> UC60
+Comprador --> UC61
+PSE --> UC59
+DIAN --> UC62
+Admin --> Comision
+
+UC60 ..> UC59 : <<extend>>
+UC61 ..> UC59 : <<extend>>
+UC62 ..> Comision : <<include>>
+@enduml

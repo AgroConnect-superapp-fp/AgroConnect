@@ -1,0 +1,69 @@
+RF_Codigo,RF_Titulo,RF_Modulo,CU_Codigo,CU_Titulo,HU_Codigo,HU_Titulo,Calidad_CU,Calidad_HU
+RF-01,Autenticación de usuarios,M01,CU#09,Visualizar Dashboard del Productor,HU14,Panel general,Fuerte,Fuerte
+RF-02,Recuperación de contraseña,M01,CU#09,Visualizar Dashboard del Productor,HU14,Panel general,Fuerte,Fuerte
+RF-03,Control de sesiones,M01,CU#36,Configurar Preferencias Iniciales del Sistema,HU14,Panel general,Fuerte,Fuerte
+RF-04,Panel general por rol,M01,CU#09,Visualizar Dashboard del Productor,HU14,Panel general,Fuerte,Fuerte
+RF-05,Registro multi-rol de usuarios,M02,CU#01,Registrar Productor,HU01,Registro de usuario,Fuerte,Fuerte
+RF-06,Edición de perfil,M02,CU#23,Editar Perfil de Usuario,HU03,Gestión de perfil,Fuerte,Fuerte
+RF-07,Gestión de roles y permisos,M02,CU#15,Gestionar Usuarios (Admin),HU09,Gestión de roles,Fuerte,Fuerte
+RF-08,Búsqueda y consulta de usuarios,M02,CU#15,Gestionar Usuarios (Admin),HU09,Gestión de roles,Fuerte,Fuerte
+RF-09,Desactivación de usuarios,M02,CU#23,Editar Perfil de Usuario,HU03,Gestión de perfil,Fuerte,Fuerte
+RF-10,Reputación de usuarios,M02,CU#23,Editar Perfil de Usuario,HU03,Gestión de perfil,Fuerte,Fuerte
+RF-11,Publicación de productos,M03,CU#24,Explorar Productos del Marketplace,HU05,Visualización de productos,Fuerte,Fuerte
+RF-12,Visualización de productos,M03,CU#24,Explorar Productos del Marketplace,HU05,Visualización de productos,Fuerte,Fuerte
+RF-13,Búsqueda avanzada de productos,M03,CU#24,Explorar Productos del Marketplace,HU05,Visualización de productos,Fuerte,Fuerte
+RF-14,Solicitud de compra,M03,CU#06,Publicar Demanda B2B,HU11,Negociación empresarial,Fuerte,Fuerte
+RF-15,Cierre de transacción,M03,CU#08,Calificar Transacción,HU19,Calificaciones,Fuerte,Fuerte
+RF-16,Calificaciones y comentarios,M03,CU#08,Calificar Transacción,HU19,Calificaciones,Fuerte,Fuerte
+RF-17,Control de inventario,M04,CU#27,Consultar Disponibilidad y Alertas de Inventario,HU20,Disponibilidad en tiempo real,Fuerte,Fuerte
+RF-18,Disponibilidad en tiempo real,M04,CU#27,Consultar Disponibilidad y Alertas de Inventario,HU20,Disponibilidad en tiempo real,Fuerte,Fuerte
+RF-19,Alertas de stock mínimo,M04,CU#27,Consultar Disponibilidad y Alertas de Inventario,HU20,Disponibilidad en tiempo real,Fuerte,Fuerte
+RF-20,Mensajería interna,M05,CU#13,Enviar Mensaje,HU22,Mensajería interna,Fuerte,Fuerte
+RF-21,Historial de mensajes,M05,CU#14,Consultar Historial de Mensajes,HU23,Historial de mensajes,Fuerte,Fuerte
+RF-22,Notificaciones de mensajes,M05,CU#14,Consultar Historial de Mensajes,HU23,Historial de mensajes,Fuerte,Fuerte
+RF-23,Registro de transportistas,M06,CU#29,Registrar Transportista,HU25,Registro de transportistas,Fuerte,Fuerte
+RF-24,Asignación de envíos,M06,CU#11,Asignar Envío,HU26,Asignación de envíos,Fuerte,Fuerte
+RF-25,Seguimiento de envíos,M06,CU#12,Consultar Estado del Envío,HU27,Seguimiento de envíos,Fuerte,Fuerte
+RF-26,Registro de pedidos,M07,CU#30,Consultar Historial de Pedidos,HU29,Historial de pedidos,Fuerte,Fuerte
+RF-27,Estados del pedido,M07,CU#10,Gestionar Pedido (Productor),HU07,Registro de pedidos,Fuerte,Fuerte
+RF-28,Historial de pedidos,M07,CU#30,Consultar Historial de Pedidos,HU29,Historial de pedidos,Fuerte,Fuerte
+RF-29,Integración de pagos electrónicos,M08,CU#21,Registrar Transacción,HU31,Registro de transacciones,Fuerte,Fuerte
+RF-30,Registro de transacciones,M08,CU#46,Generar Reporte de Transacciones para Contabilidad,HU31,Registro de transacciones,Fuerte,Fuerte
+RF-31,Monitoreo del sistema,M09,CU#31,Monitorear Sistema (Admin),HU32,Monitoreo del sistema,Fuerte,Fuerte
+RF-32,Generación de reportes,M09,CU#16,Generar Reportes,HU10,Generar reportes,Fuerte,Fuerte
+RF-33,Gestión de incidencias,M09,CU#31,Monitorear Sistema (Admin),HU32,Monitoreo del sistema,Fuerte,Fuerte
+RF-34,Control de accesos RBAC,M10,CU#17,Gestionar Accesos,HU34,Control de accesos,Fuerte,Fuerte
+RF-35,Registro de actividad,M10,CU#18,Registrar Actividad del Sistema,HU35,Registro de actividad,Fuerte,Fuerte
+RF-36,Copias de seguridad automáticas,M10,CU#48,Habilitar Autenticación de Dos Factores (2FA),HU36,Copias de seguridad,Fuerte,Fuerte
+RF-37,Centro de ayuda,M11,CU#20,Consultar Centro de Ayuda,HU37,Centro de ayuda,Fuerte,Fuerte
+RF-38,Sistema de tickets,M11,CU#19,Crear Ticket de Soporte,HU38,Gestión de tickets,Fuerte,Fuerte
+RF-39,Chatbot conversacional,M12,CU#07,Interacción con AgroBot,HU39,Chatbot IA (AgroBot),Fuerte,Fuerte
+RF-40,Respuestas automáticas a preguntas frecuentes,M12,CU#50,Consultar a AgroBot sobre un RF Específico,HU40,Respuestas automáticas,Fuerte,Fuerte
+RF-41,Orientación contextual al usuario,M12,CU#51,AgroBot Aprende de Feedback del Usuario,HU41,Orientación al usuario,Fuerte,Fuerte
+RF-42,Escalamiento a soporte humano,M12,CU#49,Chat con Soporte Humano (Escalamiento de AgroBot),HU42,Soporte inicial,Fuerte,Fuerte
+RF-43,Gestión del carrito de compras,M13,CU#32,Gestionar Carrito de Compras,HU43,Gestionar carrito de compras,Fuerte,Fuerte
+RF-44,Confirmación de pedido,M13,CU#05,Realizar Pedido (B2C),HU43,Gestionar carrito de compras,Fuerte,Fuerte
+RF-45,Historial de compras,M13,CU#34,Consultar Historial de Compras,HU45,Historial de compras,Fuerte,Fuerte
+RF-46,Calificación de productos adquiridos,M13,CU#35,Calificar Productos Adquiridos,HU46,Calificar Productos Adquiridos,Fuerte,Fuerte
+RF-47,Aplicación Web Responsiva,M14,CU#57,Acceder desde Múltiples Dispositivos,HU52,Acceder desde Múltiples Dispositivos,Fuerte,Fuerte
+RF-48,Aplicación Móvil Nativa Android,M14,CU#57,Acceder desde Múltiples Dispositivos,HU52,Acceder desde Múltiples Dispositivos,Fuerte,Fuerte
+RF-49,Aplicación Móvil Nativa iOS,M14,CU#57,Acceder desde Múltiples Dispositivos,HU52,Acceder desde Múltiples Dispositivos,Fuerte,Fuerte
+RF-50,Modo Offline para Productor,M14,CU#56,Sincronizar Cambios Offline al Reconectar,HU51,Sincronizar Cambios Offline al Reconectar,Fuerte,Fuerte
+RF-51,Modo Offline para Transportista,M14,CU#56,Sincronizar Cambios Offline al Reconectar,HU51,Sincronizar Cambios Offline al Reconectar,Fuerte,Fuerte
+RF-52,Cola de Sincronización,M14,CU#56,Sincronizar Cambios Offline al Reconectar,HU51,Sincronizar Cambios Offline al Reconectar,Fuerte,Fuerte
+RF-53,Sincronización Automática,M14,CU#56,Sincronizar Cambios Offline al Reconectar,HU51,Sincronizar Cambios Offline al Reconectar,Fuerte,Fuerte
+RF-54,Resolución de Conflictos,M14,CU#56,Sincronizar Cambios Offline al Reconectar,HU51,Sincronizar Cambios Offline al Reconectar,Fuerte,Fuerte
+RF-55,Caché de Catálogo,M14,CU#56,Sincronizar Cambios Offline al Reconectar,HU51,Sincronizar Cambios Offline al Reconectar,Fuerte,Fuerte
+RF-56,Pago Contra Entrega en Efectivo,M15,CU#59,Pagar con PSE (Débito Bancario ACH Colombia),HU54,Pagar con PSE-ACH Colombia,Fuerte,Fuerte
+RF-57,Transferencia Bancaria Local,M15,CU#59,Pagar con PSE (Débito Bancario ACH Colombia),HU54,Pagar con PSE-ACH Colombia,Fuerte,Fuerte
+RF-58,Pasarela de Tarjetas,M15,CU#59,Pagar con PSE (Débito Bancario ACH Colombia),HU54,Pagar con PSE-ACH Colombia,Fuerte,Fuerte
+RF-59,Liquidación con Comisión Configurable,M15,CU#59,Pagar con PSE (Débito Bancario ACH Colombia),HU54,Pagar con PSE-ACH Colombia,Fuerte,Fuerte
+RF-60,Comprobantes y Facturación Electrónica,M15,CU#62,Generar Factura Electrónica con CUFE (DIAN),HU57,Generar Factura Electrónica con CUFE (DIAN),Fuerte,Fuerte
+RF-61,Geolocalización del Productor,M16,CU#63,Definir Zona de Cobertura Geográfica,HU58,Definir Zona de Cobertura Geográfica,Fuerte,Fuerte
+RF-62,Búsqueda por Proximidad,M16,CU#63,Definir Zona de Cobertura Geográfica,HU58,Definir Zona de Cobertura Geográfica,Fuerte,Fuerte
+RF-63,Mapa de Rutas para Transportistas,M16,CU#64,Calcular Ruta Óptima de Entrega Multi-Destino,HU59,Calcular Ruta Óptima Multi-Destino,Fuerte,Fuerte
+RF-64,Cobertura por Veredas,M16,CU#63,Definir Zona de Cobertura Geográfica,HU58,Definir Zona de Cobertura Geográfica,Fuerte,Fuerte
+RF-65,Clasificación de Perecibilidad,M17,CU#66,Auditar Cumplimiento de Cadena de Frío para ICA,HU68,Cumplir Auditoría de Cadena de Frío para ICA,Fuerte,Fuerte
+RF-66,Fechas de Cosecha y Caducidad,M17,CU#66,Auditar Cumplimiento de Cadena de Frío para ICA,HU68,Cumplir Auditoría de Cadena de Frío para ICA,Fuerte,Fuerte
+RF-67,Ventana de Entrega Garantizada,M17,CU#66,Auditar Cumplimiento de Cadena de Frío para ICA,HU68,Cumplir Auditoría de Cadena de Frío para ICA,Fuerte,Fuerte
+RF-68,Trazabilidad Origen-Destino,M17,CU#66,Auditar Cumplimiento de Cadena de Frío para ICA,HU68,Cumplir Auditoría de Cadena de Frío para ICA,Fuerte,Fuerte

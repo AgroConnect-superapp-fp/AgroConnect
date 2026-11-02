@@ -1,0 +1,75 @@
+CU_Codigo,CU_Titulo,CU_Modulo,HU_Codigo,HU_Titulo,Score,Calidad
+CU#01,Registrar Productor,M02,HU01,Registro de usuario,1.0,Fuerte
+CU#02,Iniciar Sesión,M02,HU02,Inicio de sesión,1.0,Fuerte
+CU#03,Registrar Producto,M04,HU04,Publicar productos,1.0,Fuerte
+CU#04,Gestionar Inventario Sin Conexión,M14,HU51,Sincronizar Cambios Offline al Reconectar,1.0,Fuerte
+CU#05,Realizar Pedido (B2C),M13,HU43,Gestionar carrito de compras,1.0,Fuerte
+CU#06,Publicar Demanda B2B,M03,HU11,Negociación empresarial,1.0,Fuerte
+CU#07,Interacción con AgroBot,M12,HU39,Chatbot IA (AgroBot),1.0,Fuerte
+CU#08,Calificar Transacción,M03,HU19,Calificaciones,1.0,Fuerte
+CU#09,Visualizar Dashboard del Productor,M01,HU14,Panel general,1.0,Fuerte
+CU#10,Gestionar Pedido (Productor),M07,HU07,Registro de pedidos,1.0,Fuerte
+CU#11,Asignar Envío,M06,HU26,Asignación de envíos,1.0,Fuerte
+CU#12,Consultar Estado del Envío,M06,HU27,Seguimiento de envíos,1.0,Fuerte
+CU#13,Enviar Mensaje,M05,HU22,Mensajería interna,1.0,Fuerte
+CU#14,Consultar Historial de Mensajes,M05,HU23,Historial de mensajes,1.0,Fuerte
+CU#15,Gestionar Usuarios (Admin),M09,HU09,Gestión de roles,1.0,Fuerte
+CU#16,Generar Reportes,M09,HU10,Generar reportes,1.0,Fuerte
+CU#17,Gestionar Accesos,M10,HU34,Control de accesos,1.0,Fuerte
+CU#18,Registrar Actividad del Sistema,M10,HU35,Registro de actividad,1.0,Fuerte
+CU#19,Crear Ticket de Soporte,M11,HU38,Gestión de tickets,1.0,Fuerte
+CU#20,Consultar Centro de Ayuda,M11,HU37,Centro de ayuda,1.0,Fuerte
+CU#21,Registrar Transacción,M08,HU31,Registro de transacciones,1.0,Fuerte
+CU#22,Recuperar Contraseña,M02,HU12,Recuperación de contraseña,1.0,Fuerte
+CU#23,Editar Perfil de Usuario,M02,HU03,Gestión de perfil,1.0,Fuerte
+CU#24,Explorar Productos del Marketplace,M03,HU05,Visualización de productos,1.0,Fuerte
+CU#25,Buscar Productos con Filtros,M03,HU18,Búsqueda avanzada de productos,1.0,Fuerte
+CU#26,Gestionar Reputación del Usuario,M02,HU17,Reputación,1.0,Fuerte
+CU#27,Consultar Disponibilidad y Alertas de Inventario,M04,HU20,Disponibilidad en tiempo real,1.0,Fuerte
+CU#28,Recibir Notificaciones del Sistema,M01,HU13,Control de sesiones,1.0,Fuerte
+CU#29,Registrar Transportista,M06,HU25,Registro de transportistas,1.0,Fuerte
+CU#30,Consultar Historial de Pedidos,M07,HU29,Historial de pedidos,1.0,Fuerte
+CU#31,Monitorear Sistema (Admin),M09,HU32,Monitoreo del sistema,1.0,Fuerte
+CU#32,Gestionar Carrito de Compras,M13,HU43,Gestionar carrito de compras,1.0,Fuerte
+CU#33,Confirmar Pedido,M07,HU44,Confirmar pedido,1.0,Fuerte
+CU#34,Consultar Historial de Compras,M13,HU45,Historial de compras,1.0,Fuerte
+CU#35,Calificar Productos Adquiridos,M13,HU46,Calificar Productos Adquiridos,1.0,Fuerte
+CU#36,Configurar Preferencias Iniciales del Sistema,M01,HU14,Panel general,1.0,Fuerte
+CU#37,Configurar Notificaciones por Usuario,M02,HU13,Control de sesiones,1.0,Fuerte
+CU#38,Exportar Datos Personales (Derecho de Acceso Habeas Data),M02,HU16,Desactivación de usuarios,1.0,Fuerte
+CU#39,Filtrar Productos por Geolocalización Cercana,M16,HU58,Definir Zona de Cobertura Geográfica,1.0,Fuerte
+CU#40,Comparar Productos Lado a Lado,M03,HU05,Visualización de productos,1.0,Fuerte
+CU#41,Sincronizar Inventario con Múltiples Dispositivos,M04,HU21,Alertas de stock,1.0,Fuerte
+CU#42,Crear Grupo de Chat para un Pedido,M05,HU24,Notificaciones de mensajes,1.0,Fuerte
+CU#43,Asignar Transportista con Mejor Rating,M06,HU26,Asignación de envíos,1.0,Fuerte
+CU#44,Cancelar Pedido con Reembolso Automático,M07,HU47,Seguimiento de pedido,1.0,Fuerte
+CU#45,Procesar Reembolso por Cancelación,M08,HU48,Cierre de transacción,1.0,Fuerte
+CU#46,Generar Reporte de Transacciones para Contabilidad,M08,HU31,Registro de transacciones,1.0,Fuerte
+CU#47,Banear Usuario por Violación de Términos,M09,HU16,Desactivación de usuarios,1.0,Fuerte
+CU#48,Habilitar Autenticación de Dos Factores (2FA),M10,HU36,Copias de seguridad,1.0,Fuerte
+CU#49,Chat con Soporte Humano (Escalamiento de AgroBot),M11,HU42,Soporte inicial,1.0,Fuerte
+CU#50,Consultar a AgroBot sobre un RF Específico,M12,HU40,Respuestas automáticas,1.0,Fuerte
+CU#51,AgroBot Aprende de Feedback del Usuario,M12,HU41,Orientación al usuario,1.0,Fuerte
+CU#52,AgroBot Detecta Idioma y Responde,M12,HU39,Chatbot IA (AgroBot),1.0,Fuerte
+CU#53,Aplicar Código de Descuento en Checkout,M13,HU43,Gestionar carrito de compras,1.0,Fuerte
+CU#54,Recibir Notificación SMS por Alerta Crítica,M14,HU49,Recibir Alertas Críticas por SMS Rural,1.0,Fuerte
+CU#55,Consultar Precios vía Código USSD *123#,M14,HU50,Consultar Precios vía Código USSD *123#,1.0,Fuerte
+CU#56,Sincronizar Cambios Offline al Reconectar,M14,HU51,Sincronizar Cambios Offline al Reconectar,1.0,Fuerte
+CU#57,Acceder desde Múltiples Dispositivos,M14,HU52,Acceder desde Múltiples Dispositivos,1.0,Fuerte
+CU#58,Notificar al Productor cuando Comprador está Sin Conexión,M14,HU53,Verificar Estado Online de Otros Usuarios,1.0,Fuerte
+CU#59,Pagar con PSE (Débito Bancario ACH Colombia),M15,HU54,Pagar con PSE-ACH Colombia,1.0,Fuerte
+CU#60,Pagar con Nequi (Código QR),M15,HU55,Pagar con Nequi,1.0,Fuerte
+CU#61,Pagar con Daviplata (Cédula + Código),M15,HU56,Pagar con Daviplata,1.0,Fuerte
+CU#62,Generar Factura Electrónica con CUFE (DIAN),M15,HU57,Generar Factura Electrónica con CUFE (DIAN),1.0,Fuerte
+CU#63,Definir Zona de Cobertura Geográfica,M16,HU58,Definir Zona de Cobertura Geográfica,1.0,Fuerte
+CU#64,Calcular Ruta Óptima de Entrega Multi-Destino,M16,HU59,Calcular Ruta Óptima Multi-Destino,1.0,Fuerte
+CU#65,Trackear Ubicación en Tiempo Real del Transportista,M16,HU60,Trackear Ubicación en Tiempo Real del Transportista,1.0,Fuerte
+CU#66,Auditar Cumplimiento de Cadena de Frío para ICA,M17,HU68,Cumplir Auditoría de Cadena de Frío para ICA,1.0,Fuerte
+CU#66,Auditar Cumplimiento de Cadena de Frío para ICA,M17,HU69,Clasificar Producto como Perecedero,0.9,Provisional
+CU#66,Auditar Cumplimiento de Cadena de Frío para ICA,M17,HU70,Registrar Fecha de Cosecha,0.8,Provisional
+CU#66,Auditar Cumplimiento de Cadena de Frío para ICA,M17,HU71,Registrar Fecha de Caducidad,0.9,Provisional
+CU#66,Auditar Cumplimiento de Cadena de Frío para ICA,M17,HU72,Configurar Ventana de Entrega por Tipo de Producto,0.6,Provisional
+CU#66,Auditar Cumplimiento de Cadena de Frío para ICA,M17,HU73,Rastrear Origen del Producto,0.9,Provisional
+CU#66,Auditar Cumplimiento de Cadena de Frío para ICA,M17,HU74,Registrar Condiciones de Almacenamiento,0.8,Provisional
+CU#66,Auditar Cumplimiento de Cadena de Frío para ICA,M17,HU75,Notificar Vencimiento Próximo,0.5,Provisional
+CU#66,Auditar Cumplimiento de Cadena de Frío para ICA,M17,HU76,Generar Reporte de Cadena de Frío,1.0,Provisional

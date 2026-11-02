@@ -40,7 +40,6 @@ const session: AuthSession = {
     verificado: true,
     fechaRegistro: '2026-01-01T00:00:00.000Z',
   },
-  tokens: { accessToken: 'access', refreshToken: 'refresh', expiresIn: 900 },
 };
 
 function expectNothingPersisted(): void {

@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>AgroConnect — Portada del Proyecto · SENA ADSO</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Portada de presentación de AgroConnect — Proyecto Formativo SENA ADSO. Integrantes, Notion y GitHub." />
+<!--
+  Slide de portada — AgroConnect · Proyecto Formativo SENA ADSO (Ficha 2026)
+  Diseñado con el skill Open Design (nexu-io/open-design):
+  Gramática del template "Pin & Paper" — zhangzara/beautiful-html-templates (MIT),
+  atraviesado por el design system de marca del proyecto (navy/cian/verde,
+  alineado con la Portada Oficial v2). Chinchetas SVG: del template original,
+  redistribuidas bajo su licencia MIT.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Space+Grotesk:wght@500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    /* AgroConnect brand tokens (derivados de la Portada Oficial v2 + SPEC.md) */
+    --navy:      #0A1626;
+    --navy-2:    #0E1F35;
+    --navy-3:    #071120;
+    --cyan:      #45C8F1;
+    --cyan-soft: #9BE0FF;
+    --green:     #7CC242;
+    --green-soft:#A5E266;
+    --paper:     #F4F8FB;
+    --muted:     rgba(244,248,251,.62);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #05090F; }
+  body { font-family: "Space Grotesk", "Helvetica Neue", Arial, sans-serif; }
+
+  section.slide {
+    position: relative;
+    width: 1600px; height: 900px;
+    margin: 0 auto;
+    overflow: hidden;
+    color: var(--paper);
+    background:
+      radial-gradient(52% 68% at 84% 12%, rgba(69,200,241,.16), transparent 62%),
+      radial-gradient(55% 70% at 8% 96%, rgba(124,194,66,.13), transparent 60%),
+      linear-gradient(140deg, #0C1B30 0%, var(--navy) 46%, var(--navy-3) 100%);
+  }
+  /* paper grain — misma textura del template, en modo screen para fondo oscuro */
+  section.slide::before {
+    content: "";
+    position: absolute; inset: 0;
+    pointer-events: none;
+    opacity: .22;
+    mix-blend-mode: screen;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.4' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.5  0 0 0 0 0.45  0 0 0 0 0.2  0 0 0 .25 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    z-index: 1;
+  }
+
+  /* ── chinchetas decorativas de fondo ─────────────────────────── */
+  .pin-deco { position: absolute; z-index: 0; pointer-events: none; }
+  .pin-deco.a { top: 132px; right: 70px; width: 340px; color: var(--cyan); opacity: .10; transform: rotate(-16deg); }
+  .pin-deco.b { bottom: 48px; left: -70px; width: 430px; color: var(--green); opacity: .10; transform: rotate(16deg); }
+
+  /* ── chrome superior ─────────────────────────────────────────── */
+  .top {
+    position: absolute; top: 44px; left: 64px; right: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: "DM Mono", ui-monospace, monospace; font-weight: 500;
+    font-size: 15px; letter-spacing: .16em; text-transform: uppercase; line-height: 1;
+    z-index: 3;
+  }
+  .lockup { display: flex; align-items: center; gap: 14px; }
+  .lockup .mark {
+    width: 46px; height: 46px; border-radius: 50%; object-fit: cover;
+    border: 1.5px solid rgba(69,200,241,.45);
+    box-shadow: 0 0 18px rgba(69,200,241,.28);
+  }
+  .top .meta { display: flex; gap: 34px; opacity: .72; }
+  .top .meta .dot { color: var(--cyan); opacity: .9; margin-right: 6px; }
+
+  /* ── cuerpo ──────────────────────────────────────────────────── */
+  .stage {
+    position: absolute; inset: 0;
+    padding: 146px 64px 108px;
+    display: grid; grid-template-columns: 1.2fr .8fr; gap: 46px;
+    z-index: 2;
+  }
+  .left { display: flex; flex-direction: column; min-width: 0; }
+
+  .super {
+    font-family: "DM Mono", ui-monospace, monospace; font-weight: 500;
+    font-size: 15px; letter-spacing: .24em; text-transform: uppercase;
+    color: var(--cyan-soft);
+  }
+  .t-title { margin: 20px 0 0; }
+  .t-title .t-svg { display: block; width: 740px; height: 114px; overflow: visible; }
+  .tagline {
+    font-family: "Caveat", cursive; font-weight: 700;
+    font-size: 50px; line-height: 1.05; letter-spacing: 0;
+    color: #DDF3FF; margin-top: 14px; transform: rotate(-.8deg); transform-origin: left top;
+    text-shadow: 0 0 34px rgba(69,200,241,.25);
+  }
+
+  .who { margin-top: 64px; }
+  .lab {
+    font-family: "DM Mono", ui-monospace, monospace; font-weight: 500;
+    font-size: 12.5px; letter-spacing: .24em; text-transform: uppercase;
+    color: var(--cyan-soft); opacity: .85;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .lab::after { content: ""; height: 1px; flex: 0 0 76px; background: rgba(155,224,255,.4); }
+  .who ul { list-style: none; margin: 18px 0 0; padding: 0; }
+  .who li {
+    font-family: "DM Mono", ui-monospace, monospace; font-weight: 500;
+    font-size: 15.5px; letter-spacing: .1em; text-transform: uppercase;
+    line-height: 2.05; white-space: nowrap;
+  }
+  .who li .role { color: var(--cyan); opacity: .92; }
+  .who .dup {
+    font-family: "DM Mono", ui-monospace, monospace;
+    margin-top: 10px; font-size: 12.5px; letter-spacing: .14em; text-transform: uppercase;
+    opacity: .5; white-space: nowrap;
+  }
+
+  .links { margin-top: 58px; }
+  .links a.row {
+    display: flex; align-items: center; gap: 12px; margin-top: 14px;
+    text-decoration: none; cursor: pointer; width: fit-content;
+  }
+  .links .pin { flex: 0 0 auto; width: 58px; height: 20px; color: var(--green-soft); opacity: .9; transform: rotate(-5deg); pointer-events: none; }
+  .links .pill {
+    font-family: "DM Mono", ui-monospace, monospace; font-weight: 500;
+    font-size: 11.5px; letter-spacing: .2em; text-transform: uppercase;
+    color: var(--cyan-soft);
+    border: 1.5px solid rgba(69,200,241,.55); border-radius: 999px;
+    padding: 5px 13px; white-space: nowrap;
+    transition: background-color .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .links .pill.live { color: var(--green-soft); border-color: rgba(124,194,66,.7); }
+  .links .url {
+    font-family: "DM Mono", ui-monospace, monospace; font-weight: 400;
+    font-size: 13.5px; letter-spacing: .01em;
+    color: rgba(244,248,251,.92);
+    border-bottom: 1px dotted rgba(155,224,255,.5);
+    padding-bottom: 1px; white-space: nowrap;
+    transition: color .15s ease, border-color .15s ease;
+  }
+  .links a.row:hover .pill { background: rgba(69,200,241,.16); color: #fff; border-color: rgba(69,200,241,.95); }
+  .links a.row:hover .pill.live { background: rgba(124,194,66,.18); color: #fff; border-color: rgba(124,194,66,.95); }
+  .links a.row:hover .url { color: var(--cyan-soft); border-bottom-color: var(--cyan-soft); border-bottom-style: solid; }
+
+  /* ── columna derecha: foto pinneada ──────────────────────────── */
+  .right { position: relative; display: flex; flex-direction: column; justify-content: center; }
+  .photo-card {
+    position: relative;
+    background: var(--navy-2);
+    border: 1.5px solid rgba(244,248,251,.3);
+    border-radius: 6px;
+    padding: 10px;
+    transform: rotate(-1.8deg);
+    box-shadow: 12px 14px 0 0 rgba(69,200,241,.22), 0 34px 80px -24px rgba(0,0,0,.65);
+  }
+  .photo-card img {
+    display: block; width: 100%; height: 372px; object-fit: cover; object-position: 62% 50%;
+    border-radius: 3px;
+  }
+  .photo-card .pin-photo {
+    position: absolute; top: -40px; left: 44px; width: 150px; height: 66px;
+    color: var(--cyan-soft); transform: rotate(-14deg);
+    filter: drop-shadow(0 6px 10px rgba(0,0,0,.45));
+    z-index: 3;
+  }
+  .caption {
+    margin-top: 34px; text-align: center;
+    font-family: "DM Mono", ui-monospace, monospace; font-weight: 400;
+    font-size: 11.5px; letter-spacing: .22em; text-transform: uppercase;
+    color: var(--muted);
+  }
+  .caption b { color: rgba(244,248,251,.8); font-weight: 500; }
+
+  /* ── pie ─────────────────────────────────────────────────────── */
+  .bottom {
+    position: absolute; left: 64px; right: 64px; bottom: 34px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: "DM Mono", ui-monospace, monospace; font-weight: 500;
+    font-size: 13px; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--muted); z-index: 3;
+  }
+  .bottom .pg { color: var(--cyan-soft); opacity: .9; }
+
+  /* El título es SVG vectorial: su gradiente se rasteriza limpio en PDF/impresión
+     (background-clip: text dejaba artefactos de caja en el rasterizador de PDF).
+     Mismos colores, dirección y glow que el diseño de marca. */
+  @page { size: 1600px 900px; margin: 0; }
+
+  /* El grano de papel es una textura sutil pensada para pantalla; en impresión
+     se omite para que el PDF quede simple y libre de grupos de transparencia
+     (blend-mode). El PNG y la vista en navegador conservan la textura. */
+  @media print {
+    section.slide::before { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- chinchetas del sistema de diseño (Pin & Paper, MIT) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="pin" viewBox="0 0 360 110">
+      <g fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M312 38 C 296 32, 290 50, 304 58 C 320 66, 340 60, 342 44 C 344 28, 322 18, 300 24"/>
+        <path d="M300 24 C 240 14, 140 14, 70 30"/>
+        <path d="M312 56 C 250 78, 150 82, 80 70"/>
+        <ellipse cx="58" cy="50" rx="24" ry="14"/>
+      </g>
+    </symbol>
+    <symbol id="pin-open" viewBox="0 0 360 130">
+      <g fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M312 48 C 296 42, 290 60, 304 68 C 320 76, 340 70, 342 54 C 344 38, 322 28, 300 34"/>
+        <path d="M300 34 C 240 24, 140 24, 70 40"/>
+        <path d="M312 66 C 250 90, 150 96, 80 86 L 24 78 L 38 70 M24 78 L 38 88"/>
+        <ellipse cx="82" cy="32" rx="22" ry="12" transform="rotate(-18 82 32)"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
+<section class="slide" aria-label="Portada del proyecto AgroConnect">
+
+  <svg class="pin-deco a" viewBox="0 0 360 130" aria-hidden="true"><use href="#pin-open"/></svg>
+  <svg class="pin-deco b" viewBox="0 0 360 110" aria-hidden="true"><use href="#pin"/></svg>
+
+  <header class="top">
+    <span class="lockup">
+      <img class="mark" src="assets/icono-sello.png" alt="Icono de AgroConnect" />
+      <span>Proyecto Formativo · SENA CCYT</span>
+    </span>
+    <span class="meta">
+      <span>Ficha # 3292136</span>
+      <span>Armenia · Quindío</span>
+      <span>07 · 10 · 2026</span>
+    </span>
+  </header>
+
+  <main class="stage">
+    <div class="left">
+      <div class="super">Plataforma B2B + B2C de comercio agrícola directo</div>
+      <h1 class="t-title">
+        <svg class="t-svg" width="740" height="114" viewBox="0 0 740 114" role="img" aria-label="AgroConnect" style="overflow:visible">
+          <defs>
+            <linearGradient id="agroGrad" x1="0" y1="0" x2="1" y2="0.46">
+              <stop offset="8%" stop-color="#A5E266"/>
+              <stop offset="52%" stop-color="#7CC242"/>
+              <stop offset="100%" stop-color="#45C8F1"/>
+            </linearGradient>
+            <radialGradient id="agroHalo" cx="0.5" cy="0.5" r="0.5">
+              <stop offset="0%" stop-color="#45C8F1" stop-opacity="0.32"/>
+              <stop offset="55%" stop-color="#45C8F1" stop-opacity="0.12"/>
+              <stop offset="100%" stop-color="#45C8F1" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <ellipse cx="368" cy="88" rx="420" ry="105" fill="url(#agroHalo)"/>
+          <text x="0" y="98" style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:126px;letter-spacing:-5.67px" fill="#F4F8FB">Agro</text>
+          <text x="267" y="98" style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:126px;letter-spacing:-5.67px" fill="url(#agroGrad)">Connect</text>
+        </svg>
+      </h1>
+      <div class="tagline">Conectando el campo con la tecnología.</div>
+
+      <div class="who">
+        <div class="lab">Presentado por</div>
+        <ul>
+          <li>Nelson Fabián Gallego Sánchez <span class="role">— Scrum Master</span></li>
+          <li>Juan David Ferrer Castillo <span class="role">— Product Owner</span></li>
+          <li>Santiago Palacio Tovar <span class="role">— Desarrollador</span></li>
+        </ul>
+      </div>
+
+      <div class="links">
+        <div class="lab">Enlaces del proyecto</div>
+        <a class="row" href="https://agroconnectpreview.vercel.app/" target="_blank" rel="noopener noreferrer" title="Abrir la aplicación desplegada">
+          <svg class="pin" viewBox="0 0 360 110" aria-hidden="true"><use href="#pin"/></svg>
+          <span class="pill live">App en línea</span>
+          <span class="url">agroconnectpreview.vercel.app</span>
+        </a>
+        <a class="row" href="https://app.notion.com/p/AgroConnect-1d7bdc33f29483caadf20189d8ee9b19" target="_blank" rel="noopener noreferrer" title="Abrir la documentación en Notion">
+          <svg class="pin" viewBox="0 0 360 110" aria-hidden="true"><use href="#pin"/></svg>
+          <span class="pill">Notion</span>
+          <span class="url">app.notion.com/p/AgroConnect-1d7bdc33f29483caadf20189d8ee9b19</span>
+        </a>
+        <a class="row" href="https://github.com/AgroConnect-superapp-fp/AgroConnect" target="_blank" rel="noopener noreferrer" title="Abrir el repositorio en GitHub">
+          <svg class="pin" viewBox="0 0 360 110" aria-hidden="true"><use href="#pin"/></svg>
+          <span class="pill">GitHub</span>
+          <span class="url">github.com/AgroConnect-superapp-fp/AgroConnect</span>
+        </a>
+      </div>
+    </div>
+
+    <aside class="right">
+      <figure class="photo-card">
+        <svg class="pin-photo" viewBox="0 0 360 130" aria-hidden="true"><use href="#pin-open"/></svg>
+        <img src="assets/portada-v2.png" alt="Portada oficial v2 de AgroConnect: ecosistema digital agro con marketplace, gestión offline, pagos y AgroBot" />
+      </figure>
+      <div class="caption"><b>Portada de presentación del proyecto</b> — Revisión de documentación</div>
+    </aside>
+  </main>
+
+  <footer class="bottom">
+    <span>AgroConnect · Tecnólogo en Análisis y Desarrollo de Software - ADSO Cognitus</span>
+    <span class="pg">01 / 01</span>
+  </footer>
+
+</section>
+
+</body>
+</html>

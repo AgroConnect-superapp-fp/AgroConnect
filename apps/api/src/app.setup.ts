@@ -29,5 +29,11 @@ export function configureApp(app: NestExpressApplication): void {
   app.enableCors({
     origin: env.CORS_ORIGIN.split(',').map((origin) => origin.trim()),
     credentials: true,
+    // `X-Requested-With` es el header que exige CsrfGuard; sin declararlo, el
+    // preflight del navegador lo bloquearía.
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    exposedHeaders: ['x-correlation-id'],
+    maxAge: 86_400,
   });
 }

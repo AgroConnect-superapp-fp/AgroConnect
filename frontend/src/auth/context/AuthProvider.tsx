@@ -75,11 +75,6 @@ export function AuthProvider({ children }: { children: ReactNode }): React.React
         verificado: true,
         fechaRegistro: new Date().toISOString(),
       },
-      tokens: {
-        accessToken: 'demo-access',
-        refreshToken: 'demo-refresh',
-        expiresIn: 0,
-      },
     });
   }, [applySession]);
 

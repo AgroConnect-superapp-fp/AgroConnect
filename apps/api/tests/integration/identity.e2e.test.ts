@@ -88,7 +88,8 @@ describe('Identity (e2e)', () => {
         usuario: { correo: payload.correo, rol: 'productor' },
       },
     });
-    expect(response.body.data.tokens.accessToken).toEqual(expect.any(String));
+    // Cookie-only puro: el cuerpo NUNCA debe exponer los tokens a JavaScript.
+    expect(response.body.data).not.toHaveProperty('tokens');
 
     const cookies = response.headers['set-cookie'] as unknown as string[];
     expect(cookies.some((cookie) => cookie.startsWith('access_token='))).toBe(true);
@@ -139,7 +140,8 @@ describe('Identity (e2e)', () => {
 
     expect(refreshed.status).toBe(200);
     expect(refreshed.body).toMatchObject({ success: true, message: 'Token renovado' });
-    expect(refreshed.body.data.tokens.accessToken).toEqual(expect.any(String));
+    expect(refreshed.body.data.usuario).toBeDefined();
+    expect(refreshed.body.data).not.toHaveProperty('tokens');
   });
 
   it('cierra la sesión y limpia las cookies', async () => {

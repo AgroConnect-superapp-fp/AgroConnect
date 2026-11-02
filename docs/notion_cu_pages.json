@@ -1,0 +1,332 @@
+[
+  {
+    "page_id": "44cbdc33-f294-833a-af6f-81ee7deafaad",
+    "title": "CU#01 — Registrar Productor",
+    "module": null
+  },
+  {
+    "page_id": "6dbbdc33-f294-835a-bd3c-01d23e0695d6",
+    "title": "CU#02 — Iniciar Sesión",
+    "module": null
+  },
+  {
+    "page_id": "292bdc33-f294-83db-a7bb-01845e070659",
+    "title": "CU#03 — Registrar Producto",
+    "module": null
+  },
+  {
+    "page_id": "7c5bdc33-f294-826b-98f4-013b59b8a3c8",
+    "title": "CU#04 — Gestionar Inventario Sin Conexión",
+    "module": null
+  },
+  {
+    "page_id": "c55bdc33-f294-8354-9fbc-811193612eb9",
+    "title": "CU#05 — Realizar Pedido (B2C)",
+    "module": null
+  },
+  {
+    "page_id": "712bdc33-f294-82b9-89c2-817e1012cbc6",
+    "title": "CU#06 — Publicar Demanda B2B",
+    "module": null
+  },
+  {
+    "page_id": "e74bdc33-f294-8378-9dba-8166fbd57bef",
+    "title": "CU#07 — Interacción con AgroBot",
+    "module": null
+  },
+  {
+    "page_id": "055bdc33-f294-83c5-b75d-818d05e2bd8b",
+    "title": "CU#08 — Calificar Transacción",
+    "module": null
+  },
+  {
+    "page_id": "520bdc33-f294-822e-bbbe-810a451315ba",
+    "title": "CU#09 — Visualizar Dashboard del Productor",
+    "module": null
+  },
+  {
+    "page_id": "85dbdc33-f294-83bb-bbf1-81461bfe031f",
+    "title": "CU#10 — Gestionar Pedido (Productor)",
+    "module": null
+  },
+  {
+    "page_id": "33dbdc33-f294-802d-9ca4-e6658630fb19",
+    "title": "CU#11 — Asignar Envío",
+    "module": null
+  },
+  {
+    "page_id": "33dbdc33-f294-800d-a5da-eb77d9d1e116",
+    "title": "CU#12 — Consultar Estado del Envío",
+    "module": null
+  },
+  {
+    "page_id": "33dbdc33-f294-8035-bd06-eff7f0d292d1",
+    "title": "CU#13 — Enviar Mensaje",
+    "module": null
+  },
+  {
+    "page_id": "33dbdc33-f294-806d-a556-c7eb60761b12",
+    "title": "CU#14 — Consultar Historial de Mensajes",
+    "module": null
+  },
+  {
+    "page_id": "33dbdc33-f294-803a-8f8f-f2edc28bbf95",
+    "title": "CU#15 — Gestionar Usuarios (Admin)",
+    "module": null
+  },
+  {
+    "page_id": "33dbdc33-f294-805f-9992-ed8f0e5388e2",
+    "title": "CU#16 — Generar Reportes",
+    "module": null
+  },
+  {
+    "page_id": "33dbdc33-f294-802a-9338-df50e0f5e36c",
+    "title": "CU#17 — Gestionar Accesos",
+    "module": null
+  },
+  {
+    "page_id": "33dbdc33-f294-8006-80a0-e9f3dc554d5b",
+    "title": "CU#18 — Registrar Actividad del Sistema",
+    "module": null
+  },
+  {
+    "page_id": "33dbdc33-f294-8003-bd7d-cec4dd0d2914",
+    "title": "CU#19 — Crear Ticket de Soporte",
+    "module": null
+  },
+  {
+    "page_id": "33dbdc33-f294-8002-bfa4-e76e6ece1e38",
+    "title": "CU#20 — Consultar Centro de Ayuda",
+    "module": null
+  },
+  {
+    "page_id": "33dbdc33-f294-80fd-bfa3-d545247641c4",
+    "title": "CU#21 — Registrar Transacción",
+    "module": null
+  },
+  {
+    "page_id": "349bdc33-f294-81d3-b2f2-d5be5e0a1ee6",
+    "title": "CU#22 — Recuperar Contraseña",
+    "module": null
+  },
+  {
+    "page_id": "349bdc33-f294-81dc-b526-d16e44887184",
+    "title": "CU#23 — Editar Perfil de Usuario",
+    "module": null
+  },
+  {
+    "page_id": "349bdc33-f294-811b-9270-dd337dba1bb8",
+    "title": "CU#24 — Explorar Productos del Marketplace",
+    "module": null
+  },
+  {
+    "page_id": "349bdc33-f294-81f1-9b78-f4c743807f11",
+    "title": "CU#25 — Buscar Productos con Filtros",
+    "module": null
+  },
+  {
+    "page_id": "349bdc33-f294-81f4-a8a1-e579f9921066",
+    "title": "CU#26 — Gestionar Reputación del Usuario",
+    "module": null
+  },
+  {
+    "page_id": "349bdc33-f294-8122-aff3-d7822067db69",
+    "title": "CU#27 — Consultar Disponibilidad y Alertas de Inventario",
+    "module": null
+  },
+  {
+    "page_id": "349bdc33-f294-8142-a8d1-ef77c8132701",
+    "title": "CU#28 — Recibir Notificaciones del Sistema",
+    "module": null
+  },
+  {
+    "page_id": "349bdc33-f294-81bb-b5dc-d87c45acff77",
+    "title": "CU#29 — Registrar Transportista",
+    "module": null
+  },
+  {
+    "page_id": "349bdc33-f294-8103-9e6e-e8c5219a384a",
+    "title": "CU#30 — Consultar Historial de Pedidos",
+    "module": null
+  },
+  {
+    "page_id": "349bdc33-f294-81c6-9e21-df1e3dfa8f6b",
+    "title": "CU#31 — Monitorear Sistema (Admin)",
+    "module": null
+  },
+  {
+    "page_id": "349bdc33-f294-81ec-8b25-c971ccbb527a",
+    "title": "CU#32 — Gestionar Carrito de Compras",
+    "module": null
+  },
+  {
+    "page_id": "349bdc33-f294-81b0-ace7-fae7a1ddc3a6",
+    "title": "CU#33 — Confirmar Pedido",
+    "module": null
+  },
+  {
+    "page_id": "349bdc33-f294-814e-b528-c123d0caeb2d",
+    "title": "CU#34 — Consultar Historial de Compras",
+    "module": null
+  },
+  {
+    "page_id": "349bdc33-f294-8171-b2c0-cfdb59f947a6",
+    "title": "CU#35 — Calificar Productos Adquiridos",
+    "module": null
+  },
+  {
+    "page_id": "38ebdc33-f294-81f1-978c-eb37f53156a6",
+    "title": "CU#36 — Configurar Preferencias Iniciales del Sistema",
+    "module": "M01 — Gestión de Inicio y Panel General"
+  },
+  {
+    "page_id": "38ebdc33-f294-81d1-a2d4-fa637b0254b0",
+    "title": "CU#37 — Configurar Notificaciones por Usuario",
+    "module": "M02 — Gestión de Usuarios y Perfiles"
+  },
+  {
+    "page_id": "38ebdc33-f294-8175-9a18-c99fa3e89917",
+    "title": "CU#38 — Exportar Datos Personales (Derecho de Acceso Habeas Data)",
+    "module": "M02 — Gestión de Usuarios y Perfiles"
+  },
+  {
+    "page_id": "38ebdc33-f294-81a3-8616-d97aec9d0251",
+    "title": "CU#39 — Filtrar Productos por Geolocalización Cercana",
+    "module": "M03 — Marketplace Agropecuario"
+  },
+  {
+    "page_id": "38ebdc33-f294-81f7-9975-eab991d6ad6a",
+    "title": "CU#40 — Comparar Productos Lado a Lado",
+    "module": "M03 — Marketplace Agropecuario"
+  },
+  {
+    "page_id": "38ebdc33-f294-8151-901b-ede34c8a598f",
+    "title": "CU#41 — Sincronizar Inventario con Múltiples Dispositivos",
+    "module": "M04 — Gestión de Inventarios"
+  },
+  {
+    "page_id": "38ebdc33-f294-81e7-bab8-fe17ff64c37f",
+    "title": "CU#42 — Crear Grupo de Chat para un Pedido",
+    "module": "M05 — Comunicación Interna"
+  },
+  {
+    "page_id": "38ebdc33-f294-810e-bee9-d96591fd3ba7",
+    "title": "CU#43 — Asignar Transportista con Mejor Rating",
+    "module": "M06 — Gestión Logística"
+  },
+  {
+    "page_id": "38ebdc33-f294-81b8-afe9-cd955e0d46a6",
+    "title": "CU#44 — Cancelar Pedido con Reembolso Automático",
+    "module": "M07 — Gestión de Pedidos"
+  },
+  {
+    "page_id": "38ebdc33-f294-8107-97da-d1942da69c26",
+    "title": "CU#45 — Procesar Reembolso por Cancelación",
+    "module": "M08 — Pagos y Transacciones"
+  },
+  {
+    "page_id": "38ebdc33-f294-81ed-aeba-e5425621c5df",
+    "title": "CU#46 — Generar Reporte de Transacciones para Contabilidad",
+    "module": "M08 — Pagos y Transacciones"
+  },
+  {
+    "page_id": "38ebdc33-f294-8162-84ab-ff63702e1a7c",
+    "title": "CU#47 — Banear Usuario por Violación de Términos",
+    "module": "M09 — Panel Administrativo"
+  },
+  {
+    "page_id": "38ebdc33-f294-814a-b40b-c97a6228ea1b",
+    "title": "CU#48 — Habilitar Autenticación de Dos Factores (2FA)",
+    "module": "M10 — Seguridad y Control"
+  },
+  {
+    "page_id": "38ebdc33-f294-8199-99ed-d458c1fe4c40",
+    "title": "CU#49 — Chat con Soporte Humano (Escalamiento de AgroBot)",
+    "module": "M11 — Soporte y Ayuda"
+  },
+  {
+    "page_id": "38ebdc33-f294-8117-b3e7-d935d22095b5",
+    "title": "CU#50 — Consultar a AgroBot sobre un RF Específico",
+    "module": "M12 — IA AgroBot (Subsistema 12)"
+  },
+  {
+    "page_id": "38ebdc33-f294-81e8-961f-ec63697abdc6",
+    "title": "CU#51 — AgroBot Aprende de Feedback del Usuario",
+    "module": "M12 — IA AgroBot (Subsistema 12)"
+  },
+  {
+    "page_id": "38ebdc33-f294-81e6-b2a4-c5db177a24f5",
+    "title": "CU#52 — AgroBot Detecta Idioma y Responde",
+    "module": "M12 — IA AgroBot (Subsistema 12)"
+  },
+  {
+    "page_id": "38ebdc33-f294-81a0-8d88-c5d78533fb32",
+    "title": "CU#53 — Aplicar Código de Descuento en Checkout",
+    "module": "M13 — Gestión de Compras"
+  },
+  {
+    "page_id": "38ebdc33-f294-81a7-8c64-d3d4fd5d15fa",
+    "title": "CU#54 — Recibir Notificación SMS por Alerta Crítica",
+    "module": "M14 — Multicanal y Operación Offline"
+  },
+  {
+    "page_id": "38ebdc33-f294-8160-977d-e2f836354e07",
+    "title": "CU#55 — Consultar Precios vía Código USSD *123#",
+    "module": "M14 — Multicanal y Operación Offline"
+  },
+  {
+    "page_id": "38ebdc33-f294-8181-a0b2-e4e3a8d83eb0",
+    "title": "CU#56 — Sincronizar Cambios Offline al Reconectar",
+    "module": "M14 — Multicanal y Operación Offline"
+  },
+  {
+    "page_id": "38ebdc33-f294-81af-9258-e76300a4336c",
+    "title": "CU#57 — Acceder desde Múltiples Dispositivos",
+    "module": "M14 — Multicanal y Operación Offline"
+  },
+  {
+    "page_id": "38ebdc33-f294-81cc-b3af-ef36f28d2bf9",
+    "title": "CU#58 — Notificar al Productor cuando Comprador está Sin Conexión",
+    "module": "M14 — Multicanal y Operación Offline"
+  },
+  {
+    "page_id": "38ebdc33-f294-81bb-baba-e60f119fdce5",
+    "title": "CU#59 — Pagar con PSE (Débito Bancario ACH Colombia)",
+    "module": "M15 — Pagos Locales Colombianos"
+  },
+  {
+    "page_id": "38ebdc33-f294-814b-9fdb-d12bf17d4af3",
+    "title": "CU#60 — Pagar con Nequi (Código QR)",
+    "module": "M15 — Pagos Locales Colombianos"
+  },
+  {
+    "page_id": "38ebdc33-f294-8115-85f8-e4826a9f6181",
+    "title": "CU#61 — Pagar con Daviplata (Cédula + Código)",
+    "module": "M15 — Pagos Locales Colombianos"
+  },
+  {
+    "page_id": "38ebdc33-f294-81cd-bb04-f787b860887f",
+    "title": "CU#62 — Generar Factura Electrónica con CUFE (DIAN)",
+    "module": "M15 — Pagos Locales Colombianos"
+  },
+  {
+    "page_id": "38ebdc33-f294-81af-a7a6-e406351c71fa",
+    "title": "CU#63 — Definir Zona de Cobertura Geográfica",
+    "module": "M16 — Geolocalización Rural"
+  },
+  {
+    "page_id": "38ebdc33-f294-818b-aec8-fd2cab652118",
+    "title": "CU#64 — Calcular Ruta Óptima de Entrega Multi-Destino",
+    "module": "M16 — Geolocalización Rural"
+  },
+  {
+    "page_id": "38ebdc33-f294-8149-9681-e760e90277ef",
+    "title": "CU#65 — Trackear Ubicación en Tiempo Real del Transportista",
+    "module": "M16 — Geolocalización Rural"
+  },
+  {
+    "page_id": "38ebdc33-f294-81fe-8fd8-de244c141881",
+    "title": "CU#66 — Auditar Cumplimiento de Cadena de Frío para ICA",
+    "module": "M17 — Productos Perecederos"
+  }
+]

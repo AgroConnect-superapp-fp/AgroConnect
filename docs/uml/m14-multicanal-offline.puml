@@ -1,0 +1,40 @@
+@startuml M14-multicanal-offline
+' AgroConnect — M14 Multicanal y Operación Offline (RF-47 a RF-55)
+' Generado para cubrir la deuda documental H11 de PT-ECU-01 v1.1 (Sprint de modelado 2026-10-03)
+!theme plain
+left to right direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam actorStyle awesome
+
+actor "Productor" as Productor
+actor "Transportista" as Transportista
+actor "Comprador" as Comprador
+actor "Pasarela SMS\n(Sistema externo)" as SMS
+
+rectangle "M14 — Multicanal y Operación Offline" {
+  usecase "Gestionar Inventario\nSin Conexión" as UC04
+  usecase "Sincronizar Cambios\nOffline al Reconectar" as UC56
+  usecase "Acceder desde\nMúltiples Dispositivos" as UC57
+  usecase "Recibir Notificación SMS\npor Alerta Crítica" as UC54
+  usecase "Consultar Precios vía\nCódigo USSD *123#" as UC55
+  usecase "Notificar al Productor cuando\nel Comprador está Sin Conexión" as UC58
+  usecase "Aplicar Política\nLast-Write-Wins" as LWW
+  usecase "Notificar Conflicto\nal Usuario" as Conflicto
+  usecase "Validar Idempotencia\n(UUID local)" as Idempotencia
+}
+
+Productor --> UC04
+Productor --> UC56
+Productor --> UC57
+Productor --> UC55
+Transportista --> UC56
+Transportista --> UC57
+Comprador --> UC58
+SMS --> UC54
+
+UC56 ..> Idempotencia : <<include>>
+UC56 ..> LWW : <<include>>
+UC56 ..> Conflicto : <<include>>
+UC04 ..> UC56 : <<include>>
+@enduml

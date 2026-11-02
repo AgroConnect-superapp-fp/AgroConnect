@@ -1,7 +1,7 @@
-# ADR-010: Estrategia de sesión — access token en memoria y refresh token en cookie httpOnly
+# ADR-010: Estrategia de sesión — cookies httpOnly y CSRF de origen
 
-- **Estado**: Aceptada
-- **Fecha**: 2026-10-22
+- **Estado**: Aceptada — implementación parcial (actualizada 2026-11-02)
+- **Fecha**: 2026-10-22 (revisión 2026-11-02)
 - **Decisores**: Equipo AgroConnect
 - **Relacionado**: ADR-009, línea base de seguridad OWASP ASVS L2 (documento interno del equipo)
 
@@ -16,22 +16,27 @@ Además:
 
 ## Decisión
 
-1. **Access token JWT** de 15 minutos que vive **solo en memoria** (estado de React) y viaja en el header `Authorization: Bearer`.
-2. **Refresh token** en una cookie con estos atributos:
-   - `httpOnly`, `Secure`, `SameSite=None`
-   - `Path=/api/v1/auth`
-   - de dominio API
-
-   Al recargar la página, el frontend obtiene un access token nuevo llamando a `POST /auth/refresh`.
-3. **Rotación con detección de reutilización:**
+1. **Sesión 100 % cookie `httpOnly`**: el access token (15 min) y el refresh
+   token (7 días) viajan en cookies que JavaScript no puede leer. El cuerpo de
+   las respuestas de autenticación **no** incluye tokens.
+2. **Atributos de cookie:**
+   - `httpOnly`, `Secure` (obligatorio en producción).
+   - `SameSite=None` en producción, porque el frontend (Vercel) y la API
+     (Render) son sitios distintos; `Lax` en desarrollo/pruebas.
+   - `Path=/api/v1` para el access token y `Path=/api/v1/auth` para el refresh.
+3. **Rotación con detección de reutilización (planificada, no implementada):**
    - Cada refresh token pertenece a una *familia*.
-   - Si se presenta un token ya rotado, se revoca la familia completa (indicio de robo).
-4. **JWT endurecido:**
-   - `HS256` fijado (ya aplicado en el PR #51).
-   - Claims `iss` y `aud`.
-   - Secretos distintos para access y refresh.
-5. **Protección CSRF** para el endpoint de cookie: `SameSite`, más la verificación de `Origin` contra la lista CORS y un header personalizado obligatorio (`X-Requested-With`).
-6. **Hash de contraseñas:** Argon2id para hashes nuevos, con re-hash transparente desde bcrypt en el siguiente login exitoso.
+   - Si se presenta un token ya rotado, se revoca la familia completa.
+   - Estado 2026-11-02: la tabla `refresh_tokens` aún no tiene
+     `family_id`/`generation`; queda en la fase 2.
+4. **JWT endurecido:** `HS256` fijado en firma y verificación (ya aplicado).
+   `iss`/`aud` y autorización por rol desde BD quedan planificados.
+5. **Protección CSRF:** `CsrfGuard` valida `Origin`/`Referer` contra
+   `CORS_ORIGIN` y exige `X-Requested-With: XMLHttpRequest` en toda petición
+   mutante. Implementado el 2026-11-02.
+6. **Hash de contraseñas:** Argon2id para hashes nuevos, con re-hash
+   transparente desde bcrypt en el siguiente login exitoso. **Pendiente**:
+   hoy se usa bcrypt con 12 rondas.
 
 ## Alternativas consideradas
 

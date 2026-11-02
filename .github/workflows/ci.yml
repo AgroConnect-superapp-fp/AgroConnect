@@ -287,9 +287,11 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - name: Aviso si falta VERCEL_TOKEN
+      - name: Verificar VERCEL_TOKEN
         if: env.VERCEL_TOKEN == ''
-        run: echo "::warning::VERCEL_TOKEN no configurado. Agrega el secret para habilitar el deploy automatico."
+        run: |
+          echo "::error::VERCEL_TOKEN no configurado. El deploy automático es obligatorio para publicar en producción."
+          exit 1
 
       - name: Configurar Node.js
         if: env.VERCEL_TOKEN != ''
@@ -305,26 +307,16 @@ jobs:
         working-directory: .
 
       - name: Pull de configuración y entorno (Vercel)
-        id: vercel_pull
         if: env.VERCEL_TOKEN != ''
-        run: |
-          if npx --yes vercel@54 pull --yes --environment=production --token="$VERCEL_TOKEN" >/dev/null 2>&1; then
-            echo "access=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "access=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::VERCEL_TOKEN sin acceso al equipo AgroConnect - deploy automatico omitido. Usa el deploy manual documentado (npx vercel deploy --prod --yes --archive=tgz)."
-          fi
-        working-directory: .
+        run: npx --yes vercel@64.3.1 pull --yes --environment=production --token="$VERCEL_TOKEN"
 
       - name: Build de producción (Vercel)
-        if: steps.vercel_pull.outputs.access == 'true'
-        run: npx --yes vercel@54 build --prod --token="$VERCEL_TOKEN"
-        working-directory: .
+        if: env.VERCEL_TOKEN != ''
+        run: npx --yes vercel@64.3.1 build --prod --token="$VERCEL_TOKEN"
 
       - name: Deploy a producción
-        if: steps.vercel_pull.outputs.access == 'true'
-        run: npx --yes vercel@54 deploy --prebuilt --prod --yes --token="$VERCEL_TOKEN"
-        working-directory: .
+        if: env.VERCEL_TOKEN != ''
+        run: npx --yes vercel@64.3.1 deploy --prebuilt --prod --yes --token="$VERCEL_TOKEN"
 
   alignment:
     name: Alineación de entornos (manifiesto)

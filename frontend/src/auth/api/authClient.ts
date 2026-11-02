@@ -47,6 +47,9 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
+        // CsrfGuard exige este header en toda petición mutante. Un formulario
+        // HTML cross-site no puede enviarlo sin pasar por el preflight CORS.
+        'X-Requested-With': 'XMLHttpRequest',
         ...(options.headers ?? {}),
       },
     });

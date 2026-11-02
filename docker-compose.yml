@@ -17,7 +17,8 @@ services:
       POSTGRES_PASSWORD: agroconnect_dev
       POSTGRES_DB: agroconnect_dev
     ports:
-      - "5434:5432"
+      # Solo loopback: la base de desarrollo no debe quedar expuesta a la LAN.
+      - "127.0.0.1:5434:5432"
     volumes:
       - agroconnect_pgdata:/var/lib/postgresql/data
     healthcheck:
