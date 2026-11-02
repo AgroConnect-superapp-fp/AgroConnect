@@ -16,6 +16,28 @@ export interface SmtpConfig {
 }
 
 /**
+ * Escapa texto interpolado en el HTML del correo. `fullName` lo escribe el
+ * usuario y las URLs pueden contener `&` en el query string; sin escape, un
+ * nombre como `<img onerror=...>` se renderiza en el cliente de correo.
+ */
+function escapeHtml(value: string): string {
+  return value.replace(/[&<>"']/g, (char) => {
+    switch (char) {
+      case '&':
+        return '&amp;';
+      case '<':
+        return '&lt;';
+      case '>':
+        return '&gt;';
+      case '"':
+        return '&quot;';
+      default:
+        return '&#39;';
+    }
+  });
+}
+
+/**
  * Envío real de correo por SMTP.
  *
  * Sustituye al `FileEmailService` (que escribe los correos en disco) cuando
@@ -55,9 +77,9 @@ export class SmtpEmailService implements EmailService {
         'Si no solicitaste el cambio, ignora este mensaje.',
       ].join('\n'),
       html: [
-        `<p>Hola ${email.fullName},</p>`,
+        `<p>Hola ${escapeHtml(email.fullName)},</p>`,
         '<p>Solicitaste restablecer tu contraseña. Abre el siguiente enlace:</p>',
-        `<p><a href="${email.resetUrl}">${email.resetUrl}</a></p>`,
+        `<p><a href="${escapeHtml(email.resetUrl)}">${escapeHtml(email.resetUrl)}</a></p>`,
         `<p>El enlace expira en ${email.expiresInMinutes} minutos.</p>`,
         '<p>Si no solicitaste el cambio, ignora este mensaje.</p>',
       ].join(''),
@@ -78,9 +100,9 @@ export class SmtpEmailService implements EmailService {
         `El enlace expira en ${email.expiresInMinutes} minutos.`,
       ].join('\n'),
       html: [
-        `<p>Hola ${email.fullName},</p>`,
+        `<p>Hola ${escapeHtml(email.fullName)},</p>`,
         '<p>Confirma tu correo electrónico en AgroConnect:</p>',
-        `<p><a href="${email.verifyUrl}">${email.verifyUrl}</a></p>`,
+        `<p><a href="${escapeHtml(email.verifyUrl)}">${escapeHtml(email.verifyUrl)}</a></p>`,
         `<p>El enlace expira en ${email.expiresInMinutes} minutos.</p>`,
       ].join(''),
     });

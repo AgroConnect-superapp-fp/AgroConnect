@@ -29,7 +29,7 @@
         },
         "responses": {
           "201": {
-            "description": "Usuario creado; se envía correo de verificación"
+            "description": "Usuario creado; sesión en cookies httpOnly y correo de verificación"
           },
           "400": {
             "description": "Solicitud malformada o cuerpo inválido"
@@ -54,7 +54,7 @@
         "tags": [
           "Auth"
         ],
-        "summary": "Autentica un usuario y emite tokens JWT",
+        "summary": "Autentica un usuario; la sesión se entrega en cookies httpOnly",
         "requestBody": {
           "required": true,
           "content": {
@@ -67,7 +67,7 @@
         },
         "responses": {
           "200": {
-            "description": "Tokens de acceso y refresco emitidos"
+            "description": "Sesión creada; cookies httpOnly emitidas"
           },
           "400": {
             "description": "Solicitud malformada o cuerpo inválido"
@@ -92,7 +92,7 @@
         "tags": [
           "Auth"
         ],
-        "summary": "Renueva el par de tokens con un refresh token válido",
+        "summary": "Renueva la sesión con la cookie httpOnly de refresh",
         "requestBody": {
           "required": true,
           "content": {
@@ -105,7 +105,7 @@
         },
         "responses": {
           "200": {
-            "description": "Nuevos tokens emitidos"
+            "description": "Sesión renovada; cookies httpOnly rotadas"
           },
           "400": {
             "description": "Solicitud malformada o cuerpo inválido"
@@ -130,7 +130,7 @@
         "tags": [
           "Auth"
         ],
-        "summary": "Revoca la sesión del refresh token entregado",
+        "summary": "Revoca la sesión y limpia las cookies",
         "requestBody": {
           "required": true,
           "content": {

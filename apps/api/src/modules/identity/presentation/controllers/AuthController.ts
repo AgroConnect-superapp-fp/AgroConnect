@@ -152,6 +152,8 @@ export class AuthController {
 
   @Post('logout')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(AuthThrottlerGuard)
+  @Throttle({ default: RATE_LIMIT })
   @UseInterceptors(SessionTokenInterceptor)
   async logout(
     @Body(new ZodValidationPipe(logoutSchema)) body: LogoutInput,

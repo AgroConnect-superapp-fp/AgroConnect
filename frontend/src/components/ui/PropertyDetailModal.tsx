@@ -17,6 +17,7 @@ import React, { useEffect, useCallback } from 'react';
 import type { Property } from '../../types/property';
 import { getCropInfo, getCertificationInfo } from '../../types/property';
 import { getCropFallbackImage } from '../../data/fallbackImages';
+import { devLog } from '../../utils/devLog';
 import { ImageGallery } from './ImageGallery';
 import { ImageUpload } from './ImageUpload';
 
@@ -113,7 +114,7 @@ export function PropertyDetailModal({
                 tags={[property.crop, property.department.toLowerCase()]}
                 maxFiles={5}
                 onImagesUploaded={(newImages) => {
-                  console.log(
+                  devLog(
                     `[AgroConnect] Nuevas imágenes subidas para ${property.name}:`,
                     newImages
                   );

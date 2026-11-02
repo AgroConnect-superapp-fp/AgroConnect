@@ -24,5 +24,6 @@ Hay dos series de ADR:
 | [ADR-013](0013-motor-de-rutas-externo.md) | Rutas óptimas con motor externo (`RouteOptimizer`) | Aceptada |
 | [ADR-014](0014-servicio-agro-intelligence-python.md) | Satélite Python `agro-intelligence` | Aceptada (post-MVP) |
 | [ADR-015](0015-monorepo-contract-first.md) | Monorepo npm workspaces + Turborepo, contract-first | Aceptada |
+| [ADR-016](0016-pendientes-post-cutover.md) | Pendientes post-cutover: PWA, retiro legacy, refresh/Argon2, release | Propuesta |
 
 Para una decisión nueva, copia la estructura de cualquier ADR: Estado, Fecha, Decisores, Relacionado, Contexto, Decisión, Alternativas y Consecuencias. Enlázala aquí y en el índice de ADRs de Obsidian.

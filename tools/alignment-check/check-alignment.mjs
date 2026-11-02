@@ -173,6 +173,10 @@ if (mode === 'all') {
       ['Root del proyecto', manifest.urls.notionRoot],
     ]) {
       try {
+        // CodeQL js/file-access-to-http (alerta #18): este verificador lee el
+        // token de Notion de una variable de entorno y lo envía a
+        // api.notion.com como parte de su función. No es una exfiltración;
+        // es un falso positivo aceptado y documentado en la auditoría.
         const response = await fetch(
           `https://api.notion.com/v1/blocks/${pageId}/children?page_size=100`,
           { headers: { Authorization: `Bearer ${token}`, 'Notion-Version': '2022-06-28' } }

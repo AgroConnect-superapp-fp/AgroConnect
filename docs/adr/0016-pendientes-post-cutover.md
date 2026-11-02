@@ -1,0 +1,115 @@
+# ADR-016: Pendientes post-cutover — decisiones para el siguiente ciclo
+
+- **Estado**: Propuesta
+- **Fecha**: 2026-11-02
+- **Decisores**: Equipo AgroConnect
+- **Relacionado**: ADR-009 (NestJS), ADR-010 (sesión), ADR-015 (monorepo), auditoría 2026-11-02
+
+## Contexto
+
+El cutover a `apps/api` (NestJS) está desplegado y verificado: Vercel sirve el
+bundle nuevo con CSP, Render ejecuta NestJS con `CsrfGuard` y el readiness
+existe. La base de producción (Supabase) está caída, lo que bloquea la
+verificación de login/RLS, pero no impide decidir y preparar el siguiente
+ciclo. Este ADR registra las decisiones que **no** se tomaron en la Fase 0 y
+que requieren criterio de producto o arquitectura.
+
+## Decisiones pendientes
+
+### D1. PWA: implementar o retirar
+
+- **Situación:** existe `frontend/public/sw.js` pero no hay manifest ni
+  registro; el README ya no promete PWA. El valor rural-first (conectividad
+  intermitente) es real.
+- **Opciones:**
+  1. Implementar con `vite-plugin-pwa` (Workbox): manifest, iconos, precache
+     del shell y `stale-while-revalidate` para imágenes.
+  2. Retirar `sw.js` y no prometer offline; el modo demo cubre la caída.
+- **Recomendación:** opción 1, acotada al shell y a las imágenes; no cachear
+  respuestas de autenticación ni datos personales.
+- **Criterio:** Lighthouse PWA instalable, E2E de carga offline del shell y
+  `sw.js` con versión explícita.
+
+### D2. Retiro del backend Express legacy
+
+- **Situación:** `backend/` y `apps/api/` coexisten; Render ya sirve
+  `apps/api`. El legacy conserva 188 pruebas y duplica el dominio.
+- **Opciones:**
+  1. Retirarlo ya y dejar un único backend.
+  2. Mantenerlo como referencia hasta cerrar la paridad de todos los módulos.
+- **Recomendación:** opción 1 por módulos: congelar `backend/`, mover cualquier
+  prueba de contrato que aporte valor y eliminarlo cuando `apps/api` cubra
+  identity y geography al 100 %.
+- **Criterio:** `grep` sin imports desde `apps/*` a `backend/*`; CI sin el job
+  `backend`; documentación y scripts actualizados.
+
+### D3. Familias de refresh tokens
+
+- **Situación:** `refresh_tokens` no tiene `family_id`/`generation`; un token
+  rotado reutilizado no revoca la familia.
+- **Recomendación:** añadir `family_id` (UUID), `generation` (int) y
+  `rotated_at`; al detectar reuso, revocar toda la familia en una transacción.
+- **Criterio:** migración reversible, prueba de reuso concurrente y alerta de
+  seguridad cuando se detecte.
+
+### D4. Argon2id
+
+- **Situación:** el ADR-010 lo exige, pero los 11 usuarios de desarrollo usan
+  bcrypt (`$2b$`).
+- **Recomendación:** Argon2id para hashes nuevos y rehash transparente en el
+  login exitoso; mantener bcrypt para verificar los existentes.
+- **Criterio:** dependencia `argon2` con binario prebuilt, pruebas de rehash y
+  migración sin bloquear el login.
+
+### D5. Verificación de correo antes de emitir sesión
+
+- **Situación:** el registro emite cookies sin esperar `emailVerifiedAt`.
+- **Opciones:** bloquear la sesión hasta verificar o permitir una sesión
+  limitada (solo perfil y reenvío).
+- **Recomendación:** sesión limitada; no romper el flujo de registro ni los
+  E2E, pero impedir operaciones sensibles (publicar, comprar, cambiar rol).
+- **Criterio:** matriz de permisos por `verificado` y prueba E2E.
+
+### D6. `iss`/`aud` en JWT
+
+- **Situación:** los tokens no llevan emisor ni audiencia.
+- **Recomendación:** añadirlos y aceptar una ventana de transición con
+  `issuer`/`audience` opcionales; invalidar sesiones fuera de la ventana.
+- **Criterio:** tokens viejos siguen funcionando durante el despliegue; los
+  nuevos se validan estrictamente.
+
+### D7. Matrices de trazabilidad
+
+- **Situación:** `matriz_trazabilidad_cu_hu.csv` tiene 74 filas y el total
+  oficial es 69 HU/66 CU; `detalle` tiene 203 filas.
+- **Recomendación:** reconciliar contra Notion (fuente SSOT), marcar duplicados
+  o HU mal clasificadas y regenerar los CSV con el script.
+- **Criterio:** `traceability-check` sin discrepancias y matriz firmada.
+
+### D8. Release y dependencias
+
+- **Situación:** el CHANGELOG ya tiene `1.1.0`, pero no hay tag/release; hay 10
+  alertas de Dependabot en la rama por defecto (7 moderate, 3 low) y el lockfile
+  es único.
+- **Recomendación:** crear `v1.1.0` con las notas del CHANGELOG; actualizar
+  Dependabot en un PR separado, empezando por parches de seguridad y evitando
+  majors de Vite/React sin ventana de pruebas.
+- **Criterio:** release publicada, `npm audit --audit-level=high` verde y CI
+  estable.
+
+## Consecuencias
+
+- **Positivas:** el siguiente ciclo tiene alcance y criterios explícitos; no se
+  mezclan cambios de producto con el cutover.
+- **Negativas:** la deuda de refresh/Argon2 y la PWA siguen abiertas mientras
+  la base de producción no se restaure.
+- **Dependencia externa:** D3, D4 y la verificación de login requieren Supabase
+  operativo; D1, D2, D6, D7 y D8 pueden avanzar sin él.
+
+## Orden sugerido
+
+1. Restaurar Supabase y cerrar RLS/login (bloqueo externo).
+2. D2 (retiro del legacy) y D8 (release) para reducir superficie.
+3. D3/D4 (seguridad de sesión) con migración controlada.
+4. D1 (PWA) y D5 (verificación) según prioridad de producto.
+5. D6/D7 en el siguiente sprint.
