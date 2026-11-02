@@ -20,8 +20,8 @@
 - Marketplace (mapa Leaflet + productores destacados) con datos de Supabase.
 - Imágenes por cultivo, fallback automático (`SafeImage`), LQIP y créditos.
 - Si Supabase no responde: datos de demostración con aviso y botón de reintento.
-- **PWA:** pendiente. El `sw.js` existe pero no está registrado ni hay manifest
-  enlazado; no se debe prometer instalación offline hasta implementarlo.
+- **PWA:** implementada con `vite-plugin-pwa`: manifest, iconos 192/512/maskable,
+  precache del shell y caché de imágenes de Cloudinary y tiles del mapa.
 
 ### Backend de producción (`apps/api`, NestJS)
 
@@ -143,6 +143,8 @@ npx vercel deploy --prod --yes --archive=tgz
 curl -s -o /dev/null -w "%{http_code}\n" https://agroconnectpreview.vercel.app
 curl -s https://agroconnect-api-5t7n.onrender.com/health
 curl -sI https://agroconnectpreview.vercel.app | grep -Ei 'content-security|x-frame|x-content-type|referrer|permissions'
+curl -sI https://agroconnectpreview.vercel.app/manifest.webmanifest | grep -i content-type
+curl -sI https://agroconnectpreview.vercel.app/sw.js | grep -i content-type
 ```
 
 Además, en el navegador: registrar un usuario, recargar (refresh silencioso),

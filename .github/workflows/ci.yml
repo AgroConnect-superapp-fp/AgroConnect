@@ -204,6 +204,12 @@ jobs:
       - name: Build de producción
         run: npm run build
 
+      - name: Verificar artefactos PWA
+        run: |
+          test -f dist/manifest.webmanifest
+          test -f dist/sw.js
+          test -f dist/registerSW.js
+
       # Bloquea vulnerabilidades high/critical; las moderate/low se reportan sin
       # bloquear. Hoy provienen de la toolchain de pruebas (jest → sprintf-js),
       # sin fix disponible que no introduzca un cambio incompatible

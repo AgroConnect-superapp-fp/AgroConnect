@@ -113,7 +113,7 @@ Reglas clave del diseño:
 
 | Capa | Tecnologías |
 |---|---|
-| Frontend | React 19 + Vite 8 + TypeScript 6 (strict) + Tailwind CSS 4 + Leaflet 1.9 (OpenStreetMap) |
+| Frontend | React 19 + Vite 8 + TypeScript 6 (strict) + Tailwind CSS 4 + Leaflet 1.9 (OpenStreetMap) + PWA (vite-plugin-pwa) |
 | Backend | Node.js 24 + NestJS 11 + Prisma 7 (núcleo) — Express 4 legacy en retiro — TypeScript 5/6 (strict) + Zod |
 | Persistencia | PostgreSQL 16 + PostGIS 3.4 + Prisma 7 (driver adapter `@prisma/adapter-pg`) |
 | Seguridad | JWT + refresh tokens rotativos, bcrypt (12 rondas), Helmet, rate limiting, Pino con redacción de PII |
@@ -132,7 +132,7 @@ AgroConnect/
 │   ├── prisma/  # Esquema y migraciones (PostgreSQL 16 + PostGIS)
 │   ├── src/     # config, shared y módulos (auth, geography)
 │   └── tests/   # unitarias, integración y dobles de prueba
-└── frontend/    # SPA React (PWA pendiente: SW sin registrar)
+└── frontend/    # SPA React + PWA (vite-plugin-pwa)
     ├── src/     # auth (M02), componentes de mapa y UI, servicios
     ├── public/  # SW (sin registrar) e iconografía
     └── e2e/     # Pruebas end-to-end con Playwright
@@ -164,12 +164,12 @@ Características: contraseñas con bcrypt, unicidad de correo/documento/celular 
 - Parcelas almacenadas como `geography(Point, 4326)` con índice GiST y búsqueda por radio con `ST_DWithin` en `/api/v1/plots`.
 - Frontend: mapa Leaflet + OpenStreetMap con 4 capas base (OSM, satélite Esri, topográfico, CartoDB), clustering de fincas, heatmap de productividad y herramientas de dibujo de parcelas.
 
-### M03 — Prototipo del mercado (Supabase)
+### M03 — Prototipo del mercado (Supabase) y PWA
 
 - Marketplace React sobre datos de Supabase (PostgreSQL + PostgREST): mapa, KPIs, distribución por cultivo y tarjetas de fincas.
 - Imágenes de cultivos con créditos (autor · licencia) en la galería, fallback automático por cultivo (`SafeImage`) y LQIP por proveedor (Unsplash/Wikimedia/Cloudinary).
 - Respaldo de datos de demostración con aviso visible cuando Supabase no responde.
-- PWA: pendiente. El `sw.js` existe pero no está registrado ni hay manifest enlazado; no se promete instalación offline.
+- PWA: manifest y service worker con `vite-plugin-pwa`; precache del shell y caché de imágenes de Cloudinary y tiles del mapa.
 
 ### Calidad
 

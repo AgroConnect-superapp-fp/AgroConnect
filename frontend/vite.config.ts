@@ -14,9 +14,72 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
+import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [
+    react(),
+    tailwindcss(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      includeAssets: [
+        'favicon.svg',
+        'favicon.ico',
+        'icons.svg',
+        'apple-touch-icon-180x180.png',
+      ],
+      manifest: {
+        name: 'AgroConnect — Del productor al comprador',
+        short_name: 'AgroConnect',
+        description:
+          'Plataforma que conecta productores agrícolas colombianos con compradores, sin intermediarios.',
+        lang: 'es',
+        start_url: '/',
+        scope: '/',
+        display: 'standalone',
+        theme_color: '#2E7D32',
+        background_color: '#ffffff',
+        icons: [
+          { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
+          { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png' },
+          {
+            src: 'maskable-icon-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable',
+          },
+        ],
+      },
+      workbox: {
+        cleanupOutdatedCaches: true,
+        globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
+        navigateFallback: '/index.html',
+        runtimeCaching: [
+          {
+            // Imágenes del marketplace: se cachean tras la primera visita.
+            urlPattern: /^https:\/\/res\.cloudinary\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'cloudinary-images',
+              expiration: { maxEntries: 120, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+          {
+            // Tiles del mapa: caché de una semana para conectividad rural.
+            urlPattern:
+              /^https:\/\/([a-d]\.)?(tile\.openstreetmap\.org|tile\.opentopomap\.org|basemaps\.cartocdn\.com)\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'map-tiles',
+              expiration: { maxEntries: 300, maxAgeSeconds: 60 * 60 * 24 * 7 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+        ],
+      },
+    }),
+  ],
   build: {
     // Increase warning limit to 600 kB (map applications are inherently larger)
     chunkSizeWarningLimit: 600,
