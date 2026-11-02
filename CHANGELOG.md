@@ -42,6 +42,8 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
   `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy` y HSTS.
 - **Auditoría integral 2026-11-02** (`docs/auditoria-2026-11-02.md`) y scripts
   reproducibles de auditoría de administradores y RLS de Supabase.
+- **Readiness real** (`GET /health/ready`): ejecuta `SELECT 1` y devuelve 503
+  si la base no responde; `/health` queda como liveness sin tocar la DB.
 - **`docs/` y `scripts/` versionados** en el repositorio (antes ignorados).
 
 ### Cambiado
@@ -62,6 +64,12 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 
 ### Pendiente
 
+- **Base de producción no responde (2026-11-02 19:40 UTC):** `POST /auth/login`
+  y `GET /plots/nearby` devuelven 500, y el dominio
+  `fwmaehhzfydbhilpfbrl.supabase.co` no resuelve (`ENOTFOUND`). El pooler sí
+  acepta TCP, así que hay que revisar en Supabase si el proyecto está
+  pausado/eliminado y si el schema `agroconnect` y las migraciones siguen
+  aplicados. `/health/ready` ya reporta 503 cuando la DB falla.
 - Familias/generaciones de refresh tokens con revocación en cascada.
 - Argon2id con rehash transparente desde bcrypt.
 - Implementación real de PWA (manifest + registro de service worker) o retiro

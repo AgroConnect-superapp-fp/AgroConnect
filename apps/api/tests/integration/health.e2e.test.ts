@@ -24,12 +24,13 @@ describe('Health (e2e)', () => {
         onModuleDestroy: jest.fn(),
         $connect: jest.fn(),
         $disconnect: jest.fn(),
+        $queryRaw: jest.fn().mockResolvedValue([{ ok: 1 }]),
       })
       .compile();
 
     app = moduleRef.createNestApplication<NestExpressApplication>();
     configureApp(app);
-    app.setGlobalPrefix('api/v1', { exclude: ['health'] });
+    app.setGlobalPrefix('api/v1', { exclude: ['health', 'health/ready'] });
     await app.init();
     server = app.getHttpServer() as Server;
   });
@@ -45,8 +46,27 @@ describe('Health (e2e)', () => {
     expect(response.body).toEqual({ status: 'ok', service: 'agroconnect-api' });
   });
 
-  it('devuelve el correlation ID en la cabecera x-correlation-id', async () => {
-    const response = await request(server).get('/health');
+  it('responde 200 en GET /health/ready con la base disponible', async () => {
+    const response = await request(server).get('/health/ready');
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({
+      status: 'ok',
+      service: 'agroconnect-api',
+      database: 'up',
+    });
+  });
+
+  it('responde 503 en GET /health/ready si la base falla', async () => {
+    const prisma = app.get(PrismaService) as unknown as { $queryRaw: jest.Mock };
+    prisma.$queryRaw.mockRejectedValueOnce(new Error('database down'));
+
+    const response = await request(server).get('/health/ready');
+
+    expect(response.status).toBe(503);
+  });
+
+  it('devuelve el correlation ID en la cabecera x-correlation-id', async () => {    const response = await request(server).get('/health');
 
     expect(response.headers['x-correlation-id']).toBeDefined();
   });

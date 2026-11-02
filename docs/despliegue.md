@@ -29,7 +29,8 @@
   `npm ci --include=dev && npm run build -w @agroconnect/contracts &&
   npm run prisma:generate -w @agroconnect/api && npm run build -w @agroconnect/api`.
 - **Start:** `npm run start -w @agroconnect/api` (`node dist/main.js`).
-- **Salud:** `/health` (excluido del prefijo `/api/v1`).
+- **Salud:** `/health` (liveness, no toca la DB) y `/health/ready`
+  (readiness: `SELECT 1`; 200 si la DB responde, 503 si no).
 - **Runtime:** Prisma 7 con driver adapter exige `DATABASE_SCHEMA` explícito
   (ignora el `?schema=` de la URL). En Render: `agroconnect`.
 - **Migraciones:** `cd apps/api && DATABASE_URL="<supabase-url>" npx prisma migrate deploy`.
@@ -157,6 +158,7 @@ aparecer `access_token` y `refresh_token` con `HttpOnly`, `Secure` y
 | `prisma migrate deploy` con P3005 | El schema de Supabase ya tiene tablas sin historial | Usar el schema dedicado `agroconnect` y `DATABASE_SCHEMA=agroconnect` |
 | P1000 / P1001 | Contraseña/host incorrectos o placeholder sin reemplazar | Resetear la contraseña en Supabase y reconstruir la URL |
 | Cold start de ~20 s | Free tier de Render suspende por inactividad | La primera petición despierta el servicio |
+| `/health` responde 200 pero login y plots dan 500 | La sonda de liveness no comprueba la DB; Supabase puede estar pausado, con credenciales inválidas o sin el schema `agroconnect` | Revisar `/health/ready` (503 = DB caída), logs de Render por `correlationId` y el dashboard de Supabase |
 | 403 `FORBIDDEN` en login/registro | Falta `Origin` permitido o `X-Requested-With` | Verificar `CORS_ORIGIN` y que el cliente envíe el header |
 | Cookies no se guardan en el navegador | `SameSite=None` sin `Secure`, o dominio cruzado mal configurado | Servir todo por HTTPS y revisar `Path`/`Secure` |
 | Build de Vercel no encuentra `@agroconnect/contracts` | Root Directory `frontend` sin build del monorepo, o despliegue lanzado desde `frontend` (sube solo esa carpeta) | Desplegar desde la raíz; verificar `installCommand`/`buildCommand` de `frontend/vercel.json` |
