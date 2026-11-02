@@ -46,7 +46,7 @@
 
 ## 3. Hallazgos P0 (corregir antes de cualquier release)
 
-> **Estado de ejecución (2026-11-02):** P0-01 a P0-05 están corregidos en la rama `release/p0-nestjs-cutover` (PR #63). Producción sigue vulnerable hasta que el PR se mergee y Render/Vercel desplieguen. P0-06 (RLS de Supabase) requiere verificación manual con `scripts/verify-supabase-rls.sql`.
+> **Estado de ejecución (2026-11-02):** el cutover se ejecutó y verificó en producción (commit `c602172`): Vercel sirve el bundle nuevo con CSP y Render ejecuta NestJS con `CsrfGuard`. P0-01 a P0-05 quedaron cerrados. **P0-06 (RLS de Supabase) sigue abierto** y, además, la base de producción dejó de responder (`/auth/login` y `/plots/nearby` → 500; dominio Supabase `ENOTFOUND`). Ver §11.
 
 ### P0-01 — Auto-registro como administrador en producción
 - **Evidencia:** `main:backend/src/modules/auth/domain/entities/Role.ts:3-9` incluye `administrador`; `main:backend/src/modules/auth/presentation/schemas/authSchemas.ts:4` usa `z.enum(ROLE_NAMES)`; `main:backend/src/modules/auth/application/useCases/RegisterUserUseCase.ts:48-51` solo valida que el rol exista. En `main` hay **0** coincidencias de `isSelfRegistrable`/`ROLE_NOT_ALLOWED`.
@@ -291,11 +291,20 @@ docker exec agroconnect-postgres psql -U agroconnect -d agroconnect_dev -Atc \
 |---|---|---|
 | Preview Vercel | **Hecho** | `agroconnectpreview-kchv56jw2-agro-connect.vercel.app` READY; HTTP 200 con CSP/XFO/XCTO/Referrer/Permissions/HSTS |
 | Docker en loopback | **Hecho** | Contenedor recreado en `127.0.0.1:5434`. El contenedor anterior no usaba el volumen nombrado: los datos de **desarrollo** se perdieron y el esquema se recreó con las 4 migraciones (9 tablas, 2 índices GIST, 5 roles). Producción (Supabase) intacta. |
-| `VERCEL_TOKEN` | **Presente** | El secret existe en GitHub desde 2026-10-04; falta confirmar que conserva scope del team |
-| Obsidian | **Hecho** | `alignment --all` pasa Obsidian y Notion; solo falla el README de `main` (esperado hasta el merge) |
-| `chmod 600` de `.env*` | **Bloqueado** | El harness deniega comandos que contienen `.env*`; requiere ejecución del owner |
-| RLS Supabase + auditoría de admin | **Bloqueado** | No hay `psql` instalado ni `SUPABASE_DATABASE_URL` en el entorno; ejecutar los scripts desde una máquina con acceso |
-| Render dashboard | **Bloqueado** | Sin `RENDER_API_KEY`; confirmar que el servicio está vinculado al blueprint o actualizar build/start |
-| Merge a `main` | **Pendiente de OK** | Dispara Render + Vercel; no ejecutar hasta cerrar los tres bloqueos anteriores |
+| `VERCEL_TOKEN` | **Validado** | El job `Deploy a producción (Vercel)` del CI de `main` terminó en verde |
+| Obsidian | **Hecho** | `alignment --all` en verde tras sincronizar `develop` con `main` |
+| `chmod 600` de `.env*` | **Hecho** | `.env`, `.env.local`, `backend/.env*`, `frontend/.env.local` y `.vercel/.env.production.local` en `600` |
+| RLS Supabase + auditoría de admin | **Bloqueado** | No hay `psql` ni URL de Supabase en el entorno; además la base de producción no responde (ver abajo) |
+| Render dashboard | **Hecho** | El servicio está vinculado al blueprint y desplegó `apps/api` (marcador CSRF: 403) |
+| Merge a `main` | **Hecho** | PR #63 mergeado en `c602172`; CI de `main` 7/7 en verde |
+
+### Hallazgo post-cutover: la base de producción no responde (2026-11-02 19:40 UTC)
+
+- **Síntoma:** `POST /api/v1/auth/login` con un correo inexistente devuelve **500** (`INTERNAL_ERROR`); `GET /api/v1/plots/nearby` con parámetros válidos devuelve **500**. `GET /plots/nearby` sin query devuelve 422 (la validación funciona, la DB no).
+- **DNS:** `fwmaehhzfydbhilpfbrl.supabase.co` → **ENOTFOUND** (el dominio del proyecto usado por el marketplace no existe). `aws-1-sa-east-1.pooler.supabase.com` resuelve y acepta TCP en 5432.
+- **Diagnóstico:** el pooler está vivo, pero el proyecto/Supabase o el schema `agroconnect` no están disponibles. `/health` devolvía 200 porque solo era liveness; se añadió **`/health/ready`** (`SELECT 1`, 503 si la DB falla) para que el monitoreo no vuelva a dar un falso verde.
+- **Acción requerida:** revisar en Supabase si el proyecto está pausado/eliminado, si el schema `agroconnect` y las migraciones siguen aplicados y si las credenciales del pooler en Render son válidas. Los `correlationId` (`6bf58e72…`, `4deb477e…`) están en los logs de Render.
+- **Alcance:** no es una regresión del cutover; el backend legacy usaba la misma base. El marketplace cae al modo demo por el fallback del frontend.
+
 
 

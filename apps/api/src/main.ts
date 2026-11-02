@@ -21,9 +21,9 @@ async function bootstrap(): Promise<void> {
 
   app.useLogger(app.get(PinoNestLogger));
 
-  // `/health` vive en la raíz (como en el backend legacy); el resto de la API
-  // queda bajo `/api/v1`.
-  app.setGlobalPrefix('api/v1', { exclude: ['health'] });
+  // `/health` y `/health/ready` viven en la raíz (como en el backend legacy);
+  // el resto de la API queda bajo `/api/v1`.
+  app.setGlobalPrefix('api/v1', { exclude: ['health', 'health/ready'] });
 
   configureApp(app);
 

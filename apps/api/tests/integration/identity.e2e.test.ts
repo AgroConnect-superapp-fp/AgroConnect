@@ -66,7 +66,7 @@ describe('Identity (e2e)', () => {
 
     app = moduleRef.createNestApplication<NestExpressApplication>();
     configureApp(app);
-    app.setGlobalPrefix('api/v1', { exclude: ['health'] });
+    app.setGlobalPrefix('api/v1', { exclude: ['health', 'health/ready'] });
     await app.init();
     server = app.getHttpServer() as Server;
   });

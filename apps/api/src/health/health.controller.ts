@@ -1,14 +1,28 @@
-import { Controller, Get, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  ServiceUnavailableException,
+} from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 
 /**
- * Sonda de salud (SPEC §10 y `render.yaml` → `healthCheckPath: /health`).
+ * Sondas de salud.
  *
- * Mismo contrato que el backend legacy (`backend/src/app.ts`):
- * `GET /health` → 200 `{ "status": "ok", "service": "agroconnect-api" }`.
- * La ruta queda FUERA del prefijo global `/api/v1`.
+ * - `GET /health` (liveness): solo confirma que el proceso responde. Es el
+ *   `healthCheckPath` de Render y NO toca la base de datos: un fallo de la DB
+ *   no debe provocar reinicios en bucle del servicio.
+ * - `GET /health/ready` (readiness): ejecuta `SELECT 1` contra PostgreSQL.
+ *   Devuelve 200 si la DB responde y 503 si no. Es la sonda que debe usar el
+ *   monitoreo para detectar una base caída o un `DATABASE_SCHEMA` inexistente.
+ *
+ * El contrato de `/health` se mantiene idéntico al del backend legacy.
  */
 @Controller('health')
 export class HealthController {
+  constructor(private readonly prisma: PrismaService) {}
+
   @Get()
   @HttpCode(HttpStatus.OK)
   check(): { status: string; service: string } {
@@ -16,5 +30,23 @@ export class HealthController {
       status: 'ok',
       service: 'agroconnect-api',
     };
+  }
+
+  @Get('ready')
+  async ready(): Promise<{ status: string; service: string; database: string }> {
+    try {
+      await this.prisma.$queryRaw`SELECT 1`;
+      return {
+        status: 'ok',
+        service: 'agroconnect-api',
+        database: 'up',
+      };
+    } catch {
+      throw new ServiceUnavailableException({
+        status: 'error',
+        service: 'agroconnect-api',
+        database: 'down',
+      });
+    }
   }
 }
