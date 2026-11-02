@@ -342,6 +342,8 @@ están en `docs/adr/0016-pendientes-post-cutover.md`.
   `EMAIL_NOT_VERIFIED` en login/refresh.
 - **D6:** `iss`/`aud` en JWT.
 - **Pruebas:** 206 backend · 21 unit · 10 E2E.
+- **Release:** `v1.1.0` publicada con las notas del CHANGELOG; quedan 2 alertas
+  de Dependabot (dev-only, fixes semver-major) para una ventana de pruebas.
 
 ### Lote B — D2 Retiro del backend legacy (2026-11-02)
 
