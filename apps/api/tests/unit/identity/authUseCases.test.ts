@@ -219,6 +219,24 @@ describe('LoginUseCase', () => {
     expect(sut.repository.refreshTokens).toHaveLength(1);
   });
 
+  it('rehashea un hash legacy y no falla si la actualización del hash falla', async () => {
+    const sut = await seedRegisteredUser();
+    sut.hasher.needsRehashResult = true;
+
+    const before = sut.hasher.hashCalls;
+    await sut.login.execute({
+      correo: 'maria.lopez@example.com',
+      password: 'Agro2026*',
+    });
+    expect(sut.hasher.hashCalls).toBe(before + 1);
+
+    // El rehash es best-effort: si la BD falla, el login debe continuar.
+    sut.repository.failUpdatePassword = true;
+    await expect(
+      sut.login.execute({ correo: 'maria.lopez@example.com', password: 'Agro2026*' }),
+    ).resolves.toBeDefined();
+  });
+
   it('rechaza credenciales con correo inexistente', async () => {
     const sut = await seedRegisteredUser();
 

@@ -341,7 +341,7 @@ están en `docs/adr/0016-pendientes-post-cutover.md`.
 - **D5:** registro sin sesión, verificación de correo obligatoria y 403
   `EMAIL_NOT_VERIFIED` en login/refresh.
 - **D6:** `iss`/`aud` en JWT.
-- **Pruebas:** 205 backend · 21 unit · 10 E2E.
+- **Pruebas:** 206 backend · 21 unit · 10 E2E.
 
 ### Lote B — D2 Retiro del backend legacy (2026-11-02)
 

@@ -22,6 +22,7 @@ export class InMemoryUserRepository implements UserRepository {
   producerProfiles = new Map<string, NewProducerProfileData>();
   companyProfiles = new Map<string, NewCompanyProfileData>();
   refreshTokens: RefreshToken[] = [];
+  failUpdatePassword = false;
   private roleIds = new Map<RoleName, string>();
 
   constructor() {
@@ -240,6 +241,9 @@ export class InMemoryUserRepository implements UserRepository {
   }
 
   async updatePassword(userId: string, passwordHash: string): Promise<void> {
+    if (this.failUpdatePassword) {
+      throw new Error('fallo simulado al actualizar el hash');
+    }
     this.users = this.users.map((user) =>
       user.id === userId
         ? User.create({
