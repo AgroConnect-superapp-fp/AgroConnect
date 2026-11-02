@@ -40,6 +40,9 @@
   access en `Path=/api/v1` y refresh en `Path=/api/v1/auth`.
 - **CSRF:** `CsrfGuard` exige `Origin`/`Referer` permitido y
   `X-Requested-With: XMLHttpRequest` en métodos mutantes.
+- **Sesión:** refresh token con familia/generación (reuso revoca la familia),
+  Argon2id con rehash desde bcrypt y verificación de correo obligatoria.
+- **JWT:** `JWT_ISSUER`/`JWT_AUDIENCE`; los tokens sin `iss`/`aud` se rechazan.
 - **Correo:** con `SMTP_HOST` configurado se usa SMTP real; sin él, los correos
   se escriben en `MAIL_DIR` (solo desarrollo/pruebas).
 
@@ -124,13 +127,12 @@ npx vercel deploy --prod --yes --archive=tgz
 - Blueprint `render.yaml` con `rootDir: .`, build del monorepo y start de
   `@agroconnect/api`.
 - Variables sensibles (`DATABASE_URL`, `SMTP_*`) se configuran en el dashboard.
-- El servicio legacy `backend/` deja de ser el destino de producción; se
-  mantiene en el repo hasta completar el retiro por módulos.
+- El backend legacy `backend/` fue retirado; el único backend es `apps/api`.
 
 ### CI/CD
 
-- `CI — AgroConnect` corre backend legacy, API NestJS, frontend, E2E,
-  contratos, alineación y CodeQL.
+- `CI — AgroConnect` corre API NestJS, frontend, E2E, contratos, alineación
+  y CodeQL.
 - El job `deploy` es **fail-closed**: si falta `VERCEL_TOKEN`, el pipeline falla
   (no se publica una versión distinta a la validada).
 - El job ejecuta `vercel deploy --prod --yes --archive=tgz` **desde la raíz**

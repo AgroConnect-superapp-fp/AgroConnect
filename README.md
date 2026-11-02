@@ -8,7 +8,7 @@ Centro de Comercio y Turismo · Regional Quindío · Programa Análisis y Desarr
 
 [![CI](https://github.com/AgroConnect-superapp-fp/AgroConnect/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/AgroConnect-superapp-fp/AgroConnect/actions/workflows/ci.yml)
 [![Node](https://img.shields.io/badge/node-%E2%89%A5%2020-339933?logo=node.js&logoColor=white)](.nvmrc)
-[![Pruebas](https://img.shields.io/badge/pruebas-386%20backend%20%C2%B7%2021%20unit%20%C2%B7%2010%20E2E-brightgreen)](https://github.com/AgroConnect-superapp-fp/AgroConnect/actions/workflows/ci.yml)
+[![Pruebas](https://img.shields.io/badge/pruebas-206%20backend%20%C2%B7%2021%20unit%20%C2%B7%2010%20E2E-brightgreen)](https://github.com/AgroConnect-superapp-fp/AgroConnect/actions/workflows/ci.yml)
 [![Deploy](https://img.shields.io/badge/producci%C3%B3n-Vercel%20%C2%B7%20Render-000000?logo=vercel&logoColor=white)](https://agroconnectpreview.vercel.app)
 [![Licencia](https://img.shields.io/badge/licencia-Todos%20los%20derechos%20reservados-red)](LICENSE)
 
@@ -128,7 +128,7 @@ Reglas clave del diseño:
 
 ```
 AgroConnect/
-├── backend/     # API REST — Clean Architecture + DDD
+├── apps/api/    # API NestJS — Clean Architecture + DDD
 │   ├── prisma/  # Esquema y migraciones (PostgreSQL 16 + PostGIS)
 │   ├── src/     # config, shared y módulos (auth, geography)
 │   └── tests/   # unitarias, integración y dobles de prueba
@@ -157,7 +157,7 @@ API `/api/v1/auth` con flujo completo de registro, autenticación y seguridad de
 | POST | `/verify-email` | Verificación de correo |
 | POST | `/resend-verification` | Reenvío del enlace de verificación |
 
-Características: contraseñas con bcrypt, unicidad de correo/documento/celular validada en servidor, refresh tokens con `jti` y hash SHA-256, rate limiting (5 intentos/15 min), autorización de tratamiento de datos (Ley 1581 de 2012) y errores estandarizados con `correlationId`.
+Características: contraseñas con **Argon2id** (bcrypt legacy con rehash transparente), unicidad de correo/documento/celular validada en servidor, refresh tokens con familia/generación y detección de reuso, verificación de correo obligatoria antes de la sesión, rate limiting, autorización de tratamiento de datos (Ley 1581 de 2012) y errores estandarizados con `correlationId`.
 
 ### M16 — Base geoespacial
 
@@ -173,7 +173,7 @@ Características: contraseñas con bcrypt, unicidad de correo/documento/celular 
 
 ### Calidad
 
-- 386 pruebas backend (188 legacy + 198 NestJS; cobertura >95 % en líneas) · 21 pruebas unitarias de frontend (Vitest) · 10 pruebas E2E (Playwright: autenticación real, modo demo y marketplace).
+- 206 pruebas backend (NestJS; cobertura >95 % en líneas) · 21 pruebas unitarias de frontend (Vitest) · 10 pruebas E2E (Playwright: autenticación real, modo demo y marketplace).
 
 ---
 
@@ -190,7 +190,7 @@ docker run -d --name agroconnect-postgres \
   -p 5434:5432 postgis/postgis:16-3.4
 
 # 2. Dependencias y entorno
-cd backend
+cd apps/api
 npm install
 cp .env.example .env
 openssl rand -hex 32   # JWT_ACCESS_SECRET
@@ -216,7 +216,7 @@ npm run dev                   # http://localhost:5173
 ### Pruebas
 
 ```bash
-cd backend && npm test -- --coverage   # unitarias + integración (cobertura 97%)
+cd apps/api && npm test -- --coverage   # unitarias + integración (cobertura 97%)
 cd frontend && npm run test:unit       # unitarias (Vitest)
 cd frontend && npm run test:e2e        # E2E (levanta API y web)
 ```
@@ -243,7 +243,7 @@ npx vercel deploy --prod --yes --archive=tgz
 
 ### Backend de autenticación (Render)
 
-El backend NestJS (`apps/api`) + Prisma + PostgreSQL se despliega como **Web Service en Render** (plan free) con el Blueprint `render.yaml` de la raíz (Infraestructura como Código). El backend Express de `backend/` queda como legado en retiro (Strangler Fig):
+El backend NestJS (`apps/api`) + Prisma + PostgreSQL se despliega como **Web Service en Render** (plan free) con el Blueprint `render.yaml` de la raíz (Infraestructura como Código). 
 
 - **URL del servicio (producción):** https://agroconnect-api-5t7n.onrender.com — `GET /health` → 200
 - **Base de datos:** PostgreSQL de Supabase, esquema `agroconnect` (migraciones aplicadas; el runtime usa `DATABASE_SCHEMA=agroconnect`).

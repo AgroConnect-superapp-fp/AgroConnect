@@ -108,20 +108,22 @@ export function buildOpenApiDocument(): OpenApiDocument {
     servers: [{ url: '/api/v1' }],
     paths: {
       '/auth/register': authOperation('Registra un nuevo usuario (productor, comprador o transportista)', 'RegisterRequestBody', {
-        '201': response('Usuario creado; sesión en cookies httpOnly y correo de verificación'),
+        '201': response('Usuario creado; revisa el correo para verificar la cuenta'),
         '409': response('Correo o documento ya registrados'),
         ...validationErrors,
         ...rateLimited,
       }),
       '/auth/login': authOperation('Autentica un usuario; la sesión se entrega en cookies httpOnly', 'LoginRequestBody', {
         '200': response('Sesión creada; cookies httpOnly emitidas'),
-        '401': response('Credenciales inválidas o correo sin verificar'),
+        '401': response('Credenciales inválidas'),
+        '403': response('Correo sin verificar (EMAIL_NOT_VERIFIED)'),
         ...validationErrors,
         ...rateLimited,
       }),
       '/auth/refresh': authOperation('Renueva la sesión con la cookie httpOnly de refresh', 'RefreshRequestBody', {
         '200': response('Sesión renovada; cookies httpOnly rotadas'),
         '401': response('Refresh token inválido, expirado o revocado'),
+        '403': response('Correo sin verificar (EMAIL_NOT_VERIFIED)'),
         ...validationErrors,
         ...rateLimited,
       }),

@@ -5,7 +5,7 @@ Herramientas de auditoría, trazabilidad y verificación. Se versionan desde el
 
 | Script | Propósito | Uso |
 |---|---|---|
-| `security-audit.mjs` | Gate de seguridad: bloquea critical y high fuera de la allowlist (las moderate/low solo se reportan) | `node scripts/security-audit.mjs backend` |
+| `security-audit.mjs` | Gate de seguridad: bloquea critical y high fuera de la allowlist (las moderate/low solo se reportan) | `node scripts/security-audit.mjs api` |
 | `diagnose-production.mjs` | Diagnóstico de producción: Vercel, liveness, readiness, CORS, CSRF, login y DNS de Supabase | `npm run diagnose:prod` |
 | `build_traceability_matrix.py` | Genera las matrices RF↔CU↔HU | `python3 scripts/build_traceability_matrix.py` |
 | `normalize_moscow.py` | Normaliza prioridades MoSCoW en Notion | requiere `NOTION_AGROCONNECT_TOKEN` |

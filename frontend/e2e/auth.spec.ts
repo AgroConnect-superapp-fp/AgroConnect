@@ -1,6 +1,31 @@
 import { test, expect, type Page } from '@playwright/test';
+import { readdir, readFile } from 'node:fs/promises';
+import { join } from 'node:path';
 
 const BACKEND_URL = process.env.BACKEND_URL ?? 'http://localhost:4100';
+const MAIL_DIR = process.env.MAIL_DIR ?? '/tmp/agroconnect-mails';
+
+async function readVerificationToken(correo: string): Promise<string> {
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    try {
+      const files = (await readdir(MAIL_DIR))
+        .filter((file) => file.endsWith('-email-verification.txt'))
+        .sort()
+        .reverse();
+      for (const file of files) {
+        const content = await readFile(join(MAIL_DIR, file), 'utf8');
+        if (content.includes(`Para: ${correo}`)) {
+          const match = /verifyToken=([a-f0-9]+)/.exec(content);
+          if (match?.[1]) return match[1];
+        }
+      }
+    } catch {
+      // El correo puede tardar unos milisegundos en escribirse.
+    }
+    await new Promise((resolve) => setTimeout(resolve, 250));
+  }
+  throw new Error(`No se encontró el correo de verificación para ${correo}`);
+}
 
 function uniqueEmail(prefix = 'e2e'): string {
   const stamp = `${Date.now()}.${Math.floor(Math.random() * 10_000)}`;
@@ -54,8 +79,9 @@ async function fillProducerRegistration(page: Page, data: ProducerData): Promise
 }
 
 test.describe('Registro y autenticación de usuarios', () => {
-  test('un productor se registra, inicia sesión y accede a su panel', async ({
+  test('un productor se registra, verifica el correo, inicia sesión y accede a su panel', async ({
     page,
+    request,
   }) => {
     const producer = uniqueProducer();
 
@@ -63,19 +89,24 @@ test.describe('Registro y autenticación de usuarios', () => {
     await fillProducerRegistration(page, producer);
 
     await expect(page.getByTestId('register-success')).toBeVisible();
-    await expect(page.getByTestId('dashboard-usuario')).toHaveText(producer.nombre);
-    await expect(page.getByText('Panel de Productor')).toBeVisible();
+    await expect(page.getByText('Revisa tu correo')).toBeVisible();
 
-    await page.getByTestId('dashboard-logout').click();
-    await expect(page.getByRole('button', { name: 'Crear cuenta' })).toBeVisible();
+    const token = await readVerificationToken(producer.correo);
+    const verified = await request.post(`${BACKEND_URL}/api/v1/auth/verify-email`, {
+      data: { token },
+    });
+    expect(verified.status()).toBe(200);
 
-    await page.getByRole('button', { name: 'Iniciar sesión' }).click();
+    await page.getByTestId('register-go-login').click();
     await page.getByTestId('login-correo').fill(producer.correo);
     await page.getByTestId('login-password').fill(producer.password);
     await page.getByRole('button', { name: 'Iniciar sesión' }).last().click();
 
     await expect(page.getByTestId('dashboard-bienvenida')).toBeVisible();
     await expect(page.getByTestId('dashboard-usuario')).toHaveText(producer.nombre);
+
+    await page.getByTestId('dashboard-logout').click();
+    await expect(page.getByRole('button', { name: 'Crear cuenta' })).toBeVisible();
   });
 
   test('el correo duplicado se rechaza con el mensaje del sistema', async ({ page }) => {
@@ -84,9 +115,7 @@ test.describe('Registro y autenticación de usuarios', () => {
     await openRegistration(page);
     await fillProducerRegistration(page, producer);
     await expect(page.getByTestId('register-success')).toBeVisible();
-    await page.getByTestId('dashboard-logout').click();
-    await expect(page.getByRole('button', { name: 'Crear cuenta' })).toBeVisible();
-
+    await page.getByTestId('register-go-login').click();
     await page.getByRole('button', { name: 'Crear cuenta' }).click();
     await expect(page.getByTestId('role-card-productor')).toBeVisible();
     await fillProducerRegistration(page, {

@@ -279,7 +279,7 @@ docker exec agroconnect-postgres psql -U agroconnect -d agroconnect_dev -Atc \
 |---|---|
 | `turbo run typecheck` | 5/5 |
 | `turbo run lint` | 3/3 |
-| `turbo run test` | 188 legacy + 198 NestJS |
+| `turbo run test` | 198 NestJS |
 | Frontend unit | 21/21 |
 | Frontend build | OK |
 | E2E Playwright | 10/10 |
@@ -332,6 +332,23 @@ docker exec agroconnect-postgres psql -U agroconnect -d agroconnect_dev -Atc \
 Los cambios se validaron con typecheck, lint, Jest, Vitest, build, E2E,
 `alignment --ci` y `security-audit.mjs`. El detalle y los criterios del Lote B
 están en `docs/adr/0016-pendientes-post-cutover.md`.
+
+### Lote B — D3/D4/D5/D6 Seguridad de sesión (2026-11-02)
+
+- **D3:** familias/generaciones de refresh con revocación en cascada y
+  migración `20261103000000_add_refresh_token_family`.
+- **D4:** Argon2id con fallback bcrypt y rehash transparente.
+- **D5:** registro sin sesión, verificación de correo obligatoria y 403
+  `EMAIL_NOT_VERIFIED` en login/refresh.
+- **D6:** `iss`/`aud` en JWT.
+- **Pruebas:** 206 backend · 21 unit · 10 E2E.
+
+### Lote B — D2 Retiro del backend legacy (2026-11-02)
+
+- `backend/` eliminado; el esquema y las migraciones Prisma se movieron a
+  `apps/api/prisma`. El CI ya no tiene el job `backend`; los rulesets exigen
+  `API (NestJS)`, y scripts/documentación quedaron con un único backend.
+- La suite de 198 tests de `apps/api` y el E2E cubren la paridad funcional.
 
 ### Lote B — D1 PWA implementada (2026-11-02)
 

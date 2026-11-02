@@ -32,9 +32,11 @@ export interface RegisterUserData {
   user: NewUserData;
   producerProfile?: NewProducerProfileData;
   companyProfile?: NewCompanyProfileData;
-  refreshToken: {
+  refreshToken?: {
     tokenHash: string;
     expiresAt: Date;
+    familyId: string;
+    generation: number;
   };
 }
 
@@ -45,14 +47,26 @@ export interface UserRepository {
   findByPhone(phone: string): Promise<User | null>;
   findById(id: string): Promise<User | null>;
   register(data: RegisterUserData): Promise<User>;
-  saveRefreshToken(data: { userId: string; tokenHash: string; expiresAt: Date }): Promise<void>;
+  saveRefreshToken(data: {
+    userId: string;
+    tokenHash: string;
+    expiresAt: Date;
+    familyId: string;
+    generation: number;
+  }): Promise<void>;
   findRefreshTokenByHash(tokenHash: string): Promise<RefreshToken | null>;
   revokeRefreshToken(tokenHash: string): Promise<void>;
+  revokeRefreshTokenFamily(familyId: string): Promise<void>;
   revokeAllUserTokens(userId: string): Promise<void>;
   /** Revoca el token actual y emite el siguiente de forma atómica; `false` si ya estaba revocado. */
   rotateRefreshToken(
     currentTokenHash: string,
-    nextToken: { tokenHash: string; expiresAt: Date },
+    nextToken: {
+      tokenHash: string;
+      expiresAt: Date;
+      familyId: string;
+      generation: number;
+    },
   ): Promise<boolean>;
   updatePassword(userId: string, passwordHash: string): Promise<void>;
   markEmailVerified(userId: string): Promise<void>;

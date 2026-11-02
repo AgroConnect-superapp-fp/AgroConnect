@@ -11,4 +11,8 @@ export class BcryptPasswordHasher implements PasswordHasher {
   async compare(plainPassword: string, passwordHash: string): Promise<boolean> {
     return bcrypt.compare(plainPassword, passwordHash);
   }
+
+  needsRehash(): boolean {
+    return false;
+  }
 }
