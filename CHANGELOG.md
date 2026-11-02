@@ -50,6 +50,9 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 - **Runbook de recuperación** (`docs/runbook-recuperacion-supabase.md`):
   reactivar/crear el proyecto, actualizar el pooler, migrar, verificar RLS y
   cookies.
+- **PWA real** con `vite-plugin-pwa`: manifest, iconos 192/512/maskable, precache
+  del shell y caché de imágenes Cloudinary/tiles; gate de CI que verifica
+  `manifest.webmanifest`, `sw.js` y `registerSW.js`.
 - **`scripts/` y `docs/` versionados** en el repositorio (antes ignorados).
 - **ADR-016** con las decisiones pendientes del siguiente ciclo (PWA, retiro
   del legacy, refresh/Argon2id, verificación de correo, release).
@@ -88,8 +91,6 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
   aplicados. `/health/ready` ya reporta 503 cuando la DB falla.
 - Familias/generaciones de refresh tokens con revocación en cascada.
 - Argon2id con rehash transparente desde bcrypt.
-- Implementación real de PWA (manifest + registro de service worker) o retiro
-  del `sw.js` actual.
 - Sincronización de Obsidian y Notion con los conteos y el stack de esta
   versión.
 - **Siguiente ciclo:** ver ADR-016 para las opciones y criterios de PWA,
