@@ -279,7 +279,7 @@ docker exec agroconnect-postgres psql -U agroconnect -d agroconnect_dev -Atc \
 |---|---|
 | `turbo run typecheck` | 5/5 |
 | `turbo run lint` | 3/3 |
-| `turbo run test` | 188 legacy + 194 NestJS |
+| `turbo run test` | 188 legacy + 198 NestJS |
 | Frontend unit | 21/21 |
 | Frontend build | OK |
 | E2E Playwright | 10/10 |
@@ -312,6 +312,27 @@ docker exec agroconnect-postgres psql -U agroconnect -d agroconnect_dev -Atc \
 - **Runbook:** `docs/runbook-recuperacion-supabase.md` (reactivar/crear el proyecto, actualizar el pooler en Render, crear el schema, `prisma migrate deploy`, RLS, admin audit y verificación de cookies).
 - **`scripts/security-audit.mjs` corregido:** antes marcaba cualquier advisory como “alta”; ahora solo bloquea `high`/`critical` y reporta las `moderate`/`low`. Backend y frontend: **OK**.
 - **Permisos locales:** `.env`, `.env.local`, `backend/.env*`, `frontend/.env.local` y `.vercel/.env.production.local` en `600`.
+
+### Lote A ejecutado (2026-11-02)
+
+| Mejora | Estado |
+|---|---|
+| README: PWA deja de afirmarse como implementada | Hecho |
+| OpenAPI: descripciones de sesión cookie-only (sin “tokens” en el cuerpo) | Hecho |
+| `engines.node` unificado en `>=24` | Hecho |
+| `logout` con rate limiting | Hecho |
+| `SmtpEmailService` escapa nombre y URLs en HTML | Hecho |
+| `searchProperties` sanitiza el filtro PostgREST | Hecho |
+| 27 trazas de debug del frontend movidas a `devLog` (no se emiten en producción) | Hecho |
+| `paths-ignore` para pushes que solo cambian docs/scripts | Hecho |
+| Test de `trust proxy` para el rate limiting | Hecho |
+| Falso positivo de CodeQL #18 documentado en el código | Hecho |
+| ADR-016 con las decisiones del Lote B | Hecho |
+
+Los cambios se validaron con typecheck, lint, Jest, Vitest, build, E2E,
+`alignment --ci` y `security-audit.mjs`. El detalle y los criterios del Lote B
+están en `docs/adr/0016-pendientes-post-cutover.md`.
+
 
 
 

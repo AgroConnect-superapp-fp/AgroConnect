@@ -51,6 +51,11 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
   reactivar/crear el proyecto, actualizar el pooler, migrar, verificar RLS y
   cookies.
 - **`scripts/` y `docs/` versionados** en el repositorio (antes ignorados).
+- **ADR-016** con las decisiones pendientes del siguiente ciclo (PWA, retiro
+  del legacy, refresh/Argon2id, verificación de correo, release).
+- **Logger de desarrollo** (`devLog`): las 27 trazas de debug del frontend ya
+  no se emiten en el bundle de producción.
+- **Test de `trust proxy`** para el rate limiting detrás del proxy de Render.
 
 ### Cambiado
 
@@ -67,6 +72,11 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 - **`DATABASE_SCHEMA` documentado** en los `.env.example` (Prisma 7 lo exige).
 - **ADR-010 actualizado** al estado real: cookies `SameSite=None`, `Origin` +
   `X-Requested-With`; familias de refresh y Argon2id quedan planificadas.
+- **`engines.node` unificado en `>=24`** (backend y frontend).
+- **OpenAPI** describe la sesión cookie-only, sin “tokens” en el cuerpo.
+- **README** deja de afirmar que la PWA está implementada.
+- **CI**: un push que solo cambia `docs/` o `scripts/` no reconstruye ni
+  despliega.
 
 ### Pendiente
 
@@ -82,12 +92,23 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
   del `sw.js` actual.
 - Sincronización de Obsidian y Notion con los conteos y el stack de esta
   versión.
+- **Siguiente ciclo:** ver ADR-016 para las opciones y criterios de PWA,
+  retiro del legacy, familias de refresh, Argon2id, verificación de correo,
+  `iss`/`aud`, matrices y release.
 
 ### Corregido
 
 - **`security-audit.mjs`**: el gate marcaba cualquier advisory como “alta” y
   fallaba con vulnerabilidades moderate/low. Ahora solo bloquea
   `high`/`critical` y reporta el resto en los totales.
+- **`logout`** ahora tiene rate limiting, igual que el resto de endpoints de
+  autenticación.
+- **`SmtpEmailService`** escapa el nombre del destinatario y las URLs en el
+  HTML de los correos.
+- **`searchProperties`** sanitiza el filtro PostgREST (`%`, comas, paréntesis,
+  comillas) y limita la longitud de la búsqueda.
+- **Frontend:** las trazas de debug de `PropertyMap`, `MarketplacePrototype` y
+  `PropertyDetailModal` usan `devLog` y desaparecen en producción.
 
 ## [1.0.1] — 2026-10-06
 

@@ -3,6 +3,13 @@ name: CI — AgroConnect
 on:
   push:
     branches: [main, develop, 'feature/**', 'hotfix/**']
+    # Un push que solo cambia documentación no necesita reconstruir ni
+    # desplegar. Los PR siguen ejecutando todos los gates.
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+      - 'scripts/**'
+      - 'obsidian-vault/**'
   pull_request:
     branches: [main, develop]
 
