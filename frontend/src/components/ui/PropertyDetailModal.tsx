@@ -99,7 +99,7 @@ export function PropertyDetailModal({
                 />
               ) : (
                 <div className="h-72 bg-gray-100 rounded-xl flex flex-col items-center justify-center border-2 border-dashed border-gray-300 hover:border-agro-green/50 transition-colors duration-300">
-                  <span className="text-4xl mb-2 animate-bounce">🖼️</span>
+                  <span className="text-4xl mb-2">🖼️</span>
                   <p className="text-gray-500 text-sm">No hay imágenes disponibles</p>
                 </div>
               )}
@@ -303,13 +303,6 @@ export function PropertyDetailModal({
           }
         }
 
-        @media (prefers-reduced-motion: reduce) {
-          * {
-            animation: none !important;
-            opacity: 1 !important;
-            transform: none !important;
-          }
-        }
       `}</style>
     </div>
   );

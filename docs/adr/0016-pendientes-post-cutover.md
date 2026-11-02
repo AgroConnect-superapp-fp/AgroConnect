@@ -100,6 +100,17 @@ que requieren criterio de producto o arquitectura.
 - **Criterio:** release publicada, `npm audit --audit-level=high` verde y CI
   estable.
 
+### D9. Contraste del accent yellow
+
+- **Situación:** el design system usa `#F9A825` (accent) con texto blanco en
+  varios botones; el contraste es ≈1.97:1, por debajo de WCAG AA. El badge
+  "Top" se corrigió a `text-amber-950` (≈7:1), pero la deuda sistémica sigue.
+- **Recomendación:** definir un token `--color-on-accent` (casi negro) y
+  aplicarlo a todo componente con fondo `agro-yellow`; validar con axe o
+  Lighthouse. No cambiar el color de marca.
+- **Criterio:** 4.5:1 en texto normal y 3:1 en texto grande en todos los
+  botones/chips con accent.
+
 ## Consecuencias
 
 - **Positivas:** el siguiente ciclo tiene alcance y criterios explícitos; no se

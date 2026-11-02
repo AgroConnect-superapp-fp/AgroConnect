@@ -113,6 +113,10 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 - **Matriz CU↔HU:** M17 corregido (HU70–HU76 inexistentes reemplazadas por
   HU61–HU67 con CU#66); las 6 HU sin CU quedan documentadas en
   `docs/matriz_trazabilidad_hallazgos.md`.
+- **UI (Impeccable):** 6 anti-patrones corregidos (Arial, `transition: width`,
+  `border-l-4`, `gray-on-color`, `animate-bounce`), regla global de
+  `prefers-reduced-motion` y badge "Top" con contraste AA. La excepción de
+  Inter y la deuda del accent yellow quedan en ADR-016 (D9).
 
 ## [1.0.1] — 2026-10-06
 
