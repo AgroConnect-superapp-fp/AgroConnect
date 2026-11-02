@@ -37,11 +37,12 @@ que requieren criterio de producto o arquitectura.
 - **Opciones:**
   1. Retirarlo ya y dejar un único backend.
   2. Mantenerlo como referencia hasta cerrar la paridad de todos los módulos.
-- **Recomendación:** opción 1 por módulos: congelar `backend/`, mover cualquier
-  prueba de contrato que aporte valor y eliminarlo cuando `apps/api` cubra
-  identity y geography al 100 %.
-- **Criterio:** `grep` sin imports desde `apps/*` a `backend/*`; CI sin el job
-  `backend`; documentación y scripts actualizados.
+- **Estado:** implementada el 2026-11-02. `backend/` eliminado; el esquema y
+  las migraciones Prisma se movieron a `apps/api/prisma`; CI, rulesets, scripts
+  y documentación actualizados. La paridad funcional la cubren los 198 tests
+  de `apps/api` y el E2E.
+- **Criterio cumplido:** `grep` sin imports desde `apps/*` a `backend/*`; CI
+  sin el job `backend`.
 
 ### D3. Familias de refresh tokens
 
