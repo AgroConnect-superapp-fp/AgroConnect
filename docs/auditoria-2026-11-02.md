@@ -347,6 +347,17 @@ están en `docs/adr/0016-pendientes-post-cutover.md`.
   `security-audit` frontend sin altas.
 - **Pendiente de D1:** Lighthouse instalable y E2E de carga offline explícito.
 
+### Lote B — D7 Matriz de trazabilidad (2026-11-02)
+
+- **M17 corregido:** `cu_hu.csv` tenía HU70–HU76, que no existen en el detalle
+  oficial (HU01–HU69); se reemplazaron por HU61–HU67 con CU#66, el único CU de
+  M17. `matriz_trazabilidad_completa.md` se alineó con los títulos oficiales.
+- **6 HU sin CU:** HU06 (M03), HU08 (M04), HU15 (M02), HU28 (M07), HU30 (M08)
+  y HU33 (M09). Se documentaron con sus CU candidatos en
+  `docs/matriz_trazabilidad_hallazgos.md`; no se infirió la relación.
+- **Totales:** `detalle` 68 RF + 66 CU + 69 HU = 203; `cu_hu` 74 relaciones,
+  63 HU con CU y 6 pendientes de validar en Notion.
+
 
 
 
