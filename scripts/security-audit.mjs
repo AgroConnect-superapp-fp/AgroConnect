@@ -56,6 +56,13 @@ const totals = report.metadata?.vulnerabilities ?? {
 
 const advisories = new Set();
 for (const info of Object.values(vulnerabilities)) {
+  // Solo las vulnerabilidades HIGH/CRITICAL bloquean; las moderate/low se
+  // reportan en los totales pero no deben tumbar el gate. El bug anterior
+  // agregaba cualquier advisory y lo etiquetaba como "alta".
+  if (info.severity !== 'high' && info.severity !== 'critical') {
+    continue;
+  }
+
   for (const via of info.via ?? []) {
     if (typeof via === 'object' && via.url) {
       advisories.add(via.url.split('/').pop());

@@ -44,7 +44,13 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
   reproducibles de auditoría de administradores y RLS de Supabase.
 - **Readiness real** (`GET /health/ready`): ejecuta `SELECT 1` y devuelve 503
   si la base no responde; `/health` queda como liveness sin tocar la DB.
-- **`docs/` y `scripts/` versionados** en el repositorio (antes ignorados).
+- **Diagnóstico de producción** (`scripts/diagnose-production.mjs`,
+  `npm run diagnose:prod`): Vercel, liveness, readiness, CORS, CSRF, login y
+  DNS de Supabase, con exit code 1 si algo falla.
+- **Runbook de recuperación** (`docs/runbook-recuperacion-supabase.md`):
+  reactivar/crear el proyecto, actualizar el pooler, migrar, verificar RLS y
+  cookies.
+- **`scripts/` y `docs/` versionados** en el repositorio (antes ignorados).
 
 ### Cambiado
 
@@ -76,6 +82,12 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
   del `sw.js` actual.
 - Sincronización de Obsidian y Notion con los conteos y el stack de esta
   versión.
+
+### Corregido
+
+- **`security-audit.mjs`**: el gate marcaba cualquier advisory como “alta” y
+  fallaba con vulnerabilidades moderate/low. Ahora solo bloquea
+  `high`/`critical` y reporta el resto en los totales.
 
 ## [1.0.1] — 2026-10-06
 

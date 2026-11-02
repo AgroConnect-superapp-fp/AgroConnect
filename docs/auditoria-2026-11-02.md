@@ -306,5 +306,13 @@ docker exec agroconnect-postgres psql -U agroconnect -d agroconnect_dev -Atc \
 - **Acción requerida:** revisar en Supabase si el proyecto está pausado/eliminado, si el schema `agroconnect` y las migraciones siguen aplicados y si las credenciales del pooler en Render son válidas. Los `correlationId` (`6bf58e72…`, `4deb477e…`) están en los logs de Render.
 - **Alcance:** no es una regresión del cutover; el backend legacy usaba la misma base. El marketplace cae al modo demo por el fallback del frontend.
 
+### Diagnóstico reproducible y runbook
+
+- **`node scripts/diagnose-production.mjs`** (2026-11-02): **8/11 OK**. Pasan Vercel (200 + CSP + XFO), liveness (200), CORS (204, origen y `X-Requested-With`) y CSRF (403). Fallan DNS de Supabase (`ENOTFOUND`), `/health/ready` (503) y login (500).
+- **Runbook:** `docs/runbook-recuperacion-supabase.md` (reactivar/crear el proyecto, actualizar el pooler en Render, crear el schema, `prisma migrate deploy`, RLS, admin audit y verificación de cookies).
+- **`scripts/security-audit.mjs` corregido:** antes marcaba cualquier advisory como “alta”; ahora solo bloquea `high`/`critical` y reporta las `moderate`/`low`. Backend y frontend: **OK**.
+- **Permisos locales:** `.env`, `.env.local`, `backend/.env*`, `frontend/.env.local` y `.vercel/.env.production.local` en `600`.
+
+
 
 
