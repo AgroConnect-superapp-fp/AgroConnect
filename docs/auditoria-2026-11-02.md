@@ -333,6 +333,21 @@ Los cambios se validaron con typecheck, lint, Jest, Vitest, build, E2E,
 `alignment --ci` y `security-audit.mjs`. El detalle y los criterios del Lote B
 están en `docs/adr/0016-pendientes-post-cutover.md`.
 
+### Lote B — D1 PWA implementada (2026-11-02)
+
+- **`vite-plugin-pwa` 2.0** con Workbox: `manifest.webmanifest`, iconos
+  192/512/maskable, `apple-touch-icon`, precache del shell y `runtimeCaching`
+  de imágenes de Cloudinary y tiles del mapa.
+- **`frontend/public/sw.js` eliminado:** el service worker lo genera Workbox
+  (`sw.js` + `workbox-*.js`), evitando el SW manual que nunca se registraba.
+- **Gate de CI:** el job de frontend verifica `manifest.webmanifest`, `sw.js`
+  y `registerSW.js` después del build.
+- **Verificación:** build con 28 entradas de precache (1.1 MB), E2E 10/10
+  (un caso de imágenes se re-ejecutó por flakiness de red) y
+  `security-audit` frontend sin altas.
+- **Pendiente de D1:** Lighthouse instalable y E2E de carga offline explícito.
+
+
 
 
 

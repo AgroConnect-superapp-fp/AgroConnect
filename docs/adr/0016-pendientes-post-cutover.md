@@ -1,6 +1,6 @@
 # ADR-016: Pendientes post-cutover — decisiones para el siguiente ciclo
 
-- **Estado**: Propuesta
+- **Estado**: Propuesta — D1 implementada (2026-11-02)
 - **Fecha**: 2026-11-02
 - **Decisores**: Equipo AgroConnect
 - **Relacionado**: ADR-009 (NestJS), ADR-010 (sesión), ADR-015 (monorepo), auditoría 2026-11-02
@@ -25,10 +25,10 @@ que requieren criterio de producto o arquitectura.
   1. Implementar con `vite-plugin-pwa` (Workbox): manifest, iconos, precache
      del shell y `stale-while-revalidate` para imágenes.
   2. Retirar `sw.js` y no prometer offline; el modo demo cubre la caída.
-- **Recomendación:** opción 1, acotada al shell y a las imágenes; no cachear
-  respuestas de autenticación ni datos personales.
-- **Criterio:** Lighthouse PWA instalable, E2E de carga offline del shell y
-  `sw.js` con versión explícita.
+- **Estado:** Implementada el 2026-11-02 con `vite-plugin-pwa` (Workbox):
+  manifest, iconos 192/512/maskable, precache del shell y `runtimeCaching` de
+  Cloudinary/tiles. No se cachean respuestas de autenticación.
+- **Criterio pendiente:** Lighthouse PWA instalable y E2E de carga offline.
 
 ### D2. Retiro del backend Express legacy
 
