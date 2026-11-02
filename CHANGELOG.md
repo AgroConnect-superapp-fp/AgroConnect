@@ -50,6 +50,8 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 - **Runbook de recuperación** (`docs/runbook-recuperacion-supabase.md`):
   reactivar/crear el proyecto, actualizar el pooler, migrar, verificar RLS y
   cookies.
+- **D2 — retiro del backend legacy:** `backend/` eliminado; Prisma movido a
+  `apps/api/prisma`; CI, rulesets y documentación con un único backend.
 - **PWA real** con `vite-plugin-pwa`: manifest, iconos 192/512/maskable, precache
   del shell y caché de imágenes Cloudinary/tiles; gate de CI que verifica
   `manifest.webmanifest`, `sw.js` y `registerSW.js`.

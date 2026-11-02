@@ -7,7 +7,7 @@
  *  - Cualquier vulnerabilidad HIGH fuera de la allowlist bloquea el pipeline.
  *  - La allowlist contiene únicamente riesgos aceptados y documentados.
  *
- * Uso: node scripts/security-audit.mjs <backend|frontend>
+ * Uso: node scripts/security-audit.mjs <api|frontend>
  */
 import { execSync } from 'node:child_process';
 import { resolve, dirname } from 'node:path';
@@ -25,17 +25,19 @@ const ALLOWLIST = new Map([
 ]);
 
 const project = process.argv[2];
-if (!project) {
-  console.error('Uso: node scripts/security-audit.mjs <backend|frontend>');
+if (!project || !['api','frontend'].includes(project)) {
+  console.error('Uso: node scripts/security-audit.mjs <api|frontend>');
   process.exit(2);
 }
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
-const cwd = resolve(scriptDir, '..', project);
+const cwd = resolve(scriptDir, '..');
 
 function auditJson() {
   try {
-    return execSync('npm audit --json', { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+    // El monorepo tiene un único lockfile en la raíz; auditar por workspace sin
+  // lockfile propio falla. El gate es global y cubre api + frontend.
+  return execSync('npm audit --json', { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
   } catch (error) {
     if (error.stdout) {
       return error.stdout;
