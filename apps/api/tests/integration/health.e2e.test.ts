@@ -64,6 +64,11 @@ describe('Health (e2e)', () => {
     const response = await request(server).get('/health/ready');
 
     expect(response.status).toBe(503);
+    expect(response.body).toEqual({
+      status: 'error',
+      service: 'agroconnect-api',
+      database: 'down',
+    });
   });
 
   it('devuelve el correlation ID en la cabecera x-correlation-id', async () => {    const response = await request(server).get('/health');

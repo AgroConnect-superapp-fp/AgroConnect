@@ -55,8 +55,8 @@ services:
         value: /tmp/agroconnect-mails
       - key: LOG_LEVEL
         value: info
-      # SMTP real: configurar en el dashboard de Render para que la
-      # verificación de correo y el reset de contraseña salgan del servidor.
+      # SMTP real: OBLIGATORIO en producción (D5). Sin SMTP_HOST el proceso
+      # no arranca: el registro no podría verificar el correo.
       - key: SMTP_HOST
         sync: false
       - key: SMTP_PORT

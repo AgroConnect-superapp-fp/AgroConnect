@@ -48,6 +48,24 @@ describe('configuración de entorno', () => {
     ).toThrow(/al menos 32 caracteres/);
   });
 
+  it('exige SMTP_HOST en producción (D5)', () => {
+    expect(() =>
+      parseEnv({ ...MINIMO_VALIDO, NODE_ENV: 'production', SMTP_HOST: '' }),
+    ).toThrow(/SMTP_HOST/);
+
+    expect(() =>
+      parseEnv({
+        ...MINIMO_VALIDO,
+        NODE_ENV: 'production',
+        SMTP_HOST: 'smtp.example.com',
+      }),
+    ).not.toThrow();
+  });
+
+  it('permite no tener SMTP en desarrollo y pruebas', () => {
+    expect(() => parseEnv({ ...MINIMO_VALIDO, NODE_ENV: 'test' })).not.toThrow();
+  });
+
   it('rechaza un NODE_ENV desconocido', () => {
     expect(() => parseEnv({ ...MINIMO_VALIDO, NODE_ENV: 'produccion' })).toThrow();
   });

@@ -1,10 +1,5 @@
-import {
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  ServiceUnavailableException,
-} from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus, Res } from '@nestjs/common';
+import type { Response } from 'express';
 import { PrismaService } from '../prisma/prisma.service';
 
 /**
@@ -33,7 +28,9 @@ export class HealthController {
   }
 
   @Get('ready')
-  async ready(): Promise<{ status: string; service: string; database: string }> {
+  async ready(
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<{ status: string; service: string; database: string }> {
     try {
       await this.prisma.$queryRaw`SELECT 1`;
       return {
@@ -42,11 +39,12 @@ export class HealthController {
         database: 'up',
       };
     } catch {
-      throw new ServiceUnavailableException({
+      response.status(HttpStatus.SERVICE_UNAVAILABLE);
+      return {
         status: 'error',
         service: 'agroconnect-api',
         database: 'down',
-      });
+      };
     }
   }
 }
