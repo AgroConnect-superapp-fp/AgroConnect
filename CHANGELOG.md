@@ -5,6 +5,18 @@ Todos los cambios notables de este proyecto se documentan en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/)
 y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 
+## [Unreleased]
+
+### Corregido
+
+- **SMTP obligatorio en producción (D5):** sin `SMTP_HOST` la API falla al
+  arrancar; antes el registro respondía 201 pero el correo quedaba en `/tmp` y
+  el usuario no podía verificar ni iniciar sesión.
+- **Readiness con body explícito:** `/health/ready` devuelve 503 con
+  `{status:"error",database:"down"}` en lugar del `INTERNAL_ERROR` genérico.
+- **Diagnóstico de producción:** timeout de 45 s a 90 s para tolerar el cold
+  start de Render.
+
 ## [1.1.0] — 2026-11-02
 
 ### Seguridad

@@ -341,7 +341,7 @@ están en `docs/adr/0016-pendientes-post-cutover.md`.
 - **D5:** registro sin sesión, verificación de correo obligatoria y 403
   `EMAIL_NOT_VERIFIED` en login/refresh.
 - **D6:** `iss`/`aud` en JWT.
-- **Pruebas:** 206 backend · 21 unit · 10 E2E.
+- **Pruebas:** 208 backend · 21 unit · 10 E2E.
 - **Release:** `v1.1.0` publicada con las notas del CHANGELOG; quedan 2 alertas
   de Dependabot (dev-only, fixes semver-major) para una ventana de pruebas.
 
@@ -376,6 +376,12 @@ están en `docs/adr/0016-pendientes-post-cutover.md`.
   `docs/matriz_trazabilidad_hallazgos.md`; no se infirió la relación.
 - **Totales:** `detalle` 68 RF + 66 CU + 69 HU = 203; `cu_hu` 74 relaciones,
   63 HU con CU y 6 pendientes de validar en Notion.
+
+### Corrección P0 — SMTP y readiness (2026-11-02)
+
+- `env.ts` exige `SMTP_HOST` en producción; sin él la API no arranca (D5).
+- `/health/ready` devuelve 503 con `{status:"error",database:"down"}`.
+- `diagnose-production.mjs` amplía el timeout a 90 s.
 
 ### UI — anti-patrones de Impeccable corregidos (2026-11-02)
 
