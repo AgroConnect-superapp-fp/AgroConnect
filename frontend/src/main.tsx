@@ -14,31 +14,3 @@ ReactDOM.createRoot(rootElement).render(
     <App />
   </React.StrictMode>
 );
-
-function registerServiceWorker(): void {
-  if (!('serviceWorker' in navigator)) {
-    return;
-  }
-
-  if (import.meta.env.DEV) {
-    return;
-  }
-
-  window.addEventListener('load', () => {
-    navigator.serviceWorker
-      .register('/sw.js')
-      .then((registration) => {
-        setInterval(
-          () => {
-            registration.update();
-          },
-          60 * 60 * 1000
-        );
-      })
-      .catch(() => {
-        // El registro del service worker no debe bloquear la aplicación.
-      });
-  });
-}
-
-registerServiceWorker();
