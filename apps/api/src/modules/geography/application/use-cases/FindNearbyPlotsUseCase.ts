@@ -1,8 +1,6 @@
 // 🟡 APPLICATION LAYER - Caso de Uso
 // Orquesta la lógica. NO sabe si los datos vienen de Prisma, MongoDB o una API.
 
-import { Inject, Injectable } from '@nestjs/common';
-import { PLOT_REPOSITORY } from '../tokens';
 import { DomainError } from '../../../../shared/errors/errors';
 import type { Plot } from '../../domain/entities/Plot';
 import type { PlotRepository } from '../../domain/interfaces/PlotRepository';
@@ -17,10 +15,9 @@ import type { PlotRepository } from '../../domain/interfaces/PlotRepository';
  * protegiendo el dominio. Los errores usan `DomainError` (SPEC §9) con status
  * 400, el mismo código que respondía el legacy.
  */
-@Injectable()
 export class FindNearbyPlotsUseCase {
   // Inyección de Dependencias: Recibe la INTERFACE, no la implementación concreta
-  constructor(@Inject(PLOT_REPOSITORY) private readonly plotRepository: PlotRepository) {}
+  constructor(private readonly plotRepository: PlotRepository) {}
 
   async execute(lat: number, lng: number, radiusKm: number): Promise<Plot[]> {
     // 1. Validación de entrada a nivel de aplicación

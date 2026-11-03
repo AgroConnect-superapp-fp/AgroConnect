@@ -30,6 +30,12 @@ import { SessionCookieService } from './http/SessionCookieService';
 import { SessionTokenInterceptor } from './http/SessionTokenInterceptor';
 import { PrismaModule } from '../../../prisma/prisma.module';
 import { env } from '../../../shared/config/env';
+import type { UserRepository } from '../domain/interfaces/UserRepository';
+import type { PasswordHasher } from '../domain/interfaces/PasswordHasher';
+import type { TokenService } from '../domain/interfaces/TokenService';
+import type { EmailService } from '../domain/interfaces/EmailService';
+import type { EmailVerificationTokenRepository } from '../domain/interfaces/EmailVerificationTokenRepository';
+import type { PasswordResetTokenRepository } from '../domain/interfaces/PasswordResetTokenRepository';
 
 /**
  * Módulo de identidad (autenticación).
@@ -98,15 +104,109 @@ import { env } from '../../../shared/config/env';
     },
     { provide: APP_BASE_URL, useValue: env.APP_BASE_URL },
 
-    // Casos de uso.
-    RegisterUserUseCase,
-    LoginUseCase,
-    RefreshTokenUseCase,
-    LogoutUseCase,
-    RequestPasswordResetUseCase,
-    ResetPasswordUseCase,
-    RequestEmailVerificationUseCase,
-    VerifyEmailUseCase,
+    // Casos de uso: composition root. La capa `application` no conoce NestJS;
+    // los módulos instancian los casos de uso con sus puertos inyectados.
+    {
+      provide: RegisterUserUseCase,
+      useFactory: (userRepository: UserRepository, passwordHasher: PasswordHasher) =>
+        new RegisterUserUseCase(userRepository, passwordHasher),
+      inject: [USER_REPOSITORY, PASSWORD_HASHER],
+    },
+    {
+      provide: LoginUseCase,
+      useFactory: (
+        userRepository: UserRepository,
+        passwordHasher: PasswordHasher,
+        tokenService: TokenService,
+      ) => new LoginUseCase(userRepository, passwordHasher, tokenService),
+      inject: [USER_REPOSITORY, PASSWORD_HASHER, TOKEN_SERVICE],
+    },
+    {
+      provide: RefreshTokenUseCase,
+      useFactory: (userRepository: UserRepository, tokenService: TokenService) =>
+        new RefreshTokenUseCase(userRepository, tokenService),
+      inject: [USER_REPOSITORY, TOKEN_SERVICE],
+    },
+    {
+      provide: LogoutUseCase,
+      useFactory: (userRepository: UserRepository, tokenService: TokenService) =>
+        new LogoutUseCase(userRepository, tokenService),
+      inject: [USER_REPOSITORY, TOKEN_SERVICE],
+    },
+    {
+      provide: RequestPasswordResetUseCase,
+      useFactory: (
+        userRepository: UserRepository,
+        passwordResetTokenRepository: PasswordResetTokenRepository,
+        emailService: EmailService,
+        tokenService: TokenService,
+        appBaseUrl: string,
+      ) =>
+        new RequestPasswordResetUseCase(
+          userRepository,
+          passwordResetTokenRepository,
+          emailService,
+          tokenService,
+          appBaseUrl,
+        ),
+      inject: [
+        USER_REPOSITORY,
+        PASSWORD_RESET_TOKEN_REPOSITORY,
+        EMAIL_SERVICE,
+        TOKEN_SERVICE,
+        APP_BASE_URL,
+      ],
+    },
+    {
+      provide: ResetPasswordUseCase,
+      useFactory: (
+        userRepository: UserRepository,
+        passwordResetTokenRepository: PasswordResetTokenRepository,
+        passwordHasher: PasswordHasher,
+        tokenService: TokenService,
+      ) =>
+        new ResetPasswordUseCase(
+          userRepository,
+          passwordResetTokenRepository,
+          passwordHasher,
+          tokenService,
+        ),
+      inject: [USER_REPOSITORY, PASSWORD_RESET_TOKEN_REPOSITORY, PASSWORD_HASHER, TOKEN_SERVICE],
+    },
+    {
+      provide: RequestEmailVerificationUseCase,
+      useFactory: (
+        userRepository: UserRepository,
+        emailVerificationTokenRepository: EmailVerificationTokenRepository,
+        emailService: EmailService,
+        tokenService: TokenService,
+        appBaseUrl: string,
+      ) =>
+        new RequestEmailVerificationUseCase(
+          userRepository,
+          emailVerificationTokenRepository,
+          emailService,
+          tokenService,
+          appBaseUrl,
+        ),
+      inject: [
+        USER_REPOSITORY,
+        EMAIL_VERIFICATION_TOKEN_REPOSITORY,
+        EMAIL_SERVICE,
+        TOKEN_SERVICE,
+        APP_BASE_URL,
+      ],
+    },
+    {
+      provide: VerifyEmailUseCase,
+      useFactory: (
+        userRepository: UserRepository,
+        emailVerificationTokenRepository: EmailVerificationTokenRepository,
+        tokenService: TokenService,
+      ) =>
+        new VerifyEmailUseCase(userRepository, emailVerificationTokenRepository, tokenService),
+      inject: [USER_REPOSITORY, EMAIL_VERIFICATION_TOKEN_REPOSITORY, TOKEN_SERVICE],
+    },
 
     // Presentación.
     AuthThrottlerGuard,

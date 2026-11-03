@@ -1,17 +1,14 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { USER_REPOSITORY, TOKEN_SERVICE, EMAIL_VERIFICATION_TOKEN_REPOSITORY } from '../tokens';
 import { InvalidTokenError } from '../../domain/errors/AuthErrors';
 import type { UserRepository } from '../../domain/interfaces/UserRepository';
 import type { EmailVerificationTokenRepository } from '../../domain/interfaces/EmailVerificationTokenRepository';
 import type { TokenService } from '../../domain/interfaces/TokenService';
 import type { VerifyEmailInput } from '../dtos/authDtos';
 
-@Injectable()
 export class VerifyEmailUseCase {
   constructor(
-    @Inject(USER_REPOSITORY) private readonly userRepository: UserRepository,
-    @Inject(EMAIL_VERIFICATION_TOKEN_REPOSITORY) private readonly emailVerificationTokenRepository: EmailVerificationTokenRepository,
-    @Inject(TOKEN_SERVICE) private readonly tokenService: TokenService,
+    private readonly userRepository: UserRepository,
+    private readonly emailVerificationTokenRepository: EmailVerificationTokenRepository,
+    private readonly tokenService: TokenService,
   ) {}
 
   async execute(input: VerifyEmailInput): Promise<void> {

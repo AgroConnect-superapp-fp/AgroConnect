@@ -1,5 +1,3 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { USER_REPOSITORY, PASSWORD_HASHER, TOKEN_SERVICE, PASSWORD_RESET_TOKEN_REPOSITORY } from '../tokens';
 import { InvalidTokenError } from '../../domain/errors/AuthErrors';
 import { Password } from '../../domain/value-objects/Password';
 import type { UserRepository } from '../../domain/interfaces/UserRepository';
@@ -8,13 +6,12 @@ import type { PasswordHasher } from '../../domain/interfaces/PasswordHasher';
 import type { TokenService } from '../../domain/interfaces/TokenService';
 import type { ResetPasswordInput } from '../dtos/authDtos';
 
-@Injectable()
 export class ResetPasswordUseCase {
   constructor(
-    @Inject(USER_REPOSITORY) private readonly userRepository: UserRepository,
-    @Inject(PASSWORD_RESET_TOKEN_REPOSITORY) private readonly passwordResetTokenRepository: PasswordResetTokenRepository,
-    @Inject(PASSWORD_HASHER) private readonly passwordHasher: PasswordHasher,
-    @Inject(TOKEN_SERVICE) private readonly tokenService: TokenService,
+    private readonly userRepository: UserRepository,
+    private readonly passwordResetTokenRepository: PasswordResetTokenRepository,
+    private readonly passwordHasher: PasswordHasher,
+    private readonly tokenService: TokenService,
   ) {}
 
   async execute(input: ResetPasswordInput): Promise<void> {

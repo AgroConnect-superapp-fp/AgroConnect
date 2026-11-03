@@ -1,5 +1,3 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { USER_REPOSITORY, PASSWORD_HASHER } from '../tokens';
 import { randomUUID } from 'node:crypto';
 import {
   DocumentAlreadyExistsError,
@@ -22,11 +20,10 @@ export interface RegisterUserResult {
   user: PublicUserProfile;
 }
 
-@Injectable()
 export class RegisterUserUseCase {
   constructor(
-    @Inject(USER_REPOSITORY) private readonly userRepository: UserRepository,
-    @Inject(PASSWORD_HASHER) private readonly passwordHasher: PasswordHasher,
+    private readonly userRepository: UserRepository,
+    private readonly passwordHasher: PasswordHasher,
   ) {}
 
   async execute(input: RegisterUserInput): Promise<RegisterUserResult> {
