@@ -1,6 +1,6 @@
 # ADR-017 — Descomposición progresiva de `PropertyMap`
 
-- **Estado:** Aceptada — Fase 1 implementada
+- **Estado:** Aceptada — Fases 1-2 implementadas
 - **Fecha:** 2026-11-03
 - **Decisores:** fAb Orq, beru, equipo frontend
 - **Relacionado:** ADR-016 (D9, resuelto), ADR-004, ADR-007
@@ -32,16 +32,26 @@ Extraer componentes sin estado ni efectos:
 Criterio: `PropertyMap.tsx` baja de 2021 a ~1200 líneas; tests unitarios de los
 componentes puros.
 
+**Resultado:** 2021 → 952 líneas (mejor que el objetivo); componentes y
+constantes extraídos sin cambiar el comportamiento.
+
 ### Fase 2 — Hooks de estado
 
 Extraer la lógica reutilizable:
 
-- `useMapViewport` (centro, zoom, bounds)
+- `useMapViewport` (ciclo de vida de la instancia y bloqueo de zoom con popup)
 - `useMapSearch`
 - `useMapDrawing`
 - `usePropertySelection`
 
 Criterio: hooks con tests; sin duplicar estado con el contenedor.
+
+**Resultado:** 952 → 601 líneas; `useMapViewport`, `useMapSearch`,
+`useMapDrawing` y `usePropertySelection` extraídos, más los puentes
+`MapViewport`/`MapDrawing` y los helpers `mapUtils`/`mapSearchUtils`. El
+centro, zoom y bounds siguen siendo propiedad de Leaflet (`MapContainer`); el
+hook no los replica en estado React para evitar re-renderizados y doble fuente
+de verdad. Tests: 42 unitarios frontend, 10 E2E, lint/typecheck/build verdes.
 
 ### Fase 3 — Contenedor orquestador
 

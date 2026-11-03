@@ -7,6 +7,19 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+### Cambiado
+
+- **PropertyMap Fase 2:** `useMapViewport`, `useMapSearch`, `useMapDrawing` y
+  `usePropertySelection` extraídos, junto con los puentes `MapViewport` /
+  `MapDrawing` y los helpers `mapUtils` / `mapSearchUtils`; 952 → 601 líneas,
+  sin cambio de comportamiento. 42 tests unitarios frontend y E2E 10/10.
+
+### Corregido
+
+- **ADR-018:** la evidencia del bloqueo de NestJS 12 se corrigió: el impedimento
+  es ESM-only en `@nestjs/common/core/platform-express` 12, no los peers de
+  `@nestjs/config` ni `@nestjs/jwt`, que ya aceptan 12.
+
 ## [1.1.2] — 2026-11-03
 
 ### Añadido

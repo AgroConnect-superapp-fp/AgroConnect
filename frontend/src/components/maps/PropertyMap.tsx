@@ -10,7 +10,7 @@
  * - All previous functionality preserved (search, zoom lock, popup persistence)
  */
 
-import React, { useEffect, useCallback, useState, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { devLog } from '../../utils/devLog';
 import {
   MapContainer,
@@ -32,304 +32,21 @@ import type { Property, HeatmapPoint } from '../../types/property';
 import { getCropInfo } from '../../types/property';
 import { createCropIcon, createClusterIcon } from '../../utils/mapIcons';
 import { escapeHtml } from '../../utils/escapeHtml';
-import { useLeafletDraw } from '../../hooks/useLeafletDraw';
+import { useMapSearch } from '../../hooks/useMapSearch';
+import { usePropertySelection } from '../../hooks/usePropertySelection';
 import { MapControls } from './MapControls';
+import { MapDrawing } from './MapDrawing';
 import { MapLegend } from './MapLegend';
+import { MapViewport } from './MapViewport';
 import { PropertyPopup } from './PropertyPopup';
+import {
+  CombinedSearchProvider,
+  findPropertyByName,
+  flyToAndOpenPopup,
+  flyToPlace,
+} from './mapSearchUtils';
 import { MAP_CONSTANTS, PRODUCTIVITY_HEAT_GRADIENT } from './mapConstants';
 import { MAP_STYLES_CSS } from './mapStyles';
-
-/**
- * Combined search provider: Properties + OpenStreetMap places.
- * Uses getCropInfo() for safe access to crop display names.
- */
-class CombinedSearchProvider {
-  private properties: Property[];
-
-  constructor(properties: Property[]) {
-    this.properties = properties;
-  }
-
-  async search({ query }: { query: string }): Promise<
-    Array<{
-      x: number;
-      y: number;
-      label: string;
-      bounds: null;
-      raw: {
-        type: 'property' | 'place';
-        data: Property | { name: string; type: string };
-      };
-    }>
-  > {
-    const normalizedQuery = query.toLowerCase().trim();
-    if (!normalizedQuery) return [];
-
-    const results: Array<{
-      x: number;
-      y: number;
-      label: string;
-      bounds: null;
-      raw: {
-        type: 'property' | 'place';
-        data: Property | { name: string; type: string };
-      };
-    }> = [];
-
-    const propertyMatches = this.properties.filter((property) => {
-      // ✅ DEFENSIVE: Use getCropInfo() instead of direct CROP_CATALOG access
-      const cropDisplayName = getCropInfo(property.crop).displayName;
-      const searchableText = [
-        property.name,
-        property.owner,
-        property.department,
-        property.municipality,
-        cropDisplayName,
-      ]
-        .join(' ')
-        .toLowerCase();
-      return searchableText.includes(normalizedQuery);
-    });
-
-    propertyMatches.forEach((property) => {
-      results.push({
-        x: property.lng,
-        y: property.lat,
-        label: `🌱 ${property.name} - ${property.municipality}, ${property.department}`,
-        bounds: null,
-        raw: { type: 'property', data: property },
-      });
-    });
-
-    try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&countrycodes=co`,
-        {
-          headers: {
-            'User-Agent': 'AgroConnect/1.0 (SENA Project)',
-          },
-        }
-      );
-
-      if (response.ok) {
-        const places = await response.json();
-        places.forEach(
-          (place: { lat: string; lon: string; display_name: string; type: string }) => {
-            results.push({
-              x: parseFloat(place.lon),
-              y: parseFloat(place.lat),
-              label: `📍 ${place.display_name}`,
-              bounds: null,
-              raw: {
-                type: 'place',
-                data: { name: place.display_name, type: place.type },
-              },
-            });
-          }
-        );
-      }
-    } catch (error) {
-      console.warn('[AgroConnect] Nominatim search failed:', error);
-    }
-
-    return results;
-  }
-}
-
-/**
- * Helper function: find property by name in text
- */
-function findPropertyByName(text: string, properties: Property[]): Property | null {
-  const normalizedText = text.toLowerCase();
-  return (
-    properties.find((prop) => normalizedText.includes(prop.name.toLowerCase())) || null
-  );
-}
-
-/**
- * Helper function: find marker by coordinates in map layers
- */
-function findMarkerByCoordinates(
-  map: L.Map,
-  lat: number,
-  lng: number,
-  tolerance: number
-): L.Marker | null {
-  let targetMarker: L.Marker | null = null;
-
-  map.eachLayer((layer: L.Layer) => {
-    if (layer instanceof L.Marker) {
-      const ll = layer.getLatLng();
-      if (Math.abs(ll.lat - lat) < tolerance && Math.abs(ll.lng - lng) < tolerance) {
-        targetMarker = layer;
-      }
-    }
-  });
-
-  return targetMarker;
-}
-
-/**
- * Helper function: clear search input and close suggestions dropdown.
- */
-function clearSearchInput(mapContainer: HTMLElement): void {
-  const input = mapContainer.querySelector<HTMLInputElement>(
-    `.${MAP_CONSTANTS.SEARCH_CONTROL_CSS_CLASS} input`
-  );
-
-  const resultsContainer = mapContainer.querySelector<HTMLElement>(
-    `.${MAP_CONSTANTS.SEARCH_CONTROL_CSS_CLASS} .results`
-  );
-
-  if (input) {
-    input.value = '';
-    const inputEvent = new Event('input', { bubbles: true });
-    input.dispatchEvent(inputEvent);
-    input.blur();
-  }
-
-  setTimeout(() => {
-    if (resultsContainer) {
-      resultsContainer.innerHTML = '';
-      devLog('[AgroConnect] 🧹 Results container cleared');
-    }
-  }, 50);
-
-  devLog('[AgroConnect] 🧹 Search input cleared');
-}
-
-/**
- * Helper function: fly to location and open popup (for properties)
- */
-function flyToAndOpenPopup(
-  map: L.Map,
-  property: Property,
-  isMounted: { current: boolean },
-  onPopupOpen?: (propertyId: string) => void
-): void {
-  devLog('[AgroConnect] 🎯 Flying to property:', property.name);
-
-  const mapContainer = map.getContainer();
-  const targetLatLng: L.LatLngExpression = [property.lat, property.lng];
-
-  clearSearchInput(mapContainer);
-
-  map.flyTo(targetLatLng, MAP_CONSTANTS.SEARCH_RESULT_ZOOM, {
-    duration: 1.5,
-  });
-
-  setTimeout(() => {
-    if (!isMounted.current) return;
-
-    const targetMarker = findMarkerByCoordinates(
-      map,
-      property.lat,
-      property.lng,
-      MAP_CONSTANTS.COORDINATE_TOLERANCE
-    );
-
-    if (targetMarker !== null) {
-      const markerRef: L.Marker = targetMarker;
-      devLog('[AgroConnect] ✅ Marker found, opening popup');
-
-      map.closePopup();
-
-      setTimeout(() => {
-        try {
-          markerRef.openPopup();
-          devLog('[AgroConnect] ✅ Popup opened successfully for:', property.name);
-
-          if (onPopupOpen) {
-            onPopupOpen(property.id);
-          }
-        } catch (err) {
-          console.warn('[AgroConnect] ⚠️ openPopup failed, trying fire(click):', err);
-          try {
-            markerRef.fire('click');
-          } catch (clickErr) {
-            console.error('[AgroConnect] ❌ Could not open popup:', clickErr);
-          }
-        }
-      }, 200);
-    } else {
-      console.warn('[AgroConnect] ⚠️ Marker not found after flyTo');
-    }
-  }, 1700);
-}
-
-/**
- * Helper function: fly to geographic place (no popup)
- */
-function flyToPlace(map: L.Map, lat: number, lng: number, zoom: number = 13): void {
-  devLog('[AgroConnect] 📍 Flying to place:', lat, lng);
-
-  const mapContainer = map.getContainer();
-  clearSearchInput(mapContainer);
-
-  map.flyTo([lat, lng], zoom, { duration: 1.2 });
-}
-
-/**
- * Map Instance Capture component.
- */
-function MapInstanceCapture({
-  mapRef,
-}: {
-  mapRef: React.MutableRefObject<L.Map | null>;
-}): null {
-  const map = useMap();
-
-  useEffect(() => {
-    mapRef.current = map;
-    devLog('[AgroConnect] 🗺️ Map instance captured');
-  }, [map, mapRef]);
-
-  return null;
-}
-
-/**
- * Zoom Lock on Popup component.
- */
-function ZoomLockOnPopup(): null {
-  const map = useMap();
-
-  useEffect(() => {
-    const mapContainer = map.getContainer();
-
-    const disableZoom = (): void => {
-      devLog('[AgroConnect] 🔒 Zoom disabled (popup open)');
-
-      if (map.scrollWheelZoom) map.scrollWheelZoom.disable();
-      if (map.doubleClickZoom) map.doubleClickZoom.disable();
-      if (map.touchZoom) map.touchZoom.disable();
-      if (map.boxZoom) map.boxZoom.disable();
-
-      mapContainer.setAttribute('data-popup-open', 'true');
-    };
-
-    const enableZoom = (): void => {
-      devLog('[AgroConnect] 🔓 Zoom enabled (popup closed)');
-
-      if (map.scrollWheelZoom) map.scrollWheelZoom.enable();
-      if (map.doubleClickZoom) map.doubleClickZoom.enable();
-      if (map.touchZoom) map.touchZoom.enable();
-      if (map.boxZoom) map.boxZoom.enable();
-
-      mapContainer.removeAttribute('data-popup-open');
-    };
-
-    map.on('popupopen', disableZoom);
-    map.on('popupclose', enableZoom);
-
-    return () => {
-      map.off('popupopen', disableZoom);
-      map.off('popupclose', enableZoom);
-      enableZoom();
-    };
-  }, [map]);
-
-  return null;
-}
 
 /**
  * Search Control using EVENT DELEGATION on mapContainer.
@@ -750,20 +467,6 @@ function AttributionExternalLinks(): null {
 }
 
 /**
- * Drawing Tools component.
- */
-function DrawingTools({
-  enabled,
-  onPolygonCreated,
-}: {
-  enabled: boolean;
-  onPolygonCreated?: (coords: [number, number][]) => void;
-}): null {
-  useLeafletDraw({ enabled, onPolygonCreated });
-  return null;
-}
-
-/**
  * Main PropertyMap component.
  */
 interface PropertyMapProps {
@@ -785,66 +488,14 @@ export function PropertyMap({
     intensity: p.productivity / 100,
   }));
 
-  const [isSearchOpen, setIsSearchOpen] = useState(true);
-
-  const openPopupPropertyIdRef = useRef<string | null>(null);
   const mapRef = useRef<L.Map | null>(null);
-
-  const handleCloseSearch = useCallback(() => {
-    setIsSearchOpen(false);
-  }, []);
-
-  const handleOpenSearch = useCallback(() => {
-    setIsSearchOpen(true);
-    setTimeout(() => {
-      const input = document.querySelector<HTMLInputElement>(
-        `.${MAP_CONSTANTS.MAP_WRAPPER_CLASS} .${MAP_CONSTANTS.SEARCH_CONTROL_CSS_CLASS} input`
-      );
-      if (input) {
-        input.focus();
-        input.select();
-      }
-    }, 150);
-  }, []);
-
-  // Restore popup after layer/drawing changes
-  useEffect(() => {
-    if (!mapRef.current || !openPopupPropertyIdRef.current) return;
-
-    const map = mapRef.current;
-    const propertyId = openPopupPropertyIdRef.current;
-    const property = properties.find((p) => p.id === propertyId);
-
-    if (!property) return;
-
-    setTimeout(() => {
-      const marker = findMarkerByCoordinates(
-        map,
-        property.lat,
-        property.lng,
-        MAP_CONSTANTS.COORDINATE_TOLERANCE
-      );
-
-      if (marker) {
-        try {
-          marker.openPopup();
-          devLog('[AgroConnect] ✅ Popup restored for:', property.name);
-        } catch (err) {
-          console.warn('[AgroConnect] ⚠️ Could not restore popup:', err);
-        }
-      }
-    }, 100);
-  }, [showProductiveZones, enableDrawing, properties]);
-
-  const handlePopupOpen = useCallback((propertyId: string) => {
-    openPopupPropertyIdRef.current = propertyId;
-    devLog('[AgroConnect] 📌 Popup state saved for property:', propertyId);
-  }, []);
-
-  const handlePopupClose = useCallback(() => {
-    openPopupPropertyIdRef.current = null;
-    devLog('[AgroConnect] 📌 Popup state cleared');
-  }, []);
+  const { isSearchOpen, openSearch, closeSearch } = useMapSearch();
+  const { handlePopupOpen, handlePopupClose } = usePropertySelection({
+    mapRef,
+    properties,
+    showProductiveZones,
+    enableDrawing,
+  });
 
   return (
     <div
@@ -859,12 +510,10 @@ export function PropertyMap({
         style={{ height: '100%', width: '100%' }}
         zoomControl={false}
       >
-        <MapInstanceCapture mapRef={mapRef} />
-
-        <ZoomLockOnPopup />
+        <MapViewport mapRef={mapRef} />
 
         <SearchControl properties={properties} onPopupOpen={handlePopupOpen} />
-        <InjectCloseButton onClose={handleCloseSearch} />
+        <InjectCloseButton onClose={closeSearch} />
 
         <MapControls>
           {showProductiveZones && (
@@ -874,9 +523,9 @@ export function PropertyMap({
           )}
         </MapControls>
 
-        <SearchToggleLeafletControl visible={!isSearchOpen} onOpen={handleOpenSearch} />
+        <SearchToggleLeafletControl visible={!isSearchOpen} onOpen={openSearch} />
 
-        <DrawingTools enabled={enableDrawing} onPolygonCreated={onPolygonCreated} />
+        <MapDrawing enabled={enableDrawing} onPolygonCreated={onPolygonCreated} />
 
         <MapLegend />
         <AttributionExternalLinks />
