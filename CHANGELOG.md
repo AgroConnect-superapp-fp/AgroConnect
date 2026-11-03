@@ -19,6 +19,9 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
   `agro-yellow-soft` (`#ffd54f`, 5.58:1 sobre oscuro) y `agro-yellow-ink`
   (`#b45309`, 5.02:1 sobre blanco); `Button` secondary, toggle de zonas,
   footer y créditos de imagen actualizados. El color de marca no cambia.
+- **PropertyMap Fase 1:** `MapLegend`, `PropertyPopup`, `MapControls`,
+  `mapConstants` y `mapStyles` extraídos; 2021 → 959 líneas; sin cambio de
+  comportamiento; lint, build y alignment verdes; E2E 10/10 en CI.
 - **Clean Architecture:** la capa `application` ya no importa `@nestjs/common`;
   los 9 casos de uso se instancian en los módulos con `useFactory` (composition
   root) y sus constructores reciben solo interfaces de dominio.

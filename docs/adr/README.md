@@ -25,6 +25,6 @@ Hay dos series de ADR:
 | [ADR-014](0014-servicio-agro-intelligence-python.md) | Satélite Python `agro-intelligence` | Aceptada (post-MVP) |
 | [ADR-015](0015-monorepo-contract-first.md) | Monorepo npm workspaces + Turborepo, contract-first | Aceptada |
 | [ADR-016](0016-pendientes-post-cutover.md) | Pendientes post-cutover: PWA (implementada), retiro legacy, refresh/Argon2, release | Aceptada parcialmente |
-| [ADR-017](0017-property-map-decomposition.md) | Descomposición progresiva de `PropertyMap` (2021 líneas) | Propuesto |
+| [ADR-017](0017-property-map-decomposition.md) | Descomposición progresiva de `PropertyMap` (2021 líneas) | Aceptada — Fase 1 implementada |
 
 Para una decisión nueva, copia la estructura de cualquier ADR: Estado, Fecha, Decisores, Relacionado, Contexto, Decisión, Alternativas y Consecuencias. Enlázala aquí y en el índice de ADRs de Obsidian.

@@ -1,6 +1,6 @@
 # ADR-017 — Descomposición progresiva de `PropertyMap`
 
-- **Estado:** Propuesto
+- **Estado:** Aceptada — Fase 1 implementada
 - **Fecha:** 2026-11-03
 - **Decisores:** fAb Orq, beru, equipo frontend
 - **Relacionado:** ADR-016 (D9, resuelto), ADR-004, ADR-007
