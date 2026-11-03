@@ -26,5 +26,6 @@ Hay dos series de ADR:
 | [ADR-015](0015-monorepo-contract-first.md) | Monorepo npm workspaces + Turborepo, contract-first | Aceptada |
 | [ADR-016](0016-pendientes-post-cutover.md) | Pendientes post-cutover: PWA (implementada), retiro legacy, refresh/Argon2, release | Aceptada parcialmente |
 | [ADR-017](0017-property-map-decomposition.md) | Descomposición progresiva de `PropertyMap` (2021 líneas) | Aceptada — Fase 1 implementada |
+| [ADR-018](0018-dependabot-12.md) | Ventana Dependabot 12: CLI 12 + minimatch/deepmerge; core/TS7 bloqueados | Aceptada — alcance parcial |
 
 Para una decisión nueva, copia la estructura de cualquier ADR: Estado, Fecha, Decisores, Relacionado, Contexto, Decisión, Alternativas y Consecuencias. Enlázala aquí y en el índice de ADRs de Obsidian.
