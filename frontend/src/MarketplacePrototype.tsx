@@ -383,7 +383,7 @@ function App(): React.ReactElement {
                 </p>
               </div>
               <div className="w-36 h-28 bg-agro-yellow/10 rounded-lg border-2 border-agro-yellow/30 animate-slideInRight delay-300 hover:scale-110 hover:shadow-lg hover:border-agro-yellow interactive-transition cursor-default group flex flex-col items-center justify-center text-center p-3">
-                <p className="text-xs text-gray-700 font-semibold group-hover:text-agro-yellow interactive-transition leading-tight">
+                <p className="text-xs text-gray-700 font-semibold group-hover:text-agro-yellow-ink interactive-transition leading-tight">
                   Hectáreas
                 </p>
                 <p className="text-3xl font-bold text-agro-dark mt-1">
@@ -448,7 +448,7 @@ function App(): React.ReactElement {
                 onClick={() => setShowProductiveZones(!showProductiveZones)}
                 className={`min-w-[220px] px-4 py-2 rounded-lg font-semibold text-sm animate-slideInRight delay-500 interactive-transition hover:scale-105 active:scale-95 flex items-center justify-center whitespace-nowrap ${
                   showProductiveZones
-                    ? 'bg-agro-yellow text-white shadow-md hover:shadow-lg'
+                    ? 'bg-agro-yellow text-on-accent shadow-md hover:shadow-lg'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -669,7 +669,7 @@ function App(): React.ReactElement {
         <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
             <div className="group">
-              <h3 className="text-2xl font-bold text-agro-yellow flex items-center gap-2 mb-3 group-hover:scale-105 interactive-transition">
+              <h3 className="text-2xl font-bold text-agro-yellow-soft flex items-center gap-2 mb-3 group-hover:scale-105 interactive-transition">
                 🌱 AgroConnect
               </h3>
               <p className="text-green-100 text-sm leading-relaxed font-semibold hover:text-white interactive-transition">
@@ -709,7 +709,7 @@ function App(): React.ReactElement {
             </div>
 
             <div>
-              <h4 className="text-lg font-bold text-agro-yellow mb-3 uppercase tracking-wide">
+              <h4 className="text-lg font-bold text-agro-yellow-soft mb-3 uppercase tracking-wide">
                 Enlaces Rápidos
               </h4>
               <ul className="space-y-2 text-sm">
@@ -723,7 +723,7 @@ function App(): React.ReactElement {
                   <li key={link}>
                     <a
                       href="#"
-                      className="text-green-100 hover:text-agro-yellow hover:translate-x-2 interactive-transition inline-block"
+                      className="text-green-100 hover:text-agro-yellow-soft hover:translate-x-2 interactive-transition inline-block"
                     >
                       → {link}
                     </a>
@@ -733,7 +733,7 @@ function App(): React.ReactElement {
             </div>
 
             <div>
-              <h4 className="text-lg font-bold text-agro-yellow mb-3 uppercase tracking-wide">
+              <h4 className="text-lg font-bold text-agro-yellow-soft mb-3 uppercase tracking-wide">
                 Contacto
               </h4>
               <ul className="space-y-3 text-sm text-green-100">
@@ -760,20 +760,21 @@ function App(): React.ReactElement {
           <div className="border-t border-white/10 pt-6">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm">
               <p className="text-green-100 text-center md:text-left">
-                © 2026 <span className="font-bold text-agro-yellow">AgroConnect</span> -
+                © 2026{' '}
+                <span className="font-bold text-agro-yellow-soft">AgroConnect</span> -
                 Proyecto Formativo ADSO SENA
               </p>
               <p className="text-green-200 flex items-center gap-2 text-center md:text-right flex-wrap justify-center">
                 <span>Powered by</span>
-                <span className="font-semibold text-agro-yellow hover:text-white interactive-transition cursor-default">
+                <span className="font-semibold text-agro-yellow-soft hover:text-white interactive-transition cursor-default">
                   PostgreSQL + PostgREST
                 </span>
                 <span>•</span>
-                <span className="font-semibold text-agro-yellow hover:text-white interactive-transition cursor-default">
+                <span className="font-semibold text-agro-yellow-soft hover:text-white interactive-transition cursor-default">
                   Supabase
                 </span>
                 <span>•</span>
-                <span className="font-semibold text-agro-yellow hover:text-white interactive-transition cursor-default">
+                <span className="font-semibold text-agro-yellow-soft hover:text-white interactive-transition cursor-default">
                   Vercel
                 </span>
               </p>
@@ -784,7 +785,7 @@ function App(): React.ReactElement {
                 href="https://unsplash.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="underline hover:text-agro-yellow"
+                className="underline hover:text-agro-yellow-soft"
               >
                 Unsplash
               </a>{' '}
@@ -793,7 +794,7 @@ function App(): React.ReactElement {
                 href="https://commons.wikimedia.org"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="underline hover:text-agro-yellow"
+                className="underline hover:text-agro-yellow-soft"
               >
                 Wikimedia Commons
               </a>{' '}
