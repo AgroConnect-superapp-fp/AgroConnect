@@ -38,6 +38,17 @@ export const envSchema = z.object({
     .transform((value) => value === 'true'),
   SMTP_FROM: z.string().default('AgroConnect <no-reply@agroconnect.co>'),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
+}).superRefine((data, ctx) => {
+  // D5 bloquea el login hasta verificar el correo. Sin SMTP en producción el
+  // FileEmailService escribiría el enlace en /tmp y nadie podría verificar.
+  if (data.NODE_ENV === 'production' && (!data.SMTP_HOST || data.SMTP_HOST.trim().length === 0)) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['SMTP_HOST'],
+      message:
+        'SMTP_HOST es obligatorio en producción: la verificación de correo (D5) bloquea el login hasta verificar',
+    });
+  }
 });
 
 export type Env = z.infer<typeof envSchema>;

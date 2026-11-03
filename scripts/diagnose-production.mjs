@@ -19,7 +19,7 @@ import { promises as dns } from 'node:dns';
 const APP = 'https://agroconnectpreview.vercel.app';
 const API = 'https://agroconnect-api-5t7n.onrender.com';
 const SUPABASE_HOST = 'fwmaehhzfydbhilpfbrl.supabase.co';
-const TIMEOUT_MS = 45_000;
+const TIMEOUT_MS = 90_000;
 
 const results = [];
 const record = (name, ok, detail) => results.push({ name, ok, detail });

@@ -67,6 +67,8 @@ que requieren criterio de producto o arquitectura.
 - **Estado:** implementada el 2026-11-02 con **bloqueo total**: el registro no
   emite cookies; login y refresh devuelven 403 `EMAIL_NOT_VERIFIED` hasta que
   `emailVerifiedAt` exista. El E2E verifica el correo antes del login.
+  `SMTP_HOST` es obligatorio en producción: sin él la API no arranca, porque el
+  `FileEmailService` dejaría el enlace en `/tmp` y nadie podría verificar.
 
 ### D6. `iss`/`aud` en JWT
 

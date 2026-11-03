@@ -43,8 +43,9 @@
 - **Sesión:** refresh token con familia/generación (reuso revoca la familia),
   Argon2id con rehash desde bcrypt y verificación de correo obligatoria.
 - **JWT:** `JWT_ISSUER`/`JWT_AUDIENCE`; los tokens sin `iss`/`aud` se rechazan.
-- **Correo:** con `SMTP_HOST` configurado se usa SMTP real; sin él, los correos
-  se escriben en `MAIL_DIR` (solo desarrollo/pruebas).
+- **Correo:** `SMTP_HOST` es **obligatorio en producción** (D5); sin él el
+  proceso no arranca. En desarrollo/pruebas, sin SMTP los correos se escriben
+  en `MAIL_DIR`.
 
 > Free tier: el servicio se suspende tras ~15 min de inactividad (despierta en
 > ~1 min con la primera petición). El cold start puede superar los 20 s.
@@ -144,6 +145,7 @@ npx vercel deploy --prod --yes --archive=tgz
 ```bash
 curl -s -o /dev/null -w "%{http_code}\n" https://agroconnectpreview.vercel.app
 curl -s https://agroconnect-api-5t7n.onrender.com/health
+curl -s https://agroconnect-api-5t7n.onrender.com/health/ready
 curl -sI https://agroconnectpreview.vercel.app | grep -Ei 'content-security|x-frame|x-content-type|referrer|permissions'
 curl -sI https://agroconnectpreview.vercel.app/manifest.webmanifest | grep -i content-type
 curl -sI https://agroconnectpreview.vercel.app/sw.js | grep -i content-type

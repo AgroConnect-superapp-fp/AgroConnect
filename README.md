@@ -8,7 +8,7 @@ Centro de Comercio y Turismo · Regional Quindío · Programa Análisis y Desarr
 
 [![CI](https://github.com/AgroConnect-superapp-fp/AgroConnect/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/AgroConnect-superapp-fp/AgroConnect/actions/workflows/ci.yml)
 [![Node](https://img.shields.io/badge/node-%E2%89%A5%2020-339933?logo=node.js&logoColor=white)](.nvmrc)
-[![Pruebas](https://img.shields.io/badge/pruebas-206%20backend%20%C2%B7%2021%20unit%20%C2%B7%2010%20E2E-brightgreen)](https://github.com/AgroConnect-superapp-fp/AgroConnect/actions/workflows/ci.yml)
+[![Pruebas](https://img.shields.io/badge/pruebas-208%20backend%20%C2%B7%2021%20unit%20%C2%B7%2010%20E2E-brightgreen)](https://github.com/AgroConnect-superapp-fp/AgroConnect/actions/workflows/ci.yml)
 [![Deploy](https://img.shields.io/badge/producci%C3%B3n-Vercel%20%C2%B7%20Render-000000?logo=vercel&logoColor=white)](https://agroconnectpreview.vercel.app)
 [![Licencia](https://img.shields.io/badge/licencia-Todos%20los%20derechos%20reservados-red)](LICENSE)
 
@@ -173,7 +173,7 @@ Características: contraseñas con **Argon2id** (bcrypt legacy con rehash transp
 
 ### Calidad
 
-- 206 pruebas backend (NestJS; cobertura >95 % en líneas) · 21 pruebas unitarias de frontend (Vitest) · 10 pruebas E2E (Playwright: autenticación real, modo demo y marketplace).
+- 208 pruebas backend (NestJS; cobertura >95 % en líneas) · 21 pruebas unitarias de frontend (Vitest) · 10 pruebas E2E (Playwright: autenticación real, modo demo y marketplace).
 
 ---
 
