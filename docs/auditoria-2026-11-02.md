@@ -122,7 +122,7 @@
 | P1-19 | Obsidian `Estado del Proyecto.md` con fecha 2026-10-04 y datos “178 tests / main = develop / 0 vulnerabilidades” | Fuente de contexto desactualizada para personas y agentes | Actualizar con 188+189/21/10, main≠develop, NestJS y deuda |
 | P1-20 | README y `tools/alignment-check/manifest.json` con 178/14/10, Express y Render Node 22 | El job de alineación **valida datos obsoletos** | Actualizar manifest + README y volver a correr `--all` |
 | P1-21 | CHANGELOG `[Unreleased]` sin monorepo, NestJS, geography ni cookie-only | Trazabilidad de cambios incompleta | Registrar los 24 commits y la deuda |
-| P1-22 | Enlace Jira `agroconnect.atlassian.net` → HTTP 404; MCP Jira falla | SSOT operativo roto | Reemplazar por estado “pausado” o crear sitio nuevo |
+| P1-22 | Enlace Jira `agroconnect.atlassian.net` → HTTP 404; MCP Jira falla | SSOT operativo roto | **Mitigado:** nota de estado añadida al root de Notion; el callout se actualizará al crear un sitio nuevo |
 | P1-23 | Matrices: `cu_hu` 74 filas, `detalle` 203, `rf_cu_hu` 17; esperado 69 HU/66 CU | Descuadre de trazabilidad | Reconciliar contra Notion y regenerar |
 | P1-24 | PWA inexistente: no hay `<link rel="manifest">`, no se registra `sw.js`, `public/` no tiene manifest; `/manifest.webmanifest` devuelve HTML | El SW es código muerto y la promesa PWA es falsa | Implementar con `vite-plugin-pwa` o eliminar SW y claims |
 | P1-25 | `render.yaml` sin `TRUST_PROXY` y con `RATE_LIMIT_MAX_ATTEMPTS=30`; `NODE_VERSION` 24 vs docs 22 | Configuración divergente | Alinear IaC con el servicio real |
