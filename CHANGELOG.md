@@ -11,9 +11,14 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 
 - **Nota de Jira en Notion:** `scripts/notion-add-jira-note.mjs` documenta que
   el sitio está suspendido y que el tablero temporal vive en GitHub.
+- **ADR-017:** plan de descomposición progresiva de `PropertyMap` (2021 líneas).
 
 ### Cambiado
 
+- **Accesibilidad del accent:** tokens `on-accent` (`#1a1a1a`, 8.83:1),
+  `agro-yellow-soft` (`#ffd54f`, 5.58:1 sobre oscuro) y `agro-yellow-ink`
+  (`#b45309`, 5.02:1 sobre blanco); `Button` secondary, toggle de zonas,
+  footer y créditos de imagen actualizados. El color de marca no cambia.
 - **Clean Architecture:** la capa `application` ya no importa `@nestjs/common`;
   los 9 casos de uso se instancian en los módulos con `useFactory` (composition
   root) y sus constructores reciben solo interfaces de dominio.

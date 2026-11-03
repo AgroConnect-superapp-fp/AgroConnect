@@ -11,7 +11,7 @@ const VARIANT_CLASSES: Record<NonNullable<ButtonProps['variant']>, string> = {
   primary:
     'bg-agro-green text-white hover:bg-agro-dark focus-visible:ring-agro-green/40 disabled:bg-agro-green/60',
   secondary:
-    'bg-agro-yellow text-agro-dark hover:bg-amber-500 focus-visible:ring-agro-yellow/40 disabled:bg-agro-yellow/60',
+    'bg-agro-yellow text-on-accent hover:bg-amber-500 focus-visible:ring-agro-yellow/40 disabled:bg-agro-yellow/60',
   ghost:
     'bg-transparent text-agro-green border border-agro-green/40 hover:bg-agro-green/5 focus-visible:ring-agro-green/30',
 };

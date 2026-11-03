@@ -100,14 +100,21 @@ que requieren criterio de producto o arquitectura.
 
 ### D9. Contraste del accent yellow
 
-- **Situación:** el design system usa `#F9A825` (accent) con texto blanco en
-  varios botones; el contraste es ≈1.97:1, por debajo de WCAG AA. El badge
-  "Top" se corrigió a `text-amber-950` (≈7:1), pero la deuda sistémica sigue.
-- **Recomendación:** definir un token `--color-on-accent` (casi negro) y
-  aplicarlo a todo componente con fondo `agro-yellow`; validar con axe o
-  Lighthouse. No cambiar el color de marca.
+- **Estado:** Resuelto 2026-11-03.
+- **Situación histórica:** el design system usa `#F9A825` (accent) con texto
+  blanco en varios botones; el contraste era ≈1.97:1, por debajo de WCAG AA.
+  El badge "Top" se corrigió a `text-amber-950` (≈7:1), pero la deuda sistémica
+  seguía.
+- **Implementación:** se añadieron `--color-on-accent` (`#1a1a1a`, 8.83:1 sobre
+  el accent), `--color-agro-yellow-soft` (`#ffd54f`, 5.58:1 sobre `agro-dark`)
+  y `--color-agro-yellow-ink` (`#b45309`, 5.02:1 sobre blanco). `Button`
+  secondary y el toggle de zonas productivas usan `text-on-accent`; los textos
+  accent sobre fondos oscuros usan `soft` y sobre fondos claros usan `ink`.
+  No se cambió el color de marca.
+- **Validación:** contraste calculado; lint/build/E2E. La pasada de axe o
+  Lighthouse queda como gate de CI.
 - **Criterio:** 4.5:1 en texto normal y 3:1 en texto grande en todos los
-  botones/chips con accent.
+  botones/chips con accent (cumplido en los pares medidos).
 
 ## Consecuencias
 
