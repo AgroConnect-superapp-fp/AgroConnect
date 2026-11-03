@@ -11,7 +11,7 @@
   "github": {
     "repoApi": "https://api.github.com/repos/AgroConnect-superapp-fp/AgroConnect",
     "visibility": "public",
-    "latestRelease": "v1.1.0"
+    "latestRelease": "v1.1.1"
   },
   "traceability": {
     "modules": 17,
