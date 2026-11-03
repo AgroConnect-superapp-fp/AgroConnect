@@ -18,20 +18,24 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
   composición. Se preserva el orden de controles Leaflet y el comportamiento
   de búsqueda, capas, clusters y popups. 42 unitarios, lint, typecheck, build y
   E2E 10/10 verdes; screenshot del mapa validado.
+- **PropertyMap Fase 4:** popup del marcador corregido, `MapLegend` con
+  jerarquía `h3`, `PropertyPopup` accesible (`role="region"`, foco y
+  `aria-label`) y auditoría axe 4.10.2 con **0 violaciones** en marketplace y
+  popup. `PropertyMap` queda en 42.83 kB (11.71 kB gzip); E2E 10/10.
 
 ### Corregido
 
+- **Popup del mapa:** se eliminó `width: auto !important`, que anulaba el ancho
+  calculado por Leaflet, y la animación dejó de tocar `transform` para no pisar
+  el `translate3d` inline. El contenido usa `max-height: min(65vh, 560px)` con
+  scroll interno; el popup queda dentro del mapa (451×560 px sobre 1184×800 px).
+- **Fallback de Supabase:** `fetchProperties` y `searchProperties` se abortan a
+  los 5 s con `AbortSignal`. PostgREST no reintenta peticiones abortadas, así que
+  la UI muestra los datos de demostración en lugar de quedar en `LoadingScreen`
+  durante los reintentos de red.
 - **ADR-018:** la evidencia del bloqueo de NestJS 12 se corrigió: el impedimento
   es ESM-only en `@nestjs/common/core/platform-express` 12, no los peers de
   `@nestjs/config` ni `@nestjs/jwt`, que ya aceptan 12.
-
-### Pendiente
-
-- **Popup del mapa:** el popup de marcador (~735 px) no cabe en el mapa
-  (800 px) con el padding de `autoPan`; Leaflet lo posiciona fuera del
-  contenedor y la captura queda recortada. Es un defecto previo a la
-  descomposición; se corrige en Fase 4 con `max-height`/scroll o una galería
-  más baja.
 
 ## [1.1.2] — 2026-11-03
 

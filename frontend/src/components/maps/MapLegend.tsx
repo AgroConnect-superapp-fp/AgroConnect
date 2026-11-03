@@ -24,9 +24,9 @@ export function MapLegend(): null {
           line-height: 1.6; max-width: 200px;
         `;
         div.innerHTML = `
-          <h4 style="margin: 0 0 8px 0; color: #2E7D32; font-size: 14px; border-bottom: 2px solid #4CAF50; padding-bottom: 4px;">
+          <h3 style="margin: 0 0 8px 0; color: #2E7D32; font-size: 14px; border-bottom: 2px solid #4CAF50; padding-bottom: 4px;">
             🌱 Tipos de Cultivo
-          </h4>
+          </h3>
           ${Object.entries(CROP_CATALOG)
             .map(
               ([, info]) => `
@@ -38,9 +38,9 @@ export function MapLegend(): null {
             )
             .join('')}
           <div style="margin-top: 10px; padding-top: 8px; border-top: 2px solid #4CAF50;">
-            <h4 style="margin: 0 0 8px 0; color: #2E7D32; font-size: 14px;">
+            <h3 style="margin: 0 0 8px 0; color: #2E7D32; font-size: 14px;">
               🎯 Productividad
-            </h4>
+            </h3>
             <div style="display: flex; gap: 2px; margin-top: 4px;">
               ${PRODUCTIVITY_LEGEND.map(
                 (range) =>

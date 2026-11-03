@@ -1,6 +1,6 @@
 # ADR-017 — Descomposición progresiva de `PropertyMap`
 
-- **Estado:** Aceptada — Fases 1-3 implementadas; Fase 4 en curso
+- **Estado:** Aceptada — Fases 1-4 implementadas
 - **Fecha:** 2026-11-03
 - **Decisores:** fAb Orq, beru, equipo frontend
 - **Relacionado:** ADR-016 (D9, resuelto), ADR-004, ADR-007
@@ -77,12 +77,28 @@ typecheck, build y E2E 10/10 verdes; screenshot del mapa validado.
 - Revisión de accesibilidad (axe/Lighthouse) y de rendimiento del bundle.
 - Sin cambios en contratos de API ni en la URL de Leaflet/OSM.
 
-**Hallazgo pendiente:** el popup de marcador mide ~735 px y el mapa 800 px;
-con el padding de `autoPan` no cabe y Leaflet lo posiciona por encima del
-contenedor (coordenada Y negativa), por lo que la captura del popup queda
-recortada. Es previo a la descomposición (los estilos y `autoPan` no cambiaron).
-En Fase 4 se corregirá con `max-height` + scroll interno o reduciendo la
-galería, y se repetirá la captura antes de cerrar el ADR.
+**Resultado:** popup corregido. La causa era doble: `width: auto !important`
+anulaba el ancho calculado por Leaflet y la animación `transform` pisaba el
+`translate3d` inline que usa Leaflet para posicionarlo. Se eliminó el override,
+la animación quedó solo en `opacity` y el contenido se limita a
+`max-height: min(65vh, 560px)` con scroll interno. El popup final mide
+451×560 px dentro de un mapa de 1184×800 px; las capturas de
+`docs/evidencias/fase4/` (`fase4-mapa.png` y `fase4-popup.png`) confirman que
+queda dentro del contenedor.
+
+**Accesibilidad:** auditoría axe 4.10.2 sobre marketplace y popup → **0
+violaciones**. Los hallazgos iniciales `landmark-one-main`,
+`page-has-heading-one` y `region` eran falsos positivos por auditar el
+`LoadingScreen`; `heading-order` era real y se corrigió en `MapLegend`
+(`h4` → `h3`). `PropertyPopup` expone `role="region"`, `tabIndex={0}` y
+`aria-label` tanto en marcador como en polígono.
+
+**E2E y estabilidad:** 10/10. Para que el fallback de demostración no dependa
+de los reintentos de PostgREST, `fetchProperties` y `searchProperties` se
+acotan con `AbortSignal` a 5 s; PostgREST no reintenta una petición abortada y
+la UI muestra los datos de demostración. Bundle: `PropertyMap` 42.83 kB
+(11.71 kB gzip), dentro del presupuesto. Gate final: Prettier, lint, typecheck,
+42 unitarios, build y E2E 10/10 verdes.
 
 ## Alternativas consideradas
 

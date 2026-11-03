@@ -16,6 +16,14 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+/**
+ * Tiempo máximo para una consulta de datos. Sin este límite, PostgREST puede
+ * reintentar errores de red y dejar la UI en `LoadingScreen` más de 10 s.
+ * Al abortar con `AbortSignal`, PostgREST no reintenta y el fallback demo
+ * aparece de inmediato.
+ */
+const DB_TIMEOUT_MS = 5_000;
+
 export interface PropertyRow {
   id: string;
   name: string;
@@ -78,11 +86,14 @@ function mapRowToProperty(row: PropertyRow): Property {
 }
 
 export async function fetchProperties(): Promise<Property[]> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), DB_TIMEOUT_MS);
   try {
     const { data, error } = await supabase
       .from('properties')
       .select('*')
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .abortSignal(controller.signal);
     if (error) {
       console.error('[Supabase] Error:', error);
       throw error;
@@ -91,6 +102,8 @@ export async function fetchProperties(): Promise<Property[]> {
   } catch (error) {
     console.error('[Supabase] Exception:', error);
     return [];
+  } finally {
+    clearTimeout(timeoutId);
   }
 }
 
@@ -111,15 +124,22 @@ export async function searchProperties(query: string): Promise<Property[]> {
     }
 
     const pattern = `%${term}%`;
-    const { data, error } = await supabase
-      .from('properties')
-      .select('*')
-      .or(
-        `name.ilike.${pattern},municipality.ilike.${pattern},department.ilike.${pattern}`
-      )
-      .order('created_at', { ascending: false });
-    if (error) throw error;
-    return (data as PropertyRow[]).map(mapRowToProperty);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), DB_TIMEOUT_MS);
+    try {
+      const { data, error } = await supabase
+        .from('properties')
+        .select('*')
+        .or(
+          `name.ilike.${pattern},municipality.ilike.${pattern},department.ilike.${pattern}`
+        )
+        .order('created_at', { ascending: false })
+        .abortSignal(controller.signal);
+      if (error) throw error;
+      return (data as PropertyRow[]).map(mapRowToProperty);
+    } finally {
+      clearTimeout(timeoutId);
+    }
   } catch (error) {
     console.error('[Supabase] Search error:', error);
     return [];
