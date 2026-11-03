@@ -394,8 +394,9 @@ están en `docs/adr/0016-pendientes-post-cutover.md`.
 | `animate-bounce` en dots, badge y estado vacío | `animate-pulse` o `softFloatIn` con `ease-out` |
 | `prefers-reduced-motion` local con `*` | Regla global en `index.css` que no rompe transforms de Leaflet |
 
-La excepción de Inter (design system) y la deuda de contraste del accent yellow
-quedan documentadas en ADR-016 (D9).
+La excepción de Inter (design system) se mantiene documentada; la deuda de
+contraste del accent yellow quedó resuelta con los tokens `on-accent`, `soft`
+e `ink` (ADR-016 D9). El refactor de `PropertyMap` se planifica en ADR-017.
 
 
 

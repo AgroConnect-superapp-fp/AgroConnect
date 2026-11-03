@@ -297,7 +297,7 @@ export function ImageGallery({
             href={credit.sourceUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="underline hover:text-agro-yellow"
+            className="underline hover:text-agro-yellow-soft"
           >
             {credit.author}
           </a>{' '}
@@ -306,7 +306,7 @@ export function ImageGallery({
             href={credit.licenseUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="underline hover:text-agro-yellow"
+            className="underline hover:text-agro-yellow-soft"
           >
             {credit.license}
           </a>

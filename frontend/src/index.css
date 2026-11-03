@@ -4,10 +4,15 @@
   --color-agro-green: #2e7d32;
   --color-agro-light: #4caf50;
   --color-agro-yellow: #f9a825;
+  --color-agro-yellow-soft: #ffd54f;
+  --color-agro-yellow-ink: #b45309;
+  --color-on-accent: #1a1a1a;
   --color-agro-dark: #1b5e20;
   --font-sans: 'Inter', system-ui, sans-serif;
 }
 
+/* SPEC §3 fija Inter para la UI; la excepción de "overused-font" está
+   justificada en docs/auditoria-2026-11-02.md (design system). */
 body {
   margin: 0;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
