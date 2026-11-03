@@ -7,6 +7,11 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+### Añadido
+
+- **Nota de Jira en Notion:** `scripts/notion-add-jira-note.mjs` documenta que
+  el sitio está suspendido y que el tablero temporal vive en GitHub.
+
 ### Cambiado
 
 - **Clean Architecture:** la capa `application` ya no importa `@nestjs/common`;
