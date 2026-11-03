@@ -1,7 +1,9 @@
 # Guía de ejecución, uso y despliegue — AgroConnect
 
-> Documento operativo del proyecto. Estado vigente: **2026-11-02**, tras la
-> auditoría integral y el cutover de producción a NestJS (`apps/api`).
+> Documento operativo del proyecto. Estado vigente: **2026-11-03**. El frontend
+> y la API (liveness) están arriba, pero el proyecto de Supabase no resuelve en
+> DNS: `/health/ready` devuelve 503 y el login real 500. La recuperación está
+> en `docs/runbook-recuperacion-supabase.md`.
 
 ## 1. Aplicación en producción
 
@@ -9,17 +11,25 @@
 - **Proyecto Vercel:** `agro-connect/agroconnectpreview` (Root Directory `frontend`)
 - **Repo:** `AgroConnect-superapp-fp/AgroConnect` (público, organización)
 - **API:** https://agroconnect-api-5t7n.onrender.com (`GET /health` → 200)
-- **Base de datos:** PostgreSQL de Supabase, esquema `agroconnect`
+- **Base de datos:** PostgreSQL administrado por la API, esquema `agroconnect`.
+  **Estado 2026-11-03:** la instancia histórica de Supabase está `ENOTFOUND`;
+  pendiente desplegar la nueva base. El marketplace ya no depende de Supabase.
 
 ### Qué funciona en producción
 
-- **Registro e inicio de sesión reales** contra `apps/api` (NestJS 11).
+- **Acceso de demostración** («Explorar la demo»): entra al mercado sin registro.
+- **Registro e inicio de sesión:** implementados contra `apps/api` (NestJS 11),
+  pero **bloqueados** mientras Supabase no responda (login 500).
 - **Sesión cookie-only:** access y refresh en cookies `httpOnly`; el cuerpo de
   auth solo devuelve `usuario`.
-- **Acceso de demostración** («Explorar la demo»): entra al mercado sin registro.
-- Marketplace (mapa Leaflet + productores destacados) con datos de Supabase.
+- Marketplace (mapa Leaflet + productores destacados) con datos de
+  `GET /api/v1/products` o fallback demo si la API no responde.
 - Imágenes por cultivo, fallback automático (`SafeImage`), LQIP y créditos.
-- Si Supabase no responde: datos de demostración con aviso y botón de reintento.
+- Si la API de productos no responde: datos de demostración con aviso y botón de reintento.
+- **API del marketplace:** `GET /api/v1/products` con `search`, `crop`,
+  `department`, `municipality`, `certification`, `limit` y `offset`. Contrato
+  Zod/OpenAPI en `@agroconnect/contracts`; datos de desarrollo con
+  `npm run seed:products -w @agroconnect/api`.
 - **PWA:** implementada con `vite-plugin-pwa`: manifest, iconos 192/512/maskable,
   precache del shell y caché de imágenes de Cloudinary y tiles del mapa.
 
@@ -33,7 +43,7 @@
   (readiness: `SELECT 1`; 200 si la DB responde, 503 si no).
 - **Runtime:** Prisma 7 con driver adapter exige `DATABASE_SCHEMA` explícito
   (ignora el `?schema=` de la URL). En Render: `agroconnect`.
-- **Migraciones:** `cd apps/api && DATABASE_URL="<supabase-url>" npx prisma migrate deploy`.
+- **Migraciones:** `cd apps/api && DATABASE_URL="<postgres-url>" npx prisma migrate deploy`.
 - **Proxy:** `TRUST_PROXY=1` para que `req.ip` sea la IP real detrás de Render.
 - **Rate limit:** `RATE_LIMIT_MAX_ATTEMPTS=10` por ventana de 15 min.
 - **Cookies:** `SameSite=None; Secure` en producción (cross-site Vercel→Render),
@@ -59,7 +69,7 @@
 | PostgreSQL | 16 + PostGIS 3.4 (Docker: `postgis/postgis:16-3.4`) |
 | Docker + Compose | Base de datos local de desarrollo y pruebas |
 | Navegador | Chromium/Chrome actualizado (Leaflet) |
-| Cuentas | Supabase (marketplace), Cloudinary (imágenes), Vercel, Render, GitHub |
+| Cuentas | PostgreSQL de la API, Cloudinary (imágenes), Vercel, Render, GitHub |
 
 ## 3. Ejecución en local
 
@@ -102,9 +112,9 @@ Variables clave del frontend (`frontend/.env.local`):
   - `installCommand`: `cd .. && npm ci --include=dev`
   - `buildCommand`: `cd .. && npm run build -w @agroconnect/contracts && npm run build -w agroconnect-frontend`
   - `outputDirectory`: `dist` (relativo a `frontend`)
-- Variables: `VITE_API_URL`, `VITE_CLOUDINARY_*` y `VITE_SUPABASE_*` en
-  **Production** y **Preview** (Preview debe apuntar al API de staging o al
-  mismo API si no hay staging).
+- Variables: `VITE_API_URL` y `VITE_CLOUDINARY_*` en **Production** y
+  **Preview** (Preview debe apuntar al API de staging o al mismo API si no hay
+  staging).
 - Cabeceras: CSP, XFO, XCTO, Referrer-Policy, Permissions-Policy y HSTS en
   ambos `vercel.json` (raíz y `frontend/`).
 

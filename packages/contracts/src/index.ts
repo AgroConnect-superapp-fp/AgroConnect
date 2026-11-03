@@ -4,4 +4,5 @@
  */
 export * from './authSchemas';
 export * from './plotSchemas';
+export * from './productSchemas';
 export { buildOpenApiDocument, type OpenApiDocument } from './openapi';

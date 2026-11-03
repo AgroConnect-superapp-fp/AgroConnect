@@ -1,7 +1,7 @@
 # Plan T6 — Resto del incremento de acceso y perfiles
 
 **Fecha:** 3 de octubre de 2026
-**Estado:** Incrementos 2a (recuperación de contraseña) y 2b (verificación de correo) completados; este documento cubre lo restante.
+**Estado:** Incrementos 2a y 2b completados; 2.3a (marketplace sobre API propia) completado el 3-nov-2026. Queda 2.3b y 2c.
 
 ---
 
@@ -41,17 +41,24 @@ Implementada según el diseño previsto: tabla `email_verification_tokens` + col
 
 ### 2.3 Migración del prototipo Marketplace a la API propia (M03/M16)
 
+**Estado:** 2.3a (catálogo de lectura) **completada el 2026-11-03**; 2.3b (publicación autenticada) pendiente.
+
 **Objetivo:** retirar Supabase/PostgREST del prototipo y consumir `/api/v1` (cierra la deuda técnica registrada desde el Incremento 1).
 
-**Trabajo:**
-1. Modelo de dominio `Product` (M03) y `Plot` (M16, ya existe en backend) con repositorios Prisma.
-2. Endpoints: `GET /api/v1/products` (filtros + paginación), `GET /api/v1/plots/nearby` (ya existe), `POST /api/v1/products` (productor autenticado).
-3. Búsqueda geoespacial: `ST_DWithin` con índice GIST (patrón ya implementado en M16).
-4. Frontend: reemplazar `services/supabase.ts` por `services/productsApi.ts`; eliminar `@supabase/supabase-js` de `package.json`.
-5. Datos semilla para desarrollo (`prisma/seed.ts`).
-6. E2E del flujo: buscar → filtrar por ubicación → ver detalle.
+**Implementado (2.3a):**
+1. Modelo Prisma `Product` (M03) con enums de cultivo/certificación, JSONB de imágenes/coordenadas, checks de productividad/coordenadas e índices; migración `20261103114851_add_marketplace_products`.
+2. `GET /api/v1/products` con búsqueda, filtros (`crop`, `department`, `municipality`, `certification`), `limit`/`offset` y contrato Zod/OpenAPI en `@agroconnect/contracts`.
+3. Módulo `marketplace` con dominio, puerto, caso de uso, repositorio Prisma y controller; 225 pruebas backend y cobertura 81.64 % de ramas.
+4. Frontend: `services/productsApi.ts` reemplaza `services/supabase.ts`; se eliminó `@supabase/supabase-js`; fallback demo si la API no responde.
+5. Seed idempotente de 10 productos (`scripts/seed-products.ts`).
+6. E2E 10/10: demo/fallback contra `/api/v1/products`, autenticación y marketplace.
 
-**Estimación:** 2 incrementos (catálogo + migración del prototipo).
+**Pendiente (2.3b):**
+- `POST /api/v1/products` para productores autenticados, con validación de rol y carga de imágenes a Cloudinary.
+- Búsqueda geoespacial de productos por radio si el catálogo lo requiere (M16 ya tiene `ST_DWithin` para parcelas).
+- Prueba E2E del flujo buscar → filtrar por ubicación → ver detalle con datos publicados por un productor.
+
+**Estimación:** 2.3a completada; 2.3b ≈ 1 incremento.
 
 ## 3. Orden recomendado
 
@@ -59,6 +66,7 @@ Implementada según el diseño previsto: tabla `email_verification_tokens` + col
 |---|---|---|
 | ~~1~~ | ~~2b — Verificación de correo~~ | ✅ Completado el 3-oct-2026 |
 | 1 | 2c — Perfiles empresa/transportista | Habilita logística y B2B reales (M06/M17) |
-| 2 | 2d — Marketplace API propia | Elimina Supabase y habilita M03/M16 de punta a punta |
+| ~~2~~ | ~~2d — Marketplace API propia (2.3a lectura)~~ | ✅ Completado el 3-nov-2026: elimina Supabase del marketplace |
+| 3 | 2.3b — Publicación autenticada de productos | Habilita que el productor publique y gestione su catálogo |
 
 Cada incremento debe repetir el ciclo verificado: migración manual + tests unitarios/integración + E2E + CI en verde + evidencia documentada.

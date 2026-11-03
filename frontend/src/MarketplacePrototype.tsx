@@ -3,8 +3,8 @@
  * Orchestrates the main layout, KPIs, Map, and Producer Cards.
  * Integrates the PropertyDetailModal for rich interactions and Cloudinary uploads.
  *
- * Architecture (v2.1 - Defensive Rendering + Supabase Integration):
- * - Properties loaded from PostgreSQL via PostgREST (Supabase)
+ * Architecture (v2.2 - Defensive Rendering + API propia):
+ * - Properties loaded from GET /api/v1/products (NestJS + PostgreSQL)
  * - Defensive fallback for unknown crops/certifications (prevents undefined errors)
  * - Loading state with premium spinner
  * - Error state with retry functionality
@@ -12,7 +12,7 @@
  */
 
 import { useState, lazy, Suspense, useMemo, useEffect } from 'react';
-import { fetchProperties } from './services/supabase';
+import { fetchProducts } from './services/productsApi';
 import { devLog } from './utils/devLog';
 import { resolveImageUrl } from './services/cloudinary';
 import { MOCK_PROPERTIES } from './data/mockProperties';
@@ -50,7 +50,7 @@ function handleMapError(error: Error): void {
 }
 
 /**
- * Premium Loading Component - Shown while fetching from Supabase
+ * Premium Loading Component - Shown while fetching from the products API
  */
 function LoadingScreen(): React.ReactElement {
   return (
@@ -64,10 +64,10 @@ function LoadingScreen(): React.ReactElement {
         </div>
         <h2 className="text-2xl font-bold text-agro-dark mb-2">AgroConnect</h2>
         <p className="text-gray-600 font-medium mb-1">
-          Conectando con base de datos PostgreSQL
+          Conectando con el servicio de productos
         </p>
         <p className="text-sm text-gray-500">
-          Cargando propiedades agrícolas desde Supabase...
+          Cargando propiedades agrícolas desde la API...
         </p>
         <div className="mt-6 flex justify-center gap-1">
           <div
@@ -89,7 +89,7 @@ function LoadingScreen(): React.ReactElement {
 }
 
 /**
- * Error Screen Component - Shown when Supabase connection fails
+ * Error Screen Component - Shown when the products API fails
  */
 function ErrorScreen({
   error,
@@ -104,17 +104,15 @@ function ErrorScreen({
         <div className="text-6xl mb-4">⚠️</div>
         <h2 className="text-2xl font-bold text-red-700 mb-3">Error de Conexión</h2>
         <p className="text-gray-700 mb-2 font-medium">
-          No se pudo conectar con la base de datos
+          No se pudo conectar con el servicio de productos
         </p>
         <p className="text-sm text-red-800 mb-6 bg-red-50 rounded-lg p-3 border border-red-100">
           {error}
         </p>
         <div className="space-y-2 text-left text-xs text-gray-600 mb-6 bg-gray-50 rounded-lg p-4">
           <p className="font-semibold text-gray-800 mb-2">🔍 Posibles causas:</p>
-          <p>• Variables de entorno no configuradas</p>
-          <p>• Supabase URL o ANON KEY incorrectos</p>
-          <p>• Tabla 'properties' no existe en la base de datos</p>
-          <p>• Row Level Security bloqueando las consultas</p>
+          <p>• La API no está disponible o VITE_API_URL es incorrecta</p>
+          <p>• La tabla 'products' no existe o faltan migraciones</p>
           <p>• Problema de red o CORS</p>
         </div>
         <button
@@ -124,12 +122,6 @@ function ErrorScreen({
           <span>🔄</span>
           <span>Reintentar Conexión</span>
         </button>
-        <button
-          onClick={() => window.open('https://app.supabase.com', '_blank')}
-          className="w-full mt-3 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 interactive-transition text-sm"
-        >
-          Abrir Dashboard de Supabase
-        </button>
       </div>
     </div>
   );
@@ -137,7 +129,7 @@ function ErrorScreen({
 
 function App(): React.ReactElement {
   // ============================================
-  // STATE: Properties from Supabase
+  // STATE: Properties from the products API
   // ============================================
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
@@ -149,11 +141,11 @@ function App(): React.ReactElement {
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
 
   // ============================================
-  // EFFECT: Load properties from Supabase
+  // EFFECT: Load properties from the products API
   // ============================================
   const loadProperties = async (): Promise<void> => {
     try {
-      const data = await fetchProperties();
+      const data = await fetchProducts();
 
       if (data.length === 0) {
         setProperties(MOCK_PROPERTIES);
@@ -256,9 +248,9 @@ function App(): React.ReactElement {
             No hay propiedades registradas
           </h2>
           <p className="text-gray-600 mb-6">
-            La base de datos PostgreSQL está conectada pero no contiene datos. Ejecuta el
-            script SQL de inicialización en Supabase para cargar las propiedades de
-            ejemplo.
+            La API está conectada pero no contiene productos. Ejecuta el seed de
+            desarrollo (`npm run seed:products -w @agroconnect/api`) para cargar las
+            propiedades de ejemplo.
           </p>
           <button
             onClick={reload}
@@ -370,7 +362,7 @@ function App(): React.ReactElement {
                 Del productor al comprador, sin intermediarios
               </p>
             </div>
-            {/* KPI Cards: Calculated from real Supabase data */}
+            {/* KPI Cards: Calculated from the products API data */}
             <div className="flex gap-3 flex-wrap justify-end">
               <div className="w-36 h-28 bg-agro-green/10 rounded-lg border border-agro-green/30 animate-slideInRight delay-200 hover:scale-110 hover:shadow-lg interactive-transition cursor-default group animate-pulseGlowGreen flex flex-col items-center justify-center text-center p-3">
                 <p className="text-xs text-agro-dark font-semibold group-hover:text-agro-green interactive-transition leading-tight">
@@ -419,7 +411,7 @@ function App(): React.ReactElement {
           >
             <p>
               ⚠️ Mostrando <strong>datos de demostración</strong>: no se pudo conectar con
-              la base de datos.
+              el servicio de productos.
             </p>
             <button
               type="button"
@@ -767,11 +759,11 @@ function App(): React.ReactElement {
               <p className="text-green-200 flex items-center gap-2 text-center md:text-right flex-wrap justify-center">
                 <span>Powered by</span>
                 <span className="font-semibold text-agro-yellow-soft hover:text-white interactive-transition cursor-default">
-                  PostgreSQL + PostgREST
+                  NestJS + PostgreSQL
                 </span>
                 <span>•</span>
                 <span className="font-semibold text-agro-yellow-soft hover:text-white interactive-transition cursor-default">
-                  Supabase
+                  PostGIS
                 </span>
                 <span>•</span>
                 <span className="font-semibold text-agro-yellow-soft hover:text-white interactive-transition cursor-default">

@@ -93,7 +93,7 @@ export const IMAGE_PRESETS = {
  *
  * AgroConnect stores image references in two shapes:
  * - Cloudinary public IDs (e.g. "agroconnect/finca-12/cosecha") -> transformed.
- * - Direct URLs from external providers (legacy Supabase rows) -> used as-is.
+ * - Direct URLs from external providers (legacy rows) -> used as-is.
  */
 const DIRECT_IMAGE_URL_PATTERN = /^(https?:)?\/\//i;
 const DATA_IMAGE_URL_PATTERN = /^data:image\//i;

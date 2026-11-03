@@ -8,7 +8,7 @@ Centro de Comercio y Turismo · Regional Quindío · Programa Análisis y Desarr
 
 [![CI](https://github.com/AgroConnect-superapp-fp/AgroConnect/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/AgroConnect-superapp-fp/AgroConnect/actions/workflows/ci.yml)
 [![Node](https://img.shields.io/badge/node-%E2%89%A5%2020-339933?logo=node.js&logoColor=white)](.nvmrc)
-[![Pruebas](https://img.shields.io/badge/pruebas-208%20backend%20%C2%B7%2021%20unit%20%C2%B7%2010%20E2E-brightgreen)](https://github.com/AgroConnect-superapp-fp/AgroConnect/actions/workflows/ci.yml)
+[![Pruebas](https://img.shields.io/badge/pruebas-225%20backend%20%C2%B7%2045%20unit%20%C2%B7%2010%20E2E-brightgreen)](https://github.com/AgroConnect-superapp-fp/AgroConnect/actions/workflows/ci.yml)
 [![Deploy](https://img.shields.io/badge/producci%C3%B3n-Vercel%20%C2%B7%20Render-000000?logo=vercel&logoColor=white)](https://agroconnectpreview.vercel.app)
 [![Licencia](https://img.shields.io/badge/licencia-Todos%20los%20derechos%20reservados-red)](LICENSE)
 
@@ -164,16 +164,17 @@ Características: contraseñas con **Argon2id** (bcrypt legacy con rehash transp
 - Parcelas almacenadas como `geography(Point, 4326)` con índice GiST y búsqueda por radio con `ST_DWithin` en `/api/v1/plots`.
 - Frontend: mapa Leaflet + OpenStreetMap con 4 capas base (OSM, satélite Esri, topográfico, CartoDB), clustering de fincas, heatmap de productividad y herramientas de dibujo de parcelas.
 
-### M03 — Prototipo del mercado (Supabase) y PWA
+### M03 — Marketplace sobre API propia y PWA
 
-- Marketplace React sobre datos de Supabase (PostgreSQL + PostgREST): mapa, KPIs, distribución por cultivo y tarjetas de fincas.
+- Marketplace React sobre `GET /api/v1/products` (NestJS + Prisma + PostgreSQL): mapa, KPIs, distribución por cultivo y tarjetas de fincas.
+- Filtros de búsqueda, cultivo, departamento, municipio y certificación, con paginación validada por contrato Zod.
 - Imágenes de cultivos con créditos (autor · licencia) en la galería, fallback automático por cultivo (`SafeImage`) y LQIP por proveedor (Unsplash/Wikimedia/Cloudinary).
-- Respaldo de datos de demostración con aviso visible cuando Supabase no responde.
+- Respaldo de datos de demostración con aviso visible cuando la API de productos no responde.
 - PWA: manifest y service worker con `vite-plugin-pwa`; precache del shell y caché de imágenes de Cloudinary y tiles del mapa.
 
 ### Calidad
 
-- 208 pruebas backend (NestJS; cobertura >95 % en líneas) · 21 pruebas unitarias de frontend (Vitest) · 10 pruebas E2E (Playwright: autenticación real, modo demo y marketplace).
+- 225 pruebas backend (NestJS; 94.62 % líneas, 81.64 % ramas) · 45 pruebas unitarias de frontend (Vitest) · 10 pruebas E2E (Playwright: autenticación real, modo demo y marketplace).
 
 ---
 
@@ -227,11 +228,11 @@ cd frontend && npm run test:e2e        # E2E (levanta API y web)
 
 - **URL de producción:** https://agroconnectpreview.vercel.app
 - **Proyecto:** `agro-connect/agroconnectpreview` · **Root Directory:** `frontend` · Node 24.x
-- **Variables de entorno (Production/Preview):** `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_CLOUDINARY_CLOUD_NAME`, `VITE_CLOUDINARY_UPLOAD_PRESET`.
+- **Variables de entorno (Production/Preview):** `VITE_API_URL`, `VITE_CLOUDINARY_CLOUD_NAME`, `VITE_CLOUDINARY_UPLOAD_PRESET`.
 
 > **Nota de infraestructura (plan Hobby):** Vercel no permite conectar repositorios privados de organizaciones sin plan Pro, por lo que la Git Integration nativa no está activa. El job `deploy` del CI queda como respaldo automático (condicionado al scope del token) y no marca el pipeline en rojo si el token no tiene acceso.
 
-**Acceso de demostración:** el botón **«🚀 Explorar la demo (sin registro)»** del inicio permite entrar al mercado sin cuenta. El **registro e inicio de sesión reales funcionan en producción** con el backend desplegado en Render (sección siguiente); en local requieren ejecutar el backend.
+**Acceso de demostración:** el botón **«🚀 Explorar la demo (sin registro)»** del inicio permite entrar al mercado sin cuenta. El **registro e inicio de sesión reales están bloqueados temporalmente** porque la base PostgreSQL de la API no está disponible; la recuperación está documentada en `docs/runbook-recuperacion-supabase.md`. En local requieren una base PostgreSQL operativa y ejecutar el backend.
 
 **Deploy manual (procedimiento vigente)** — desde la raíz del repo, con sesión `vercel login` activa:
 
@@ -246,11 +247,11 @@ npx vercel deploy --prod --yes --archive=tgz
 El backend NestJS (`apps/api`) + Prisma + PostgreSQL se despliega como **Web Service en Render** (plan free) con el Blueprint `render.yaml` de la raíz (Infraestructura como Código). 
 
 - **URL del servicio (producción):** https://agroconnect-api-5t7n.onrender.com — `GET /health` → 200
-- **Base de datos:** PostgreSQL de Supabase, esquema `agroconnect` (migraciones aplicadas; el runtime usa `DATABASE_SCHEMA=agroconnect`).
-- **Registro e inicio de sesión reales verificados** desde la app pública (2026-10-04).
+- **Base de datos:** PostgreSQL administrado por la API, esquema `agroconnect` (runtime con `DATABASE_SCHEMA=agroconnect`). La instancia histórica de Supabase está `ENOTFOUND`; `/health/ready` 503 y login 500 hasta desplegar la nueva base. El marketplace ya no depende de Supabase.
+- **Registro e inicio de sesión reales:** bloqueados mientras la base de la API no esté disponible; el modo demo y el marketplace con API propia siguen operativos.
 - En Vercel: `VITE_API_URL=https://agroconnect-api-5t7n.onrender.com` (Production).
 
-Despliegue (resumen): Blueprint `render.yaml` → `DATABASE_URL` con la connection string de Supabase (*Session pooler*) → `DATABASE_SCHEMA=agroconnect` → Manual Deploy. Migraciones: `cd apps/api && DATABASE_URL="<supabase-url>" npx prisma migrate deploy`.
+Despliegue (resumen): Blueprint `render.yaml` → `DATABASE_URL` del PostgreSQL administrado → `DATABASE_SCHEMA=agroconnect` → Manual Deploy. Migraciones: `cd apps/api && DATABASE_URL="<postgres-url>" npx prisma migrate deploy`; seed opcional: `npm run seed:products -w @agroconnect/api`.
 
 > Nota free tier: el servicio se suspende tras ~15 min de inactividad y despierta en ~1 min en la primera petición.
 
@@ -339,7 +340,7 @@ Fotografías de cultivos usadas en el prototipo del mercado:
 Además se usan fotografías de [Unsplash](https://unsplash.com/license) (banano, maíz y café) bajo la licencia Unsplash.
 
 > La galería de detalle de la app muestra el crédito (autor · licencia) de cada imagen.
-> Si Supabase no responde, el prototipo muestra datos de demostración con un aviso visible.
+> Si la API de productos no responde, el prototipo muestra datos de demostración con un aviso visible.
 
 > Documentación elaborada por el equipo Scrum AgroConnect con base en el set documental oficial del proyecto formativo.
 

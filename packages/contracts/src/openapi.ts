@@ -21,6 +21,7 @@ import {
   verifyEmailSchema,
 } from './authSchemas';
 import { nearbyPlotsQuerySchema } from './plotSchemas';
+import { productSchema, productsQuerySchema } from './productSchemas';
 
 export interface OpenApiDocument {
   openapi: '3.1.0';
@@ -166,6 +167,17 @@ export function buildOpenApiDocument(): OpenApiDocument {
           },
         },
       },
+      '/products': {
+        get: {
+          tags: ['Marketplace'],
+          summary: 'Lista los productos del marketplace con búsqueda, filtros y paginación',
+          parameters: queryParameters(z.toJSONSchema(productsQuerySchema, { io: 'input' })),
+          responses: {
+            '200': response('Productos del marketplace', 'ProductList'),
+            ...validationErrors,
+          },
+        },
+      },
     },
     components: {
       schemas: {
@@ -178,6 +190,12 @@ export function buildOpenApiDocument(): OpenApiDocument {
         VerifyEmailRequestBody: z.toJSONSchema(verifyEmailSchema),
         ResendVerificationRequestBody: z.toJSONSchema(resendVerificationSchema),
         NearbyPlotsQuery: z.toJSONSchema(nearbyPlotsQuerySchema, { io: 'input' }),
+        ProductsQuery: z.toJSONSchema(productsQuerySchema, { io: 'input' }),
+        Product: z.toJSONSchema(productSchema),
+        ProductList: {
+          type: 'array',
+          items: { $ref: '#/components/schemas/Product' },
+        },
       },
     },
   };

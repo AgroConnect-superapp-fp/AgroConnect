@@ -38,11 +38,11 @@ model User {
   createdAt             DateTime   @default(now()) @map("fecha_registro")
   updatedAt             DateTime   @updatedAt @map("actualizado_en")
 
-  role            Role             @relation(fields: [roleId], references: [id])
-  producerProfile ProducerProfile?
-  companyProfile  CompanyProfile?
-  refreshTokens   RefreshToken[]
-  plots           Plot[]
+  role                    Role                     @relation(fields: [roleId], references: [id])
+  producerProfile         ProducerProfile?
+  companyProfile          CompanyProfile?
+  refreshTokens           RefreshToken[]
+  plots                   Plot[]
   passwordResetTokens     PasswordResetToken[]
   emailVerificationTokens EmailVerificationToken[]
 
@@ -51,11 +51,11 @@ model User {
 }
 
 model ProducerProfile {
-  id           String  @id @default(uuid()) @db.Uuid
-  userId       String  @unique @map("user_id") @db.Uuid
-  farmName     String  @map("nombre_finca")
-  municipality String  @map("municipio")
-  village      String  @map("vereda")
+  id           String                                 @id @default(uuid()) @db.Uuid
+  userId       String                                 @unique @map("user_id") @db.Uuid
+  farmName     String                                 @map("nombre_finca")
+  municipality String                                 @map("municipio")
+  village      String                                 @map("vereda")
   coordinates  Unsupported("geography(Point, 4326)")? @map("coordenadas")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -94,15 +94,63 @@ model RefreshToken {
   @@map("refresh_tokens")
 }
 
+enum ProductCrop {
+  coffee
+  cacao
+  banana
+  sugarcane
+  rice
+  corn
+  cassava
+  oil_palm
+
+  @@map("product_crop")
+}
+
+enum ProductCertification {
+  organic
+  rainforest_alliance
+  fair_trade
+  conventional
+  global_gap
+
+  @@map("product_certification")
+}
+
+model Product {
+  id            String                @id @default(uuid()) @db.Uuid
+  name          String
+  owner         String
+  description   String?
+  contact       String?
+  department    String
+  municipality  String
+  crop          ProductCrop
+  areaHectares  Float                 @map("area_hectares")
+  productivity  Int
+  certification ProductCertification?
+  lat           Float
+  lng           Float
+  images        Json                  @default("[]")
+  coordinates   Json                  @default("[]")
+  createdAt     DateTime              @default(now()) @map("created_at")
+  updatedAt     DateTime              @updatedAt @map("updated_at")
+
+  @@index([crop])
+  @@index([department, municipality])
+  @@index([createdAt])
+  @@map("products")
+}
+
 model Plot {
-  id           String   @id @default(uuid()) @db.Uuid
+  id           String                                 @id @default(uuid()) @db.Uuid
   name         String
-  areaHectares Float    @map("area_hectares")
+  areaHectares Float                                  @map("area_hectares")
   municipality String
   department   String
-  farmerId     String   @map("farmer_id") @db.Uuid
+  farmerId     String                                 @map("farmer_id") @db.Uuid
   centroid     Unsupported("geography(Point, 4326)")?
-  createdAt    DateTime @default(now()) @map("created_at")
+  createdAt    DateTime                               @default(now()) @map("created_at")
 
   farmer User @relation(fields: [farmerId], references: [id])
 

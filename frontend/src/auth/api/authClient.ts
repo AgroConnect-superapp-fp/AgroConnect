@@ -1,110 +1,24 @@
 import type { AuthSession, LoginPayload, RegisterPayload } from '../types';
+import { API_URL, ApiError, apiRequest } from '../../services/apiClient';
 
-const API_URL: string = import.meta.env['VITE_API_URL'] ?? 'http://localhost:4000';
+export { API_URL, ApiError };
 
-export class ApiError extends Error {
-  constructor(
-    public readonly status: number,
-    public readonly code: string,
-    message: string,
-    public readonly details?: string[]
-  ) {
-    super(message);
-    this.name = 'ApiError';
-  }
-}
-
-interface ApiSuccessBody<T> {
-  success: true;
-  data: T;
-  message: string;
-}
-
-interface ApiFailureBody {
-  success: false;
-  error: {
-    code: string;
-    message: string;
-    details?: string[];
-  };
-  correlationId?: string;
-}
-
-type ApiBody<T> = ApiSuccessBody<T> | ApiFailureBody;
-
-function isFailure<T>(body: ApiBody<T>): body is ApiFailureBody {
-  return body.success === false;
-}
-
-async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
-  let response: Response;
-
-  try {
-    response = await fetch(`${API_URL}${path}`, {
-      ...options,
-      // La sesión viaja en cookies httpOnly: el navegador las adjunta (y las
-      // renueva) automáticamente. El JavaScript NUNCA lee ni envía tokens.
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        // CsrfGuard exige este header en toda petición mutante. Un formulario
-        // HTML cross-site no puede enviarlo sin pasar por el preflight CORS.
-        'X-Requested-With': 'XMLHttpRequest',
-        ...(options.headers ?? {}),
-      },
-    });
-  } catch {
-    throw new ApiError(
-      0,
-      'NETWORK_ERROR',
-      'No fue posible conectar con el servidor. Verifica tu conexión e intenta de nuevo.'
-    );
-  }
-
-  if (response.status === 204) {
-    return undefined as T;
-  }
-
-  const body = (await response.json().catch(() => null)) as ApiBody<T> | null;
-
-  if (!response.ok) {
-    if (body && isFailure(body)) {
-      throw new ApiError(
-        response.status,
-        body.error.code,
-        body.error.message,
-        body.error.details
-      );
-    }
-
-    throw new ApiError(
-      response.status,
-      'INTERNAL_ERROR',
-      'Ocurrió un error inesperado. Intenta de nuevo más tarde.'
-    );
-  }
-
-  if (!body || !('data' in body)) {
-    throw new ApiError(
-      response.status,
-      'INTERNAL_ERROR',
-      'Respuesta inesperada del servidor.'
-    );
-  }
-
-  return body.data;
-}
-
+/**
+ * Cliente del módulo de identidad.
+ *
+ * La sesión es cookie-only: el navegador adjunta access/refresh en cookies
+ * httpOnly y el JavaScript nunca lee ni envía tokens.
+ */
 export const authApi = {
   register(payload: RegisterPayload): Promise<AuthSession> {
-    return request<AuthSession>('/api/v1/auth/register', {
+    return apiRequest<AuthSession>('/api/v1/auth/register', {
       method: 'POST',
       body: JSON.stringify(payload),
     });
   },
 
   login(payload: LoginPayload): Promise<AuthSession> {
-    return request<AuthSession>('/api/v1/auth/login', {
+    return apiRequest<AuthSession>('/api/v1/auth/login', {
       method: 'POST',
       body: JSON.stringify(payload),
     });
@@ -114,44 +28,42 @@ export const authApi = {
   // adjunta solo. La respuesta trae la sesión completa (usuario + tokens) para
   // restaurar el estado tras recargar la página.
   refresh(): Promise<AuthSession> {
-    return request<AuthSession>('/api/v1/auth/refresh', {
+    return apiRequest<AuthSession>('/api/v1/auth/refresh', {
       method: 'POST',
     });
   },
 
   logout(): Promise<void> {
-    return request<void>('/api/v1/auth/logout', {
+    return apiRequest<void>('/api/v1/auth/logout', {
       method: 'POST',
     });
   },
 
   forgotPassword(correo: string): Promise<null> {
-    return request<null>('/api/v1/auth/forgot-password', {
+    return apiRequest<null>('/api/v1/auth/forgot-password', {
       method: 'POST',
       body: JSON.stringify({ correo }),
     });
   },
 
   resetPassword(token: string, password: string): Promise<null> {
-    return request<null>('/api/v1/auth/reset-password', {
+    return apiRequest<null>('/api/v1/auth/reset-password', {
       method: 'POST',
       body: JSON.stringify({ token, password }),
     });
   },
 
   verifyEmail(token: string): Promise<null> {
-    return request<null>('/api/v1/auth/verify-email', {
+    return apiRequest<null>('/api/v1/auth/verify-email', {
       method: 'POST',
       body: JSON.stringify({ token }),
     });
   },
 
   resendVerification(correo: string): Promise<null> {
-    return request<null>('/api/v1/auth/resend-verification', {
+    return apiRequest<null>('/api/v1/auth/resend-verification', {
       method: 'POST',
       body: JSON.stringify({ correo }),
     });
   },
 };
-
-export { API_URL };

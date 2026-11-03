@@ -5,7 +5,7 @@
  * - All 8 Colombian crops defined
  * - All 5 certifications defined
  * - Exported getCropInfo() helper with fallback for unknown values
- * - Prevents runtime errors from Supabase data inconsistencies
+ * - Prevents runtime errors from API data inconsistencies
  */
 
 // ============================================

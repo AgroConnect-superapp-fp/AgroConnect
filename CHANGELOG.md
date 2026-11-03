@@ -7,8 +7,21 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+### Añadido
+
+- **Marketplace sobre API propia (2.3a):** modelo Prisma `Product` con enums de
+  cultivo/certificación, imágenes/coordenadas JSONB, checks e índices;
+  `GET /api/v1/products` con búsqueda, filtros y paginación; contrato Zod y
+  OpenAPI en `@agroconnect/contracts`; seed idempotente de 10 productos.
+- **ADR-019:** decisión de retirar Supabase/PostgREST del marketplace y usar la
+  API NestJS como única puerta de lectura.
+
 ### Cambiado
 
+- **Marketplace frontend:** `services/productsApi.ts` reemplaza
+  `services/supabase.ts`; se elimina `@supabase/supabase-js` del bundle y del
+  lockfile. El fallback demo se activa si la API no responde. 225 tests backend
+  (81.64 % ramas), 45 unitarios frontend y E2E 10/10 verdes.
 - **PropertyMap Fase 2:** `useMapViewport`, `useMapSearch`, `useMapDrawing` y
   `usePropertySelection` extraídos, junto con los puentes `MapViewport` /
   `MapDrawing` y los helpers `mapUtils` / `mapSearchUtils`; 952 → 601 líneas,
@@ -29,10 +42,12 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
   calculado por Leaflet, y la animación dejó de tocar `transform` para no pisar
   el `translate3d` inline. El contenido usa `max-height: min(65vh, 560px)` con
   scroll interno; el popup queda dentro del mapa (451×560 px sobre 1184×800 px).
-- **Fallback de Supabase:** `fetchProperties` y `searchProperties` se abortan a
-  los 5 s con `AbortSignal`. PostgREST no reintenta peticiones abortadas, así que
-  la UI muestra los datos de demostración en lugar de quedar en `LoadingScreen`
-  durante los reintentos de red.
+- **Fallback del marketplace:** `fetchProducts` acota la consulta a 5 s y
+  devuelve `[]` ante cualquier error; la UI muestra los datos de demostración en
+  lugar de quedar en `LoadingScreen`.
+- **Migración de productos:** el SQL generado por Prisma eliminaba los índices
+  GIST de PostGIS por drift; se corrigió para preservarlos y se restauraron en
+  la base de pruebas.
 - **ADR-018:** la evidencia del bloqueo de NestJS 12 se corrigió: el impedimento
   es ESM-only en `@nestjs/common/core/platform-express` 12, no los peers de
   `@nestjs/config` ni `@nestjs/jwt`, que ya aceptan 12.

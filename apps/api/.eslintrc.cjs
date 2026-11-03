@@ -28,6 +28,12 @@ module.exports = {
   },
   overrides: [
     {
+      files: ['scripts/**/*.ts'],
+      rules: {
+        'no-console': 'off',
+      },
+    },
+    {
       files: ['tests/**/*.ts'],
       rules: {
         '@typescript-eslint/no-unsafe-assignment': 'off',
