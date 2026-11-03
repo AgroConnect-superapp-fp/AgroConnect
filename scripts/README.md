@@ -7,6 +7,7 @@ Herramientas de auditoría, trazabilidad y verificación. Se versionan desde el
 |---|---|---|
 | `security-audit.mjs` | Gate de seguridad: bloquea critical y high fuera de la allowlist (las moderate/low solo se reportan) | `node scripts/security-audit.mjs api` |
 | `diagnose-production.mjs` | Diagnóstico de producción: Vercel, liveness, readiness, CORS, CSRF, login y DNS de Supabase | `npm run diagnose:prod` |
+| `notion-add-jira-note.mjs` | Inserta la nota de Jira suspendido en el root de Notion | `node scripts/notion-add-jira-note.mjs` (requiere `NOTION_AGROCONNECT_TOKEN`) |
 | `build_traceability_matrix.py` | Genera las matrices RF↔CU↔HU | `python3 scripts/build_traceability_matrix.py` |
 | `normalize_moscow.py` | Normaliza prioridades MoSCoW en Notion | requiere `NOTION_AGROCONNECT_TOKEN` |
 | `update_notion_modules.py` | Sincroniza los 17 módulos con Notion | requiere `NOTION_AGROCONNECT_TOKEN` |
