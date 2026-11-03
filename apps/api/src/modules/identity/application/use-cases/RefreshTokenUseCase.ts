@@ -1,5 +1,3 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { USER_REPOSITORY, TOKEN_SERVICE } from '../tokens';
 import { EmailNotVerifiedError, InvalidTokenError } from '../../domain/errors/AuthErrors';
 import type { PublicUserProfile } from '../../domain/entities/User';
 import type { UserRepository } from '../../domain/interfaces/UserRepository';
@@ -11,11 +9,10 @@ export interface RefreshResult {
   tokens: TokenPair;
 }
 
-@Injectable()
 export class RefreshTokenUseCase {
   constructor(
-    @Inject(USER_REPOSITORY) private readonly userRepository: UserRepository,
-    @Inject(TOKEN_SERVICE) private readonly tokenService: TokenService,
+    private readonly userRepository: UserRepository,
+    private readonly tokenService: TokenService,
   ) {}
 
   async execute(input: RefreshInput): Promise<RefreshResult> {

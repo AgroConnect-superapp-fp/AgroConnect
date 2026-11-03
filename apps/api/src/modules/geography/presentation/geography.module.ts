@@ -4,6 +4,7 @@ import { FindNearbyPlotsUseCase } from '../application/use-cases/FindNearbyPlots
 import { PrismaPlotRepository } from '../infrastructure/repositories/PrismaPlotRepository';
 import { PlotController } from './controllers/PlotController';
 import { PrismaModule } from '../../../prisma/prisma.module';
+import type { PlotRepository } from '../domain/interfaces/PlotRepository';
 
 /**
  * Módulo de geografía (parcelas).
@@ -21,8 +22,13 @@ import { PrismaModule } from '../../../prisma/prisma.module';
     // Puerto del dominio → implementación de infraestructura.
     { provide: PLOT_REPOSITORY, useClass: PrismaPlotRepository },
 
-    // Casos de uso.
-    FindNearbyPlotsUseCase,
+    // Caso de uso: composition root, sin decoradores de Nest en application.
+    {
+      provide: FindNearbyPlotsUseCase,
+      useFactory: (plotRepository: PlotRepository) =>
+        new FindNearbyPlotsUseCase(plotRepository),
+      inject: [PLOT_REPOSITORY],
+    },
   ],
 })
 export class GeographyModule {}

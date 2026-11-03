@@ -5,6 +5,16 @@ Todos los cambios notables de este proyecto se documentan en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/)
 y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 
+## [Unreleased]
+
+### Cambiado
+
+- **Clean Architecture:** la capa `application` ya no importa `@nestjs/common`;
+  los 9 casos de uso se instancian en los módulos con `useFactory` (composition
+  root) y sus constructores reciben solo interfaces de dominio.
+- **Tests:** 208 backend, 21 unit, 10 E2E; el comportamiento no cambia, solo el
+  cableado de dependencias.
+
 ## [1.1.1] — 2026-11-02
 
 ### Cambiado

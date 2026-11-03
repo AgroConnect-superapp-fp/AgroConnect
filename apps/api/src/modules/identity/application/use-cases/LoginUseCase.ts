@@ -1,6 +1,4 @@
 import { randomUUID } from 'node:crypto';
-import { Inject, Injectable } from '@nestjs/common';
-import { USER_REPOSITORY, PASSWORD_HASHER, TOKEN_SERVICE } from '../tokens';
 import { EmailNotVerifiedError, InvalidCredentialsError } from '../../domain/errors/AuthErrors';
 import { Email } from '../../domain/value-objects/Email';
 import type { PublicUserProfile } from '../../domain/entities/User';
@@ -14,12 +12,11 @@ export interface LoginResult {
   tokens: TokenPair;
 }
 
-@Injectable()
 export class LoginUseCase {
   constructor(
-    @Inject(USER_REPOSITORY) private readonly userRepository: UserRepository,
-    @Inject(PASSWORD_HASHER) private readonly passwordHasher: PasswordHasher,
-    @Inject(TOKEN_SERVICE) private readonly tokenService: TokenService,
+    private readonly userRepository: UserRepository,
+    private readonly passwordHasher: PasswordHasher,
+    private readonly tokenService: TokenService,
   ) {}
 
   async execute(input: LoginInput): Promise<LoginResult> {

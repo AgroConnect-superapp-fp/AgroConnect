@@ -1,5 +1,3 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { USER_REPOSITORY, TOKEN_SERVICE, EMAIL_SERVICE, EMAIL_VERIFICATION_TOKEN_REPOSITORY, APP_BASE_URL } from '../tokens';
 import { randomBytes, randomUUID } from 'node:crypto';
 import { Email } from '../../domain/value-objects/Email';
 import type { UserRepository } from '../../domain/interfaces/UserRepository';
@@ -10,14 +8,13 @@ import type { ResendVerificationInput } from '../dtos/authDtos';
 
 export const EMAIL_VERIFICATION_TTL_HOURS = 24;
 
-@Injectable()
 export class RequestEmailVerificationUseCase {
   constructor(
-    @Inject(USER_REPOSITORY) private readonly userRepository: UserRepository,
-    @Inject(EMAIL_VERIFICATION_TOKEN_REPOSITORY) private readonly emailVerificationTokenRepository: EmailVerificationTokenRepository,
-    @Inject(EMAIL_SERVICE) private readonly emailService: EmailService,
-    @Inject(TOKEN_SERVICE) private readonly tokenService: TokenService,
-    @Inject(APP_BASE_URL) private readonly appBaseUrl: string,
+    private readonly userRepository: UserRepository,
+    private readonly emailVerificationTokenRepository: EmailVerificationTokenRepository,
+    private readonly emailService: EmailService,
+    private readonly tokenService: TokenService,
+    private readonly appBaseUrl: string,
   ) {}
 
   async execute(input: ResendVerificationInput): Promise<void> {
