@@ -22,6 +22,9 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 - **PropertyMap Fase 1:** `MapLegend`, `PropertyPopup`, `MapControls`,
   `mapConstants` y `mapStyles` extraídos; 2021 → 959 líneas; sin cambio de
   comportamiento; lint, build y alignment verdes; E2E 10/10 en CI.
+- **Dependabot:** `@nestjs/cli` 12.0.11; overrides `minimatch` 11.0.4 y
+  `deepmerge` 4.3.1; 46 → 22 vulnerabilidades (5 low, 17 moderate, 0 high).
+  NestJS 12 y TypeScript 7 quedan bloqueados por peers oficiales (ADR-018).
 - **Clean Architecture:** la capa `application` ya no importa `@nestjs/common`;
   los 9 casos de uso se instancian en los módulos con `useFactory` (composition
   root) y sus constructores reciben solo interfaces de dominio.
