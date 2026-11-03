@@ -7,11 +7,14 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [1.1.2] — 2026-11-03
+
 ### Añadido
 
 - **Nota de Jira en Notion:** `scripts/notion-add-jira-note.mjs` documenta que
   el sitio está suspendido y que el tablero temporal vive en GitHub.
 - **ADR-017:** plan de descomposición progresiva de `PropertyMap` (2021 líneas).
+- **ADR-018:** ventana Dependabot 12 con alcance verificado y bloqueos documentados.
 
 ### Cambiado
 
