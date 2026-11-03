@@ -27,8 +27,9 @@
 - Imágenes por cultivo, fallback automático (`SafeImage`), LQIP y créditos.
 - Si la API de productos no responde: datos de demostración con aviso y botón de reintento.
 - **API del marketplace:** `GET /api/v1/products` con `search`, `crop`,
-  `department`, `municipality`, `certification`, `limit` y `offset`. Contrato
-  Zod/OpenAPI en `@agroconnect/contracts`; datos de desarrollo con
+  `department`, `municipality`, `certification`, `limit` y `offset`;
+  `POST /api/v1/products` para productores autenticados con cookie httpOnly.
+  Contrato Zod/OpenAPI en `@agroconnect/contracts`; datos de desarrollo con
   `npm run seed:products -w @agroconnect/api`.
 - **PWA:** implementada con `vite-plugin-pwa`: manifest, iconos 192/512/maskable,
   precache del shell y caché de imágenes de Cloudinary y tiles del mapa.

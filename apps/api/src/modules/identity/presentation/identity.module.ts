@@ -26,6 +26,7 @@ import { FileEmailService } from '../infrastructure/services/FileEmailService';
 import { SmtpEmailService } from '../infrastructure/services/SmtpEmailService';
 import { AuthController } from './controllers/AuthController';
 import { AuthThrottlerGuard } from './guards/AuthThrottlerGuard';
+import { SessionAuthGuard } from './guards/SessionAuthGuard';
 import { SessionCookieService } from './http/SessionCookieService';
 import { SessionTokenInterceptor } from './http/SessionTokenInterceptor';
 import { PrismaModule } from '../../../prisma/prisma.module';
@@ -203,13 +204,13 @@ import type { PasswordResetTokenRepository } from '../domain/interfaces/Password
         userRepository: UserRepository,
         emailVerificationTokenRepository: EmailVerificationTokenRepository,
         tokenService: TokenService,
-      ) =>
-        new VerifyEmailUseCase(userRepository, emailVerificationTokenRepository, tokenService),
+      ) => new VerifyEmailUseCase(userRepository, emailVerificationTokenRepository, tokenService),
       inject: [USER_REPOSITORY, EMAIL_VERIFICATION_TOKEN_REPOSITORY, TOKEN_SERVICE],
     },
 
     // Presentación.
     AuthThrottlerGuard,
+    SessionAuthGuard,
     SessionCookieService,
     SessionTokenInterceptor,
   ],
@@ -222,6 +223,9 @@ import type { PasswordResetTokenRepository } from '../domain/interfaces/Password
     ResetPasswordUseCase,
     RequestEmailVerificationUseCase,
     VerifyEmailUseCase,
+    SessionAuthGuard,
+    TOKEN_SERVICE,
+    USER_REPOSITORY,
   ],
 })
 export class IdentityModule {}

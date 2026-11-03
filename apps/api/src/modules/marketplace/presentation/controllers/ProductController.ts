@@ -1,9 +1,22 @@
-import { Controller, Get, Query } from '@nestjs/common';
-import { productsQuerySchema } from '@agroconnect/contracts';
-import type { ProductsQuery } from '@agroconnect/contracts';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import { productsQuerySchema, publishProductSchema } from '@agroconnect/contracts';
+import type { ProductsQuery, PublishProductInput } from '@agroconnect/contracts';
 import { ListProductsUseCase } from '../../application/use-cases/ListProductsUseCase';
+import { PublishProductUseCase } from '../../application/use-cases/PublishProductUseCase';
 import { ZodValidationPipe } from '../../../../shared/http/zod-validation.pipe';
 import { success } from '../../../../shared/http/responses';
+import type { AuthenticatedRequest } from '../../../../shared/http/authenticated-user';
+import { SessionAuthGuard } from '../../../identity/presentation/guards/SessionAuthGuard';
 
 /**
  * Catálogo público del marketplace (M03).
@@ -14,7 +27,10 @@ import { success } from '../../../../shared/http/responses';
  */
 @Controller('products')
 export class ProductController {
-  constructor(private readonly listProductsUseCase: ListProductsUseCase) {}
+  constructor(
+    private readonly listProductsUseCase: ListProductsUseCase,
+    private readonly publishProductUseCase: PublishProductUseCase,
+  ) {}
 
   @Get()
   async findAll(
@@ -29,5 +45,23 @@ export class ProductController {
       products.map((product) => product.props),
       'Productos del marketplace obtenidos',
     );
+  }
+
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  @UseGuards(SessionAuthGuard)
+  async create(
+    @Req() request: AuthenticatedRequest,
+    @Body(new ZodValidationPipe(publishProductSchema, 'Datos del producto inválidos'))
+    body: PublishProductInput,
+  ): Promise<unknown> {
+    // El guard garantiza la sesión; esta comprobación es defensa de tipos.
+    if (!request.user) {
+      throw new Error('La petición llegó al controller sin usuario autenticado');
+    }
+
+    const product = await this.publishProductUseCase.execute(request.user, body);
+
+    return success(product.props, 'Producto publicado correctamente');
   }
 }

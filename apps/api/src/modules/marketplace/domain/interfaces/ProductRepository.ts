@@ -1,4 +1,9 @@
-import type { Product, ProductCertification, ProductCrop } from '../entities/Product';
+import type {
+  Product,
+  ProductCertification,
+  ProductCrop,
+  ProductImage,
+} from '../entities/Product';
 
 /**
  * Filtros de lectura del marketplace.
@@ -16,6 +21,25 @@ export interface ProductFilters {
   offset: number;
 }
 
+export interface NewProductData {
+  name: string;
+  owner: string;
+  description?: string;
+  contact?: string;
+  department: string;
+  municipality: string;
+  crop: ProductCrop;
+  area: number;
+  productivity: number;
+  certification?: ProductCertification;
+  lat: number;
+  lng: number;
+  producerId: string;
+  images: ProductImage[];
+  coordinates: [number, number][];
+}
+
 export interface ProductRepository {
   findAll(filters: ProductFilters): Promise<Product[]>;
+  create(data: NewProductData): Promise<Product>;
 }

@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
 import { PrismaModule } from '../../../prisma/prisma.module';
+import { IdentityModule } from '../../identity/presentation/identity.module';
 import { PRODUCT_REPOSITORY } from '../application/tokens';
 import { ListProductsUseCase } from '../application/use-cases/ListProductsUseCase';
+import { PublishProductUseCase } from '../application/use-cases/PublishProductUseCase';
 import { PrismaProductRepository } from '../infrastructure/repositories/PrismaProductRepository';
 import { ProductController } from './controllers/ProductController';
 import type { ProductRepository } from '../domain/interfaces/ProductRepository';
@@ -15,7 +17,7 @@ import type { ProductRepository } from '../domain/interfaces/ProductRepository';
  * - `presentation`: endpoint público `GET /api/v1/products`.
  */
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, IdentityModule],
   controllers: [ProductController],
   providers: [
     { provide: PRODUCT_REPOSITORY, useClass: PrismaProductRepository },
@@ -23,6 +25,12 @@ import type { ProductRepository } from '../domain/interfaces/ProductRepository';
       provide: ListProductsUseCase,
       useFactory: (productRepository: ProductRepository) =>
         new ListProductsUseCase(productRepository),
+      inject: [PRODUCT_REPOSITORY],
+    },
+    {
+      provide: PublishProductUseCase,
+      useFactory: (productRepository: ProductRepository) =>
+        new PublishProductUseCase(productRepository),
       inject: [PRODUCT_REPOSITORY],
     },
   ],

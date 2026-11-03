@@ -13,6 +13,10 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
   cultivo/certificación, imágenes/coordenadas JSONB, checks e índices;
   `GET /api/v1/products` con búsqueda, filtros y paginación; contrato Zod y
   OpenAPI en `@agroconnect/contracts`; seed idempotente de 10 productos.
+- **Publicación de productos (2.3b):** `POST /api/v1/products` con
+  `SessionAuthGuard` (cookie httpOnly, usuario activo y correo verificado),
+  autorización productor/administrador y `producerId` tomado de la sesión;
+  formulario `PublishProductScreen` con carga de imágenes a Cloudinary.
 - **ADR-019:** decisión de retirar Supabase/PostgREST del marketplace y usar la
   API NestJS como única puerta de lectura.
 
@@ -20,8 +24,8 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 
 - **Marketplace frontend:** `services/productsApi.ts` reemplaza
   `services/supabase.ts`; se elimina `@supabase/supabase-js` del bundle y del
-  lockfile. El fallback demo se activa si la API no responde. 225 tests backend
-  (81.64 % ramas), 45 unitarios frontend y E2E 10/10 verdes.
+  lockfile. El fallback demo se activa si la API no responde. 240 tests backend
+  (83.26 % ramas), 46 unitarios frontend y E2E 11/11 verdes.
 - **PropertyMap Fase 2:** `useMapViewport`, `useMapSearch`, `useMapDrawing` y
   `usePropertySelection` extraídos, junto con los puentes `MapViewport` /
   `MapDrawing` y los helpers `mapUtils` / `mapSearchUtils`; 952 → 601 líneas,

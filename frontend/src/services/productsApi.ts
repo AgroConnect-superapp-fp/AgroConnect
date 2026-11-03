@@ -1,4 +1,4 @@
-import type { Product, ProductsQuery } from '@agroconnect/contracts';
+import type { Product, ProductsQuery, PublishProductInput } from '@agroconnect/contracts';
 import type { Property } from '../types/property';
 import { apiRequest } from './apiClient';
 
@@ -73,4 +73,23 @@ export async function fetchProducts(
  */
 export function searchProducts(query: string): Promise<Property[]> {
   return fetchProducts({ search: query, limit: DEFAULT_LIMIT });
+}
+
+/**
+ * Publica un producto con la sesión cookie del productor.
+ *
+ * La subida de imágenes ocurre antes, desde el formulario, con el preset
+ * unsigned de Cloudinary; aquí solo viajan los metadatos ya subidos.
+ */
+export async function publishProduct(payload: PublishProductInput): Promise<Property> {
+  const product = await apiRequest<Product>(
+    '/api/v1/products',
+    {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    },
+    15_000
+  );
+
+  return toProperty(product);
 }

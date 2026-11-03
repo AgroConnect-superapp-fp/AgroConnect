@@ -104,6 +104,7 @@ test.describe('Registro y autenticación de usuarios', () => {
 
     await expect(page.getByTestId('dashboard-bienvenida')).toBeVisible();
     await expect(page.getByTestId('dashboard-usuario')).toHaveText(producer.nombre);
+    await expect(page.getByTestId('dashboard-publish')).toBeVisible();
 
     await page.getByTestId('dashboard-logout').click();
     await expect(page.getByRole('button', { name: 'Crear cuenta' })).toBeVisible();

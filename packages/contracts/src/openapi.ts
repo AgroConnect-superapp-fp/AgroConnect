@@ -21,7 +21,11 @@ import {
   verifyEmailSchema,
 } from './authSchemas';
 import { nearbyPlotsQuerySchema } from './plotSchemas';
-import { productSchema, productsQuerySchema } from './productSchemas';
+import {
+  productSchema,
+  productsQuerySchema,
+  publishProductSchema,
+} from './productSchemas';
 
 export interface OpenApiDocument {
   openapi: '3.1.0';
@@ -177,6 +181,17 @@ export function buildOpenApiDocument(): OpenApiDocument {
             ...validationErrors,
           },
         },
+        post: {
+          tags: ['Marketplace'],
+          summary: 'Publica un producto (solo productor autenticado)',
+          requestBody: jsonBody('PublishProductRequestBody'),
+          responses: {
+            '201': response('Producto publicado', 'Product'),
+            '401': response('Sesión ausente, expirada o inválida'),
+            '403': response('El rol no puede publicar productos'),
+            ...validationErrors,
+          },
+        },
       },
     },
     components: {
@@ -192,6 +207,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
         NearbyPlotsQuery: z.toJSONSchema(nearbyPlotsQuerySchema, { io: 'input' }),
         ProductsQuery: z.toJSONSchema(productsQuerySchema, { io: 'input' }),
         Product: z.toJSONSchema(productSchema),
+        PublishProductRequestBody: z.toJSONSchema(publishProductSchema),
         ProductList: {
           type: 'array',
           items: { $ref: '#/components/schemas/Product' },

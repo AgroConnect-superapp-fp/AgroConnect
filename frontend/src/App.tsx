@@ -9,6 +9,7 @@ import { ForgotPasswordScreen } from './auth/screens/ForgotPasswordScreen';
 import { ResetPasswordScreen } from './auth/screens/ResetPasswordScreen';
 import { VerifyEmailScreen } from './auth/screens/VerifyEmailScreen';
 import { DashboardScreen } from './auth/screens/DashboardScreen';
+import { PublishProductScreen } from './marketplace/PublishProductScreen';
 import type { RoleName } from './auth/types';
 
 const MarketplacePrototype = lazy(() => import('./MarketplacePrototype'));
@@ -22,6 +23,7 @@ type View =
   | 'reset'
   | 'verify'
   | 'dashboard'
+  | 'publish'
   | 'marketplace';
 
 function LoadingScreen(): React.ReactElement {
@@ -85,7 +87,21 @@ function AppContent(): React.ReactElement {
       );
     }
 
-    return <DashboardScreen onOpenMarketplace={() => setView('marketplace')} />;
+    if (view === 'publish') {
+      return (
+        <PublishProductScreen
+          onBack={() => setView('dashboard')}
+          onPublished={() => setView('marketplace')}
+        />
+      );
+    }
+
+    return (
+      <DashboardScreen
+        onOpenMarketplace={() => setView('marketplace')}
+        onPublishProduct={() => setView('publish')}
+      />
+    );
   }
 
   if (view === 'roles') {

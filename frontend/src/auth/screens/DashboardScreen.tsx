@@ -4,6 +4,7 @@ import { getRoleOption, ROLE_LABELS } from '../types';
 
 interface DashboardScreenProps {
   onOpenMarketplace: () => void;
+  onPublishProduct: () => void;
   showSuccessBanner?: boolean;
   onDismissSuccessBanner?: () => void;
 }
@@ -28,11 +29,6 @@ const NEXT_INCREMENTS = [
     estado: 'Siguiente',
   },
   {
-    nombre: 'Registro de productos',
-    detalle: 'Nombre, precio, unidad e imágenes de tus cosechas con Cloudinary.',
-    estado: 'Planificado',
-  },
-  {
     nombre: 'Inventario del productor',
     detalle: 'Consulta, actualización y alertas de stock de tus productos.',
     estado: 'Planificado',
@@ -46,6 +42,7 @@ const NEXT_INCREMENTS = [
 
 export function DashboardScreen({
   onOpenMarketplace,
+  onPublishProduct,
   showSuccessBanner = false,
   onDismissSuccessBanner,
 }: DashboardScreenProps): React.ReactElement {
@@ -133,6 +130,23 @@ export function DashboardScreen({
             </div>
           </div>
         </section>
+
+        {usuario.rol === 'productor' && (
+          <section className="mt-6 rounded-2xl border border-emerald-200 bg-white p-5 shadow-sm">
+            <h2 className="text-lg font-bold text-gray-900">Publica tu cosecha</h2>
+            <p className="mt-1 text-sm text-gray-600">
+              Registra el producto, sube imágenes a Cloudinary y publícalo en el
+              marketplace.
+            </p>
+            <Button
+              data-testid="dashboard-publish"
+              onClick={onPublishProduct}
+              className="mt-3"
+            >
+              Publicar producto
+            </Button>
+          </section>
+        )}
 
         <section className="mt-6">
           <h2 className="text-lg font-bold text-gray-900">Lo que viene para tu panel</h2>

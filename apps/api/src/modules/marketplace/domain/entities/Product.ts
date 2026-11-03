@@ -39,6 +39,7 @@ export interface ProductProps {
   certification?: ProductCertification;
   lat: number;
   lng: number;
+  producerId?: string;
   images: ProductImage[];
   coordinates: [number, number][];
   createdAt?: Date;

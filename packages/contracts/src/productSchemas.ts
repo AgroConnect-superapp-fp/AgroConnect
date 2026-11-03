@@ -52,6 +52,7 @@ export const productSchema = z.object({
   certification: z.enum(MARKETPLACE_CERTIFICATIONS).optional(),
   lat: z.number().min(-90).max(90),
   lng: z.number().min(-180).max(180),
+  producerId: z.string().optional(),
   images: z.array(productImageSchema),
   coordinates: z.array(z.tuple([z.number(), z.number()])),
 });
@@ -85,3 +86,56 @@ export const productsQuerySchema = z.object({
 export type Product = z.infer<typeof productSchema>;
 export type ProductImage = z.infer<typeof productImageSchema>;
 export type ProductsQuery = z.infer<typeof productsQuerySchema>;
+
+
+/**
+ * Cuerpo de `POST /api/v1/products`.
+ *
+ * El `producerId` NO viaja en el cuerpo: lo toma el servidor de la sesión
+ * autenticada. `owner` es opcional y, si falta, se usa el nombre del productor.
+ */
+export const publishProductSchema = z.object({
+  name: z
+    .string({ error: 'El nombre del producto es obligatorio' })
+    .trim()
+    .min(3, 'El nombre debe tener al menos 3 caracteres')
+    .max(160, 'El nombre no puede superar 160 caracteres'),
+  owner: z.string().trim().min(3).max(160).optional(),
+  description: z.string().trim().max(2000).optional(),
+  contact: z.string().trim().max(60).optional(),
+  department: z
+    .string({ error: 'El departamento es obligatorio' })
+    .trim()
+    .min(2, 'El departamento debe tener al menos 2 caracteres')
+    .max(120),
+  municipality: z
+    .string({ error: 'El municipio es obligatorio' })
+    .trim()
+    .min(2, 'El municipio debe tener al menos 2 caracteres')
+    .max(120),
+  crop: z.enum(MARKETPLACE_CROPS),
+  area: z
+    .number({ error: 'El área es obligatoria' })
+    .positive('El área debe ser mayor que cero')
+    .max(100_000, 'El área no puede superar 100000 hectáreas'),
+  productivity: z
+    .number({ error: 'La productividad es obligatoria' })
+    .min(0, 'La productividad debe estar entre 0 y 100')
+    .max(100, 'La productividad debe estar entre 0 y 100'),
+  certification: z.enum(MARKETPLACE_CERTIFICATIONS).optional(),
+  lat: z
+    .number({ error: 'La latitud es obligatoria' })
+    .min(-90, 'La latitud debe estar entre -90 y 90')
+    .max(90, 'La latitud debe estar entre -90 y 90'),
+  lng: z
+    .number({ error: 'La longitud es obligatoria' })
+    .min(-180, 'La longitud debe estar entre -180 y 180')
+    .max(180, 'La longitud debe estar entre -180 y 180'),
+  images: z.array(productImageSchema).max(6, 'Máximo 6 imágenes por producto').default([]),
+  coordinates: z
+    .array(z.tuple([z.number(), z.number()]))
+    .max(100, 'La parcela no puede tener más de 100 puntos')
+    .default([]),
+});
+
+export type PublishProductInput = z.infer<typeof publishProductSchema>;

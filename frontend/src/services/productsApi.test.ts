@@ -6,7 +6,7 @@ vi.mock('./apiClient', () => ({
 }));
 
 import { apiRequest } from './apiClient';
-import { fetchProducts, searchProducts } from './productsApi';
+import { fetchProducts, publishProduct, searchProducts } from './productsApi';
 
 const mockedRequest = vi.mocked(apiRequest);
 
@@ -79,5 +79,38 @@ describe('productsApi', () => {
     mockedRequest.mockRejectedValue(new Error('backend down'));
 
     await expect(fetchProducts()).resolves.toEqual([]);
+  });
+});
+
+describe('publishProduct', () => {
+  it('envía el contrato por POST y mapea la respuesta', async () => {
+    mockedRequest.mockResolvedValue(product);
+    const payload = {
+      name: 'Finca La Esperanza',
+      department: 'Cundinamarca',
+      municipality: 'La Mesa',
+      crop: 'coffee' as const,
+      area: 50,
+      productivity: 85,
+      certification: 'organic' as const,
+      lat: 4.6249,
+      lng: -74.0679,
+      images: [],
+      coordinates: [],
+    };
+
+    const published = await publishProduct(payload);
+
+    expect(mockedRequest).toHaveBeenCalledWith(
+      '/api/v1/products',
+      {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      },
+      15_000
+    );
+    expect(published).toEqual(
+      expect.objectContaining({ id: 'product-1', name: 'Finca La Esperanza' })
+    );
   });
 });

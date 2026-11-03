@@ -1,8 +1,10 @@
-import { productsQuerySchema } from '@agroconnect/contracts';
+import { productsQuerySchema, publishProductSchema } from '@agroconnect/contracts';
 import { ProductController } from '../../../src/modules/marketplace/presentation/controllers/ProductController';
 import type { ListProductsUseCase } from '../../../src/modules/marketplace/application/use-cases/ListProductsUseCase';
+import type { PublishProductUseCase } from '../../../src/modules/marketplace/application/use-cases/PublishProductUseCase';
 import { Product } from '../../../src/modules/marketplace/domain/entities/Product';
 import { ZodValidationPipe } from '../../../src/shared/http/zod-validation.pipe';
+import type { AuthenticatedRequest } from '../../../src/shared/http/authenticated-user';
 
 /**
  * Réplica del pipeline de NestJS para `@Query` + `ZodValidationPipe`: el valor
@@ -10,15 +12,18 @@ import { ZodValidationPipe } from '../../../src/shared/http/zod-validation.pipe'
  */
 function buildController() {
   const execute = jest.fn();
+  const publishExecute = jest.fn();
   const useCase = { execute } as unknown as ListProductsUseCase;
+  const publishUseCase = { execute: publishExecute } as unknown as PublishProductUseCase;
   const pipe = new ZodValidationPipe(productsQuerySchema, 'Parámetros de búsqueda inválidos');
 
+  const controller = new ProductController(useCase, publishUseCase);
   const call = async (query: unknown) => {
     const parsed = pipe.transform(query);
-    return new ProductController(useCase).findAll(parsed);
+    return controller.findAll(parsed);
   };
 
-  return { execute, call };
+  return { execute, publishExecute, controller, call };
 }
 
 describe('ProductController.findAll', () => {
@@ -90,5 +95,60 @@ describe('ProductController.findAll', () => {
       statusCode: 422,
     });
     expect(execute).not.toHaveBeenCalled();
+  });
+});
+
+describe('ProductController.create', () => {
+  const buildPublished = () =>
+    new Product({
+      id: 'product-2',
+      name: 'Café del Quindío',
+      owner: 'María Productora',
+      department: 'Quindío',
+      municipality: 'Salento',
+      crop: 'coffee',
+      area: 10,
+      productivity: 90,
+      certification: 'organic',
+      lat: 4.5339,
+      lng: -75.6811,
+      producerId: 'user-1',
+      images: [],
+      coordinates: [],
+    });
+
+  it('publica con el usuario autenticado y responde 201 con el producto', async () => {
+    const { publishExecute, controller } = buildController();
+    const product = buildPublished();
+    publishExecute.mockResolvedValue(product);
+
+    const body = publishProductSchema.parse({
+      name: 'Café del Quindío',
+      department: 'Quindío',
+      municipality: 'Salento',
+      crop: 'coffee',
+      area: 10,
+      productivity: 90,
+      certification: 'organic',
+      lat: 4.5339,
+      lng: -75.6811,
+    });
+    const request = {
+      user: {
+        id: 'user-1',
+        fullName: 'María Productora',
+        email: 'maria@example.com',
+        role: 'productor',
+      },
+    } as AuthenticatedRequest;
+
+    const result = await controller.create(request, body);
+
+    expect(publishExecute).toHaveBeenCalledWith(request.user, body);
+    expect(result).toEqual({
+      success: true,
+      data: product.props,
+      message: 'Producto publicado correctamente',
+    });
   });
 });

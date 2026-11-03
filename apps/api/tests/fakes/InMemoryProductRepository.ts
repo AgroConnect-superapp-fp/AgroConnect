@@ -1,5 +1,7 @@
-import type { Product } from '../../src/modules/marketplace/domain/entities/Product';
+import { randomUUID } from 'node:crypto';
+import { Product } from '../../src/modules/marketplace/domain/entities/Product';
 import type {
+  NewProductData,
   ProductFilters,
   ProductRepository,
 } from '../../src/modules/marketplace/domain/interfaces/ProductRepository';
@@ -22,5 +24,14 @@ export class InMemoryProductRepository implements ProductRepository {
   async findAll(filters: ProductFilters): Promise<Product[]> {
     this.lastFilters = filters;
     return this.products;
+  }
+
+  async create(data: NewProductData): Promise<Product> {
+    const product = new Product({
+      id: randomUUID(),
+      ...data,
+    });
+    this.products.push(product);
+    return product;
   }
 }

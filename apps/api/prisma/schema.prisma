@@ -45,6 +45,7 @@ model User {
   plots                   Plot[]
   passwordResetTokens     PasswordResetToken[]
   emailVerificationTokens EmailVerificationToken[]
+  products                Product[]
 
   @@index([roleId])
   @@map("users")
@@ -131,6 +132,8 @@ model Product {
   certification ProductCertification?
   lat           Float
   lng           Float
+  producerId    String?               @map("producer_id") @db.Uuid
+  producer      User?                 @relation(fields: [producerId], references: [id], onDelete: SetNull)
   images        Json                  @default("[]")
   coordinates   Json                  @default("[]")
   createdAt     DateTime              @default(now()) @map("created_at")
@@ -139,6 +142,7 @@ model Product {
   @@index([crop])
   @@index([department, municipality])
   @@index([createdAt])
+  @@index([producerId])
   @@map("products")
 }
 

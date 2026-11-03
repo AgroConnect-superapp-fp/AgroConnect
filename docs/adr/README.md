@@ -27,6 +27,6 @@ Hay dos series de ADR:
 | [ADR-016](0016-pendientes-post-cutover.md) | Pendientes post-cutover: PWA (implementada), retiro legacy, refresh/Argon2, release | Aceptada parcialmente |
 | [ADR-017](0017-property-map-decomposition.md) | Descomposición progresiva de `PropertyMap` (2021 líneas) | Aceptada — Fases 1-4 implementadas |
 | [ADR-018](0018-dependabot-12.md) | Ventana Dependabot 12: CLI 12 + minimatch/deepmerge; core/TS7 bloqueados | Aceptada — alcance parcial |
-| [ADR-019](0019-marketplace-api-propia.md) | Marketplace sobre API propia y retiro de Supabase/PostgREST | Aceptada — 2.3a implementada |
+| [ADR-019](0019-marketplace-api-propia.md) | Marketplace sobre API propia y retiro de Supabase/PostgREST | Aceptada — 2.3a/2.3b implementadas |
 
 Para una decisión nueva, copia la estructura de cualquier ADR: Estado, Fecha, Decisores, Relacionado, Contexto, Decisión, Alternativas y Consecuencias. Enlázala aquí y en el índice de ADRs de Obsidian.

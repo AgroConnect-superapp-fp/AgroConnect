@@ -1,6 +1,6 @@
 # ADR-019 — Marketplace sobre API propia (retiro de Supabase/PostgREST)
 
-- **Estado:** Aceptada — 2.3a implementada
+- **Estado:** Aceptada — 2.3a y 2.3b implementadas
 - **Fecha:** 2026-11-03
 - **Decisores:** fAb Orq, tech lead, equipo frontend/backend
 - **Relacionado:** ADR-009, ADR-015, ADR-016, ADR-017, ADR-018
@@ -36,9 +36,11 @@ Migrar la **lectura** del marketplace a la API propia:
   dependencia `@supabase/supabase-js`.
 - Fallback de datos demo si la API falla; timeout de 5 s para no bloquear la UI.
 - Seed idempotente de 10 productos para desarrollo.
-
-La escritura (`POST /products`) queda para 2.3b porque requiere autenticación
-de productor, autorización por rol y carga de imágenes a Cloudinary.
+- `POST /api/v1/products` protegido por `SessionAuthGuard` (cookie httpOnly,
+  usuario activo y correo verificado); solo `productor` y `administrador`
+  publican. El `producerId` se toma de la sesión, nunca del cuerpo.
+- Formulario `PublishProductScreen` con carga de imágenes a Cloudinary,
+  validación de campos y acceso al marketplace para el productor autenticado.
 
 ## Alternativas consideradas
 
@@ -55,8 +57,9 @@ de productor, autorización por rol y carga de imágenes a Cloudinary.
 - **Positivas:** una sola puerta de entrada a los datos (NestJS), validación de
   servidor, contrato tipado, eliminación de la anon key del bundle y un chunk
   de marketplace mucho menor. El fallback demo sigue cubriendo la indisponibilidad.
-- **Negativas:** se agrega una migración y un modelo que deben mantenerse; el
-  seed es manual y `POST /products` aún no existe.
+- **Negativas:** se agregan una migración y un modelo que deben mantenerse; el
+  seed es manual y la subida usa el preset unsigned de Cloudinary, por lo que
+  la configuración del preset es un requisito operativo.
 - **Operación:** el marketplace ya no depende de Supabase. La autenticación y
   `/health/ready` siguen dependiendo de la base PostgreSQL de la API hasta que
   se complete el despliegue en el nuevo entorno.
@@ -66,8 +69,10 @@ de productor, autorización por rol y carga de imágenes a Cloudinary.
 - Migración `20261103114851_add_marketplace_products`; se corrigió el SQL
   generado por Prisma para no eliminar los índices GIST de PostGIS.
 - `GET /api/v1/products` con contrato Zod/OpenAPI sin drift.
-- Backend: **225 tests**, cobertura **94.62 % líneas / 81.64 % ramas**.
-- Frontend: **45 unitarios**, build verde; `MarketplacePrototype` pasó de
-  ~281 kB a **65.64 kB** (17.79 kB gzip) al retirar Supabase.
-- E2E: **10/10** con demo/fallback contra `/api/v1/products`.
+- Backend: **240 tests**, cobertura **94.78 % líneas / 83.26 % ramas**.
+- Frontend: **46 unitarios**, build verde; `MarketplacePrototype` pasó de
+  ~281 kB a **57.04 kB** (14.79 kB gzip) al retirar Supabase.
+- E2E: **11/11** con demo/fallback contra `/api/v1/products` y publicación real de una cosecha.
 - `@supabase/supabase-js` eliminado de `package.json` y del lockfile.
+- Migración `20261103130000_add_product_producer` con `producer_id` opcional y
+  FK `ON DELETE SET NULL`; el seed mantiene productos demo sin productor.

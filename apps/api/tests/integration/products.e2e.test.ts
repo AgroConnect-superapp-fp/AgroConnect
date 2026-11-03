@@ -6,6 +6,8 @@ import request from 'supertest';
 import { AppModule } from '../../src/app.module';
 import { configureApp } from '../../src/app.setup';
 import { PrismaService } from '../../src/prisma/prisma.service';
+import { JwtTokenService } from '../../src/modules/identity/infrastructure/services/JwtTokenService';
+import { env } from '../../src/shared/config/env';
 
 /**
  * Prueba e2e de `GET /api/v1/products` contra PostgreSQL real.
@@ -22,6 +24,18 @@ describe('Products (e2e)', () => {
   const productId = randomUUID();
   const suffix = `${Date.now()}`.slice(-8);
   const name = `Finca de Pruebas ${suffix}`;
+  const producerId = randomUUID();
+  const buyerId = randomUUID();
+  const tokenService = new JwtTokenService(
+    env.JWT_ACCESS_SECRET,
+    env.JWT_REFRESH_SECRET,
+    env.JWT_ACCESS_EXPIRES_IN,
+    env.JWT_REFRESH_EXPIRES_IN,
+    env.JWT_ISSUER,
+    env.JWT_AUDIENCE,
+  );
+  let producerToken = '';
+  let buyerToken = '';
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
@@ -32,6 +46,49 @@ describe('Products (e2e)', () => {
     await app.init();
     server = app.getHttpServer() as Server;
     prisma = app.get(PrismaService);
+
+    const producerRole = await prisma.role.findUniqueOrThrow({
+      where: { name: 'productor' },
+    });
+    const buyerRole = await prisma.role.findUniqueOrThrow({
+      where: { name: 'comprador_b2c' },
+    });
+    await prisma.user.createMany({
+      data: [
+        {
+          id: producerId,
+          fullName: 'Productor E2E',
+          document: `P${suffix}`,
+          email: `producer.${suffix}@example.com`,
+          phone: `30${suffix.padStart(8, '0')}`,
+          passwordHash: 'hash',
+          roleId: producerRole.id,
+          status: 'ACTIVO',
+          acceptsDataProcessing: true,
+          emailVerifiedAt: new Date(),
+        },
+        {
+          id: buyerId,
+          fullName: 'Comprador E2E',
+          document: `C${suffix}`,
+          email: `buyer.${suffix}@example.com`,
+          phone: `31${suffix.padStart(8, '0')}`,
+          passwordHash: 'hash',
+          roleId: buyerRole.id,
+          status: 'ACTIVO',
+          acceptsDataProcessing: true,
+          emailVerifiedAt: new Date(),
+        },
+      ],
+    });
+    producerToken = tokenService.generateTokens({
+      userId: producerId,
+      role: 'productor',
+    }).accessToken;
+    buyerToken = tokenService.generateTokens({
+      userId: buyerId,
+      role: 'comprador_b2c',
+    }).accessToken;
 
     await prisma.product.create({
       data: {
@@ -71,6 +128,8 @@ describe('Products (e2e)', () => {
 
   afterAll(async () => {
     await prisma.product.deleteMany({ where: { id: productId } });
+    await prisma.product.deleteMany({ where: { producerId } });
+    await prisma.user.deleteMany({ where: { id: { in: [producerId, buyerId] } } });
     await app.close();
   });
 
@@ -166,6 +225,95 @@ describe('Products (e2e)', () => {
     expect(response.body).toMatchObject({
       success: false,
       error: { code: 'VALIDATION_ERROR' },
+    });
+  });
+
+  describe('POST /api/v1/products (publicación autenticada)', () => {
+    it('rechaza sin cookie de sesión con 401', async () => {
+      const response = await request(server).post('/api/v1/products').send({});
+
+      expect(response.status).toBe(401);
+      expect(response.body).toMatchObject({
+        success: false,
+        error: { code: 'TOKEN_INVALID' },
+      });
+    });
+
+    it('rechaza a un comprador con 403', async () => {
+      const response = await request(server)
+        .post('/api/v1/products')
+        .set('Cookie', `access_token=${buyerToken}`)
+        .send({
+          name: 'Producto de comprador',
+          department: 'Quindío',
+          municipality: 'Salento',
+          crop: 'coffee',
+          area: 1,
+          productivity: 50,
+          lat: 4.5,
+          lng: -75.6,
+        });
+
+      expect(response.status).toBe(403);
+      expect(response.body).toMatchObject({
+        success: false,
+        error: { code: 'FORBIDDEN' },
+      });
+    });
+
+    it('publica con un productor autenticado y responde 201', async () => {
+      const response = await request(server)
+        .post('/api/v1/products')
+        .set('Cookie', `access_token=${producerToken}`)
+        .send({
+          name: `Cosecha E2E ${suffix}`,
+          department: 'Quindío',
+          municipality: 'Salento',
+          crop: 'coffee',
+          area: 8.5,
+          productivity: 91,
+          certification: 'organic',
+          lat: 4.5339,
+          lng: -75.6811,
+          images: [{ publicId: 'cld-sample-4', alt: 'Café E2E' }],
+          coordinates: [
+            [4.53, -75.68],
+            [4.54, -75.67],
+          ],
+        });
+
+      expect(response.status).toBe(201);
+      expect(response.body).toMatchObject({
+        success: true,
+        message: 'Producto publicado correctamente',
+        data: {
+          name: `Cosecha E2E ${suffix}`,
+          producerId,
+          crop: 'coffee',
+        },
+      });
+    });
+
+    it('rechaza un cuerpo inválido con 422', async () => {
+      const response = await request(server)
+        .post('/api/v1/products')
+        .set('Cookie', `access_token=${producerToken}`)
+        .send({
+          name: 'X',
+          department: 'Q',
+          municipality: 'S',
+          crop: 'tomate',
+          area: 0,
+          productivity: 200,
+          lat: 100,
+          lng: -200,
+        });
+
+      expect(response.status).toBe(422);
+      expect(response.body).toMatchObject({
+        success: false,
+        error: { code: 'VALIDATION_ERROR' },
+      });
     });
   });
 });

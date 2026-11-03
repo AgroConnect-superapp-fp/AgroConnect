@@ -1,15 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, PrismaClient } from '../../../../generated/prisma/client';
 import { Product } from '../../domain/entities/Product';
-import type { ProductFilters, ProductRepository } from '../../domain/interfaces/ProductRepository';
+import type {
+  NewProductData,
+  ProductFilters,
+  ProductRepository,
+} from '../../domain/interfaces/ProductRepository';
 import type { ProductImage } from '../../domain/entities/Product';
 
 /**
  * Repositorio de productos del marketplace sobre Prisma.
  *
- * La lectura es pública y solo devuelve datos aprobados. La escritura llegará
- * en el siguiente incremento, cuando el productor autenticado publique un
- * producto; por eso aquí solo se implementa `findAll`.
+ * La lectura es pública; `create` solo se invoca desde el caso de uso de
+ * publicación, después de que el guard validó la sesión y el rol del productor.
  */
 @Injectable()
 export class PrismaProductRepository implements ProductRepository {
@@ -50,6 +53,30 @@ export class PrismaProductRepository implements ProductRepository {
     return rows.map((row) => this.toDomain(row));
   }
 
+  async create(data: NewProductData): Promise<Product> {
+    const row = await this.prisma.product.create({
+      data: {
+        name: data.name,
+        owner: data.owner,
+        description: data.description,
+        contact: data.contact,
+        department: data.department,
+        municipality: data.municipality,
+        crop: data.crop,
+        areaHectares: data.area,
+        productivity: data.productivity,
+        certification: data.certification,
+        lat: data.lat,
+        lng: data.lng,
+        producerId: data.producerId,
+        images: data.images as unknown as Prisma.InputJsonValue,
+        coordinates: data.coordinates,
+      },
+    });
+
+    return this.toDomain(row);
+  }
+
   private toDomain(row: {
     id: string;
     name: string;
@@ -64,6 +91,7 @@ export class PrismaProductRepository implements ProductRepository {
     certification: string | null;
     lat: number;
     lng: number;
+    producerId: string | null;
     images: unknown;
     coordinates: unknown;
     createdAt: Date;
@@ -83,6 +111,7 @@ export class PrismaProductRepository implements ProductRepository {
       certification: (row.certification ?? undefined) as Product['props']['certification'],
       lat: row.lat,
       lng: row.lng,
+      producerId: row.producerId ?? undefined,
       images: normalizeImages(row.images),
       coordinates: normalizeCoordinates(row.coordinates),
       createdAt: row.createdAt,
