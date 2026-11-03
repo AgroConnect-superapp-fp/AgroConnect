@@ -1,6 +1,6 @@
 # ADR-017 — Descomposición progresiva de `PropertyMap`
 
-- **Estado:** Aceptada — Fases 1-2 implementadas
+- **Estado:** Aceptada — Fases 1-3 implementadas; Fase 4 en curso
 - **Fecha:** 2026-11-03
 - **Decisores:** fAb Orq, beru, equipo frontend
 - **Relacionado:** ADR-016 (D9, resuelto), ADR-004, ADR-007
@@ -63,11 +63,26 @@ Separar el layout:
 
 Criterio: `PropertyMap.tsx` < 400 líneas y actúa solo como composición.
 
+**Resultado:** 601 → 69 líneas. `PropertyMap` conserva hooks, wrapper y
+composición; `PropertyMapCanvas` (148 líneas) monta `MapContainer`, clusters y
+polígonos; `PropertyMapToolbar` (385 líneas) agrupa búsqueda, cierre y toggle;
+`PropertyMapSidebar` (138 líneas) agrupa leyenda, atribución y capa de zonas
+productivas. El orden de controles Leaflet se preserva con un slot `children`
+para que `MapControls` siga entre búsqueda y toggle. Gate: 42 unitarios, lint,
+typecheck, build y E2E 10/10 verdes; screenshot del mapa validado.
+
 ### Fase 4 — Validación y cierre
 
 - E2E 10/10, screenshot de mapa y popup.
 - Revisión de accesibilidad (axe/Lighthouse) y de rendimiento del bundle.
 - Sin cambios en contratos de API ni en la URL de Leaflet/OSM.
+
+**Hallazgo pendiente:** el popup de marcador mide ~735 px y el mapa 800 px;
+con el padding de `autoPan` no cabe y Leaflet lo posiciona por encima del
+contenedor (coordenada Y negativa), por lo que la captura del popup queda
+recortada. Es previo a la descomposición (los estilos y `autoPan` no cambiaron).
+En Fase 4 se corregirá con `max-height` + scroll interno o reduciendo la
+galería, y se repetirá la captura antes de cerrar el ADR.
 
 ## Alternativas consideradas
 
