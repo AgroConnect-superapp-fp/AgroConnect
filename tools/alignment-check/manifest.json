@@ -1,6 +1,6 @@
 {
   "project": "AgroConnect",
-  "updated": "2026-11-02",
+  "updated": "2026-11-03",
   "urls": {
     "app": "https://agroconnectpreview.vercel.app",
     "api": "https://agroconnect-api-5t7n.onrender.com",
@@ -11,7 +11,7 @@
   "github": {
     "repoApi": "https://api.github.com/repos/AgroConnect-superapp-fp/AgroConnect",
     "visibility": "public",
-    "latestRelease": "v1.1.1"
+    "latestRelease": "v1.1.2"
   },
   "traceability": {
     "modules": 17,
