@@ -1,5 +1,7 @@
 import type { User } from '../entities/User';
 import type { Role, RoleName } from '../entities/Role';
+import type { CompanyType } from '../entities/CompanyProfile';
+import type { VehicleType } from '../entities/TransporterProfile';
 import type { RefreshToken } from '../entities/RefreshToken';
 
 export interface NewProducerProfileData {
@@ -14,6 +16,19 @@ export interface NewCompanyProfileData {
   companyName: string;
   nit: string;
   address?: string;
+  companyType?: CompanyType;
+  department?: string;
+  municipality?: string;
+}
+
+export interface NewTransporterProfileData {
+  vehicleType: VehicleType;
+  plate: string;
+  capacityKg: number;
+  coverageMunicipalities: string[];
+  coldChain: boolean;
+  soatExpiresAt: Date;
+  licenseExpiresAt: Date;
 }
 
 export interface NewUserData {
@@ -32,6 +47,7 @@ export interface RegisterUserData {
   user: NewUserData;
   producerProfile?: NewProducerProfileData;
   companyProfile?: NewCompanyProfileData;
+  transporterProfile?: NewTransporterProfileData;
   refreshToken?: {
     tokenHash: string;
     expiresAt: Date;

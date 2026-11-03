@@ -3,6 +3,7 @@ import { User } from '../../../src/modules/identity/domain/entities/User';
 import { Role } from '../../../src/modules/identity/domain/entities/Role';
 import { ProducerProfile } from '../../../src/modules/identity/domain/entities/ProducerProfile';
 import { CompanyProfile } from '../../../src/modules/identity/domain/entities/CompanyProfile';
+import { TransporterProfile } from '../../../src/modules/identity/domain/entities/TransporterProfile';
 import { RefreshToken } from '../../../src/modules/identity/domain/entities/RefreshToken';
 import { DomainError } from '../../../src/shared/errors/errors';
 
@@ -101,6 +102,14 @@ describe('Role', () => {
     expect(company.requiresCompanyProfile()).toBe(true);
     expect(buyer.requiresProducerProfile()).toBe(false);
     expect(buyer.requiresCompanyProfile()).toBe(false);
+    expect(
+      Role.create({
+        id: randomUUID(),
+        name: 'transportista',
+        description: 'x',
+      }).requiresTransporterProfile(),
+    ).toBe(true);
+    expect(producer.requiresTransporterProfile()).toBe(false);
   });
 
   it('valida nombres de rol con el type guard', () => {
@@ -246,12 +255,58 @@ describe('CompanyProfile', () => {
       companyName: 'Frutas del Quindío S.A.S.',
       nit: '901234567-8',
       address: 'Calle 12 # 4-56',
+      companyType: 'distribuidor',
+      department: 'Quindío',
+      municipality: 'Armenia',
     });
 
     expect(profile.id).toBe('empresa-1');
     expect(profile.userId).toBe('usuario-2');
     expect(profile.nit).toBe('901234567-8');
     expect(profile.address).toBe('Calle 12 # 4-56');
+    expect(profile.companyType).toBe('distribuidor');
+    expect(profile.department).toBe('Quindío');
+    expect(profile.municipality).toBe('Armenia');
+  });
+});
+
+describe('TransporterProfile', () => {
+  const base = {
+    id: randomUUID(),
+    userId: randomUUID(),
+    vehicleType: 'camion' as const,
+    plate: 'ABC123',
+    capacityKg: 3500,
+    coverageMunicipalities: ['Armenia', 'Salento'],
+    coldChain: true,
+    soatExpiresAt: new Date('2027-12-31T00:00:00.000Z'),
+    licenseExpiresAt: new Date('2027-12-31T00:00:00.000Z'),
+  };
+
+  it('normaliza la placa y expone los datos del vehículo', () => {
+    const profile = TransporterProfile.create({ ...base, plate: 'abc123' });
+
+    expect(profile.plate).toBe('ABC123');
+    expect(profile.vehicleType).toBe('camion');
+    expect(profile.capacityKg).toBe(3500);
+    expect(profile.coldChain).toBe(true);
+  });
+
+  it('rechaza placas, capacidades y coberturas inválidas', () => {
+    expect(() => TransporterProfile.create({ ...base, plate: 'XX1' })).toThrow('placa');
+    expect(() => TransporterProfile.create({ ...base, capacityKg: 0 })).toThrow('capacidad');
+    expect(() => TransporterProfile.create({ ...base, coverageMunicipalities: [] })).toThrow(
+      'municipios',
+    );
+  });
+
+  it('rechaza documentos vencidos', () => {
+    expect(() =>
+      TransporterProfile.create({
+        ...base,
+        soatExpiresAt: new Date('2020-01-01T00:00:00.000Z'),
+      }),
+    ).toThrow('SOAT');
   });
 });
 

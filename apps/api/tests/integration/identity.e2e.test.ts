@@ -102,6 +102,40 @@ describe('Identity (e2e)', () => {
     expect(cookies ?? []).toHaveLength(0);
   });
 
+  it('registra un transportista y persiste su perfil de vehículo', async () => {
+    const payload = registerPayload({
+      rol: 'transportista',
+      finca: undefined,
+      transportista: {
+        tipoVehiculo: 'camion',
+        placa: `TRA${Math.floor(100 + Math.random() * 899)}`,
+        capacidadKg: 3500,
+        cobertura: ['Armenia', 'Salento'],
+        cadenaFrio: true,
+        soatVence: '2027-12-31',
+        licenciaVence: '2027-12-31',
+      },
+    });
+
+    const response = await request(server).post('/api/v1/auth/register').send(payload);
+    expect(response.status).toBe(201);
+    expect(response.body).toMatchObject({
+      success: true,
+      data: { usuario: { rol: 'transportista' } },
+    });
+
+    const prisma = app.get(PrismaService);
+    const profile = await prisma.transporterProfile.findUnique({
+      where: { userId: response.body.data.usuario.id as string },
+    });
+    expect(profile).toMatchObject({
+      vehicleType: 'camion',
+      capacityKg: 3500,
+      coldChain: true,
+      coverageMunicipalities: ['Armenia', 'Salento'],
+    });
+  });
+
   it('rechaza con 409 un correo ya registrado', async () => {
     const payload = registerPayload();
     const first = await request(server).post('/api/v1/auth/register').send(payload);
@@ -211,7 +245,8 @@ describe('Identity (e2e)', () => {
     expect(response.status).toBe(202);
     expect(response.body).toMatchObject({
       success: true,
-      message: 'Si el correo está registrado, recibirás instrucciones para restablecer tu contraseña',
+      message:
+        'Si el correo está registrado, recibirás instrucciones para restablecer tu contraseña',
     });
   });
 
@@ -270,7 +305,10 @@ describe('Identity (e2e)', () => {
       .post('/api/v1/auth/reset-password')
       .send({ token, password: 'NuevaClaveSegura2' });
     expect(reset.status).toBe(200);
-    expect(reset.body).toMatchObject({ success: true, message: 'Contraseña actualizada correctamente' });
+    expect(reset.body).toMatchObject({
+      success: true,
+      message: 'Contraseña actualizada correctamente',
+    });
 
     await verifyUser(payload.correo as string);
 
@@ -293,7 +331,10 @@ describe('Identity (e2e)', () => {
 
     const verified = await request(server).post('/api/v1/auth/verify-email').send({ token });
     expect(verified.status).toBe(200);
-    expect(verified.body).toMatchObject({ success: true, message: 'Correo verificado correctamente' });
+    expect(verified.body).toMatchObject({
+      success: true,
+      message: 'Correo verificado correctamente',
+    });
 
     // El token es de un solo uso: al reutilizarlo debe rechazarse.
     const reutilizado = await request(server).post('/api/v1/auth/verify-email').send({ token });
@@ -309,7 +350,10 @@ describe('Identity (e2e)', () => {
       .send(registerPayload({ documento: payload.documento }));
 
     expect(segundo.status).toBe(409);
-    expect(segundo.body).toMatchObject({ success: false, error: { code: 'DOCUMENT_ALREADY_EXISTS' } });
+    expect(segundo.body).toMatchObject({
+      success: false,
+      error: { code: 'DOCUMENT_ALREADY_EXISTS' },
+    });
   });
 
   it('rechaza con 409 un celular ya registrado', async () => {

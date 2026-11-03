@@ -10,6 +10,7 @@ import type { z } from 'zod';
 
 export {
   companySchema,
+  transporterFormSchema,
   credentialsSchema,
   farmSchema,
   forgotPasswordSchema,
@@ -17,6 +18,7 @@ export {
   personalDataSchema,
   resetPasswordFormSchema as resetPasswordSchema,
   type CompanyForm,
+  type TransporterForm,
   type CredentialsForm,
   type FarmForm,
   type ForgotPasswordForm,

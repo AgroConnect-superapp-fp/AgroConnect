@@ -26,6 +26,7 @@ export interface RoleProps {
 
 const PRODUCER_ROLES: readonly RoleName[] = ['productor'];
 const COMPANY_ROLES: readonly RoleName[] = ['comprador_b2b'];
+const TRANSPORTER_ROLES: readonly RoleName[] = ['transportista'];
 
 export class Role {
   private constructor(private readonly props: RoleProps) {}
@@ -63,5 +64,9 @@ export class Role {
 
   requiresCompanyProfile(): boolean {
     return COMPANY_ROLES.includes(this.props.name);
+  }
+
+  requiresTransporterProfile(): boolean {
+    return TRANSPORTER_ROLES.includes(this.props.name);
   }
 }

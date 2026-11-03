@@ -10,6 +10,7 @@ import { InfrastructureError } from '../../../../shared/errors/errors';
 import { uniqueViolationTarget } from '../../../../shared/infrastructure/prismaErrors';
 import {
   DocumentAlreadyExistsError,
+  PlateAlreadyExistsError,
   EmailAlreadyExistsError,
   NitAlreadyExistsError,
   PhoneAlreadyExistsError,
@@ -111,6 +112,24 @@ export class PrismaUserRepository implements UserRepository {
               companyName: data.companyProfile.companyName,
               nit: data.companyProfile.nit,
               address: data.companyProfile.address ?? null,
+              companyType: data.companyProfile.companyType,
+              department: data.companyProfile.department ?? null,
+              municipality: data.companyProfile.municipality ?? null,
+            },
+          });
+        }
+
+        if (data.transporterProfile) {
+          await tx.transporterProfile.create({
+            data: {
+              userId: user.id,
+              vehicleType: data.transporterProfile.vehicleType,
+              plate: data.transporterProfile.plate,
+              capacityKg: data.transporterProfile.capacityKg,
+              coverageMunicipalities: data.transporterProfile.coverageMunicipalities,
+              coldChain: data.transporterProfile.coldChain,
+              soatExpiresAt: data.transporterProfile.soatExpiresAt,
+              licenseExpiresAt: data.transporterProfile.licenseExpiresAt,
             },
           });
         }
@@ -274,8 +293,12 @@ export class PrismaUserRepository implements UserRepository {
     if (target.includes('documento') || target.includes('document')) {
       return new DocumentAlreadyExistsError();
     }
-    if (target.includes('celular') || target.includes('phone')) return new PhoneAlreadyExistsError();
+    if (target.includes('celular') || target.includes('phone'))
+      return new PhoneAlreadyExistsError();
     if (target.includes('nit')) return new NitAlreadyExistsError();
+    if (target.includes('placa') || target.includes('plate')) {
+      return new PlateAlreadyExistsError();
+    }
     return new UserAlreadyExistsError();
   }
 

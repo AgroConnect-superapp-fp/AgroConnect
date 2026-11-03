@@ -7,12 +7,14 @@ import { ApiError } from '../api/authClient';
 import {
   companySchema,
   credentialsSchema,
+  transporterFormSchema,
   farmSchema,
   personalDataSchema,
   serverDetailsToFields,
   zodErrorsToFields,
   type FieldErrors,
 } from '../schemas/authSchemas';
+import { COMPANY_TYPES, VEHICLE_TYPES, type CompanyType } from '@agroconnect/contracts';
 import { getRoleOption, type RoleName } from '../types';
 
 interface RegisterScreenProps {
@@ -39,7 +41,30 @@ export function RegisterScreen({
     celular: '',
   });
   const [farm, setFarm] = useState({ nombre: '', municipio: '', vereda: '' });
-  const [company, setCompany] = useState({ razonSocial: '', nit: '', direccion: '' });
+  const [company, setCompany] = useState<{
+    razonSocial: string;
+    nit: string;
+    direccion: string;
+    tipoEmpresa: CompanyType | '';
+    departamento: string;
+    municipio: string;
+  }>({
+    razonSocial: '',
+    nit: '',
+    direccion: '',
+    tipoEmpresa: '',
+    departamento: '',
+    municipio: '',
+  });
+  const [transporter, setTransporter] = useState({
+    tipoVehiculo: 'camion',
+    placa: '',
+    capacidadKg: '',
+    cobertura: '',
+    cadenaFrio: false,
+    soatVence: '',
+    licenciaVence: '',
+  });
   const [credentials, setCredentials] = useState({
     password: '',
     confirmarPassword: '',
@@ -52,6 +77,7 @@ export function RegisterScreen({
 
   const requiresFarm = role === 'productor';
   const requiresCompany = role === 'comprador_b2b';
+  const requiresTransporter = role === 'transportista';
 
   function normalizeErrors(errors: FieldErrors): FieldErrors {
     return Object.fromEntries(
@@ -91,7 +117,29 @@ export function RegisterScreen({
         setFieldErrors(zodErrorsToFields(parsed.error));
         return;
       }
-      setCompany({ ...parsed.data, direccion: parsed.data.direccion ?? '' });
+      setCompany({
+        ...parsed.data,
+        direccion: parsed.data.direccion ?? '',
+        tipoEmpresa: parsed.data.tipoEmpresa ?? '',
+        departamento: parsed.data.departamento ?? '',
+        municipio: parsed.data.municipio ?? '',
+      });
+    }
+
+    if (requiresTransporter) {
+      const parsed = transporterFormSchema.safeParse(transporter);
+      if (!parsed.success) {
+        setFieldErrors(
+          Object.fromEntries(
+            parsed.error.issues.map((issue) => [
+              `transportista-${issue.path.join('.')}`,
+              issue.message,
+            ])
+          )
+        );
+        return;
+      }
+      setTransporter(parsed.data);
     }
 
     setFieldErrors({});
@@ -132,6 +180,23 @@ export function RegisterScreen({
               razonSocial: company.razonSocial,
               nit: company.nit,
               direccion: company.direccion || undefined,
+              tipoEmpresa: company.tipoEmpresa || undefined,
+              departamento: company.departamento || undefined,
+              municipio: company.municipio || undefined,
+            }
+          : undefined,
+        transportista: requiresTransporter
+          ? {
+              tipoVehiculo: transporter.tipoVehiculo as (typeof VEHICLE_TYPES)[number],
+              placa: transporter.placa,
+              capacidadKg: Number(transporter.capacidadKg),
+              cobertura: transporter.cobertura
+                .split(',')
+                .map((value) => value.trim())
+                .filter(Boolean),
+              cadenaFrio: transporter.cadenaFrio,
+              soatVence: transporter.soatVence,
+              licenciaVence: transporter.licenciaVence,
             }
           : undefined,
         aceptaTratamientoDatos: true,
@@ -356,10 +421,137 @@ export function RegisterScreen({
                 error={fieldErrors['empresa-direccion']}
                 placeholder="Calle 12 # 4-56, Armenia"
               />
+              <label className="flex flex-col gap-1.5 text-sm font-semibold text-gray-800">
+                Tipo de empresa
+                <select
+                  id="register-empresa-tipo"
+                  data-testid="register-empresa-tipo"
+                  value={company.tipoEmpresa}
+                  onChange={(event) =>
+                    setCompany({
+                      ...company,
+                      tipoEmpresa: event.target.value as CompanyType | '',
+                    })
+                  }
+                  className="min-h-12 rounded-lg border border-gray-300 px-3.5 py-2.5 text-base font-normal text-gray-900"
+                >
+                  <option value="">Selecciona una opción</option>
+                  {COMPANY_TYPES.map((type) => (
+                    <option key={type} value={type}>
+                      {type.split('_').join(' ')}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <FormField
+                id="register-empresa-departamento"
+                label="Departamento"
+                value={company.departamento}
+                onChange={(value) => setCompany({ ...company, departamento: value })}
+                error={fieldErrors['empresa-departamento']}
+                placeholder="Quindío"
+              />
+              <FormField
+                id="register-empresa-municipio"
+                label="Municipio"
+                value={company.municipio}
+                onChange={(value) => setCompany({ ...company, municipio: value })}
+                error={fieldErrors['empresa-municipio']}
+                placeholder="Armenia"
+              />
             </>
           )}
 
-          {!requiresFarm && !requiresCompany && (
+          {requiresTransporter && (
+            <>
+              <p className="text-sm text-gray-600">
+                Registra tu vehículo y cobertura para conectar con productores y
+                compradores.
+              </p>
+              <label className="flex flex-col gap-1.5 text-sm font-semibold text-gray-800">
+                Tipo de vehículo
+                <select
+                  id="register-transportista-vehiculo"
+                  data-testid="register-transportista-vehiculo"
+                  value={transporter.tipoVehiculo}
+                  onChange={(event) =>
+                    setTransporter({
+                      ...transporter,
+                      tipoVehiculo: event.target.value,
+                    })
+                  }
+                  className="min-h-12 rounded-lg border border-gray-300 px-3.5 py-2.5 text-base font-normal text-gray-900"
+                >
+                  {VEHICLE_TYPES.map((type) => (
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <FormField
+                id="register-transportista-placa"
+                label="Placa"
+                value={transporter.placa}
+                onChange={(value) => setTransporter({ ...transporter, placa: value })}
+                error={fieldErrors['transportista-placa']}
+                placeholder="ABC123"
+                maxLength={6}
+                help="Formato ABC123 o ABC12D"
+              />
+              <FormField
+                id="register-transportista-capacidad"
+                label="Capacidad (kg)"
+                value={transporter.capacidadKg}
+                onChange={(value) =>
+                  setTransporter({ ...transporter, capacidadKg: value })
+                }
+                error={fieldErrors['transportista-capacidadKg']}
+                inputMode="decimal"
+                placeholder="3500"
+              />
+              <FormField
+                id="register-transportista-cobertura"
+                label="Cobertura"
+                value={transporter.cobertura}
+                onChange={(value) => setTransporter({ ...transporter, cobertura: value })}
+                error={fieldErrors['transportista-cobertura']}
+                placeholder="Armenia, Salento, Circasia"
+                help="Separa los municipios con comas"
+              />
+              <label className="flex min-h-12 cursor-pointer items-center gap-3 rounded-lg border border-gray-200 px-3.5 py-3 text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  checked={transporter.cadenaFrio}
+                  onChange={(event) =>
+                    setTransporter({ ...transporter, cadenaFrio: event.target.checked })
+                  }
+                  className="h-5 w-5 accent-agro-green"
+                />
+                Tengo cadena de frío para productos perecederos
+              </label>
+              <FormField
+                id="register-transportista-soat"
+                label="Vencimiento del SOAT"
+                type="date"
+                value={transporter.soatVence}
+                onChange={(value) => setTransporter({ ...transporter, soatVence: value })}
+                error={fieldErrors['transportista-soatVence']}
+              />
+              <FormField
+                id="register-transportista-licencia"
+                label="Vencimiento de la licencia"
+                type="date"
+                value={transporter.licenciaVence}
+                onChange={(value) =>
+                  setTransporter({ ...transporter, licenciaVence: value })
+                }
+                error={fieldErrors['transportista-licenciaVence']}
+              />
+            </>
+          )}
+
+          {!requiresFarm && !requiresCompany && !requiresTransporter && (
             <p className="rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
               El perfil <strong>{roleOption.titulo}</strong> no requiere datos
               adicionales. Continúa para crear tu contraseña.

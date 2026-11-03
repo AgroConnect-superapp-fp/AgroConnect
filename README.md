@@ -8,7 +8,7 @@ Centro de Comercio y Turismo · Regional Quindío · Programa Análisis y Desarr
 
 [![CI](https://github.com/AgroConnect-superapp-fp/AgroConnect/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/AgroConnect-superapp-fp/AgroConnect/actions/workflows/ci.yml)
 [![Node](https://img.shields.io/badge/node-%E2%89%A5%2020-339933?logo=node.js&logoColor=white)](.nvmrc)
-[![Pruebas](https://img.shields.io/badge/pruebas-240%20backend%20%C2%B7%2046%20unit%20%C2%B7%2011%20E2E-brightgreen)](https://github.com/AgroConnect-superapp-fp/AgroConnect/actions/workflows/ci.yml)
+[![Pruebas](https://img.shields.io/badge/pruebas-246%20backend%20%C2%B7%2046%20unit%20%C2%B7%2013%20E2E-brightgreen)](https://github.com/AgroConnect-superapp-fp/AgroConnect/actions/workflows/ci.yml)
 [![Deploy](https://img.shields.io/badge/producci%C3%B3n-Vercel%20%C2%B7%20Render-000000?logo=vercel&logoColor=white)](https://agroconnectpreview.vercel.app)
 [![Licencia](https://img.shields.io/badge/licencia-Todos%20los%20derechos%20reservados-red)](LICENSE)
 
@@ -157,6 +157,8 @@ API `/api/v1/auth` con flujo completo de registro, autenticación y seguridad de
 | POST | `/verify-email` | Verificación de correo |
 | POST | `/resend-verification` | Reenvío del enlace de verificación |
 
+Perfiles específicos: productor (finca), empresa (tipo, NIT, ubicación) y transportista (vehículo, placa, capacidad, cobertura, cadena de frío y vigencias de SOAT/licencia).
+
 Características: contraseñas con **Argon2id** (bcrypt legacy con rehash transparente), unicidad de correo/documento/celular validada en servidor, refresh tokens con familia/generación y detección de reuso, verificación de correo obligatoria antes de la sesión, rate limiting, autorización de tratamiento de datos (Ley 1581 de 2012) y errores estandarizados con `correlationId`.
 
 ### M16 — Base geoespacial
@@ -175,7 +177,7 @@ Características: contraseñas con **Argon2id** (bcrypt legacy con rehash transp
 
 ### Calidad
 
-- 240 pruebas backend (NestJS; 94.78 % líneas, 83.26 % ramas) · 46 pruebas unitarias de frontend (Vitest) · 11 pruebas E2E (Playwright: autenticación real, modo demo, marketplace y publicación).
+- 246 pruebas backend (NestJS; 94.11 % líneas, 82.73 % ramas) · 46 pruebas unitarias de frontend (Vitest) · 13 pruebas E2E (Playwright: autenticación real, modo demo, marketplace, publicación y perfiles).
 
 ---
 

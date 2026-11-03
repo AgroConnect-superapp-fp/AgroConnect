@@ -5,6 +5,7 @@ import { RefreshToken } from '../../src/modules/identity/domain/entities/Refresh
 import type {
   NewCompanyProfileData,
   NewProducerProfileData,
+  NewTransporterProfileData,
   RegisterUserData,
   UserRepository,
 } from '../../src/modules/identity/domain/interfaces/UserRepository';
@@ -21,6 +22,7 @@ export class InMemoryUserRepository implements UserRepository {
   users: User[] = [];
   producerProfiles = new Map<string, NewProducerProfileData>();
   companyProfiles = new Map<string, NewCompanyProfileData>();
+  transporterProfiles = new Map<string, NewTransporterProfileData>();
   refreshTokens: RefreshToken[] = [];
   failUpdatePassword = false;
   private roleIds = new Map<RoleName, string>();
@@ -139,6 +141,10 @@ export class InMemoryUserRepository implements UserRepository {
 
     if (data.companyProfile) {
       this.companyProfiles.set(user.id, data.companyProfile);
+    }
+
+    if (data.transporterProfile) {
+      this.transporterProfiles.set(user.id, data.transporterProfile);
     }
 
     if (data.refreshToken) {

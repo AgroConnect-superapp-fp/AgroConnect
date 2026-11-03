@@ -14,6 +14,26 @@ enum UserStatus {
   SUSPENDIDO
 }
 
+enum CompanyType {
+  restaurante
+  plaza_mercado
+  distribuidor
+  supermercado
+  exportador
+  otro
+
+  @@map("company_type")
+}
+
+enum VehicleType {
+  camion
+  camioneta
+  moto
+  furgon
+
+  @@map("vehicle_type")
+}
+
 model Role {
   id          String @id @default(uuid()) @db.Uuid
   name        String @unique @map("nombre")
@@ -41,6 +61,7 @@ model User {
   role                    Role                     @relation(fields: [roleId], references: [id])
   producerProfile         ProducerProfile?
   companyProfile          CompanyProfile?
+  transporterProfile      TransporterProfile?
   refreshTokens           RefreshToken[]
   plots                   Plot[]
   passwordResetTokens     PasswordResetToken[]
@@ -65,15 +86,34 @@ model ProducerProfile {
 }
 
 model CompanyProfile {
-  id          String  @id @default(uuid()) @db.Uuid
-  userId      String  @unique @map("user_id") @db.Uuid
-  companyName String  @map("razon_social")
-  nit         String  @unique @map("nit")
-  address     String? @map("direccion")
+  id           String       @id @default(uuid()) @db.Uuid
+  userId       String       @unique @map("user_id") @db.Uuid
+  companyName  String       @map("razon_social")
+  nit          String       @unique @map("nit")
+  address      String?      @map("direccion")
+  companyType  CompanyType? @map("tipo_empresa")
+  department   String?      @map("departamento")
+  municipality String?      @map("municipio")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("company_profiles")
+}
+
+model TransporterProfile {
+  id                     String      @id @default(uuid()) @db.Uuid
+  userId                 String      @unique @map("user_id") @db.Uuid
+  vehicleType            VehicleType @map("tipo_vehiculo")
+  plate                  String      @unique @map("placa")
+  capacityKg             Float       @map("capacidad_kg")
+  coverageMunicipalities String[]    @map("cobertura_municipios")
+  coldChain              Boolean     @default(false) @map("cadena_frio")
+  soatExpiresAt          DateTime    @map("soat_vence") @db.Date
+  licenseExpiresAt       DateTime    @map("licencia_vence") @db.Date
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("transporter_profiles")
 }
 
 model RefreshToken {

@@ -38,6 +38,12 @@ export class NitAlreadyExistsError extends DomainError {
   }
 }
 
+export class PlateAlreadyExistsError extends DomainError {
+  constructor() {
+    super('CONFLICT', 'La placa ya está registrada', 409);
+  }
+}
+
 export class RoleNotFoundError extends DomainError {
   constructor(role: string) {
     super('ROLE_NOT_FOUND', `El rol "${role}" no es válido`, 422);

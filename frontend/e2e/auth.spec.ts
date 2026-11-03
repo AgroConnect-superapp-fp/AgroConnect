@@ -211,6 +211,63 @@ test.describe('Registro y autenticación de usuarios', () => {
     await expect(page.getByTestId('forgot-correo')).toBeVisible();
   });
 
+  test('un transportista registra su vehículo y cobertura', async ({ page }) => {
+    const producer = uniqueProducer({ nombre: 'Transportes del Eje' });
+    const plate = `TRA${producer.documento.slice(-3)}`;
+
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Crear cuenta' }).click();
+    await page.getByTestId('role-card-transportista').click();
+
+    await page.getByTestId('register-nombre').fill(producer.nombre);
+    await page.getByTestId('register-documento').fill(producer.documento);
+    await page.getByTestId('register-correo').fill(producer.correo);
+    await page.getByTestId('register-celular').fill(producer.celular);
+    await page.getByTestId('register-next-1').click();
+
+    await page.getByTestId('register-transportista-placa').fill(plate);
+    await page.getByTestId('register-transportista-capacidad').fill('3500');
+    await page.getByTestId('register-transportista-cobertura').fill('Armenia, Salento');
+    await page.getByTestId('register-transportista-soat').fill('2027-12-31');
+    await page.getByTestId('register-transportista-licencia').fill('2027-12-31');
+    await page.getByTestId('register-next-2').click();
+
+    await page.getByTestId('register-password').fill(producer.password);
+    await page.getByTestId('register-confirmar').fill(producer.password);
+    await page.getByTestId('register-acepta').check();
+    await page.getByTestId('register-submit').click();
+
+    await expect(page.getByTestId('register-success')).toBeVisible();
+  });
+
+  test('una empresa registra su tipo y ubicación', async ({ page }) => {
+    const producer = uniqueProducer({ nombre: 'Compras del Quindío' });
+
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Crear cuenta' }).click();
+    await page.getByTestId('role-card-comprador_b2b').click();
+
+    await page.getByTestId('register-nombre').fill(producer.nombre);
+    await page.getByTestId('register-documento').fill(producer.documento);
+    await page.getByTestId('register-correo').fill(producer.correo);
+    await page.getByTestId('register-celular').fill(producer.celular);
+    await page.getByTestId('register-next-1').click();
+
+    await page.getByTestId('register-empresa-razon').fill('Frutas del Quindío S.A.S.');
+    await page.getByTestId('register-empresa-nit').fill(producer.documento);
+    await page.getByTestId('register-empresa-tipo').selectOption('distribuidor');
+    await page.getByTestId('register-empresa-departamento').fill('Quindío');
+    await page.getByTestId('register-empresa-municipio').fill('Armenia');
+    await page.getByTestId('register-next-2').click();
+
+    await page.getByTestId('register-password').fill(producer.password);
+    await page.getByTestId('register-confirmar').fill(producer.password);
+    await page.getByTestId('register-acepta').check();
+    await page.getByTestId('register-submit').click();
+
+    await expect(page.getByTestId('register-success')).toBeVisible();
+  });
+
   test('un enlace de verificación inválido muestra el error y permite reenviar', async ({
     page,
   }) => {

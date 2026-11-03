@@ -1,7 +1,7 @@
 # Plan T6 — Resto del incremento de acceso y perfiles
 
 **Fecha:** 3 de octubre de 2026
-**Estado:** Incrementos 2a y 2b completados; 2.3a y 2.3b (marketplace sobre API propia y publicación) completados el 3-nov-2026. Queda 2c.
+**Estado:** Incrementos 2a, 2b, 2.3a/2.3b (marketplace) y 2c (perfiles) completados el 3-nov-2026.
 
 ---
 
@@ -23,9 +23,11 @@
 
 Implementada según el diseño previsto: tabla `email_verification_tokens` + columna `correo_verificado_en`, `RequestEmailVerificationUseCase` y `VerifyEmailUseCase`, endpoints `POST /verify-email` y `POST /resend-verification`, envío automático tras el registro, `verificado` en el perfil público y pantalla `VerifyEmailScreen` con reenvío de enlace.
 
-> Pendiente menor para 2c: proveedor SMTP real en producción (hoy `FileEmailService` escribe en `MAIL_DIR`). La regla de bloqueo de acciones sensibles para correos sin verificar se definirá al implementar M03/M08.
+> Mejora futura: proveedor SMTP real en producción (hoy `FileEmailService` escribe en `MAIL_DIR`). La regla de bloqueo de acciones sensibles para correos sin verificar se definirá al implementar M03/M08.
 
 ### 2.2 Perfiles específicos de empresa y transportista
+
+**Estado:** ✅ implementado el 3-nov-2026 con migración `20261103140000_add_company_transporter_profiles`, validación de dominio, registro UI y pruebas.
 
 **Empresa (ya existe el perfil básico):** ampliar `company_profiles` con `tipo_empresa`, `departamento`, `municipio` y validación de NIT contra la DIAN (servicio externo, opcional).
 
@@ -37,7 +39,7 @@ Implementada según el diseño previsto: tabla `email_verification_tokens` + col
 - `cadena_frio` (boolean; habilita transporte de perecederos M17)
 - Documentos: SOAT y licencia vigentes (fechas, validación de vigencia)
 
-**Estimación:** 1 incremento medio (migración + registro multi-paso + tests).
+**Estimación:** completado; validación DIAN y carga de documentos quedan como mejoras futuras.
 
 ### 2.3 Migración del prototipo Marketplace a la API propia (M03/M16)
 
@@ -63,7 +65,7 @@ Implementada según el diseño previsto: tabla `email_verification_tokens` + col
 | Prioridad | Incremento | Valor |
 |---|---|---|
 | ~~1~~ | ~~2b — Verificación de correo~~ | ✅ Completado el 3-oct-2026 |
-| 1 | 2c — Perfiles empresa/transportista | Habilita logística y B2B reales (M06/M17) |
+| ~~1~~ | ~~2c — Perfiles empresa/transportista~~ | ✅ Completado el 3-nov-2026 |
 | ~~2~~ | ~~2d — Marketplace API propia (2.3a lectura)~~ | ✅ Completado el 3-nov-2026: elimina Supabase del marketplace |
 | ~~3~~ | ~~2.3b — Publicación autenticada de productos~~ | ✅ Completado el 3-nov-2026 |
 
