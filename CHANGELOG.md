@@ -7,6 +7,12 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+### Cambiado
+
+- **Leaflet single source:** se eliminó el CDN unpkg; el Leaflet del bundle
+  se expone como `window.L` para los plugins UMD; CSP sin unpkg; el registro
+  manual del service worker se retiró porque `vite-plugin-pwa` lo inyecta.
+
 ### Corregido
 
 - **SMTP obligatorio en producción (D5):** sin `SMTP_HOST` la API falla al

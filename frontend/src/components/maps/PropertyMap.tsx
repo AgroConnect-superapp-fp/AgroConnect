@@ -22,7 +22,7 @@ import {
   useMap,
 } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
-import L from 'leaflet';
+import L from '../../lib/leaflet';
 
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
@@ -1040,14 +1040,12 @@ export function PropertyMap({
         .leaflet-draw-toolbar a.leaflet-draw-draw-rectangle:hover,
         .leaflet-draw-toolbar a.leaflet-draw-draw-marker:hover {
           background-color: #FACC15 !important;
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3E%3C/svg%3E"), url(https://unpkg.com/leaflet-draw@1.0.4/dist/images/spritesheet.png) !important;
           filter: none !important;
         }
 
         .leaflet-draw-toolbar a.leaflet-draw-edit-edit:hover,
         .leaflet-draw-toolbar a.leaflet-draw-edit-remove:hover {
           background-color: #EF4444 !important;
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3E%3C/svg%3E"), url(https://unpkg.com/leaflet-draw@1.0.4/dist/images/spritesheet.png) !important;
           filter: none !important;
         }
 
