@@ -111,7 +111,7 @@
 | ID | Evidencia | Impacto | Corrección |
 |---|---|---|---|
 | P1-14 | `backend/src` 72 archivos/17 364 líneas vs `apps/api/src` 82/17 988; ≥25 archivos homónimos | Dos implementaciones completas del mismo dominio; divergencia ya real (cookies, SMTP, hardening) | Plan de cutover y retiro del legacy (§7) |
-| P1-15 | 9 casos de uso de `apps/api/application` importan `@nestjs/common` | La capa de aplicación depende del framework (ADR-005) | Mover decoradores a providers/composition root o documentar el trade-off en ADR |
+| P1-15 | 9 casos de uso de `apps/api/application` importan `@nestjs/common` | La capa de aplicación dependía del framework (ADR-005) | **Corregido:** constructores sin decoradores y `useFactory` en los módulos (composition root) |
 | P1-16 | `PropertyMap.tsx` 2 019 líneas; `MarketplacePrototype` 808; `cloudinary.ts` 480; `RegisterScreen` 419 | Mantenibilidad y riesgo de regresión | Extraer hooks/servicios/componentes |
 | P1-17 | `scripts/` en `.gitignore` | `security-audit.mjs`, matrices y clientes Notion/Jira no son revisables ni reproducibles | Versionar en `tools/` o quitar la regla |
 | P1-18 | `application` y `domain` sin pruebas de contrato contra el backend desplegado | El E2E valida NestJS en 4100, no el Express de Render | E2E contra el artefacto que va a producción |
