@@ -260,6 +260,8 @@ Despliegue (resumen): Blueprint `render.yaml` → `DATABASE_URL` del PostgreSQL 
 
 > Detalle operativo completo en `docs/despliegue.md` (guía interna del proyecto).
 
+> Para desplegar con PostgreSQL propio (sin Supabase), sigue `docs/runbook-despliegue-postgres.md`; incluye migraciones, seed, smoke test de Cloudinary y verificación de `/health/ready`.
+
 ---
 
 ## Sincronización entre entornos (local · GitHub · Notion · Obsidian)

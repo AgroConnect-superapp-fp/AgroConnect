@@ -20,7 +20,8 @@
     "dev": "turbo run dev",
     "generate:openapi": "npm run generate:openapi --workspace @agroconnect/contracts",
     "check:drift": "npm run check:drift --workspace @agroconnect/contracts",
-    "diagnose:prod": "node scripts/diagnose-production.mjs"
+    "diagnose:prod": "node scripts/diagnose-production.mjs",
+    "smoke:cloudinary": "node scripts/smoke-cloudinary.mjs"
   },
   "devDependencies": {
     "turbo": "^2.11.10",

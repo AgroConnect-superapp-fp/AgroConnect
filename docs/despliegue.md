@@ -3,7 +3,8 @@
 > Documento operativo del proyecto. Estado vigente: **2026-11-03**. El frontend
 > y la API (liveness) están arriba, pero el proyecto de Supabase no resuelve en
 > DNS: `/health/ready` devuelve 503 y el login real 500. La recuperación está
-> en `docs/runbook-recuperacion-supabase.md`.
+> en `docs/runbook-recuperacion-supabase.md`. Para el nuevo entorno PostgreSQL
+> propio, usa `docs/runbook-despliegue-postgres.md`.
 
 ## 1. Aplicación en producción
 

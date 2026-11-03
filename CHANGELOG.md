@@ -24,6 +24,8 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
   única, capacidad, cobertura, cadena de frío y vigencias; registro UI y
   validación de dominio.
 - **ADR-020:** decisión de perfiles operativos para empresa y transportista.
+- **Despliegue PostgreSQL propio:** runbook operativo y script
+  `npm run smoke:cloudinary` para validar el preset unsigned sin subir PII.
 
 ### Cambiado
 
