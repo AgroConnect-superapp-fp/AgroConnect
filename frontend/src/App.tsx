@@ -9,6 +9,7 @@ import { ForgotPasswordScreen } from './auth/screens/ForgotPasswordScreen';
 import { ResetPasswordScreen } from './auth/screens/ResetPasswordScreen';
 import { VerifyEmailScreen } from './auth/screens/VerifyEmailScreen';
 import { DashboardScreen } from './auth/screens/DashboardScreen';
+import { ProfileScreen } from './auth/screens/ProfileScreen';
 import { PublishProductScreen } from './marketplace/PublishProductScreen';
 import type { RoleName } from './auth/types';
 
@@ -23,6 +24,7 @@ type View =
   | 'reset'
   | 'verify'
   | 'dashboard'
+  | 'profile'
   | 'publish'
   | 'marketplace';
 
@@ -96,10 +98,15 @@ function AppContent(): React.ReactElement {
       );
     }
 
+    if (view === 'profile') {
+      return <ProfileScreen onBack={() => setView('dashboard')} />;
+    }
+
     return (
       <DashboardScreen
         onOpenMarketplace={() => setView('marketplace')}
         onPublishProduct={() => setView('publish')}
+        onOpenProfile={() => setView('profile')}
       />
     );
   }

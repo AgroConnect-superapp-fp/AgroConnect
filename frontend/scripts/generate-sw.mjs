@@ -38,16 +38,21 @@ async function main() {
     (file) => CACHEABLE_EXTENSIONS.test(file) && !IGNORED.test(file)
   );
 
-  const additionalManifestEntries = await Promise.all(
+  const manifestEntries = await Promise.all(
     files.map(async (file) => {
       const content = await readFile(file);
       const fileStat = await stat(file);
       return {
-        url: `/${relative(DIST, file).split(sep).join('/')}`,
-        revision: `${fileStat.size}-${createHash('sha256').update(content).digest('hex').slice(0, 16)}`,
+        bytes: fileStat.size,
+        entry: {
+          url: `/${relative(DIST, file).split(sep).join('/')}`,
+          revision: `${fileStat.size}-${createHash('sha256').update(content).digest('hex').slice(0, 16)}`,
+        },
       };
     })
   );
+  const additionalManifestEntries = manifestEntries.map(({ entry }) => entry);
+  const totalBytes = manifestEntries.reduce((sum, { bytes }) => sum + bytes, 0);
 
   if (!additionalManifestEntries.some((entry) => entry.url === '/index.html')) {
     throw new Error(

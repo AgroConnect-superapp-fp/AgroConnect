@@ -364,6 +364,81 @@
         }
       }
     },
+    "/profile/me": {
+      "get": {
+        "tags": [
+          "Profile"
+        ],
+        "summary": "Obtiene el perfil del usuario autenticado",
+        "responses": {
+          "200": {
+            "description": "Perfil del usuario",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileSnapshot"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud malformada o cuerpo inválido"
+          },
+          "401": {
+            "description": "Sesión ausente, expirada o inválida"
+          },
+          "422": {
+            "description": "Reglas de negocio incumplidas (detalles por campo)"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Profile"
+        ],
+        "summary": "Actualiza el perfil del rol autenticado",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfileUpdateRequestBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Perfil actualizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileSnapshot"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud malformada o cuerpo inválido"
+          },
+          "401": {
+            "description": "Sesión ausente, expirada o inválida"
+          },
+          "403": {
+            "description": "El bloque no corresponde al rol autenticado"
+          },
+          "422": {
+            "description": "Reglas de negocio incumplidas (detalles por campo)"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        }
+      }
+    },
     "/products": {
       "get": {
         "tags": [
@@ -1055,6 +1130,290 @@
           "lng",
           "images",
           "coordinates"
+        ],
+        "additionalProperties": false
+      },
+      "ProfileUpdateRequestBody": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "productor": {
+            "type": "object",
+            "properties": {
+              "nombre": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 120
+              },
+              "municipio": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 120
+              },
+              "vereda": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 120
+              },
+              "latitud": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "longitud": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              }
+            },
+            "additionalProperties": false
+          },
+          "empresa": {
+            "type": "object",
+            "properties": {
+              "razonSocial": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 160
+              },
+              "direccion": {
+                "type": "string",
+                "maxLength": 200
+              },
+              "tipoEmpresa": {
+                "type": "string",
+                "enum": [
+                  "restaurante",
+                  "plaza_mercado",
+                  "distribuidor",
+                  "supermercado",
+                  "exportador",
+                  "otro"
+                ]
+              },
+              "departamento": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 120
+              },
+              "municipio": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 120
+              }
+            },
+            "additionalProperties": false
+          },
+          "transportista": {
+            "type": "object",
+            "properties": {
+              "tipoVehiculo": {
+                "type": "string",
+                "enum": [
+                  "camion",
+                  "camioneta",
+                  "moto",
+                  "furgon"
+                ]
+              },
+              "placa": {
+                "type": "string",
+                "pattern": "^[A-Z]{3}\\d{3}$|^[A-Z]{3}\\d{2}[A-Z]$"
+              },
+              "capacidadKg": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 100000
+              },
+              "cobertura": {
+                "minItems": 1,
+                "maxItems": 20,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 3,
+                  "maxLength": 120
+                }
+              },
+              "cadenaFrio": {
+                "type": "boolean"
+              },
+              "soatVence": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              },
+              "licenciaVence": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProfileSnapshot": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "usuario": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "nombre": {
+                "type": "string"
+              },
+              "correo": {
+                "type": "string"
+              },
+              "rol": {
+                "type": "string",
+                "enum": [
+                  "productor",
+                  "comprador_b2c",
+                  "comprador_b2b",
+                  "transportista",
+                  "administrador"
+                ]
+              },
+              "estado": {
+                "type": "string",
+                "enum": [
+                  "ACTIVO",
+                  "INACTIVO",
+                  "SUSPENDIDO"
+                ]
+              },
+              "verificado": {
+                "type": "boolean"
+              },
+              "fechaRegistro": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "nombre",
+              "correo",
+              "rol",
+              "estado",
+              "verificado",
+              "fechaRegistro"
+            ],
+            "additionalProperties": false
+          },
+          "productor": {
+            "type": "object",
+            "properties": {
+              "nombre": {
+                "type": "string"
+              },
+              "municipio": {
+                "type": "string"
+              },
+              "vereda": {
+                "type": "string"
+              },
+              "latitud": {
+                "type": "number"
+              },
+              "longitud": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "nombre",
+              "municipio",
+              "vereda"
+            ],
+            "additionalProperties": false
+          },
+          "empresa": {
+            "type": "object",
+            "properties": {
+              "razonSocial": {
+                "type": "string"
+              },
+              "nit": {
+                "type": "string"
+              },
+              "direccion": {
+                "type": "string"
+              },
+              "tipoEmpresa": {
+                "type": "string",
+                "enum": [
+                  "restaurante",
+                  "plaza_mercado",
+                  "distribuidor",
+                  "supermercado",
+                  "exportador",
+                  "otro"
+                ]
+              },
+              "departamento": {
+                "type": "string"
+              },
+              "municipio": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "razonSocial",
+              "nit"
+            ],
+            "additionalProperties": false
+          },
+          "transportista": {
+            "type": "object",
+            "properties": {
+              "tipoVehiculo": {
+                "type": "string",
+                "enum": [
+                  "camion",
+                  "camioneta",
+                  "moto",
+                  "furgon"
+                ]
+              },
+              "placa": {
+                "type": "string"
+              },
+              "capacidadKg": {
+                "type": "number"
+              },
+              "cobertura": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "cadenaFrio": {
+                "type": "boolean"
+              },
+              "soatVence": {
+                "type": "string"
+              },
+              "licenciaVence": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "tipoVehiculo",
+              "placa",
+              "capacidadKg",
+              "cobertura",
+              "cadenaFrio",
+              "soatVence",
+              "licenciaVence"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "usuario"
         ],
         "additionalProperties": false
       },

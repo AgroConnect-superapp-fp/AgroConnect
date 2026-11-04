@@ -3,6 +3,10 @@ import { Role, type RoleName } from '../../src/modules/identity/domain/entities/
 import { User } from '../../src/modules/identity/domain/entities/User';
 import { RefreshToken } from '../../src/modules/identity/domain/entities/RefreshToken';
 import type {
+  CompanyProfileUpdate,
+  ProfileSnapshot,
+  ProducerProfileUpdate,
+  TransporterProfileUpdate,
   NewCompanyProfileData,
   NewProducerProfileData,
   NewTransporterProfileData,
@@ -244,6 +248,71 @@ export class InMemoryUserRepository implements UserRepository {
       nextToken.generation,
     );
     return true;
+  }
+
+  async findProfileById(id: string): Promise<ProfileSnapshot | null> {
+    const user = this.users.find((item) => item.id === id);
+    if (!user) {
+      return null;
+    }
+
+    const snapshot: ProfileSnapshot = { user: user.toPublicProfile() };
+    const producer = this.producerProfiles.get(id);
+    if (producer) {
+      snapshot.producer = {
+        farmName: producer.farmName,
+        municipality: producer.municipality,
+        village: producer.village,
+        ...(producer.latitude !== undefined && producer.longitude !== undefined
+          ? { latitude: producer.latitude, longitude: producer.longitude }
+          : {}),
+      };
+    }
+
+    const company = this.companyProfiles.get(id);
+    if (company) {
+      snapshot.company = {
+        companyName: company.companyName,
+        nit: company.nit,
+        ...(company.address ? { address: company.address } : {}),
+        ...(company.companyType ? { companyType: company.companyType } : {}),
+        ...(company.department ? { department: company.department } : {}),
+        ...(company.municipality ? { municipality: company.municipality } : {}),
+      };
+    }
+
+    const transporter = this.transporterProfiles.get(id);
+    if (transporter) {
+      snapshot.transporter = {
+        vehicleType: transporter.vehicleType,
+        plate: transporter.plate,
+        capacityKg: transporter.capacityKg,
+        coverageMunicipalities: transporter.coverageMunicipalities,
+        coldChain: transporter.coldChain,
+        soatExpiresAt: transporter.soatExpiresAt,
+        licenseExpiresAt: transporter.licenseExpiresAt,
+      };
+    }
+
+    return snapshot;
+  }
+
+  async updateProducerProfile(userId: string, data: ProducerProfileUpdate): Promise<void> {
+    const current = this.producerProfiles.get(userId);
+    if (!current) throw new Error('perfil de productor no encontrado');
+    this.producerProfiles.set(userId, { ...current, ...data });
+  }
+
+  async updateCompanyProfile(userId: string, data: CompanyProfileUpdate): Promise<void> {
+    const current = this.companyProfiles.get(userId);
+    if (!current) throw new Error('perfil de empresa no encontrado');
+    this.companyProfiles.set(userId, { ...current, ...data });
+  }
+
+  async updateTransporterProfile(userId: string, data: TransporterProfileUpdate): Promise<void> {
+    const current = this.transporterProfiles.get(userId);
+    if (!current) throw new Error('perfil de transportista no encontrado');
+    this.transporterProfiles.set(userId, { ...current, ...data });
   }
 
   async updatePassword(userId: string, passwordHash: string): Promise<void> {

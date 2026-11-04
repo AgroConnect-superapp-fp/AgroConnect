@@ -5,7 +5,14 @@ import { User } from '../../domain/entities/User';
 import { Role } from '../../domain/entities/Role';
 import { RefreshToken } from '../../domain/entities/RefreshToken';
 import type { RoleName } from '../../domain/entities/Role';
-import type { RegisterUserData, UserRepository } from '../../domain/interfaces/UserRepository';
+import type {
+  CompanyProfileUpdate,
+  ProfileSnapshot,
+  ProducerProfileUpdate,
+  RegisterUserData,
+  TransporterProfileUpdate,
+  UserRepository,
+} from '../../domain/interfaces/UserRepository';
 import { InfrastructureError } from '../../../../shared/errors/errors';
 import { uniqueViolationTarget } from '../../../../shared/infrastructure/prismaErrors';
 import {
@@ -267,6 +274,121 @@ export class PrismaUserRepository implements UserRepository {
       });
       return true;
     });
+  }
+
+  async findProfileById(id: string): Promise<ProfileSnapshot | null> {
+    const record = await this.prisma.user.findUnique({
+      where: { id },
+      include: {
+        role: true,
+        producerProfile: true,
+        companyProfile: true,
+        transporterProfile: true,
+      },
+    });
+    if (!record) {
+      return null;
+    }
+
+    const snapshot: ProfileSnapshot = { user: this.toDomain(record).toPublicProfile() };
+
+    if (record.producerProfile) {
+      const coordinatesRows = await this.prisma.$queryRaw<
+        Array<{ lat: number | null; lng: number | null }>
+      >`
+        SELECT ST_Y(coordenadas::geometry) AS lat, ST_X(coordenadas::geometry) AS lng
+        FROM producer_profiles
+        WHERE id = ${record.producerProfile.id}::uuid
+      `;
+      const coordinates = coordinatesRows[0];
+      snapshot.producer = {
+        farmName: record.producerProfile.farmName,
+        municipality: record.producerProfile.municipality,
+        village: record.producerProfile.village,
+        latitude: coordinates?.lat ?? undefined,
+        longitude: coordinates?.lng ?? undefined,
+      };
+    }
+
+    snapshot.company = record.companyProfile
+      ? {
+          companyName: record.companyProfile.companyName,
+          nit: record.companyProfile.nit,
+          address: record.companyProfile.address ?? undefined,
+          companyType: record.companyProfile.companyType ?? undefined,
+          department: record.companyProfile.department ?? undefined,
+          municipality: record.companyProfile.municipality ?? undefined,
+        }
+      : undefined;
+
+    snapshot.transporter = record.transporterProfile
+      ? {
+          vehicleType: record.transporterProfile.vehicleType,
+          plate: record.transporterProfile.plate,
+          capacityKg: record.transporterProfile.capacityKg,
+          coverageMunicipalities: record.transporterProfile.coverageMunicipalities,
+          coldChain: record.transporterProfile.coldChain,
+          soatExpiresAt: record.transporterProfile.soatExpiresAt,
+          licenseExpiresAt: record.transporterProfile.licenseExpiresAt,
+        }
+      : undefined;
+
+    return snapshot;
+  }
+
+  async updateProducerProfile(userId: string, data: ProducerProfileUpdate): Promise<void> {
+    await this.prisma.producerProfile.update({
+      where: { userId },
+      data: {
+        farmName: data.farmName,
+        municipality: data.municipality,
+        village: data.village,
+      },
+    });
+
+    if (data.latitude !== undefined && data.longitude !== undefined) {
+      await this.prisma.$executeRaw`
+        UPDATE producer_profiles
+        SET coordenadas = ST_SetSRID(ST_MakePoint(${data.longitude}, ${data.latitude}), 4326)::geography
+        WHERE user_id = ${userId}::uuid
+      `;
+    }
+  }
+
+  async updateCompanyProfile(userId: string, data: CompanyProfileUpdate): Promise<void> {
+    await this.prisma.companyProfile.update({
+      where: { userId },
+      data: {
+        companyName: data.companyName,
+        address: data.address,
+        companyType: data.companyType,
+        department: data.department,
+        municipality: data.municipality,
+      },
+    });
+  }
+
+  async updateTransporterProfile(userId: string, data: TransporterProfileUpdate): Promise<void> {
+    try {
+      await this.prisma.transporterProfile.update({
+        where: { userId },
+        data: {
+          vehicleType: data.vehicleType,
+          plate: data.plate,
+          capacityKg: data.capacityKg,
+          coverageMunicipalities: data.coverageMunicipalities,
+          coldChain: data.coldChain,
+          soatExpiresAt: data.soatExpiresAt,
+          licenseExpiresAt: data.licenseExpiresAt,
+        },
+      });
+    } catch (error) {
+      const target = uniqueViolationTarget(error);
+      if (target?.includes('placa') || target?.includes('plate')) {
+        throw new PlateAlreadyExistsError();
+      }
+      throw error;
+    }
   }
 
   async updatePassword(userId: string, passwordHash: string): Promise<void> {

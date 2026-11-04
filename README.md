@@ -16,22 +16,22 @@ Centro de Comercio y Turismo · Regional Quindío · Programa Análisis y Desarr
 
 ## Información del proyecto
 
-| Atributo | Valor |
-|---|---|
-| Nombre oficial | AgroConnect |
-| Tipo | Marketplace dual B2B y B2C agropecuario para Colombia rural |
-| Alcance | 17 módulos funcionales (M01–M17) |
-| Trazabilidad oficial | 68 RF · 30 RNF · 66 CU · 69 HU · 6 actores |
+| Atributo             | Valor                                                                                                                                     |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Nombre oficial       | AgroConnect                                                                                                                               |
+| Tipo                 | Marketplace dual B2B y B2C agropecuario para Colombia rural                                                                               |
+| Alcance              | 17 módulos funcionales (M01–M17)                                                                                                          |
+| Trazabilidad oficial | 68 RF · 30 RNF · 66 CU · 69 HU · 6 actores                                                                                                |
 | Documentación fuente | Notion: PT-PP-01, PT-ERS-01, PT-ECU-01, PT-AR-ARQ-01, PT-IGS-01, PT-PP-02, PT-PS-01, PT-MTC-01, PT-MU-01, PT-OPS-01, PT-EVD-01 y ADR-0001 |
 
 ### Equipo Scrum
 
-| Rol | Nombre |
-|---|---|
-| Scrum Master | Nelson Fabián Gallego Sánchez |
-| Product Owner | Juan David Ferrer Castillo |
-| Desarrollador 1 | Carlos Andrés Zuluaga Atehortua |
-| Desarrollador 2 | Santiago Palacio Tovar |
+| Rol               | Nombre                          |
+| ----------------- | ------------------------------- |
+| Scrum Master      | Nelson Fabián Gallego Sánchez   |
+| Product Owner     | Juan David Ferrer Castillo      |
+| Desarrollador 1   | Carlos Andrés Zuluaga Atehortua |
+| Desarrollador 2   | Santiago Palacio Tovar          |
 | Asesor pedagógico | Instructor SENA ADSO Ficha 2026 |
 
 ---
@@ -51,25 +51,25 @@ AgroConnect responde con una plataforma que integra cuatro capacidades diferenci
 
 ## Módulos funcionales (17)
 
-| Módulo | Nombre |
-|---|---|
-| M01 | Gestión de Inicio y Panel General |
-| M02 | Gestión de Usuarios y Perfiles |
-| M03 | Marketplace Agropecuario |
-| M04 | Gestión de Inventarios |
-| M05 | Comunicación Interna |
-| M06 | Gestión Logística |
-| M07 | Gestión de Pedidos |
-| M08 | Pagos y Transacciones |
-| M09 | Panel Administrativo |
-| M10 | Seguridad y Control |
-| M11 | Soporte y Ayuda |
-| M12 | Inteligencia Artificial AgroBot |
-| M13 | Gestión de Compras |
-| M14 | Funcionamiento Multicanal y Sincronización Offline |
-| M15 | Pagos y Métodos Locales |
-| M16 | Geolocalización y Logística Rural |
-| M17 | Manejo de Productos Perecederos |
+| Módulo | Nombre                                             |
+| ------ | -------------------------------------------------- |
+| M01    | Gestión de Inicio y Panel General                  |
+| M02    | Gestión de Usuarios y Perfiles                     |
+| M03    | Marketplace Agropecuario                           |
+| M04    | Gestión de Inventarios                             |
+| M05    | Comunicación Interna                               |
+| M06    | Gestión Logística                                  |
+| M07    | Gestión de Pedidos                                 |
+| M08    | Pagos y Transacciones                              |
+| M09    | Panel Administrativo                               |
+| M10    | Seguridad y Control                                |
+| M11    | Soporte y Ayuda                                    |
+| M12    | Inteligencia Artificial AgroBot                    |
+| M13    | Gestión de Compras                                 |
+| M14    | Funcionamiento Multicanal y Sincronización Offline |
+| M15    | Pagos y Métodos Locales                            |
+| M16    | Geolocalización y Logística Rural                  |
+| M17    | Manejo de Productos Perecederos                    |
 
 ### Actores del sistema (6)
 
@@ -81,12 +81,12 @@ Productor Agrícola · Comprador (B2C y B2B) · Transportista · Administrador �
 
 La arquitectura oficial (PT-AR-ARQ-01, v1.0) sigue **Clean Architecture** (Robert C. Martin) con cuatro capas concéntricas y regla estricta de dependencias, complementada con **Domain-Driven Design** y patrones GoF:
 
-| Capa | Responsabilidad |
-|---|---|
-| Domain | Entidades, Value Objects, Aggregates y eventos de dominio. Sin dependencias externas. |
-| Application | Casos de uso, DTOs, mappers e interfaces (ports) de repositorios. Solo depende de Domain. |
-| Infrastructure | Implementaciones Prisma, adaptadores de servicios externos (Cloudinary, JWT, correo). |
-| Interface | Controllers REST, middleware, validación y serialización. |
+| Capa           | Responsabilidad                                                                           |
+| -------------- | ----------------------------------------------------------------------------------------- |
+| Domain         | Entidades, Value Objects, Aggregates y eventos de dominio. Sin dependencias externas.     |
+| Application    | Casos de uso, DTOs, mappers e interfaces (ports) de repositorios. Solo depende de Domain. |
+| Infrastructure | Implementaciones Prisma, adaptadores de servicios externos (Cloudinary, JWT, correo).     |
+| Interface      | Controllers REST, middleware, validación y serialización.                                 |
 
 Reglas clave del diseño:
 
@@ -98,27 +98,27 @@ Reglas clave del diseño:
 
 ### Decisiones arquitectónicas destacadas (ADR)
 
-| ADR | Decisión |
-|---|---|
-| ADR-002 | PostgreSQL 16 LTS + PostGIS sobre Oracle/PostgreSQL 15 |
-| ADR-003 | Cloudinary para activos multimedia |
-| ADR-004 | React + Vite como SPA (sin Next.js) |
-| ADR-005 | Clean Architecture de 4 capas |
-| ADR-006 | UUID local + Last-Write-Wins para operación offline |
+| ADR     | Decisión                                                            |
+| ------- | ------------------------------------------------------------------- |
+| ADR-002 | PostgreSQL 16 LTS + PostGIS sobre Oracle/PostgreSQL 15              |
+| ADR-003 | Cloudinary para activos multimedia                                  |
+| ADR-004 | React + Vite como SPA (sin Next.js)                                 |
+| ADR-005 | Clean Architecture de 4 capas                                       |
+| ADR-006 | UUID local + Last-Write-Wins para operación offline                 |
 | ADR-007 | Leaflet + OpenStreetMap (Google Maps está prohibido en el proyecto) |
 
 ---
 
 ## Stack tecnológico
 
-| Capa | Tecnologías |
-|---|---|
-| Frontend | React 19 + Vite 8 + TypeScript 6 (strict) + Tailwind CSS 4 + Leaflet 1.9 (OpenStreetMap) + PWA (vite-plugin-pwa) |
-| Backend | Node.js 24 + NestJS 11 + Prisma 7 (núcleo) — Express 4 legacy en retiro — TypeScript 5/6 (strict) + Zod |
-| Persistencia | PostgreSQL 16 + PostGIS 3.4 + Prisma 7 (driver adapter `@prisma/adapter-pg`) |
-| Seguridad | JWT + refresh tokens rotativos, bcrypt (12 rondas), Helmet, rate limiting, Pino con redacción de PII |
-| Pruebas | Jest 30 + Supertest (backend) · Vitest (frontend unitarias) · Playwright (E2E) |
-| Assets | Cloudinary (transformaciones y CDN) |
+| Capa         | Tecnologías                                                                                                      |
+| ------------ | ---------------------------------------------------------------------------------------------------------------- |
+| Frontend     | React 19 + Vite 8 + TypeScript 6 (strict) + Tailwind CSS 4 + Leaflet 1.9 (OpenStreetMap) + PWA (vite-plugin-pwa) |
+| Backend      | Node.js 24 + NestJS 11 + Prisma 7 (núcleo) — Express 4 legacy en retiro — TypeScript 5/6 (strict) + Zod          |
+| Persistencia | PostgreSQL 16 + PostGIS 3.4 + Prisma 7 (driver adapter `@prisma/adapter-pg`)                                     |
+| Seguridad    | JWT + refresh tokens rotativos, bcrypt (12 rondas), Helmet, rate limiting, Pino con redacción de PII             |
+| Pruebas      | Jest 30 + Supertest (backend) · Vitest (frontend unitarias) · Playwright (E2E)                                   |
+| Assets       | Cloudinary (transformaciones y CDN)                                                                              |
 
 **Design system:** verde primario `#2E7D32`, amarillo acento `#F9A825`, tipografías Inter (UI) y Merriweather (contenido), touch targets mínimos de 48×48 px y contraste WCAG AA.
 
@@ -140,24 +140,33 @@ AgroConnect/
 
 ---
 
-## Estado implementado (incrementos 1–2b + prototipo del mercado)
+## Estado implementado (incrementos 1–2c + marketplace propio)
 
 ### M02 — Gestión de Usuarios y Perfiles
 
 API `/api/v1/auth` con flujo completo de registro, autenticación y seguridad de cuenta:
 
-| Método | Ruta | Propósito |
-|---|---|---|
-| POST | `/register` | Registro multi-rol (productor, comprador, empresa, transportista, administrador) |
-| POST | `/login` | Autenticación con JWT |
-| POST | `/refresh` | Renovación con rotación de refresh token |
-| POST | `/logout` | Revocación del refresh token |
-| POST | `/forgot-password` | Token de recuperación de un solo uso (30 min) |
-| POST | `/reset-password` | Restablecimiento y revocación de sesiones |
-| POST | `/verify-email` | Verificación de correo |
-| POST | `/resend-verification` | Reenvío del enlace de verificación |
+| Método | Ruta                   | Propósito                                                                        |
+| ------ | ---------------------- | -------------------------------------------------------------------------------- |
+| POST   | `/register`            | Registro multi-rol (productor, comprador, empresa, transportista, administrador) |
+| POST   | `/login`               | Autenticación con JWT                                                            |
+| POST   | `/refresh`             | Renovación con rotación de refresh token                                         |
+| POST   | `/logout`              | Revocación del refresh token                                                     |
+| POST   | `/forgot-password`     | Token de recuperación de un solo uso (30 min)                                    |
+| POST   | `/reset-password`      | Restablecimiento y revocación de sesiones                                        |
+| POST   | `/verify-email`        | Verificación de correo                                                           |
+| POST   | `/resend-verification` | Reenvío del enlace de verificación                                               |
 
 Perfiles específicos: productor (finca), empresa (tipo, NIT, ubicación) y transportista (vehículo, placa, capacidad, cobertura, cadena de frío y vigencias de SOAT/licencia).
+
+### Perfil autenticado (`/api/v1/profile/me`)
+
+| Método | Ruta          | Propósito                                    |
+| ------ | ------------- | -------------------------------------------- |
+| GET    | `/profile/me` | Consulta el usuario y su perfil de rol       |
+| PATCH  | `/profile/me` | Actualiza solo el bloque del rol autenticado |
+
+El servidor autoriza por rol: productor → finca; empresa → razón social, dirección, tipo y ubicación; transportista → vehículo, placa, capacidad, cobertura, cadena de frío y vigencias. El NIT, el rol y los identificadores no son editables desde este endpoint.
 
 Características: contraseñas con **Argon2id** (bcrypt legacy con rehash transparente), unicidad de correo/documento/celular validada en servidor, refresh tokens con familia/generación y detección de reuso, verificación de correo obligatoria antes de la sesión, rate limiting, autorización de tratamiento de datos (Ley 1581 de 2012) y errores estandarizados con `correlationId`.
 
@@ -177,7 +186,7 @@ Características: contraseñas con **Argon2id** (bcrypt legacy con rehash transp
 
 ### Calidad
 
-- 247 pruebas backend (NestJS; 94.28 % líneas, 83.59 % ramas) · 49 pruebas unitarias de frontend (Vitest) · 14 pruebas E2E (Playwright: autenticación real, modo demo, marketplace, publicación, perfiles y accesibilidad axe).
+- 267 pruebas backend (NestJS; 93.92 % líneas, 82.23 % ramas) · 49 pruebas unitarias de frontend (Vitest) · 14 pruebas E2E (Playwright: autenticación real, modo demo, marketplace, publicación, perfiles y accesibilidad axe).
 
 ---
 
@@ -247,7 +256,7 @@ npx vercel deploy --prod --yes --archive=tgz
 
 ### Backend de autenticación (Render)
 
-El backend NestJS (`apps/api`) + Prisma + PostgreSQL se despliega como **Web Service en Render** (plan free) con el Blueprint `render.yaml` de la raíz (Infraestructura como Código). 
+El backend NestJS (`apps/api`) + Prisma + PostgreSQL se despliega como **Web Service en Render** (plan free) con el Blueprint `render.yaml` de la raíz (Infraestructura como Código).
 
 - **URL del servicio (producción):** https://agroconnect-api-5t7n.onrender.com — `GET /health` → 200
 - **Base de datos:** PostgreSQL administrado por la API, esquema `agroconnect` (runtime con `DATABASE_SCHEMA=agroconnect`). La instancia histórica de Supabase está `ENOTFOUND`; `/health/ready` 503 y login 500 hasta desplegar la nueva base. El marketplace ya no depende de Supabase.
@@ -281,12 +290,12 @@ node tools/alignment-check/check-alignment.mjs --json # salida para automatizaci
 bash tools/alignment-check/install-git-hook.sh   # hook pre-push: bloquea el push si el README deriva
 ```
 
-| Entorno | Rol | Qué vive aquí | Cuándo se toca |
-|---|---|---|---|
-| **Directorio del proyecto** | Operación y código | Código, IaC (`render.yaml`, `vercel.json`, `docker-compose.yml`), README, CHANGELOG | Cada cambio de implementación |
-| **GitHub** | Fuente técnica del equipo | Repositorio público, releases/tags, CI (5 jobs + CodeQL), rulesets, Dependabot | Cada push (vía PR); releases al cerrar versión |
-| **Obsidian** | Conocimiento enlazado | Notas de estudio: Estado del Proyecto, índice, guía de sustentación, dashboards Dataview | Cuando el cambio aporta contexto de estudio/operación |
-| **Notion** | SSOT documental SENA | Documentos PT-* oficiales, matriz de trazabilidad, PT-OPS-01 (hub operativo) | Cuando el cambio afecta documentación oficial |
+| Entorno                     | Rol                       | Qué vive aquí                                                                            | Cuándo se toca                                        |
+| --------------------------- | ------------------------- | ---------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| **Directorio del proyecto** | Operación y código        | Código, IaC (`render.yaml`, `vercel.json`, `docker-compose.yml`), README, CHANGELOG      | Cada cambio de implementación                         |
+| **GitHub**                  | Fuente técnica del equipo | Repositorio público, releases/tags, CI (5 jobs + CodeQL), rulesets, Dependabot           | Cada push (vía PR); releases al cerrar versión        |
+| **Obsidian**                | Conocimiento enlazado     | Notas de estudio: Estado del Proyecto, índice, guía de sustentación, dashboards Dataview | Cuando el cambio aporta contexto de estudio/operación |
+| **Notion**                  | SSOT documental SENA      | Documentos PT-* oficiales, matriz de trazabilidad, PT-OPS-01 (hub operativo)             | Cuando el cambio afecta documentación oficial         |
 
 **Flujo ante un cambio que toque un hecho compartido:**
 
@@ -299,16 +308,16 @@ bash tools/alignment-check/install-git-hook.sh   # hook pre-push: bloquea el pus
 
 ## Cumplimiento normativo colombiano
 
-| Norma | Aplicación en el sistema |
-|---|---|
-| Ley 1581 de 2012 + Decreto 1377 de 2013 | Protección de datos personales (Habeas Data) y autorización de tratamiento en el registro |
-| Ley 527 de 1999 | Validez probatoria de mensajes de datos y comercio electrónico |
+| Norma                                             | Aplicación en el sistema                                                                    |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Ley 1581 de 2012 + Decreto 1377 de 2013           | Protección de datos personales (Habeas Data) y autorización de tratamiento en el registro   |
+| Ley 527 de 1999                                   | Validez probatoria de mensajes de datos y comercio electrónico                              |
 | Ley 1480 de 2011, modificada por Ley 2439 de 2024 | Estatuto del Consumidor: retracto (5 días hábiles), reversión (15 días) y entrega (30 días) |
-| Resolución 165 de 2023 DIAN | Facturación electrónica con CUFE y XML UBL 2.1 (M15) |
-| Resolución ICA 824 de 2022 y modificatorias | Registro y trazabilidad de productos perecederos (M17) |
-| Decreto 1500 de 2007 | Trazabilidad origen-destino de productos |
-| Resolución 2674 de 2013 INVIMA | Buenas Prácticas de Manufactura |
-| Decreto 2200 de 2019 | Cadena de frío en transporte de perecederos |
+| Resolución 165 de 2023 DIAN                       | Facturación electrónica con CUFE y XML UBL 2.1 (M15)                                        |
+| Resolución ICA 824 de 2022 y modificatorias       | Registro y trazabilidad de productos perecederos (M17)                                      |
+| Decreto 1500 de 2007                              | Trazabilidad origen-destino de productos                                                    |
+| Resolución 2674 de 2013 INVIMA                    | Buenas Prácticas de Manufactura                                                             |
+| Decreto 2200 de 2019                              | Cadena de frío en transporte de perecederos                                                 |
 
 ---
 
@@ -329,18 +338,18 @@ bash tools/alignment-check/install-git-hook.sh   # hook pre-push: bloquea el pus
 
 Fotografías de cultivos usadas en el prototipo del mercado:
 
-| Cultivo | Archivo | Autor/a | Licencia |
-|---|---|---|---|
-| Banano | [Magdalena zona bananera.jpg](https://commons.wikimedia.org/wiki/File:Magdalena_zona_bananera.jpg) | Claudia Marcela Bolaño Castro | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
-| Café | [Coffee tree in Hacienda Guayabal, Colombia.jpg](https://commons.wikimedia.org/wiki/File:Coffee_tree_in_Hacienda_Guayabal,_Colombia.jpg) | Bernard Gagnon | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
-| Café | [Coffea arabica 2.jpg](https://commons.wikimedia.org/wiki/File:Coffea_arabica_2.jpg) | Kızıldeniz | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
-| Café | [Coffea arabica, coffee beans .jpg](https://commons.wikimedia.org/wiki/File:Coffea_arabica,_coffee_beans_.jpg) | Renjusplace | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
-| Arroz | [Blond and green rice fields.jpg](https://commons.wikimedia.org/wiki/File:Blond_and_green_rice_fields.jpg) | Basile Morin | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
-| Palma de aceite | [Oil palm plantation in Mersing District.jpg](https://commons.wikimedia.org/wiki/File:Oil_palm_plantation_in_Mersing_District.jpg) | Wee Hong | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
-| Cacao | [Cacao fruit in Côte d'Ivoire (11).JPG](https://commons.wikimedia.org/wiki/File:Cacao_fruit_in_C%C3%B4te_d%27Ivoire_(11).JPG) | Hanay | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
-| Cacao | [Theobroma cacao fruit.jpg](https://commons.wikimedia.org/wiki/File:Theobroma_cacao_fruit.jpg) | Bernard Gagnon | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0) |
-| Caña de azúcar | [Sugarcane plantation 01.jpg](https://commons.wikimedia.org/wiki/File:Sugarcane_plantation_01.jpg) | Filo gèn' | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
-| Yuca | [Cassava plants.jpg](https://commons.wikimedia.org/wiki/File:Cassava_plants.jpg) | Munkaila Sulemana | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
+| Cultivo         | Archivo                                                                                                                                  | Autor/a                       | Licencia                                                       |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- | -------------------------------------------------------------- |
+| Banano          | [Magdalena zona bananera.jpg](https://commons.wikimedia.org/wiki/File:Magdalena_zona_bananera.jpg)                                       | Claudia Marcela Bolaño Castro | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
+| Café            | [Coffee tree in Hacienda Guayabal, Colombia.jpg](https://commons.wikimedia.org/wiki/File:Coffee_tree_in_Hacienda_Guayabal,_Colombia.jpg) | Bernard Gagnon                | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
+| Café            | [Coffea arabica 2.jpg](https://commons.wikimedia.org/wiki/File:Coffea_arabica_2.jpg)                                                     | Kızıldeniz                    | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
+| Café            | [Coffea arabica, coffee beans .jpg](https://commons.wikimedia.org/wiki/File:Coffea_arabica,_coffee_beans_.jpg)                           | Renjusplace                   | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
+| Arroz           | [Blond and green rice fields.jpg](https://commons.wikimedia.org/wiki/File:Blond_and_green_rice_fields.jpg)                               | Basile Morin                  | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
+| Palma de aceite | [Oil palm plantation in Mersing District.jpg](https://commons.wikimedia.org/wiki/File:Oil_palm_plantation_in_Mersing_District.jpg)       | Wee Hong                      | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
+| Cacao           | [Cacao fruit in Côte d'Ivoire (11).JPG](<https://commons.wikimedia.org/wiki/File:Cacao_fruit_in_C%C3%B4te_d%27Ivoire_(11).JPG>)          | Hanay                         | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
+| Cacao           | [Theobroma cacao fruit.jpg](https://commons.wikimedia.org/wiki/File:Theobroma_cacao_fruit.jpg)                                           | Bernard Gagnon                | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0) |
+| Caña de azúcar  | [Sugarcane plantation 01.jpg](https://commons.wikimedia.org/wiki/File:Sugarcane_plantation_01.jpg)                                       | Filo gèn'                     | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
+| Yuca            | [Cassava plants.jpg](https://commons.wikimedia.org/wiki/File:Cassava_plants.jpg)                                                         | Munkaila Sulemana             | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
 
 Además se usan fotografías de [Unsplash](https://unsplash.com/license) (banano, maíz y café) bajo la licencia Unsplash.
 

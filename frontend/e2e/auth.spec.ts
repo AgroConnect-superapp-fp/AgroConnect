@@ -106,6 +106,16 @@ test.describe('Registro y autenticación de usuarios', () => {
     await expect(page.getByTestId('dashboard-usuario')).toHaveText(producer.nombre);
     await expect(page.getByTestId('dashboard-publish')).toBeVisible();
 
+    await page.getByTestId('dashboard-profile').click();
+    await expect(page.getByTestId('profile-productor-nombre')).toHaveValue('El Mirador');
+    await page.getByTestId('profile-productor-nombre').fill('El Mirador Renovado');
+    await page.getByTestId('profile-save').click();
+    await expect(page.getByTestId('profile-success')).toHaveText(
+      'Perfil actualizado correctamente.'
+    );
+    await page.getByRole('button', { name: '← Volver al panel' }).click();
+    await expect(page.getByTestId('dashboard-bienvenida')).toBeVisible();
+
     await page.getByTestId('dashboard-logout').click();
     await expect(page.getByRole('button', { name: 'Crear cuenta' })).toBeVisible();
   });

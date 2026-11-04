@@ -5,6 +5,7 @@ import { getRoleOption, ROLE_LABELS } from '../types';
 interface DashboardScreenProps {
   onOpenMarketplace: () => void;
   onPublishProduct: () => void;
+  onOpenProfile: () => void;
   showSuccessBanner?: boolean;
   onDismissSuccessBanner?: () => void;
 }
@@ -24,9 +25,9 @@ const ROLE_WELCOME: Record<string, string> = {
 
 const NEXT_INCREMENTS = [
   {
-    nombre: 'Pulido del acceso',
-    detalle: 'Verificación por correo, recuperación de contraseña y edición de perfil.',
-    estado: 'Siguiente',
+    nombre: 'Edición de perfil',
+    detalle: 'Consulta y actualiza los datos de tu finca, empresa o vehículo.',
+    estado: 'Disponible',
   },
   {
     nombre: 'Inventario del productor',
@@ -43,6 +44,7 @@ const NEXT_INCREMENTS = [
 export function DashboardScreen({
   onOpenMarketplace,
   onPublishProduct,
+  onOpenProfile,
   showSuccessBanner = false,
   onDismissSuccessBanner,
 }: DashboardScreenProps): React.ReactElement {
@@ -74,6 +76,14 @@ export function DashboardScreen({
               </p>
               <p className="text-xs text-gray-500">{ROLE_LABELS[usuario.rol]}</p>
             </div>
+            <Button
+              variant="ghost"
+              data-testid="dashboard-profile"
+              onClick={onOpenProfile}
+              className="!min-h-10 !px-3 !py-2 text-sm"
+            >
+              Mi perfil
+            </Button>
             <Button
               variant="ghost"
               data-testid="dashboard-logout"

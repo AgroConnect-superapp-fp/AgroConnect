@@ -17,6 +17,8 @@ import { RequestPasswordResetUseCase } from '../application/use-cases/RequestPas
 import { ResetPasswordUseCase } from '../application/use-cases/ResetPasswordUseCase';
 import { RequestEmailVerificationUseCase } from '../application/use-cases/RequestEmailVerificationUseCase';
 import { VerifyEmailUseCase } from '../application/use-cases/VerifyEmailUseCase';
+import { GetProfileUseCase } from '../application/use-cases/GetProfileUseCase';
+import { UpdateProfileUseCase } from '../application/use-cases/UpdateProfileUseCase';
 import { PrismaUserRepository } from '../infrastructure/repositories/PrismaUserRepository';
 import { PrismaEmailVerificationTokenRepository } from '../infrastructure/repositories/PrismaEmailVerificationTokenRepository';
 import { PrismaPasswordResetTokenRepository } from '../infrastructure/repositories/PrismaPasswordResetTokenRepository';
@@ -25,6 +27,7 @@ import { JwtTokenService } from '../infrastructure/services/JwtTokenService';
 import { FileEmailService } from '../infrastructure/services/FileEmailService';
 import { SmtpEmailService } from '../infrastructure/services/SmtpEmailService';
 import { AuthController } from './controllers/AuthController';
+import { ProfileController } from './controllers/ProfileController';
 import { AuthThrottlerGuard } from './guards/AuthThrottlerGuard';
 import { SessionAuthGuard } from './guards/SessionAuthGuard';
 import { SessionCookieService } from './http/SessionCookieService';
@@ -58,7 +61,7 @@ import type { PasswordResetTokenRepository } from '../domain/interfaces/Password
       },
     ]),
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, ProfileController],
   providers: [
     // Puertos del dominio → implementaciones de infraestructura.
     { provide: USER_REPOSITORY, useClass: PrismaUserRepository },
@@ -197,6 +200,16 @@ import type { PasswordResetTokenRepository } from '../domain/interfaces/Password
         TOKEN_SERVICE,
         APP_BASE_URL,
       ],
+    },
+    {
+      provide: GetProfileUseCase,
+      useFactory: (userRepository: UserRepository) => new GetProfileUseCase(userRepository),
+      inject: [USER_REPOSITORY],
+    },
+    {
+      provide: UpdateProfileUseCase,
+      useFactory: (userRepository: UserRepository) => new UpdateProfileUseCase(userRepository),
+      inject: [USER_REPOSITORY],
     },
     {
       provide: VerifyEmailUseCase,
