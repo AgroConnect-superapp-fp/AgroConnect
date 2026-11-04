@@ -111,8 +111,11 @@ que requieren criterio de producto o arquitectura.
   secondary y el toggle de zonas productivas usan `text-on-accent`; los textos
   accent sobre fondos oscuros usan `soft` y sobre fondos claros usan `ink`.
   No se cambió el color de marca.
-- **Validación:** contraste calculado; lint/build/E2E. La pasada de axe o
-  Lighthouse queda como gate de CI.
+- **Validación:** contraste calculado; lint/build/E2E.
+- **Gate CI (2026-11-03):** `frontend/e2e/a11y.spec.ts` ejecuta axe WCAG 2.1
+  A/AA sobre marketplace y modal. Detectó y corrigió contrastes de badges de
+  cultivo, productividad, botón de reintento y el nombre accesible del dropzone.
+  Lighthouse PWA sigue como gate separado.
 - **Criterio:** 4.5:1 en texto normal y 3:1 en texto grande en todos los
   botones/chips con accent (cumplido en los pares medidos).
 

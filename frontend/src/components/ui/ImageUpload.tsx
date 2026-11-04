@@ -182,6 +182,13 @@ export function ImageUpload({
 
   const isDisabled = uploadState.isUploading;
 
+  const uploadTitle = isDisabled
+    ? 'Subiendo imágenes...'
+    : isDragging
+      ? '¡Suelta las imágenes aquí!'
+      : 'Arrastra imágenes o haz clic para seleccionar';
+  const uploadHint = `JPEG, PNG, WebP o AVIF • Máximo 10MB por archivo • Hasta ${maxFiles} archivos`;
+
   return (
     <div className={`w-full ${className}`}>
       {/* Drop Zone */}
@@ -202,20 +209,7 @@ export function ImageUpload({
                 : 'border-gray-300 hover:border-agro-green hover:bg-gray-50 cursor-pointer'
           }
         `}
-        role="button"
-        tabIndex={isDisabled ? -1 : 0}
-        aria-label={
-          isDisabled
-            ? 'Subiendo imágenes, por favor espere...'
-            : 'Zona de carga de imágenes. Haz clic o arrastra archivos aquí.'
-        }
-        aria-disabled={isDisabled}
-        onKeyDown={(e) => {
-          if (!isDisabled && (e.key === 'Enter' || e.key === ' ')) {
-            e.preventDefault();
-            triggerFileInput();
-          }
-        }}
+        aria-busy={isDisabled}
       >
         <input
           ref={fileInputRef}
@@ -229,19 +223,24 @@ export function ImageUpload({
         />
 
         <div className="flex flex-col items-center gap-3">
-          <div className="text-5xl">{isDisabled ? '⏳' : '📸'}</div>
-          <div>
-            <p className="text-lg font-semibold text-gray-700">
-              {isDisabled
-                ? 'Subiendo imágenes...'
-                : isDragging
-                  ? '¡Suelta las imágenes aquí!'
-                  : 'Arrastra imágenes o haz clic para seleccionar'}
-            </p>
-            <p className="text-sm text-gray-500 mt-1">
-              JPEG, PNG, WebP o AVIF • Máximo 10MB por archivo • Hasta {maxFiles} archivos
-            </p>
+          <div className="text-5xl" aria-hidden="true">
+            {isDisabled ? '⏳' : '📸'}
           </div>
+          <div>
+            <p className="text-lg font-semibold text-gray-700">{uploadTitle}</p>
+            <p className="text-sm text-gray-500 mt-1">{uploadHint}</p>
+          </div>
+          <button
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              triggerFileInput();
+            }}
+            disabled={isDisabled}
+            className="min-h-11 rounded-lg bg-agro-green px-4 py-2 text-sm font-semibold text-white hover:bg-agro-dark disabled:cursor-not-allowed disabled:bg-agro-green/60"
+          >
+            Seleccionar imágenes
+          </button>
         </div>
       </div>
 
@@ -273,11 +272,11 @@ export function ImageUpload({
             <p className="text-sm text-yellow-800 font-semibold">
               Validación de archivos
             </p>
-            <p className="text-sm text-yellow-600">{validationError}</p>
+            <p className="text-sm text-amber-700">{validationError}</p>
           </div>
           <button
             onClick={() => setValidationError(null)}
-            className="text-yellow-600 hover:text-yellow-800 text-sm font-semibold"
+            className="text-amber-700 hover:text-amber-800 text-sm font-semibold"
           >
             Cerrar
           </button>

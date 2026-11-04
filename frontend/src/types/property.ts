@@ -67,7 +67,7 @@ export const CROP_CATALOG: Record<CropType, CropInfo> = {
   oil_palm: {
     displayName: 'Palma de Aceite',
     emoji: '🌴',
-    color: '#228B22',
+    color: '#1B5E20',
     season: 'Todo el año',
   },
 };

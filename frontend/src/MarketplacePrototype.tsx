@@ -15,6 +15,7 @@ import { useState, lazy, Suspense, useMemo, useEffect } from 'react';
 import { fetchProducts } from './services/productsApi';
 import { devLog } from './utils/devLog';
 import { resolveImageUrl } from './services/cloudinary';
+import { getContrastTextColor } from './utils/colorContrast';
 import { MOCK_PROPERTIES } from './data/mockProperties';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import { PropertyDetailModal } from './components/ui/PropertyDetailModal';
@@ -383,7 +384,7 @@ function App(): React.ReactElement {
                 </p>
               </div>
               <div className="w-36 h-28 bg-blue-50 rounded-lg border border-blue-200 animate-slideInRight delay-400 hover:scale-110 hover:shadow-lg interactive-transition cursor-default group animate-pulseGlowBlue flex flex-col items-center justify-center text-center p-3">
-                <p className="text-xs text-blue-700 font-semibold group-hover:text-blue-900 interactive-transition leading-tight">
+                <p className="text-xs text-blue-800 font-semibold group-hover:text-blue-950 interactive-transition leading-tight">
                   Productividad
                 </p>
                 <p className="text-3xl font-bold text-blue-800 mt-1">
@@ -416,7 +417,7 @@ function App(): React.ReactElement {
             <button
               type="button"
               onClick={reload}
-              className="rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-700 interactive-transition"
+              className="rounded-lg bg-amber-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-800 interactive-transition"
             >
               Reintentar conexión
             </button>
@@ -577,8 +578,11 @@ function App(): React.ReactElement {
                       />
                       <div className="absolute top-2 right-2">
                         <span
-                          className="px-2 py-1 text-white text-xs font-semibold rounded-full shadow-md interactive-transition group-hover:scale-110"
-                          style={{ backgroundColor: cropInfo.color }}
+                          className="px-2 py-1 text-xs font-semibold rounded-full shadow-md interactive-transition group-hover:scale-110"
+                          style={{
+                            backgroundColor: cropInfo.color,
+                            color: getContrastTextColor(cropInfo.color),
+                          }}
                         >
                           {cropInfo.emoji} {cropInfo.displayName}
                         </span>
@@ -594,8 +598,11 @@ function App(): React.ReactElement {
                       <span className="text-6xl">{cropInfo.emoji}</span>
                       <div className="absolute top-2 right-2">
                         <span
-                          className="px-2 py-1 text-white text-xs font-semibold rounded-full shadow-md"
-                          style={{ backgroundColor: cropInfo.color }}
+                          className="px-2 py-1 text-xs font-semibold rounded-full shadow-md"
+                          style={{
+                            backgroundColor: cropInfo.color,
+                            color: getContrastTextColor(cropInfo.color),
+                          }}
                         >
                           {cropInfo.displayName}
                         </span>
@@ -618,9 +625,9 @@ function App(): React.ReactElement {
                         <span
                           className={`font-bold ${
                             property.productivity >= 70
-                              ? 'text-green-600'
+                              ? 'text-green-700'
                               : property.productivity >= 40
-                                ? 'text-yellow-600'
+                                ? 'text-yellow-700'
                                 : 'text-red-600'
                           }`}
                         >

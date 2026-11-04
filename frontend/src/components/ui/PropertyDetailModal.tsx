@@ -17,6 +17,7 @@ import React, { useEffect, useCallback } from 'react';
 import type { Property } from '../../types/property';
 import { getCropInfo, getCertificationInfo } from '../../types/property';
 import { getCropFallbackImage } from '../../data/fallbackImages';
+import { getContrastTextColor } from '../../utils/colorContrast';
 import { devLog } from '../../utils/devLog';
 import { ImageGallery } from './ImageGallery';
 import { ImageUpload } from './ImageUpload';
@@ -173,8 +174,11 @@ export function PropertyDetailModal({
                   </p>
                   <div className="mt-1">
                     <span
-                      className="px-2.5 py-1 text-white text-xs font-semibold rounded-full shadow-sm inline-block transition-all duration-200 group-hover:scale-110 group-hover:shadow-md"
-                      style={{ backgroundColor: cropInfo.color }}
+                      className="px-2.5 py-1 text-xs font-semibold rounded-full shadow-sm inline-block transition-all duration-200 group-hover:scale-110 group-hover:shadow-md"
+                      style={{
+                        backgroundColor: cropInfo.color,
+                        color: getContrastTextColor(cropInfo.color),
+                      }}
                     >
                       {cropInfo.displayName}
                     </span>
@@ -195,9 +199,9 @@ export function PropertyDetailModal({
                   <p
                     className={`text-lg font-bold mt-1 transition-transform duration-200 group-hover:scale-110 ${
                       property.productivity >= 70
-                        ? 'text-green-600'
+                        ? 'text-green-700'
                         : property.productivity >= 40
-                          ? 'text-yellow-600'
+                          ? 'text-yellow-700'
                           : 'text-red-600'
                     }`}
                   >

@@ -24,6 +24,9 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
   única, capacidad, cobertura, cadena de frío y vigencias; registro UI y
   validación de dominio.
 - **ADR-020:** decisión de perfiles operativos para empresa y transportista.
+- **Gate de accesibilidad (D9):** `e2e/a11y.spec.ts` con axe sobre marketplace
+  y modal; se corrigieron contrastes de badges, productividad, botón de
+  reintento y semántica del dropzone de imágenes.
 - **Despliegue PostgreSQL propio:** runbook operativo y script
   `npm run smoke:cloudinary` para validar el preset unsigned sin subir PII.
 
@@ -32,7 +35,7 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 - **Marketplace frontend:** `services/productsApi.ts` reemplaza
   `services/supabase.ts`; se elimina `@supabase/supabase-js` del bundle y del
   lockfile. El fallback demo se activa si la API no responde. 246 tests backend
-  (82.73 % ramas), 46 unitarios frontend y E2E 13/13 verdes.
+  (82.73 % ramas), 49 unitarios frontend y 14 pruebas E2E.
 - **PropertyMap Fase 2:** `useMapViewport`, `useMapSearch`, `useMapDrawing` y
   `usePropertySelection` extraídos, junto con los puentes `MapViewport` /
   `MapDrawing` y los helpers `mapUtils` / `mapSearchUtils`; 952 → 601 líneas,

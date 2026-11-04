@@ -70,9 +70,9 @@ Migrar la **lectura** del marketplace a la API propia:
   generado por Prisma para no eliminar los índices GIST de PostGIS.
 - `GET /api/v1/products` con contrato Zod/OpenAPI sin drift.
 - Backend: **240 tests**, cobertura **94.78 % líneas / 83.26 % ramas**.
-- Frontend: **46 unitarios**, build verde; `MarketplacePrototype` pasó de
+- Frontend: **49 unitarios**, build verde; `MarketplacePrototype` pasó de
   ~281 kB a **57.04 kB** (14.79 kB gzip) al retirar Supabase.
-- E2E: **11/11** con demo/fallback contra `/api/v1/products` y publicación real de una cosecha.
+- E2E: **14 pruebas**, con demo/fallback, publicación y gate axe;
 - `@supabase/supabase-js` eliminado de `package.json` y del lockfile.
 - Migración `20261103130000_add_product_producer` con `producer_id` opcional y
   FK `ON DELETE SET NULL`; el seed mantiene productos demo sin productor.
