@@ -6,14 +6,14 @@
 
 ## HU sin CU (6)
 
-| HU | Título | Módulo | CU del módulo (candidatos) |
-|---|---|---|---|
-| HU06 | Solicitud de compra | M03 — Marketplace Agropecuario | CU#06 (Publicar Demanda B2B); CU#08 (Calificar Transacción); CU#24 (Explorar Productos del Marketplace); CU#25 (Buscar Productos con Filtros); CU#40 (Comparar Productos Lado a Lado) |
-| HU08 | Control de inventario | M04 — Gestión de Inventarios | CU#03 (Registrar Producto); CU#27 (Consultar Disponibilidad y Alertas de Inventario); CU#41 (Sincronizar Inventario con Múltiples Dispositivos) |
-| HU15 | Búsqueda de usuarios | M02 — Gestión de Usuarios y Perfiles | CU#01 (Registrar Productor); CU#02 (Iniciar Sesión); CU#22 (Recuperar Contraseña); CU#23 (Editar Perfil de Usuario); CU#26 (Gestionar Reputación del Usuario); CU#37 (Configurar Notificaciones por Usuario); CU#38 (Exportar Datos Personales (Derecho de Acceso Habeas Data)) |
-| HU28 | Estados del pedido | M07 — Gestión de Pedidos | CU#10 (Gestionar Pedido (Productor)); CU#30 (Consultar Historial de Pedidos); CU#33 (Confirmar Pedido); CU#44 (Cancelar Pedido con Reembolso Automático) |
-| HU30 | Integración de pagos | M08 — Pagos y Transacciones | CU#21 (Registrar Transacción); CU#45 (Procesar Reembolso por Cancelación); CU#46 (Generar Reporte de Transacciones para Contabilidad) |
-| HU33 | Gestión de incidencias | M09 — Panel Administrativo | CU#15 (Gestionar Usuarios (Admin)); CU#16 (Generar Reportes); CU#31 (Monitorear Sistema (Admin)); CU#47 (Banear Usuario por Violación de Términos) |
+| HU   | Título                 | Módulo                               | CU del módulo (candidatos)                                                                                                                                                                                                                                                      |
+| ---- | ---------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| HU06 | Solicitud de compra    | M03 — Marketplace Agropecuario       | CU#06 (Publicar Demanda B2B); CU#08 (Calificar Transacción); CU#24 (Explorar Productos del Marketplace); CU#25 (Buscar Productos con Filtros); CU#40 (Comparar Productos Lado a Lado)                                                                                           |
+| HU08 | Control de inventario  | M04 — Gestión de Inventarios         | CU#03 (Registrar Producto); CU#27 (Consultar Disponibilidad y Alertas de Inventario); CU#41 (Sincronizar Inventario con Múltiples Dispositivos)                                                                                                                                 |
+| HU15 | Búsqueda de usuarios   | M02 — Gestión de Usuarios y Perfiles | CU#01 (Registrar Productor); CU#02 (Iniciar Sesión); CU#22 (Recuperar Contraseña); CU#23 (Editar Perfil de Usuario); CU#26 (Gestionar Reputación del Usuario); CU#37 (Configurar Notificaciones por Usuario); CU#38 (Exportar Datos Personales (Derecho de Acceso Habeas Data)) |
+| HU28 | Estados del pedido     | M07 — Gestión de Pedidos             | CU#10 (Gestionar Pedido (Productor)); CU#30 (Consultar Historial de Pedidos); CU#33 (Confirmar Pedido); CU#44 (Cancelar Pedido con Reembolso Automático)                                                                                                                        |
+| HU30 | Integración de pagos   | M08 — Pagos y Transacciones          | CU#21 (Registrar Transacción); CU#45 (Procesar Reembolso por Cancelación); CU#46 (Generar Reporte de Transacciones para Contabilidad)                                                                                                                                           |
+| HU33 | Gestión de incidencias | M09 — Panel Administrativo           | CU#15 (Gestionar Usuarios (Admin)); CU#16 (Generar Reportes); CU#31 (Monitorear Sistema (Admin)); CU#47 (Banear Usuario por Violación de Términos)                                                                                                                              |
 
 ## Totales verificados
 
@@ -28,3 +28,25 @@
 3. Regenerar los `.md` derivados con `scripts/build_traceability_matrix.py` cuando Notion esté disponible.
 
 > El chequeo automático `traceability-check` reporta 8 HU porque escanea patrones en archivos, no la matriz; no es un indicador fiable para este total.
+
+## Consulta a Notion (2026-11-04)
+
+Se consultó la página oficial **Matriz de Trazabilidad RF↔CU↔HU v4.0** y el
+**Anexo — Tabla de Equivalencias de HUs AgroConnect**.
+
+- La matriz detallada tiene 68 filas (RF-01 a RF-68). De las 6 HU pendientes,
+  solo **HU33** aparece explícitamente: `RF-33 → CU#31 (Monitorear Sistema
+(Admin)) → HU33 (Gestión de incidencias)`.
+- **HU06, HU08, HU15, HU28 y HU30 no aparecen** en la tabla detallada de Notion;
+  por tanto no existe una relación CU↔HU confirmada para ellas en ese documento.
+- El Anexo de Equivalencias advierte que la numeración de las fichas antiguas
+  no coincide con el Product Backlog v2.0:
+  - HU06 actual → **HU14 oficial candidata** (M13, “Solicitar compra al productor”).
+  - HU15 actual → **HU08 oficial candidata** (M02, “Consultar usuarios”).
+  - HU04 actual → **HU11 oficial candidata** (M04/M03, “Publicar productos”).
+  - La tabla está en estado **v0.1 de trabajo** y exige aprobación de Ferrer y
+    Fabián antes de renumerar fichas, casos de prueba, CU o trazabilidad.
+
+**Conclusión:** D7 no se puede cerrar todavía. Agregar relaciones a los CSV sin
+esa aprobación inventaría trazabilidad o consolidaría una numeración que el
+propio SSOT marca como provisional. No se modificaron los CSV.
