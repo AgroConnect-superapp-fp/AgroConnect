@@ -52,7 +52,9 @@ export default defineConfig({
       },
       workbox: {
         cleanupOutdatedCaches: true,
-        globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
+        // El precache final lo genera scripts/generate-sw.mjs después del build;
+        // Workbox no puede globear los assets en este entorno.
+        globPatterns: [],
         navigateFallback: '/index.html',
         runtimeCaching: [
           {

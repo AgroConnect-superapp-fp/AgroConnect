@@ -8,7 +8,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && node scripts/generate-sw.mjs",
     "lint": "eslint . --report-unused-disable-directives --max-warnings 0",
     "lint:fix": "eslint . --fix --report-unused-disable-directives --max-warnings 0",
     "format": "prettier --write \"src/**/*.{ts,tsx,css,json}\"",
@@ -62,7 +62,8 @@
     "typescript-eslint": "^8.72.1",
     "vite": "^8.3.2",
     "vite-plugin-pwa": "^2.0.0",
-    "vitest": "^5.0.5"
+    "vitest": "^5.0.5",
+    "workbox-build": "^7.4.1"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

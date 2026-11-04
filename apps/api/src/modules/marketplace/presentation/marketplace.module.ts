@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { PrismaModule } from '../../../prisma/prisma.module';
+import { env } from '../../../shared/config/env';
 import { IdentityModule } from '../../identity/presentation/identity.module';
 import { PRODUCT_REPOSITORY } from '../application/tokens';
 import { ListProductsUseCase } from '../application/use-cases/ListProductsUseCase';
@@ -17,7 +19,17 @@ import type { ProductRepository } from '../domain/interfaces/ProductRepository';
  * - `presentation`: endpoint público `GET /api/v1/products`.
  */
 @Module({
-  imports: [PrismaModule, IdentityModule],
+  imports: [
+    PrismaModule,
+    IdentityModule,
+    ThrottlerModule.forRoot([
+      {
+        name: 'default',
+        ttl: env.RATE_LIMIT_WINDOW_MS,
+        limit: env.RATE_LIMIT_MAX_ATTEMPTS,
+      },
+    ]),
+  ],
   controllers: [ProductController],
   providers: [
     { provide: PRODUCT_REPOSITORY, useClass: PrismaProductRepository },

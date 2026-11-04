@@ -3,9 +3,10 @@
 #
 #   docker compose up -d
 #
-# Coincide por defecto con el puerto 5434 y la base `agroconnect_dev`
-# esperados por backend/.env (ajusta ambos si tu configuración difiere).
-# El esquema de aplicación se define en backend/.env como DATABASE_SCHEMA.
+# Coincide por defecto con el puerto 5434 y la base local `agroconnect_dev`
+# esperados por apps/api/.env. El entorno administrado de producción usa la
+# base `agroconnect` (ver docs/runbook-despliegue-postgres.md).
+# El esquema de aplicación se define con DATABASE_SCHEMA.
 # ---------------------------------------------------------------------------
 services:
   db:

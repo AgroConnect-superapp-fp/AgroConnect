@@ -9,6 +9,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { productsQuerySchema, publishProductSchema } from '@agroconnect/contracts';
 import type { ProductsQuery, PublishProductInput } from '@agroconnect/contracts';
 import { ListProductsUseCase } from '../../application/use-cases/ListProductsUseCase';
@@ -17,6 +18,7 @@ import { ZodValidationPipe } from '../../../../shared/http/zod-validation.pipe';
 import { success } from '../../../../shared/http/responses';
 import type { AuthenticatedRequest } from '../../../../shared/http/authenticated-user';
 import { SessionAuthGuard } from '../../../identity/presentation/guards/SessionAuthGuard';
+import { AuthThrottlerGuard } from '../../../identity/presentation/guards/AuthThrottlerGuard';
 
 /**
  * Catálogo público del marketplace (M03).
@@ -49,7 +51,8 @@ export class ProductController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @UseGuards(SessionAuthGuard)
+  @UseGuards(SessionAuthGuard, AuthThrottlerGuard)
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
   async create(
     @Req() request: AuthenticatedRequest,
     @Body(new ZodValidationPipe(publishProductSchema, 'Datos del producto inválidos'))

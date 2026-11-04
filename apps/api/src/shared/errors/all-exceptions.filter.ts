@@ -9,6 +9,7 @@ import type { Request, Response } from 'express';
 import { ZodError } from 'zod';
 import { AppError, type ErrorCode } from './errors';
 import { logger } from '../logger/logger';
+import { isDatabaseUnavailable } from '../infrastructure/prismaErrors';
 
 /**
  * Cuerpo de error: EXACTAMENTE el mismo formato que produce el backend legacy
@@ -75,6 +76,20 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     if (exception instanceof HttpException) {
       this.handleHttpException(exception, response, correlationId);
+      return;
+    }
+
+    if (isDatabaseUnavailable(exception)) {
+      logger.error({ err: exception, correlationId }, 'Base de datos no disponible');
+
+      response.status(HttpStatus.SERVICE_UNAVAILABLE).json({
+        success: false,
+        error: {
+          code: 'SERVICE_UNAVAILABLE',
+          message: 'El servicio de datos no está disponible. Intente de nuevo más tarde.',
+        },
+        correlationId,
+      } satisfies ErrorBody);
       return;
     }
 

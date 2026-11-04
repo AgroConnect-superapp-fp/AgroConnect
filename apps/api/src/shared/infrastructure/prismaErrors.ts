@@ -6,10 +6,7 @@ interface PrismaKnownError {
 
 function isPrismaKnownError(error: unknown): error is PrismaKnownError {
   return (
-    typeof error === 'object' &&
-    error !== null &&
-    'code' in error &&
-    typeof error.code === 'string'
+    typeof error === 'object' && error !== null && 'code' in error && typeof error.code === 'string'
   );
 }
 
@@ -23,4 +20,21 @@ export function uniqueViolationTarget(error: unknown): string | null {
     return null;
   }
   return `${JSON.stringify(error.meta ?? {})} ${error.message}`.toLowerCase();
+}
+
+const DATABASE_UNAVAILABLE_CODES = new Set(['P1001', 'P1002', 'P1008', 'P1017', 'P2021', 'P2022']);
+
+/**
+ * Detecta errores de infraestructura de base de datos que deben responder 503
+ * (servicio temporalmente no disponible), no 500.
+ */
+export function isDatabaseUnavailable(error: unknown): boolean {
+  if (isPrismaKnownError(error) && DATABASE_UNAVAILABLE_CODES.has(error.code)) {
+    return true;
+  }
+
+  const message = error instanceof Error ? error.message : String(error);
+  return /can't reach database server|connection terminated|econnrefused|enotfound|etimedout/i.test(
+    message,
+  );
 }

@@ -28,7 +28,8 @@ postgresql://agroconnect_app:<password>@<host>:5432/agroconnect?sslmode=require
 ```
 
 En el runtime, `DATABASE_SCHEMA=agroconnect` y `DATABASE_URL` deben apuntar a
-esa base. Para migraciones se recomienda una conexión directa (sin pooler de
+esa base. El `docker-compose.yml` local usa el nombre `agroconnect_dev`; usa
+`agroconnect` en el entorno administrado. Para migraciones se recomienda una conexión directa (sin pooler de
 transacciones).
 
 ## 2. Variables de entorno de la API

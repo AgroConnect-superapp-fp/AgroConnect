@@ -69,7 +69,7 @@ Migrar la **lectura** del marketplace a la API propia:
 - Migración `20261103114851_add_marketplace_products`; se corrigió el SQL
   generado por Prisma para no eliminar los índices GIST de PostGIS.
 - `GET /api/v1/products` con contrato Zod/OpenAPI sin drift.
-- Backend: **240 tests**, cobertura **94.78 % líneas / 83.26 % ramas**.
+- Backend: **247 tests**, cobertura **94.28 % líneas / 83.59 % ramas**.
 - Frontend: **49 unitarios**, build verde; `MarketplacePrototype` pasó de
   ~281 kB a **57.04 kB** (14.79 kB gzip) al retirar Supabase.
 - E2E: **14 pruebas**, con demo/fallback, publicación y gate axe;

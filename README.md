@@ -8,7 +8,7 @@ Centro de Comercio y Turismo · Regional Quindío · Programa Análisis y Desarr
 
 [![CI](https://github.com/AgroConnect-superapp-fp/AgroConnect/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/AgroConnect-superapp-fp/AgroConnect/actions/workflows/ci.yml)
 [![Node](https://img.shields.io/badge/node-%E2%89%A5%2020-339933?logo=node.js&logoColor=white)](.nvmrc)
-[![Pruebas](https://img.shields.io/badge/pruebas-246%20backend%20%C2%B7%2049%20unit%20%C2%B7%2014%20E2E-brightgreen)](https://github.com/AgroConnect-superapp-fp/AgroConnect/actions/workflows/ci.yml)
+[![Pruebas](https://img.shields.io/badge/pruebas-247%20backend%20%C2%B7%2049%20unit%20%C2%B7%2014%20E2E-brightgreen)](https://github.com/AgroConnect-superapp-fp/AgroConnect/actions/workflows/ci.yml)
 [![Deploy](https://img.shields.io/badge/producci%C3%B3n-Vercel%20%C2%B7%20Render-000000?logo=vercel&logoColor=white)](https://agroconnectpreview.vercel.app)
 [![Licencia](https://img.shields.io/badge/licencia-Todos%20los%20derechos%20reservados-red)](LICENSE)
 
@@ -173,11 +173,11 @@ Características: contraseñas con **Argon2id** (bcrypt legacy con rehash transp
 - Publicación autenticada (`POST /api/v1/products`) con `SessionAuthGuard`, autorización por rol y carga de imágenes a Cloudinary desde el panel del productor.
 - Imágenes de cultivos con créditos (autor · licencia) en la galería, fallback automático por cultivo (`SafeImage`) y LQIP por proveedor (Unsplash/Wikimedia/Cloudinary).
 - Respaldo de datos de demostración con aviso visible cuando la API de productos no responde.
-- PWA: manifest y service worker con `vite-plugin-pwa`; precache del shell y caché de imágenes de Cloudinary y tiles del mapa.
+- PWA: manifest y service worker con `vite-plugin-pwa`; el build genera un precache final con `index.html`, JS, CSS e imágenes, más caché de Cloudinary y tiles del mapa.
 
 ### Calidad
 
-- 246 pruebas backend (NestJS; 94.11 % líneas, 82.73 % ramas) · 49 pruebas unitarias de frontend (Vitest) · 14 pruebas E2E (Playwright: autenticación real, modo demo, marketplace, publicación, perfiles y accesibilidad axe).
+- 247 pruebas backend (NestJS; 94.28 % líneas, 83.59 % ramas) · 49 pruebas unitarias de frontend (Vitest) · 14 pruebas E2E (Playwright: autenticación real, modo demo, marketplace, publicación, perfiles y accesibilidad axe).
 
 ---
 

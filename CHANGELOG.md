@@ -24,6 +24,8 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
   única, capacidad, cobertura, cadena de frío y vigencias; registro UI y
   validación de dominio.
 - **ADR-020:** decisión de perfiles operativos para empresa y transportista.
+- **PWA/precache:** el build genera el service worker final después de Vite, con `index.html`, JS, CSS e imágenes; se elimina el precache vacío de Workbox.
+- **Rate limit y 503:** `POST /products` limita a 10 publicaciones/minuto; los fallos de conexión Prisma responden 503 `SERVICE_UNAVAILABLE`.
 - **Gate de accesibilidad (D9):** `e2e/a11y.spec.ts` con axe sobre marketplace
   y modal; se corrigieron contrastes de badges, productividad, botón de
   reintento y semántica del dropzone de imágenes.
@@ -35,7 +37,7 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 - **Marketplace frontend:** `services/productsApi.ts` reemplaza
   `services/supabase.ts`; se elimina `@supabase/supabase-js` del bundle y del
   lockfile. El fallback demo se activa si la API no responde. 246 tests backend
-  (82.73 % ramas), 49 unitarios frontend y 14 pruebas E2E.
+  (83.59 % ramas), 49 unitarios frontend y 14 pruebas E2E.
 - **PropertyMap Fase 2:** `useMapViewport`, `useMapSearch`, `useMapDrawing` y
   `usePropertySelection` extraídos, junto con los puentes `MapViewport` /
   `MapDrawing` y los helpers `mapUtils` / `mapSearchUtils`; 952 → 601 líneas,

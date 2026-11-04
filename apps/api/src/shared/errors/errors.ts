@@ -20,6 +20,7 @@ export type ErrorCode =
   | 'EMAIL_NOT_VERIFIED'
   | 'TOKEN_INVALID'
   | 'RATE_LIMITED'
+  | 'SERVICE_UNAVAILABLE'
   | 'NOT_FOUND'
   | 'BAD_REQUEST'
   | 'UNAUTHORIZED'
