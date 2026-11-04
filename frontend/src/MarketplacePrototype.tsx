@@ -807,6 +807,12 @@ function App(): React.ReactElement {
         <PropertyDetailModal
           property={selectedProperty}
           onClose={() => setSelectedProperty(null)}
+          onPropertyUpdated={(updated) => {
+            setProperties((current) =>
+              current.map((item) => (item.id === updated.id ? updated : item))
+            );
+            setSelectedProperty(updated);
+          }}
         />
       )}
     </div>

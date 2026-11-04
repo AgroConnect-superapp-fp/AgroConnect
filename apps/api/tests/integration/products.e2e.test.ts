@@ -105,6 +105,7 @@ describe('Products (e2e)', () => {
         certification: 'organic',
         lat: 4.5339,
         lng: -75.6811,
+        producerId,
         images: [
           {
             publicId: 'cld-sample-4',
@@ -225,6 +226,101 @@ describe('Products (e2e)', () => {
     expect(response.body).toMatchObject({
       success: false,
       error: { code: 'VALIDATION_ERROR' },
+    });
+  });
+
+  describe('PATCH /api/v1/products/:id (imágenes del propietario)', () => {
+    it('reemplaza las imágenes del producto autenticado', async () => {
+      const response = await request(server)
+        .patch(`/api/v1/products/${productId}`)
+        .set('Cookie', `access_token=${producerToken}`)
+        .send({
+          images: [
+            {
+              publicId: 'agroconnect/products/e2e/actualizada',
+              alt: 'Imagen actualizada',
+              url: 'https://res.cloudinary.com/demo/image/upload/e2e.png',
+            },
+          ],
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body).toMatchObject({
+        success: true,
+        message: 'Imágenes del producto actualizadas',
+        data: {
+          id: productId,
+          images: [
+            expect.objectContaining({
+              publicId: 'agroconnect/products/e2e/actualizada',
+            }),
+          ],
+        },
+      });
+    });
+
+    it('rechaza a un comprador con 403', async () => {
+      const response = await request(server)
+        .patch(`/api/v1/products/${productId}`)
+        .set('Cookie', `access_token=${buyerToken}`)
+        .send({ images: [] });
+
+      expect(response.status).toBe(403);
+      expect(response.body).toMatchObject({
+        success: false,
+        error: { code: 'FORBIDDEN' },
+      });
+    });
+
+    it('rechaza más de 6 imágenes con 422', async () => {
+      const response = await request(server)
+        .patch(`/api/v1/products/${productId}`)
+        .set('Cookie', `access_token=${producerToken}`)
+        .send({
+          images: Array.from({ length: 7 }, (_, index) => ({ publicId: `imagen-${index}` })),
+        });
+
+      expect(response.status).toBe(422);
+      expect(response.body).toMatchObject({
+        success: false,
+        error: { code: 'VALIDATION_ERROR' },
+      });
+    });
+  });
+
+  describe('POST /api/v1/uploads/signature', () => {
+    it('rechaza sin cookie de sesión con 401', async () => {
+      const response = await request(server).post('/api/v1/uploads/signature');
+
+      expect(response.status).toBe(401);
+      expect(response.body).toMatchObject({
+        success: false,
+        error: { code: 'TOKEN_INVALID' },
+      });
+    });
+
+    it('rechaza a un comprador con 403', async () => {
+      const response = await request(server)
+        .post('/api/v1/uploads/signature')
+        .set('Cookie', `access_token=${buyerToken}`);
+
+      expect(response.status).toBe(403);
+      expect(response.body).toMatchObject({
+        success: false,
+        error: { code: 'FORBIDDEN' },
+      });
+    });
+
+    it('responde 503 si Cloudinary no está configurado', async () => {
+      const response = await request(server)
+        .post('/api/v1/uploads/signature')
+        .set('Cookie', `access_token=${producerToken}`);
+
+      expect(response.status).toBe(503);
+      expect(response.body).toMatchObject({
+        success: false,
+        error: { code: 'SERVICE_UNAVAILABLE' },
+      });
     });
   });
 

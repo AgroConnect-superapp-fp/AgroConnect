@@ -4,16 +4,28 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
+  ParseUUIDPipe,
+  Patch,
   Post,
   Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
-import { productsQuerySchema, publishProductSchema } from '@agroconnect/contracts';
-import type { ProductsQuery, PublishProductInput } from '@agroconnect/contracts';
+import {
+  productsQuerySchema,
+  publishProductSchema,
+  updateProductImagesSchema,
+} from '@agroconnect/contracts';
+import type {
+  ProductsQuery,
+  PublishProductInput,
+  UpdateProductImagesInput,
+} from '@agroconnect/contracts';
 import { ListProductsUseCase } from '../../application/use-cases/ListProductsUseCase';
 import { PublishProductUseCase } from '../../application/use-cases/PublishProductUseCase';
+import { UpdateProductImagesUseCase } from '../../application/use-cases/UpdateProductImagesUseCase';
 import { ZodValidationPipe } from '../../../../shared/http/zod-validation.pipe';
 import { success } from '../../../../shared/http/responses';
 import type { AuthenticatedRequest } from '../../../../shared/http/authenticated-user';
@@ -32,6 +44,7 @@ export class ProductController {
   constructor(
     private readonly listProductsUseCase: ListProductsUseCase,
     private readonly publishProductUseCase: PublishProductUseCase,
+    private readonly updateProductImagesUseCase: UpdateProductImagesUseCase,
   ) {}
 
   @Get()
@@ -66,5 +79,24 @@ export class ProductController {
     const product = await this.publishProductUseCase.execute(request.user, body);
 
     return success(product.props, 'Producto publicado correctamente');
+  }
+
+  @Patch(':id')
+  @UseGuards(SessionAuthGuard, AuthThrottlerGuard)
+  @Throttle({ default: { limit: 20, ttl: 60_000 } })
+  async updateImages(
+    @Req() request: AuthenticatedRequest,
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Body(new ZodValidationPipe(updateProductImagesSchema, 'Datos de imágenes inválidos'))
+    body: UpdateProductImagesInput,
+  ): Promise<unknown> {
+    const user = request.user!;
+    const product = await this.updateProductImagesUseCase.execute(
+      { id: user.id, role: user.role },
+      id,
+      body.images,
+    );
+
+    return success(product.props, 'Imágenes del producto actualizadas');
   }
 }

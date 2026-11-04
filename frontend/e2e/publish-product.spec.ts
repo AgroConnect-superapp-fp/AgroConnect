@@ -63,6 +63,25 @@ test('un productor publica una cosecha con una imagen', async ({ page }) => {
   expect(loggedIn.status()).toBe(200);
 
   const image = await readFile('public/pwa-192x192.png');
+  await page.route('**/api/v1/uploads/signature', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        success: true,
+        message: 'Firma de subida generada',
+        data: {
+          cloudName: 'demo',
+          apiKey: 'e2e-key',
+          timestamp: Math.floor(Date.now() / 1000),
+          signature: 'e2e-signature',
+          folder: `agroconnect/products/e2e-${suffix}`,
+          allowedFormats: ['jpg', 'jpeg', 'png', 'webp', 'avif'],
+          maxBytes: 10 * 1024 * 1024,
+        },
+      }),
+    })
+  );
   await page.route('https://api.cloudinary.com/**', (route) =>
     route.fulfill({
       status: 200,
@@ -106,4 +125,28 @@ test('un productor publica una cosecha con una imagen', async ({ page }) => {
     page.getByRole('heading', { name: /Productores Destacados/ })
   ).toBeVisible();
   await expect(page.getByText(productName)).toBeVisible();
+
+  await page.getByRole('button', { name: 'Ver Detalles y Fotos' }).first().click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toBeVisible();
+
+  const patchResponse = page.waitForResponse(
+    (response) =>
+      response.url().includes('/api/v1/products/') &&
+      response.request().method() === 'PATCH'
+  );
+  await dialog.locator('input[type="file"]').setInputFiles({
+    name: 'segunda.png',
+    mimeType: 'image/png',
+    buffer: image,
+  });
+  const patched = await patchResponse;
+  expect(patched.status()).toBe(200);
+
+  const listed = await page.request.get(
+    `${BACKEND_URL}/api/v1/products?search=${encodeURIComponent(productName)}`
+  );
+  expect(listed.status()).toBe(200);
+  const body = (await listed.json()) as { data: Array<{ images: unknown[] }> };
+  expect(body.data[0]?.images).toHaveLength(2);
 });

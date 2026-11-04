@@ -4,7 +4,7 @@ Referencias: OWASP ASVS 4.0.3 nivel 2 y OWASP API Security Top 10 (2023). Este d
 
 **Leyenda:** ✅ implementado · 🟡 parcial · ⏳ planificado (incremento indicado).
 
-**Última revisión:** 2026-11-04, tras el marketplace sobre API propia, la publicación autenticada, los perfiles 2c y el gate axe.
+**Última revisión:** 2026-11-04, tras el marketplace sobre API propia, la publicación autenticada, los perfiles 2c, la subida firmada a Cloudinary y la edición de imágenes por propietario.
 
 ## Autenticación y sesión (ASVS V2, V3)
 
@@ -26,9 +26,9 @@ Referencias: OWASP ASVS 4.0.3 nivel 2 y OWASP API Security Top 10 (2023). Este d
 | Control                                             | Estado | Evidencia o plan                                                                         |
 | --------------------------------------------------- | ------ | ---------------------------------------------------------------------------------------- |
 | Sin auto-registro de roles privilegiados            | ✅     | PR #51 (`ROLE_NOT_ALLOWED`)                                                              |
-| Autenticación obligatoria en rutas privadas (guard) | 🟡     | `SessionAuthGuard` en publicación; falta en futuros endpoints privados                   |
+| Autenticación obligatoria en rutas privadas (guard) | ✅     | `SessionAuthGuard` en publicación, perfiles, firma de subida y edición de imágenes       |
 | RBAC por permisos                                   | 🟡     | `PublishProductUseCase` restringe productor/administrador; falta un `RolesGuard` general |
-| Autorización por propiedad del recurso (BOLA)       | 🟡     | `producerId` se toma de la sesión; faltan CRUD/edición por propietario                   |
+| Autorización por propiedad del recurso (BOLA)       | ✅     | `PATCH /products/:id` valida `producerId` de la sesión; administrador puede moderar      |
 | Filtrado de campos de salida (sin `passwordHash`)   | ✅     | `toPublicProfile()`                                                                      |
 
 ## Validación, inyección y XSS (ASVS V5 · API8)
@@ -42,13 +42,14 @@ Referencias: OWASP ASVS 4.0.3 nivel 2 y OWASP API Security Top 10 (2023). Este d
 
 ## Configuración, transporte y cabeceras (ASVS V14 · API8)
 
-| Control                                                         | Estado | Evidencia o plan                                                       |
-| --------------------------------------------------------------- | ------ | ---------------------------------------------------------------------- |
-| Helmet en la API                                                | ✅     | `app.setup.ts`                                                         |
-| CORS con lista blanca por entorno (sin localhost en producción) | ✅     | PR #51 (`render.yaml`)                                                 |
-| CSP, HSTS, X-Frame-Options y Referrer-Policy en el frontend     | ✅     | `vercel.json` (CSP, XFO, XCTO, Referrer-Policy, HSTS)                  |
-| Secretos solo por variables de entorno, validados al arrancar   | ✅     | `config/env.ts` (zod)                                                  |
-| Subidas a Cloudinary firmadas por el backend                    | ⏳     | Hoy se usa un preset unsigned; requiere endpoint de firma y moderación |
+| Control                                                         | Estado | Evidencia o plan                                                                    |
+| --------------------------------------------------------------- | ------ | ----------------------------------------------------------------------------------- |
+| Helmet en la API                                                | ✅     | `app.setup.ts`                                                                      |
+| CORS con lista blanca por entorno (sin localhost en producción) | ✅     | PR #51 (`render.yaml`)                                                              |
+| CSP, HSTS, X-Frame-Options y Referrer-Policy en el frontend     | ✅     | `vercel.json` (CSP, XFO, XCTO, Referrer-Policy, HSTS)                               |
+| Secretos solo por variables de entorno, validados al arrancar   | ✅     | `config/env.ts` (zod)                                                               |
+| Subidas a Cloudinary firmadas por el backend                    | ✅     | `POST /uploads/signature` (SHA-1, carpeta por usuario, formatos permitidos, 20/min) |
+| Moderación de imágenes aprobada por administrador               | ⏳     | `moderationStatus` existe en el contrato; falta flujo administrativo y política     |
 
 ## Registro y monitoreo (ASVS V7)
 

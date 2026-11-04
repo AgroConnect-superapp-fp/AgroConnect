@@ -9,6 +9,16 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 
 ### Añadido
 
+- **Subida firmada a Cloudinary:** `POST /api/v1/uploads/signature`
+  (productor/administrador) emite `timestamp`, `folder` por usuario,
+  `allowed_formats` y firma SHA-1; el `api_secret` nunca llega al frontend.
+  Sin credenciales Cloudinary el endpoint responde 503.
+- **Edición de imágenes por propietario:** `PATCH /api/v1/products/:id`
+  reemplaza hasta 6 imágenes; el caso de uso valida rol, propiedad (BOLA) y
+  existencia. El modal guarda las imágenes en PostgreSQL y actualiza la galería.
+- **Multi-imagen:** el modal ahora notifica solo las imágenes nuevas y evita
+  duplicados al re-renderizar.
+
 - **Perfil autenticado (`GET/PATCH /api/v1/profile/me`):** consulta y edición
   del perfil del rol en sesión (finca, empresa o transportista), con contrato
   Zod/OpenAPI, autorización por rol, persistencia Prisma/PostGIS y pantalla
@@ -36,11 +46,10 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 - **Gate de accesibilidad (D9):** `e2e/a11y.spec.ts` con axe sobre marketplace
   y modal; se corrigieron contrastes de badges, productividad, botón de
   reintento y semántica del dropzone de imágenes.
-- **Fix build PWA:** `scripts/generate-sw.mjs` usa `result.size` en lugar de
-  una variable inexistente (`totalBytes`), evitando que el build falle tras
-  generar el service worker.
+- **Fix build PWA:** `scripts/generate-sw.mjs` calcula el tamaño real del
+  precache; el build ya no falla por `totalBytes` y reporta 20 entradas.
 - **Despliegue PostgreSQL propio:** runbook operativo y script
-  `npm run smoke:cloudinary` para validar el preset unsigned sin subir PII.
+  `npm run smoke:cloudinary` para validar credenciales firmadas sin subir PII.
 
 ### Cambiado
 

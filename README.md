@@ -179,14 +179,16 @@ Características: contraseñas con **Argon2id** (bcrypt legacy con rehash transp
 
 - Marketplace React sobre `GET /api/v1/products` (NestJS + Prisma + PostgreSQL): mapa, KPIs, distribución por cultivo y tarjetas de fincas.
 - Filtros de búsqueda, cultivo, departamento, municipio y certificación, con paginación validada por contrato Zod.
-- Publicación autenticada (`POST /api/v1/products`) con `SessionAuthGuard`, autorización por rol y carga de imágenes a Cloudinary desde el panel del productor.
+- Publicación autenticada (`POST /api/v1/products`) con `SessionAuthGuard`, autorización por rol y carga de imágenes desde el panel del productor.
+- Subida firmada a Cloudinary (`POST /api/v1/uploads/signature`): el secreto se queda en el backend y el navegador recibe una firma de corta duración.
+- Edición de imágenes por propietario (`PATCH /api/v1/products/:id`) desde el modal; el productor no puede modificar productos ajenos.
 - Imágenes de cultivos con créditos (autor · licencia) en la galería, fallback automático por cultivo (`SafeImage`) y LQIP por proveedor (Unsplash/Wikimedia/Cloudinary).
 - Respaldo de datos de demostración con aviso visible cuando la API de productos no responde.
 - PWA: manifest y service worker con `vite-plugin-pwa`; el build genera un precache final con `index.html`, JS, CSS e imágenes, más caché de Cloudinary y tiles del mapa.
 
 ### Calidad
 
-- 267 pruebas backend (NestJS; 93.92 % líneas, 82.23 % ramas) · 49 pruebas unitarias de frontend (Vitest) · 14 pruebas E2E (Playwright: autenticación real, modo demo, marketplace, publicación, perfiles y accesibilidad axe).
+- 282 pruebas backend (NestJS; 94.09 % líneas, 82.64 % ramas) · 49 pruebas unitarias de frontend (Vitest) · 14 pruebas E2E (Playwright: autenticación real, modo demo, marketplace, publicación, perfiles, imágenes y accesibilidad axe).
 
 ---
 
@@ -240,7 +242,7 @@ cd frontend && npm run test:e2e        # E2E (levanta API y web)
 
 - **URL de producción:** https://agroconnectpreview.vercel.app
 - **Proyecto:** `agro-connect/agroconnectpreview` · **Root Directory:** `frontend` · Node 24.x
-- **Variables de entorno (Production/Preview):** `VITE_API_URL`, `VITE_CLOUDINARY_CLOUD_NAME`, `VITE_CLOUDINARY_UPLOAD_PRESET`.
+- **Variables de entorno (Production/Preview):** `VITE_API_URL`, `VITE_CLOUDINARY_CLOUD_NAME`. La subida se firma en la API; no se expone ningún secreto.
 
 > **Nota de infraestructura (plan Hobby):** Vercel no permite conectar repositorios privados de organizaciones sin plan Pro, por lo que la Git Integration nativa no está activa. El job `deploy` del CI queda como respaldo automático (condicionado al scope del token) y no marca el pipeline en rojo si el token no tiene acceso.
 

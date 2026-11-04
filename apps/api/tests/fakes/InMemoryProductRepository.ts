@@ -26,6 +26,10 @@ export class InMemoryProductRepository implements ProductRepository {
     return this.products;
   }
 
+  async findById(id: string): Promise<Product | null> {
+    return this.products.find((product) => product.id === id) ?? null;
+  }
+
   async create(data: NewProductData): Promise<Product> {
     const product = new Product({
       id: randomUUID(),
@@ -33,5 +37,15 @@ export class InMemoryProductRepository implements ProductRepository {
     });
     this.products.push(product);
     return product;
+  }
+
+  async updateImages(id: string, images: Product['props']['images']): Promise<Product> {
+    const index = this.products.findIndex((product) => product.id === id);
+    if (index === -1) {
+      throw new Error('producto no encontrado');
+    }
+    const updated = new Product({ ...this.products[index]!.props, images });
+    this.products[index] = updated;
+    return updated;
   }
 }

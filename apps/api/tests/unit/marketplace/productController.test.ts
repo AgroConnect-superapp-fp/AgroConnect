@@ -2,6 +2,7 @@ import { productsQuerySchema, publishProductSchema } from '@agroconnect/contract
 import { ProductController } from '../../../src/modules/marketplace/presentation/controllers/ProductController';
 import type { ListProductsUseCase } from '../../../src/modules/marketplace/application/use-cases/ListProductsUseCase';
 import type { PublishProductUseCase } from '../../../src/modules/marketplace/application/use-cases/PublishProductUseCase';
+import type { UpdateProductImagesUseCase } from '../../../src/modules/marketplace/application/use-cases/UpdateProductImagesUseCase';
 import { Product } from '../../../src/modules/marketplace/domain/entities/Product';
 import { ZodValidationPipe } from '../../../src/shared/http/zod-validation.pipe';
 import type { AuthenticatedRequest } from '../../../src/shared/http/authenticated-user';
@@ -13,17 +14,21 @@ import type { AuthenticatedRequest } from '../../../src/shared/http/authenticate
 function buildController() {
   const execute = jest.fn();
   const publishExecute = jest.fn();
+  const updateImagesExecute = jest.fn();
   const useCase = { execute } as unknown as ListProductsUseCase;
   const publishUseCase = { execute: publishExecute } as unknown as PublishProductUseCase;
+  const updateImagesUseCase = {
+    execute: updateImagesExecute,
+  } as unknown as UpdateProductImagesUseCase;
   const pipe = new ZodValidationPipe(productsQuerySchema, 'Parámetros de búsqueda inválidos');
 
-  const controller = new ProductController(useCase, publishUseCase);
+  const controller = new ProductController(useCase, publishUseCase, updateImagesUseCase);
   const call = async (query: unknown) => {
     const parsed = pipe.transform(query);
     return controller.findAll(parsed);
   };
 
-  return { execute, publishExecute, controller, call };
+  return { execute, publishExecute, updateImagesExecute, controller, call };
 }
 
 describe('ProductController.findAll', () => {

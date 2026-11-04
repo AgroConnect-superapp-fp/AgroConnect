@@ -22,3 +22,9 @@ process.env.LOG_LEVEL = process.env.LOG_LEVEL ?? 'fatal';
 // servidor externo. Se deshabilita para que se use el servicio de archivo.
 process.env.SMTP_HOST = '';
 process.env.MAIL_DIR = process.env.MAIL_DIR ?? '/tmp/agroconnect-mails-test';
+
+// Las pruebas no llaman a Cloudinary real. La firma debe responder 503 si no
+// hay credenciales; los tests unitarios de firma inyectan su propia config.
+process.env.CLOUDINARY_CLOUD_NAME = '';
+process.env.CLOUDINARY_API_KEY = '';
+process.env.CLOUDINARY_API_SECRET = '';

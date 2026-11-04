@@ -53,6 +53,11 @@ export class PrismaProductRepository implements ProductRepository {
     return rows.map((row) => this.toDomain(row));
   }
 
+  async findById(id: string): Promise<Product | null> {
+    const row = await this.prisma.product.findUnique({ where: { id } });
+    return row ? this.toDomain(row) : null;
+  }
+
   async create(data: NewProductData): Promise<Product> {
     const row = await this.prisma.product.create({
       data: {
@@ -74,6 +79,14 @@ export class PrismaProductRepository implements ProductRepository {
       },
     });
 
+    return this.toDomain(row);
+  }
+
+  async updateImages(id: string, images: ProductImage[]): Promise<Product> {
+    const row = await this.prisma.product.update({
+      where: { id },
+      data: { images: images as unknown as Prisma.InputJsonValue },
+    });
     return this.toDomain(row);
   }
 

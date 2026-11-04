@@ -2,25 +2,22 @@
 /**
  * Smoke test de Cloudinary para AgroConnect.
  *
- * Usa el preset unsigned del frontend (los mismos valores públicos que recibe
- * el navegador). No lee ni imprime secretos, y sube una imagen mínima sin PII.
+ * Usa las credenciales server-side (`CLOUDINARY_API_SECRET`) para firmar una
+ * subida de prueba. No imprime el secreto y sube una imagen mínima sin PII.
  *
  * Uso:
- *   CLOUDINARY_CLOUD_NAME=... CLOUDINARY_UPLOAD_PRESET=... \
+ *   CLOUDINARY_CLOUD_NAME=... CLOUDINARY_API_KEY=... CLOUDINARY_API_SECRET=... \
  *     npm run smoke:cloudinary
- *
- * También acepta los nombres VITE_CLOUDINARY_CLOUD_NAME y
- * VITE_CLOUDINARY_UPLOAD_PRESET para reutilizar el .env.local del frontend.
  */
-const cloudName =
-  process.env.CLOUDINARY_CLOUD_NAME ?? process.env.VITE_CLOUDINARY_CLOUD_NAME;
-const uploadPreset =
-  process.env.CLOUDINARY_UPLOAD_PRESET ??
-  process.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+import { createHash } from "node:crypto";
 
-if (!cloudName || !uploadPreset) {
+const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+const apiKey = process.env.CLOUDINARY_API_KEY;
+const apiSecret = process.env.CLOUDINARY_API_SECRET;
+
+if (!cloudName || !apiKey || !apiSecret) {
   console.error(
-    "Faltan CLOUDINARY_CLOUD_NAME/CLOUDINARY_UPLOAD_PRESET (o sus equivalentes VITE_*).",
+    "Faltan CLOUDINARY_CLOUD_NAME/CLOUDINARY_API_KEY/CLOUDINARY_API_SECRET.",
   );
   console.error("Configúralos en la sesión y vuelve a ejecutar el smoke test.");
   process.exitCode = 1;
@@ -37,9 +34,19 @@ if (!cloudName || !uploadPreset) {
     new Blob([png], { type: "image/png" }),
     "agroconnect-smoke.png",
   );
-  form.append("upload_preset", uploadPreset);
-  form.append("folder", "agroconnect/smoke");
-  form.append("tags", "smoke-test");
+  const folder = "agroconnect/smoke";
+  const allowedFormats = "jpg,jpeg,png,webp,avif";
+  const timestamp = Math.floor(Date.now() / 1000);
+  const toSign = `allowed_formats=${allowedFormats}&folder=${folder}&timestamp=${timestamp}`;
+  const signature = createHash("sha1")
+    .update(`${toSign}${apiSecret}`)
+    .digest("hex");
+
+  form.append("api_key", apiKey);
+  form.append("timestamp", String(timestamp));
+  form.append("signature", signature);
+  form.append("folder", folder);
+  form.append("allowed_formats", allowedFormats);
 
   try {
     const response = await fetch(

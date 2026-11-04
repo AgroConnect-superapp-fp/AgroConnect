@@ -115,6 +115,26 @@ describe('AllExceptionsFilter', () => {
     expect(JSON.stringify(captured.body)).not.toContain('pool');
   });
 
+  it('preserva 503 SERVICE_UNAVAILABLE sin exponer el mensaje interno', () => {
+    const { host, captured } = createHost();
+
+    filter.catch(
+      new DomainError('SERVICE_UNAVAILABLE', 'Cloudinary no configurado: secreto interno', 503),
+      host,
+    );
+
+    expect(captured.statusCode).toBe(503);
+    expect(captured.body).toEqual({
+      success: false,
+      error: {
+        code: 'SERVICE_UNAVAILABLE',
+        message: 'Servicio no disponible. Intente de nuevo más tarde.',
+      },
+      correlationId: 'corr-123',
+    });
+    expect(JSON.stringify(captured.body)).not.toContain('Cloudinary');
+  });
+
   it('traduce un fallo de conexión de Prisma a 503 SERVICE_UNAVAILABLE', () => {
     const { host, captured } = createHost();
 

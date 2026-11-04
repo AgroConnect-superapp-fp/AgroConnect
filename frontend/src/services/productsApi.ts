@@ -1,5 +1,5 @@
 import type { Product, ProductsQuery, PublishProductInput } from '@agroconnect/contracts';
-import type { Property } from '../types/property';
+import type { Property, PropertyImage } from '../types/property';
 import { apiRequest } from './apiClient';
 
 /**
@@ -81,6 +81,22 @@ export function searchProducts(query: string): Promise<Property[]> {
  * La subida de imágenes ocurre antes, desde el formulario, con el preset
  * unsigned de Cloudinary; aquí solo viajan los metadatos ya subidos.
  */
+export async function updateProductImages(
+  productId: string,
+  images: PropertyImage[]
+): Promise<Property> {
+  const product = await apiRequest<Product>(
+    `/api/v1/products/${productId}`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify({ images }),
+    },
+    15_000
+  );
+
+  return toProperty(product);
+}
+
 export async function publishProduct(payload: PublishProductInput): Promise<Property> {
   const product = await apiRequest<Product>(
     '/api/v1/products',

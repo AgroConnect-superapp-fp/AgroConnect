@@ -48,6 +48,7 @@ export function ImageUpload({
   const [previews, setPreviews] = useState<Array<{ file: File; url: string }>>([]);
   const [validationError, setValidationError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const lastNotifiedCountRef = useRef(0);
 
   const { uploadState, handleUpload, handleDrop, handleDragOver, reset } = useImageUpload(
     folder,
@@ -150,6 +151,7 @@ export function ImageUpload({
     previews.forEach((preview) => URL.revokeObjectURL(preview.url));
     setPreviews([]);
     setValidationError(null);
+    lastNotifiedCountRef.current = 0;
     reset();
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -165,13 +167,16 @@ export function ImageUpload({
 
   // Notify parent when upload completes (improved timing)
   React.useEffect(() => {
+    const count = uploadState.uploadedImages.length;
     if (
       !uploadState.isUploading &&
-      uploadState.uploadedImages.length > 0 &&
+      count > lastNotifiedCountRef.current &&
       !uploadState.error &&
       onImagesUploaded
     ) {
-      onImagesUploaded(uploadState.uploadedImages);
+      const newImages = uploadState.uploadedImages.slice(lastNotifiedCountRef.current);
+      lastNotifiedCountRef.current = count;
+      onImagesUploaded(newImages);
     }
   }, [
     uploadState.isUploading,

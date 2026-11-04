@@ -23,19 +23,17 @@ import { Cloudinary } from '@cloudinary/url-gen';
 import { format, quality } from '@cloudinary/url-gen/actions/delivery';
 import { scale, fill } from '@cloudinary/url-gen/actions/resize';
 import { byRadius } from '@cloudinary/url-gen/actions/roundCorners';
+import type { UploadSignature } from '@agroconnect/contracts';
+import { apiRequest } from './apiClient';
 
 /**
  * Cloudinary configuration from environment variables.
  *
- * SECURITY: Only CLOUD_NAME and UPLOAD_PRESET are exposed to the client.
- * These are public by design (visible in network requests anyway).
- * API_KEY and API_SECRET are intentionally excluded - they must only
- * exist in the backend environment.
+ * SECURITY: Only CLOUD_NAME is exposed to the client. La subida usa una
+ * firma emitida por el backend; API_KEY y API_SECRET no viven en el bundle.
  */
 export const CLOUDINARY_CONFIG = {
   cloudName: (import.meta.env['VITE_CLOUDINARY_CLOUD_NAME'] as string) || 'demo',
-  uploadPreset:
-    (import.meta.env['VITE_CLOUDINARY_UPLOAD_PRESET'] as string) || 'ml_default',
 } as const;
 
 /**
@@ -291,12 +289,29 @@ function sleep(ms: number): Promise<void> {
  */
 export async function uploadImage({
   file,
-  folder = 'agroconnect',
-  tags = [],
   signal,
   onProgress,
   maxRetries = 2,
 }: UploadOptions): Promise<CloudinaryUploadResponse> {
+  if (signal?.aborted) {
+    throw new DOMException('Upload aborted', 'AbortError');
+  }
+
+  let signature: UploadSignature;
+  try {
+    signature = await apiRequest<UploadSignature>(
+      '/api/v1/uploads/signature',
+      { method: 'POST' },
+      10_000
+    );
+  } catch (error) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : 'No fue posible preparar la carga de imágenes.';
+    throw new Error(message);
+  }
+
   let lastError: Error | null = null;
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
@@ -306,7 +321,7 @@ export async function uploadImage({
     }
 
     try {
-      return await performUpload(file, folder, tags, signal, onProgress);
+      return await performUpload(file, signature, signal, onProgress);
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
 
@@ -339,8 +354,7 @@ export async function uploadImage({
  */
 function performUpload(
   file: File,
-  folder: string,
-  tags: string[],
+  signature: UploadSignature,
   signal: AbortSignal | undefined,
   onProgress?: (progress: number) => void
 ): Promise<CloudinaryUploadResponse> {
@@ -349,11 +363,11 @@ function performUpload(
     const formData = new FormData();
 
     formData.append('file', file);
-    formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset);
-    formData.append('folder', folder);
-    if (tags.length > 0) {
-      formData.append('tags', tags.join(','));
-    }
+    formData.append('api_key', signature.apiKey);
+    formData.append('timestamp', String(signature.timestamp));
+    formData.append('signature', signature.signature);
+    formData.append('folder', signature.folder);
+    formData.append('allowed_formats', signature.allowedFormats.join(','));
 
     // Handle abort signal
     if (signal) {
@@ -394,7 +408,7 @@ function performUpload(
 
     xhr.open(
       'POST',
-      `https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/image/upload`
+      `https://api.cloudinary.com/v1_1/${signature.cloudName}/image/upload`
     );
     xhr.send(formData);
   });

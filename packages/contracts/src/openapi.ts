@@ -26,7 +26,9 @@ import {
   productSchema,
   productsQuerySchema,
   publishProductSchema,
+  updateProductImagesSchema,
 } from "./productSchemas";
+import { uploadSignatureSchema } from "./uploadSchemas";
 
 export interface OpenApiDocument {
   openapi: "3.1.0";
@@ -263,6 +265,41 @@ export function buildOpenApiDocument(): OpenApiDocument {
           },
         },
       },
+      "/products/{id}": {
+        patch: {
+          tags: ["Marketplace"],
+          summary: "Actualiza las imágenes de un producto del propietario",
+          parameters: [
+            {
+              name: "id",
+              in: "path",
+              required: true,
+              schema: { type: "string", format: "uuid" },
+            },
+          ],
+          requestBody: jsonBody("UpdateProductImagesRequestBody"),
+          responses: {
+            "200": response("Imágenes actualizadas", "Product"),
+            "401": response("Sesión ausente, expirada o inválida"),
+            "403": response("El usuario no es propietario ni administrador"),
+            "404": response("Producto no encontrado"),
+            ...validationErrors,
+          },
+        },
+      },
+      "/uploads/signature": {
+        post: {
+          tags: ["Uploads"],
+          summary: "Genera una firma de subida directa a Cloudinary",
+          responses: {
+            "200": response("Firma de subida", "UploadSignature"),
+            "401": response("Sesión ausente, expirada o inválida"),
+            "403": response("El rol no puede subir imágenes de producto"),
+            "429": response("Demasiadas solicitudes: límite de tasa aplicado"),
+            "503": response("Cloudinary no configurado en este entorno"),
+          },
+        },
+      },
     },
     components: {
       schemas: {
@@ -282,6 +319,10 @@ export function buildOpenApiDocument(): OpenApiDocument {
         ProfileUpdateRequestBody: z.toJSONSchema(profileUpdateSchema),
         ProfileSnapshot: z.toJSONSchema(profileSnapshotSchema),
         PublishProductRequestBody: z.toJSONSchema(publishProductSchema),
+        UpdateProductImagesRequestBody: z.toJSONSchema(
+          updateProductImagesSchema,
+        ),
+        UploadSignature: z.toJSONSchema(uploadSignatureSchema),
         ProductList: {
           type: "array",
           items: { $ref: "#/components/schemas/Product" },

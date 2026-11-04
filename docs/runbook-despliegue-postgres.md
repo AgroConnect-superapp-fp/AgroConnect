@@ -44,6 +44,8 @@ Configurar en el proveedor (Render u otro) sin commitear valores:
 - `APP_BASE_URL=https://<frontend>`
 - `TRUST_PROXY=1` si está detrás de un proxy
 - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_SECURE`, `SMTP_FROM`
+- `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `CLOUDINARY_UPLOAD_FOLDER=agroconnect/products`
+  (las tres primeras se configuran juntas; sin ellas la firma de subida responde 503)
 - `LOG_LEVEL=info`, `NODE_ENV=production`
 
 ## 3. Migraciones y seed
@@ -82,24 +84,22 @@ Configurar en Vercel (Production y Preview):
 
 - `VITE_API_URL=https://<api>`
 - `VITE_CLOUDINARY_CLOUD_NAME`
-- `VITE_CLOUDINARY_UPLOAD_PRESET`
 
 El marketplace ya no usa `VITE_SUPABASE_*`. Verificar que el modo demo carga
 aunque la API no responda y que el registro/login usa cookies httpOnly.
 
 ## 6. Smoke test de Cloudinary
 
-Con el preset unsigned configurado:
+Con las credenciales server-side configuradas:
 
 ```bash
-CLOUDINARY_CLOUD_NAME='<cloud>' CLOUDINARY_UPLOAD_PRESET='<preset>' \
-  npm run smoke:cloudinary
+CLOUDINARY_CLOUD_NAME='<cloud>' CLOUDINARY_API_KEY='<key>' \
+CLOUDINARY_API_SECRET='<secret>' npm run smoke:cloudinary
 ```
 
-También acepta `VITE_CLOUDINARY_CLOUD_NAME` y
-`VITE_CLOUDINARY_UPLOAD_PRESET`. El script sube un PNG 1×1 sin PII y solo
-imprime `public_id` y `secure_url`. Si falla, revisar que el preset sea
-unsigned y permita subidas desde el dominio del frontend.
+El script firma la subida con SHA-1, sube un PNG 1×1 sin PII y solo imprime
+`public_id` y `secure_url`. Si falla, revisar que las tres credenciales
+pertenezcan al mismo cloud y que la carpeta `agroconnect/smoke` sea escribible.
 
 ## 7. Verificación funcional
 

@@ -22,7 +22,7 @@ services:
       - key: NODE_ENV
         value: production
       - key: NODE_VERSION
-        value: '24'
+        value: "24"
       - key: DATABASE_URL
         sync: false
       - key: DATABASE_SCHEMA
@@ -40,17 +40,17 @@ services:
       - key: JWT_AUDIENCE
         value: agroconnect-web
       - key: BCRYPT_SALT_ROUNDS
-        value: '12'
+        value: "12"
       - key: CORS_ORIGIN
         value: https://agroconnectpreview.vercel.app
       - key: APP_BASE_URL
         value: https://agroconnectpreview.vercel.app
       - key: RATE_LIMIT_WINDOW_MS
-        value: '900000'
+        value: "900000"
       - key: RATE_LIMIT_MAX_ATTEMPTS
-        value: '10'
+        value: "10"
       - key: TRUST_PROXY
-        value: '1'
+        value: "1"
       - key: MAIL_DIR
         value: /tmp/agroconnect-mails
       - key: LOG_LEVEL
@@ -60,12 +60,22 @@ services:
       - key: SMTP_HOST
         sync: false
       - key: SMTP_PORT
-        value: '587'
+        value: "587"
       - key: SMTP_USER
         sync: false
       - key: SMTP_PASS
         sync: false
       - key: SMTP_SECURE
-        value: 'false'
+        value: "false"
       - key: SMTP_FROM
         value: AgroConnect <no-reply@agroconnect.co>
+      # Cloudinary: las tres credenciales se configuran juntas para habilitar
+      # la firma de subida. Sin ellas, POST /uploads/signature responde 503.
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: CLOUDINARY_UPLOAD_FOLDER
+        value: agroconnect/products

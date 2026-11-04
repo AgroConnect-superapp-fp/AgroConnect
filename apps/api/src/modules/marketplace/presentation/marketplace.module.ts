@@ -6,6 +6,7 @@ import { IdentityModule } from '../../identity/presentation/identity.module';
 import { PRODUCT_REPOSITORY } from '../application/tokens';
 import { ListProductsUseCase } from '../application/use-cases/ListProductsUseCase';
 import { PublishProductUseCase } from '../application/use-cases/PublishProductUseCase';
+import { UpdateProductImagesUseCase } from '../application/use-cases/UpdateProductImagesUseCase';
 import { PrismaProductRepository } from '../infrastructure/repositories/PrismaProductRepository';
 import { ProductController } from './controllers/ProductController';
 import type { ProductRepository } from '../domain/interfaces/ProductRepository';
@@ -43,6 +44,12 @@ import type { ProductRepository } from '../domain/interfaces/ProductRepository';
       provide: PublishProductUseCase,
       useFactory: (productRepository: ProductRepository) =>
         new PublishProductUseCase(productRepository),
+      inject: [PRODUCT_REPOSITORY],
+    },
+    {
+      provide: UpdateProductImagesUseCase,
+      useFactory: (productRepository: ProductRepository) =>
+        new UpdateProductImagesUseCase(productRepository),
       inject: [PRODUCT_REPOSITORY],
     },
   ],

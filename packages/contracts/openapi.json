@@ -594,6 +594,97 @@
           }
         }
       }
+    },
+    "/products/{id}": {
+      "patch": {
+        "tags": [
+          "Marketplace"
+        ],
+        "summary": "Actualiza las imágenes de un producto del propietario",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProductImagesRequestBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Imágenes actualizadas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Product"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud malformada o cuerpo inválido"
+          },
+          "401": {
+            "description": "Sesión ausente, expirada o inválida"
+          },
+          "403": {
+            "description": "El usuario no es propietario ni administrador"
+          },
+          "404": {
+            "description": "Producto no encontrado"
+          },
+          "422": {
+            "description": "Reglas de negocio incumplidas (detalles por campo)"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        }
+      }
+    },
+    "/uploads/signature": {
+      "post": {
+        "tags": [
+          "Uploads"
+        ],
+        "summary": "Genera una firma de subida directa a Cloudinary",
+        "responses": {
+          "200": {
+            "description": "Firma de subida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadSignature"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sesión ausente, expirada o inválida"
+          },
+          "403": {
+            "description": "El rol no puede subir imágenes de producto"
+          },
+          "429": {
+            "description": "Demasiadas solicitudes: límite de tasa aplicado"
+          },
+          "503": {
+            "description": "Cloudinary no configurado en este entorno"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1573,6 +1664,114 @@
           "lng",
           "images",
           "coordinates"
+        ],
+        "additionalProperties": false
+      },
+      "UpdateProductImagesRequestBody": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "images": {
+            "maxItems": 6,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "publicId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "url": {
+                  "type": "string"
+                },
+                "alt": {
+                  "type": "string"
+                },
+                "width": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "height": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "bytes": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "uploadedAt": {
+                  "type": "string"
+                },
+                "moderationStatus": {
+                  "type": "string",
+                  "enum": [
+                    "pending",
+                    "approved",
+                    "rejected"
+                  ]
+                },
+                "lqip": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "publicId"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "images"
+        ],
+        "additionalProperties": false
+      },
+      "UploadSignature": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "cloudName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "apiKey": {
+            "type": "string",
+            "minLength": 1
+          },
+          "timestamp": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "signature": {
+            "type": "string",
+            "minLength": 1
+          },
+          "folder": {
+            "type": "string",
+            "minLength": 1
+          },
+          "allowedFormats": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "maxBytes": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "cloudName",
+          "apiKey",
+          "timestamp",
+          "signature",
+          "folder",
+          "allowedFormats",
+          "maxBytes"
         ],
         "additionalProperties": false
       },

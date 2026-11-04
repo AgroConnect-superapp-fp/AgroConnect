@@ -7,6 +7,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { IdentityModule } from './modules/identity/presentation/identity.module';
 import { GeographyModule } from './modules/geography/presentation/geography.module';
 import { MarketplaceModule } from './modules/marketplace/presentation/marketplace.module';
+import { UploadsModule } from './modules/uploads/presentation/uploads.module';
 import { parseEnv } from './shared/config/env';
 import { CsrfGuard } from './shared/http/csrf.guard';
 import { AllExceptionsFilter } from './shared/errors/all-exceptions.filter';
@@ -41,6 +42,7 @@ import { PinoNestLogger } from './shared/logger/nest-logger.service';
     IdentityModule,
     GeographyModule,
     MarketplaceModule,
+    UploadsModule,
   ],
   providers: [
     PinoNestLogger,

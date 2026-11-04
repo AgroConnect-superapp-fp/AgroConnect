@@ -123,12 +123,21 @@ export class AllExceptionsFilter implements ExceptionFilter {
     // En errores 5xx el mensaje real puede filtrar detalles de infraestructura
     // (pool de conexiones, SQL, rutas), así que se sustituye por uno genérico.
     const isServerError = error.statusCode >= 500;
+    const isServiceUnavailable = error.code === 'SERVICE_UNAVAILABLE';
 
     response.status(error.statusCode).json({
       success: false,
       error: {
-        code: isServerError ? 'INTERNAL_ERROR' : error.code,
-        message: isServerError ? 'Error inesperado. Intente de nuevo más tarde.' : error.message,
+        code: isServiceUnavailable
+          ? 'SERVICE_UNAVAILABLE'
+          : isServerError
+            ? 'INTERNAL_ERROR'
+            : error.code,
+        message: isServiceUnavailable
+          ? 'Servicio no disponible. Intente de nuevo más tarde.'
+          : isServerError
+            ? 'Error inesperado. Intente de nuevo más tarde.'
+            : error.message,
         ...(!isServerError && error.details && error.details.length > 0
           ? { details: error.details }
           : {}),

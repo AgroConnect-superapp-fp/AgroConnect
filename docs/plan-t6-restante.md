@@ -78,14 +78,38 @@ pruebas backend, cobertura 82.23 % de ramas, 49 unitarios frontend y 14/14 E2E.
 **Mejoras futuras:** historial de cambios de perfil y carga de documentos
 (SOAT, licencia, cámara de comercio) a Cloudinary firmado.
 
+### 2.5 Imágenes firmadas y edición por propietario — ✅ COMPLETADA (2026-11-04)
+
+- `POST /api/v1/uploads/signature`: firma SHA-1 server-side, carpeta por
+  usuario, formatos permitidos y rate limit; el `api_secret` no sale del backend.
+- `PATCH /api/v1/products/:id`: reemplazo de hasta 6 imágenes con validación
+  de rol y propiedad (BOLA).
+- Frontend: la subida usa la firma; el modal persiste las imágenes y actualiza
+  la galería sin duplicarlas.
+- Evidencia: 282 tests backend (82.64 % ramas), 49 unitarios frontend y 14/14 E2E.
+- Pendiente de decisión: moderación administrativa y política de aprobación.
+
+### 2.6 Bloqueos por decisión de producto
+
+Estos puntos no se implementan por inferencia: cambian reglas de negocio y
+requieren aprobación del Product Owner.
+
+| Tema              | Decisión necesaria                                                                                                                        | Estado |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| Moderación        | ¿Aprobación manual antes de publicar o publicación inmediata con revisión posterior? ¿Quién modera y qué pasa con las imágenes `pending`? | ⏳     |
+| Precio/inventario | ¿El producto es vitrina (sin precio/stock) o marketplace transaccional? Si es transaccional: moneda, unidad, stock y reservas.            | ⏳     |
+| D7                | Aprobación humana de la tabla de equivalencias HU ↔ CU.                                                                                   | ⏳     |
+| Despliegue        | Proveer PostgreSQL, Cloudinary y accesos Render/Vercel.                                                                                   | ⏳     |
+
 ## 3. Orden recomendado
 
-| Prioridad | Incremento                                      | Valor                                                         |
-| --------- | ----------------------------------------------- | ------------------------------------------------------------- |
-| ~~1~~     | ~~2b — Verificación de correo~~                 | ✅ Completado el 3-oct-2026                                   |
-| ~~1~~     | ~~2c — Perfiles empresa/transportista~~         | ✅ Completado el 3-nov-2026                                   |
-| ~~2~~     | ~~2d — Marketplace API propia (2.3a lectura)~~  | ✅ Completado el 3-nov-2026: elimina Supabase del marketplace |
-| ~~3~~     | ~~2.3b — Publicación autenticada de productos~~ | ✅ Completado el 3-nov-2026                                   |
-| ~~4~~     | ~~2.4 — Perfil autenticado GET/PATCH~~          | ✅ Completado el 4-nov-2026                                   |
+| Prioridad | Incremento                                          | Valor                                                         |
+| --------- | --------------------------------------------------- | ------------------------------------------------------------- |
+| ~~1~~     | ~~2b — Verificación de correo~~                     | ✅ Completado el 3-oct-2026                                   |
+| ~~1~~     | ~~2c — Perfiles empresa/transportista~~             | ✅ Completado el 3-nov-2026                                   |
+| ~~2~~     | ~~2d — Marketplace API propia (2.3a lectura)~~      | ✅ Completado el 3-nov-2026: elimina Supabase del marketplace |
+| ~~3~~     | ~~2.3b — Publicación autenticada de productos~~     | ✅ Completado el 3-nov-2026                                   |
+| ~~4~~     | ~~2.4 — Perfil autenticado GET/PATCH~~              | ✅ Completado el 4-nov-2026                                   |
+| ~~5~~     | ~~2.5 — Imágenes firmadas y PATCH por propietario~~ | ✅ Completado el 4-nov-2026                                   |
 
 Cada incremento debe repetir el ciclo verificado: migración manual + tests unitarios/integración + E2E + CI en verde + evidencia documentada.

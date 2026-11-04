@@ -7,49 +7,74 @@ import { z } from 'zod';
  * (`backend/src/config/env.ts`) para que `.env`, `.env.example` y `render.yaml`
  * sirvan tal cual durante la migración progresiva (ADR-009 / ADR-015).
  */
-export const envSchema = z.object({
-  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
-  PORT: z.coerce.number().int().positive().default(4000),
-  DATABASE_URL: z.string().min(1, 'DATABASE_URL es obligatoria'),
-  DATABASE_SCHEMA: z.string().default('public'),
-  JWT_ACCESS_SECRET: z.string().min(32, 'JWT_ACCESS_SECRET debe tener al menos 32 caracteres'),
-  JWT_REFRESH_SECRET: z.string().min(32, 'JWT_REFRESH_SECRET debe tener al menos 32 caracteres'),
-  JWT_ACCESS_EXPIRES_IN: z.string().default('15m'),
-  JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
-  JWT_ISSUER: z.string().default('agroconnect-api'),
-  JWT_AUDIENCE: z.string().default('agroconnect-web'),
-  BCRYPT_SALT_ROUNDS: z.coerce.number().int().min(10).max(15).default(12),
-  RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(900_000),
-  RATE_LIMIT_MAX_ATTEMPTS: z.coerce.number().int().positive().default(5),
-  CORS_ORIGIN: z.string().default('http://localhost:5173'),
-  // Saltos de proxy confiables (Render = 1). Con 0, req.ip es la IP del socket.
-  TRUST_PROXY: z.coerce.number().int().min(0).max(5).default(0),
-  APP_BASE_URL: z.string().url().default('http://localhost:5173'),
-  MAIL_DIR: z.string().default('/tmp/agroconnect-mails'),
-  // SMTP real para verificación de correo y recuperación de contraseña. Sin
-  // SMTP_HOST los correos se escriben en MAIL_DIR (desarrollo y pruebas).
-  SMTP_HOST: z.string().optional(),
-  SMTP_PORT: z.coerce.number().int().positive().default(587),
-  SMTP_USER: z.string().optional(),
-  SMTP_PASS: z.string().optional(),
-  SMTP_SECURE: z
-    .union([z.literal('true'), z.literal('false')])
-    .default('false')
-    .transform((value) => value === 'true'),
-  SMTP_FROM: z.string().default('AgroConnect <no-reply@agroconnect.co>'),
-  LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
-}).superRefine((data, ctx) => {
-  // D5 bloquea el login hasta verificar el correo. Sin SMTP en producción el
-  // FileEmailService escribiría el enlace en /tmp y nadie podría verificar.
-  if (data.NODE_ENV === 'production' && (!data.SMTP_HOST || data.SMTP_HOST.trim().length === 0)) {
-    ctx.addIssue({
-      code: 'custom',
-      path: ['SMTP_HOST'],
-      message:
-        'SMTP_HOST es obligatorio en producción: la verificación de correo (D5) bloquea el login hasta verificar',
-    });
-  }
-});
+export const envSchema = z
+  .object({
+    NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+    PORT: z.coerce.number().int().positive().default(4000),
+    DATABASE_URL: z.string().min(1, 'DATABASE_URL es obligatoria'),
+    DATABASE_SCHEMA: z.string().default('public'),
+    JWT_ACCESS_SECRET: z.string().min(32, 'JWT_ACCESS_SECRET debe tener al menos 32 caracteres'),
+    JWT_REFRESH_SECRET: z.string().min(32, 'JWT_REFRESH_SECRET debe tener al menos 32 caracteres'),
+    JWT_ACCESS_EXPIRES_IN: z.string().default('15m'),
+    JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
+    JWT_ISSUER: z.string().default('agroconnect-api'),
+    JWT_AUDIENCE: z.string().default('agroconnect-web'),
+    BCRYPT_SALT_ROUNDS: z.coerce.number().int().min(10).max(15).default(12),
+    RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(900_000),
+    RATE_LIMIT_MAX_ATTEMPTS: z.coerce.number().int().positive().default(5),
+    CORS_ORIGIN: z.string().default('http://localhost:5173'),
+    // Saltos de proxy confiables (Render = 1). Con 0, req.ip es la IP del socket.
+    TRUST_PROXY: z.coerce.number().int().min(0).max(5).default(0),
+    APP_BASE_URL: z.string().url().default('http://localhost:5173'),
+    MAIL_DIR: z.string().default('/tmp/agroconnect-mails'),
+    // SMTP real para verificación de correo y recuperación de contraseña. Sin
+    // SMTP_HOST los correos se escriben en MAIL_DIR (desarrollo y pruebas).
+    SMTP_HOST: z.string().optional(),
+    SMTP_PORT: z.coerce.number().int().positive().default(587),
+    SMTP_USER: z.string().optional(),
+    SMTP_PASS: z.string().optional(),
+    SMTP_SECURE: z
+      .union([z.literal('true'), z.literal('false')])
+      .default('false')
+      .transform((value) => value === 'true'),
+    SMTP_FROM: z.string().default('AgroConnect <no-reply@agroconnect.co>'),
+    // Cloudinary: subida firmada desde el navegador. El secreto se queda en el
+    // servidor; el frontend recibe solo una firma de corta duración.
+    CLOUDINARY_CLOUD_NAME: z.string().optional(),
+    CLOUDINARY_API_KEY: z.string().optional(),
+    CLOUDINARY_API_SECRET: z.string().optional(),
+    CLOUDINARY_UPLOAD_FOLDER: z.string().default('agroconnect/products'),
+    LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
+  })
+  .superRefine((data, ctx) => {
+    // D5 bloquea el login hasta verificar el correo. Sin SMTP en producción el
+    // FileEmailService escribiría el enlace en /tmp y nadie podría verificar.
+    const cloudinaryValues = [
+      data.CLOUDINARY_CLOUD_NAME,
+      data.CLOUDINARY_API_KEY,
+      data.CLOUDINARY_API_SECRET,
+    ];
+    const configured = cloudinaryValues.filter(
+      (value) => typeof value === 'string' && value.trim().length > 0,
+    ).length;
+    if (configured > 0 && configured < cloudinaryValues.length) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['CLOUDINARY_CLOUD_NAME'],
+        message:
+          'Configura CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY y CLOUDINARY_API_SECRET juntas, o ninguna',
+      });
+    }
+
+    if (data.NODE_ENV === 'production' && (!data.SMTP_HOST || data.SMTP_HOST.trim().length === 0)) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['SMTP_HOST'],
+        message:
+          'SMTP_HOST es obligatorio en producción: la verificación de correo (D5) bloquea el login hasta verificar',
+      });
+    }
+  });
 
 export type Env = z.infer<typeof envSchema>;
 
