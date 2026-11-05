@@ -11,9 +11,18 @@
  */
 import { createHash } from "node:crypto";
 
-const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-const apiKey = process.env.CLOUDINARY_API_KEY;
-const apiSecret = process.env.CLOUDINARY_API_SECRET;
+let cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+let apiKey = process.env.CLOUDINARY_API_KEY;
+let apiSecret = process.env.CLOUDINARY_API_SECRET;
+
+// Compatibilidad con la URL estándar de Cloudinary:
+// cloudinary://<api_key>:<api_secret>@<cloud_name>
+if ((!cloudName || !apiKey || !apiSecret) && process.env.CLOUDINARY_URL) {
+  const parsed = new URL(process.env.CLOUDINARY_URL);
+  cloudName = cloudName ?? parsed.hostname;
+  apiKey = apiKey ?? decodeURIComponent(parsed.username);
+  apiSecret = apiSecret ?? decodeURIComponent(parsed.password);
+}
 
 if (!cloudName || !apiKey || !apiSecret) {
   console.error(

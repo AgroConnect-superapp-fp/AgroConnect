@@ -49,7 +49,7 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 - **Fix build PWA:** `scripts/generate-sw.mjs` calcula el tamaño real del
   precache; el build ya no falla por `totalBytes` y reporta 20 entradas.
 - **Despliegue PostgreSQL propio:** runbook operativo y script
-  `npm run smoke:cloudinary` para validar credenciales firmadas sin subir PII.
+  `npm run smoke:cloudinary` para validar credenciales firmadas sin subir PII; acepta variables separadas o `CLOUDINARY_URL`.
 
 ### Corregido
 

@@ -98,8 +98,10 @@ CLOUDINARY_API_SECRET='<secret>' npm run smoke:cloudinary
 ```
 
 El script firma la subida con SHA-1, sube un PNG 1×1 sin PII y solo imprime
-`public_id` y `secure_url`. Si falla, revisar que las tres credenciales
-pertenezcan al mismo cloud y que la carpeta `agroconnect/smoke` sea escribible.
+`public_id` y `secure_url`. También acepta la URL estándar
+`CLOUDINARY_URL=cloudinary://<api_key>:<api_secret>@<cloud_name>`.
+Si falla, revisar que las credenciales pertenezcan al mismo cloud y que la
+carpeta `agroconnect/smoke` sea escribible.
 
 ## 7. Verificación funcional
 
