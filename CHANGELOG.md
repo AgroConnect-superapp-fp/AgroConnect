@@ -77,6 +77,10 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 
 ### Cambiado
 
+- **Versiones del monorepo:** `package.json`, `apps/api` y `frontend` se
+  alinean con la release `v1.1.2`; `@agroconnect/contracts` conserva su versión
+  interna `0.1.0`.
+
 - **Marketplace frontend:** `services/productsApi.ts` reemplaza
   `services/supabase.ts`; se elimina `@supabase/supabase-js` del bundle y del
   lockfile. El fallback demo se activa si la API no responde. 246 tests backend

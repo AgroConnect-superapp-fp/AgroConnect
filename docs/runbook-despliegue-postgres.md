@@ -101,7 +101,7 @@ El script firma la subida con SHA-1, sube un PNG 1×1 sin PII y solo imprime
 `public_id` y `secure_url`. También acepta la URL estándar
 `CLOUDINARY_URL=cloudinary://<api_key>:<api_secret>@<cloud_name>`.
 Si falla, revisar que las credenciales pertenezcan al mismo cloud y que la
-carpeta `agroconnect/smoke` sea escribible.
+carpeta `agroconnect/smoke` sea escribible. El límite real de tamaño de archivo se configura en la cuenta de Cloudinary; `maxBytes` del frontend es solo validación de UX.
 
 ## 7. Verificación funcional
 

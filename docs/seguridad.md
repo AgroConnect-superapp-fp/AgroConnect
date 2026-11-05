@@ -42,14 +42,15 @@ Referencias: OWASP ASVS 4.0.3 nivel 2 y OWASP API Security Top 10 (2023). Este d
 
 ## Configuración, transporte y cabeceras (ASVS V14 · API8)
 
-| Control                                                         | Estado | Evidencia o plan                                                                    |
-| --------------------------------------------------------------- | ------ | ----------------------------------------------------------------------------------- |
-| Helmet en la API                                                | ✅     | `app.setup.ts`                                                                      |
-| CORS con lista blanca por entorno (sin localhost en producción) | ✅     | PR #51 (`render.yaml`)                                                              |
-| CSP, HSTS, X-Frame-Options y Referrer-Policy en el frontend     | ✅     | `vercel.json` (CSP, XFO, XCTO, Referrer-Policy, HSTS)                               |
-| Secretos solo por variables de entorno, validados al arrancar   | ✅     | `config/env.ts` (zod)                                                               |
-| Subidas a Cloudinary firmadas por el backend                    | ✅     | `POST /uploads/signature` (SHA-1, carpeta por usuario, formatos permitidos, 20/min) |
-| Moderación de imágenes aprobada por administrador               | ⏳     | `moderationStatus` existe en el contrato; falta flujo administrativo y política     |
+| Control                                                         | Estado | Evidencia o plan                                                                                                                          |
+| --------------------------------------------------------------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Helmet en la API                                                | ✅     | `app.setup.ts`                                                                                                                            |
+| CORS con lista blanca por entorno (sin localhost en producción) | ✅     | PR #51 (`render.yaml`)                                                                                                                    |
+| CSP, HSTS, X-Frame-Options y Referrer-Policy en el frontend     | ✅     | `vercel.json` (CSP, XFO, XCTO, Referrer-Policy, HSTS)                                                                                     |
+| Secretos solo por variables de entorno, validados al arrancar   | ✅     | `config/env.ts` (zod)                                                                                                                     |
+| Subidas a Cloudinary firmadas por el backend                    | ✅     | `POST /uploads/signature` (SHA-1, carpeta por usuario, formatos permitidos, 20/min)                                                       |
+| Límite de tamaño de subida                                      | 🟡     | `ImageUpload` valida 10 MB; Cloudinary aplica el límite real a nivel de cuenta. No existe un `max_file_size` firmado para subida directa. |
+| Moderación de imágenes aprobada por administrador               | ⏳     | `moderationStatus` existe en el contrato; falta flujo administrativo y política                                                           |
 
 ## Registro y monitoreo (ASVS V7)
 

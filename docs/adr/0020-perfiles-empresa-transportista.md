@@ -58,7 +58,7 @@ almacenamiento de documentos, respectivamente.
 
 - Migración `20261103140000_add_company_transporter_profiles` aplicada en
   `agroconnect` y `agroconnect_test` (8 migraciones en total).
-- Backend: **247 tests**, cobertura **94.28 % líneas / 83.59 % ramas**.
+- Backend: **289 tests**, cobertura **93.85 % líneas / 82.3 % ramas** (actualizado 2026-11-04).
 - Frontend: **49 unitarios**, build verde.
 - E2E: **14 pruebas**, con registro de empresa/transportista y gate axe.
 - `openapi.json` sincronizado sin drift.

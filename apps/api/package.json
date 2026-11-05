@@ -1,6 +1,6 @@
 {
   "name": "@agroconnect/api",
-  "version": "1.0.0",
+  "version": "1.1.2",
   "private": true,
   "description": "API AgroConnect sobre NestJS 11 (ADR-009) — migración progresiva del backend Express legacy (Strangler Fig)",
   "main": "dist/main.js",
