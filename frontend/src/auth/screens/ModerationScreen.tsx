@@ -6,6 +6,7 @@ import { useAuth } from '../context/useAuth';
 import { ApiError } from '../../services/apiClient';
 import { fetchPendingProducts, moderateProduct } from '../../services/productsApi';
 import { resolveImageUrl } from '../../services/cloudinary';
+import { CROP_CATALOG } from '../../types/property';
 
 interface ModerationScreenProps {
   onBack: () => void;
@@ -16,6 +17,7 @@ export function ModerationScreen({ onBack }: ModerationScreenProps): React.React
   const isAdmin = usuario?.rol === 'administrador';
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(isAdmin);
+  const [reloadKey, setReloadKey] = useState(0);
   const [moderatingId, setModeratingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -43,7 +45,7 @@ export function ModerationScreen({ onBack }: ModerationScreenProps): React.React
     return () => {
       active = false;
     };
-  }, [isAdmin]);
+  }, [isAdmin, reloadKey]);
 
   async function handleModerate(
     product: Product,
@@ -100,7 +102,19 @@ export function ModerationScreen({ onBack }: ModerationScreenProps): React.React
           data-testid="moderation-error"
           className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700"
         >
-          {error}
+          <p>{error}</p>
+          <button
+            type="button"
+            data-testid="moderation-retry"
+            onClick={() => {
+              setLoading(true);
+              setError(null);
+              setReloadKey((value) => value + 1);
+            }}
+            className="mt-2 min-h-10 rounded-lg bg-red-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-800"
+          >
+            Reintentar
+          </button>
         </div>
       )}
 
@@ -162,8 +176,8 @@ export function ModerationScreen({ onBack }: ModerationScreenProps): React.React
                       {product.owner} · {product.municipality}, {product.department}
                     </p>
                     <p className="mt-1 text-xs text-gray-500">
-                      {product.crop} · {product.area} ha · productividad{' '}
-                      {product.productivity}%
+                      {CROP_CATALOG[product.crop]?.displayName ?? product.crop} ·{' '}
+                      {product.area} ha · productividad {product.productivity}%
                       {product.createdAt
                         ? ` · ${new Date(product.createdAt).toLocaleDateString('es-CO')}`
                         : ''}
