@@ -27,15 +27,15 @@ export const MARKETPLACE_CERTIFICATIONS = [
 ] as const;
 
 export const productImageSchema = z.object({
-  publicId: z.string().min(1),
-  url: z.string().optional(),
-  alt: z.string().optional(),
+  publicId: z.string().min(1).max(255),
+  url: z.string().max(2048).optional(),
+  alt: z.string().max(200).optional(),
   width: z.number().positive().optional(),
   height: z.number().positive().optional(),
   bytes: z.number().nonnegative().optional(),
-  uploadedAt: z.string().optional(),
+  uploadedAt: z.string().max(40).optional(),
   moderationStatus: z.enum(["pending", "approved", "rejected"]).optional(),
-  lqip: z.string().optional(),
+  lqip: z.string().max(8192).optional(),
 });
 
 export const productSchema = z.object({
@@ -48,13 +48,15 @@ export const productSchema = z.object({
   municipality: z.string().min(1),
   crop: z.enum(MARKETPLACE_CROPS),
   area: z.number().positive(),
-  productivity: z.number().min(0).max(100),
+  productivity: z.number().int().min(0).max(100),
   certification: z.enum(MARKETPLACE_CERTIFICATIONS).optional(),
   lat: z.number().min(-90).max(90),
   lng: z.number().min(-180).max(180),
   producerId: z.string().optional(),
   images: z.array(productImageSchema),
   coordinates: z.array(z.tuple([z.number(), z.number()])),
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional(),
 });
 
 /**
@@ -123,6 +125,7 @@ export const publishProductSchema = z.object({
     .max(100_000, "El área no puede superar 100000 hectáreas"),
   productivity: z
     .number({ error: "La productividad es obligatoria" })
+    .int("La productividad debe ser un entero")
     .min(0, "La productividad debe estar entre 0 y 100")
     .max(100, "La productividad debe estar entre 0 y 100"),
   certification: z.enum(MARKETPLACE_CERTIFICATIONS).optional(),

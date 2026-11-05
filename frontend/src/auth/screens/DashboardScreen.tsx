@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Button } from '../components/Button';
 import { useAuth } from '../context/useAuth';
 import { getRoleOption, ROLE_LABELS } from '../types';
@@ -49,12 +50,24 @@ export function DashboardScreen({
   onDismissSuccessBanner,
 }: DashboardScreenProps): React.ReactElement {
   const { usuario, logout } = useAuth();
+  const [logoutError, setLogoutError] = useState<string | null>(null);
 
   if (!usuario) {
     return <div className="p-8 text-center text-gray-600">Cargando tu panel…</div>;
   }
 
   const roleOption = getRoleOption(usuario.rol);
+
+  async function handleLogout(): Promise<void> {
+    setLogoutError(null);
+    try {
+      await logout();
+    } catch {
+      setLogoutError(
+        'No fue posible cerrar la sesión en el servidor. Revisa tu conexión e inténtalo de nuevo.'
+      );
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-50 via-white to-amber-50">
@@ -87,7 +100,7 @@ export function DashboardScreen({
             <Button
               variant="ghost"
               data-testid="dashboard-logout"
-              onClick={() => void logout()}
+              onClick={() => void handleLogout()}
               className="!min-h-10 !px-3 !py-2 text-sm"
             >
               Cerrar sesión
@@ -97,6 +110,15 @@ export function DashboardScreen({
       </header>
 
       <main className="mx-auto max-w-4xl px-4 py-8">
+        {logoutError && (
+          <div
+            role="alert"
+            data-testid="logout-error"
+            className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700"
+          >
+            {logoutError}
+          </div>
+        )}
         {showSuccessBanner && (
           <div
             role="status"

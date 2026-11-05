@@ -237,7 +237,7 @@ describe('Products (e2e)', () => {
         .send({
           images: [
             {
-              publicId: 'agroconnect/products/e2e/actualizada',
+              publicId: `agroconnect/products/${producerId}/actualizada`,
               alt: 'Imagen actualizada',
               url: 'https://res.cloudinary.com/demo/image/upload/e2e.png',
             },
@@ -252,7 +252,7 @@ describe('Products (e2e)', () => {
           id: productId,
           images: [
             expect.objectContaining({
-              publicId: 'agroconnect/products/e2e/actualizada',
+              publicId: `agroconnect/products/${producerId}/actualizada`,
             }),
           ],
         },
@@ -371,7 +371,7 @@ describe('Products (e2e)', () => {
           certification: 'organic',
           lat: 4.5339,
           lng: -75.6811,
-          images: [{ publicId: 'cld-sample-4', alt: 'Café E2E' }],
+          images: [{ publicId: `agroconnect/products/${producerId}/cosecha-e2e`, alt: 'Café E2E' }],
           coordinates: [
             [4.53, -75.68],
             [4.54, -75.67],

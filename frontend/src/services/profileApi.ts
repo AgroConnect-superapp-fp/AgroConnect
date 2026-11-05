@@ -1,43 +1,13 @@
 import { apiRequest } from './apiClient';
-import type { PublicUser } from '../auth/types';
-import type { CompanyType, VehicleType } from '@agroconnect/contracts';
+import type { ProfileSnapshot } from '@agroconnect/contracts';
 
-export interface ProducerProfile {
-  nombre: string;
-  municipio: string;
-  vereda: string;
-  latitud?: number;
-  longitud?: number;
-}
-
-export interface CompanyProfile {
-  razonSocial: string;
-  nit: string;
-  direccion?: string;
-  tipoEmpresa?: CompanyType;
-  departamento?: string;
-  municipio?: string;
-}
-
-export interface TransporterProfile {
-  tipoVehiculo: VehicleType;
-  placa: string;
-  capacidadKg: number;
-  cobertura: string[];
-  cadenaFrio: boolean;
-  soatVence: string;
-  licenciaVence: string;
-}
-
-export interface MyProfile {
-  usuario: PublicUser;
-  productor?: ProducerProfile;
-  empresa?: CompanyProfile;
-  transportista?: TransporterProfile;
-}
+export type MyProfile = ProfileSnapshot;
+export type ProducerProfile = NonNullable<MyProfile['productor']>;
+export type CompanyProfile = NonNullable<MyProfile['empresa']>;
+export type TransporterProfile = NonNullable<MyProfile['transportista']>;
 
 export type ProfileUpdatePayload =
-  | { productor: Partial<Omit<ProducerProfile, 'latitud' | 'longitud'>> }
+  | { productor: Partial<ProducerProfile> }
   | { empresa: Partial<Omit<CompanyProfile, 'nit'>> }
   | { transportista: Partial<TransporterProfile> };
 

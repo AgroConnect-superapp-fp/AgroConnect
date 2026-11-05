@@ -4,6 +4,7 @@ import { FindNearbyPlotsUseCase } from '../application/use-cases/FindNearbyPlots
 import { PrismaPlotRepository } from '../infrastructure/repositories/PrismaPlotRepository';
 import { PlotController } from './controllers/PlotController';
 import { PrismaModule } from '../../../prisma/prisma.module';
+import { IdentityModule } from '../../identity/presentation/identity.module';
 import type { PlotRepository } from '../domain/interfaces/PlotRepository';
 
 /**
@@ -16,7 +17,7 @@ import type { PlotRepository } from '../domain/interfaces/PlotRepository';
  * - `presentation`: controller público (sin guard de autenticación).
  */
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, IdentityModule],
   controllers: [PlotController],
   providers: [
     // Puerto del dominio → implementación de infraestructura.
@@ -25,8 +26,7 @@ import type { PlotRepository } from '../domain/interfaces/PlotRepository';
     // Caso de uso: composition root, sin decoradores de Nest en application.
     {
       provide: FindNearbyPlotsUseCase,
-      useFactory: (plotRepository: PlotRepository) =>
-        new FindNearbyPlotsUseCase(plotRepository),
+      useFactory: (plotRepository: PlotRepository) => new FindNearbyPlotsUseCase(plotRepository),
       inject: [PLOT_REPOSITORY],
     },
   ],

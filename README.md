@@ -2,7 +2,7 @@
 
 Plataforma de comercio agrícola **B2B + B2C** que conecta directamente a productores rurales colombianos con consumidores finales y compradores empresariales, eliminando la intermediación innecesaria. Los productores pueden publicar sus productos, gestionar inventarios incluso con conexión intermitente, recibir pagos con los medios que ya usan, coordinar entregas y construir reputación; los compradores acceden a búsqueda sencilla, precios transparentes, productos frescos rastreables desde el origen, alertas de vencimiento y canales alternos para regiones con poca señal.
 
-**Proyecto Formativo ADSO — SENA · Ficha 2026**
+**Proyecto Formativo ADSO — SENA · Ficha 3292136**
 Centro de Comercio y Turismo · Regional Quindío · Programa Análisis y Desarrollo de Software (código 228118)
 **Metodología:** RUP + Scrum (Scrum Guide 2020) · **Esfuerzo:** 410 Story Points en 12 sprints
 
@@ -26,13 +26,13 @@ Centro de Comercio y Turismo · Regional Quindío · Programa Análisis y Desarr
 
 ### Equipo Scrum
 
-| Rol               | Nombre                          |
-| ----------------- | ------------------------------- |
-| Scrum Master      | Nelson Fabián Gallego Sánchez   |
-| Product Owner     | Juan David Ferrer Castillo      |
-| Desarrollador 1   | Carlos Andrés Zuluaga Atehortua |
-| Desarrollador 2   | Santiago Palacio Tovar          |
-| Asesor pedagógico | Instructor SENA ADSO Ficha 2026 |
+| Rol               | Nombre                             |
+| ----------------- | ---------------------------------- |
+| Scrum Master      | Nelson Fabián Gallego Sánchez      |
+| Product Owner     | Juan David Ferrer Castillo         |
+| Desarrollador 1   | Carlos Andrés Zuluaga Atehortua    |
+| Desarrollador 2   | Santiago Palacio Tovar             |
+| Asesor pedagógico | Instructor SENA ADSO Ficha 3292136 |
 
 ---
 
@@ -91,7 +91,7 @@ La arquitectura oficial (PT-AR-ARQ-01, v1.0) sigue **Clean Architecture** (Rober
 Reglas clave del diseño:
 
 - El dominio **no conoce** Prisma ni Express; la inversión de dependencias se hace por interfaces (`import { PrismaClient }` está prohibido fuera de infraestructura).
-- Los 17 módulos se agrupan en 4 bounded contexts: Identidad y Acceso, Catálogo y Marketplace, Transacciones y Servicios Complementarios.
+- Los 17 módulos se agrupan en 3 bounded contexts: Identidad y Acceso, Catálogo y Marketplace, Transacciones y Servicios Complementarios.
 - **Offline-first**: UUID v4 local por entidad, Last-Write-Wins con timestamps lógicos, con excepciones controladas para inventario, aceptación de pedidos y pagos (idempotency key).
 - **Geoespacial nativo**: `GEOGRAPHY(Point, 4326)`, índices GiST y funciones `ST_Distance`, `ST_Within`, `ST_Intersects`, `ST_DWithin`. Los cálculos de distancia y área nunca se hacen en JavaScript.
 - Patrones aplicados: Repository, Use Case, Strategy (pagos), Circuit Breaker, Outbox y Observer (AgroBot).
@@ -111,14 +111,14 @@ Reglas clave del diseño:
 
 ## Stack tecnológico
 
-| Capa         | Tecnologías                                                                                                      |
-| ------------ | ---------------------------------------------------------------------------------------------------------------- |
-| Frontend     | React 19 + Vite 8 + TypeScript 6 (strict) + Tailwind CSS 4 + Leaflet 1.9 (OpenStreetMap) + PWA (vite-plugin-pwa) |
-| Backend      | Node.js 24 + NestJS 11 + Prisma 7 (núcleo) — Express 4 legacy en retiro — TypeScript 5/6 (strict) + Zod          |
-| Persistencia | PostgreSQL 16 + PostGIS 3.4 + Prisma 7 (driver adapter `@prisma/adapter-pg`)                                     |
-| Seguridad    | JWT + refresh tokens rotativos, bcrypt (12 rondas), Helmet, rate limiting, Pino con redacción de PII             |
-| Pruebas      | Jest 30 + Supertest (backend) · Vitest (frontend unitarias) · Playwright (E2E)                                   |
-| Assets       | Cloudinary (transformaciones y CDN)                                                                              |
+| Capa         | Tecnologías                                                                                                       |
+| ------------ | ----------------------------------------------------------------------------------------------------------------- |
+| Frontend     | React 19 + Vite 8 + TypeScript 6 (strict) + Tailwind CSS 4 + Leaflet 1.9 (OpenStreetMap) + PWA (vite-plugin-pwa)  |
+| Backend      | Node.js 24 + NestJS 11 + Prisma 7 + TypeScript 6 (strict) + Zod                                                   |
+| Persistencia | PostgreSQL 16 + PostGIS 3.4 + Prisma 7 (driver adapter `@prisma/adapter-pg`)                                      |
+| Seguridad    | JWT + refresh tokens rotativos, Argon2id (bcrypt como fallback), Helmet, rate limiting, Pino con redacción de PII |
+| Pruebas      | Jest 30 + Supertest (backend) · Vitest (frontend unitarias) · Playwright (E2E)                                    |
+| Assets       | Cloudinary (transformaciones y CDN)                                                                               |
 
 **Design system:** verde primario `#2E7D32`, amarillo acento `#F9A825`, tipografías Inter (UI) y Merriweather (contenido), touch targets mínimos de 48×48 px y contraste WCAG AA.
 
@@ -130,11 +130,11 @@ Reglas clave del diseño:
 AgroConnect/
 ├── apps/api/    # API NestJS — Clean Architecture + DDD
 │   ├── prisma/  # Esquema y migraciones (PostgreSQL 16 + PostGIS)
-│   ├── src/     # config, shared y módulos (auth, geography)
+│   ├── src/     # config, shared y módulos (identity, geography, marketplace, uploads)
 │   └── tests/   # unitarias, integración y dobles de prueba
 └── frontend/    # SPA React + PWA (vite-plugin-pwa)
     ├── src/     # auth (M02), componentes de mapa y UI, servicios
-    ├── public/  # SW (sin registrar) e iconografía
+    ├── public/  # PWA generada por Vite e iconografía
     └── e2e/     # Pruebas end-to-end con Playwright
 ```
 
@@ -172,7 +172,7 @@ Características: contraseñas con **Argon2id** (bcrypt legacy con rehash transp
 
 ### M16 — Base geoespacial
 
-- Parcelas almacenadas como `geography(Point, 4326)` con índice GiST y búsqueda por radio con `ST_DWithin` en `/api/v1/plots`.
+- Parcelas almacenadas como `geography(Point, 4326)` con índice GiST y búsqueda por radio con `ST_DWithin` en `/api/v1/plots/nearby`.
 - Frontend: mapa Leaflet + OpenStreetMap con 4 capas base (OSM, satélite Esri, topográfico, CartoDB), clustering de fincas, heatmap de productividad y herramientas de dibujo de parcelas.
 
 ### M03 — Marketplace sobre API propia y PWA
@@ -188,7 +188,7 @@ Características: contraseñas con **Argon2id** (bcrypt legacy con rehash transp
 
 ### Calidad
 
-- 282 pruebas backend (NestJS; 94.09 % líneas, 82.64 % ramas) · 49 pruebas unitarias de frontend (Vitest) · 14 pruebas E2E (Playwright: autenticación real, modo demo, marketplace, publicación, perfiles, imágenes y accesibilidad axe).
+- 288 pruebas backend (NestJS; 93.78 % líneas, 82.21 % ramas) · 52 pruebas unitarias de frontend (Vitest) · 14 pruebas E2E (Playwright: autenticación real, modo demo, marketplace, publicación, perfiles, imágenes y accesibilidad axe).
 
 ---
 
@@ -231,7 +231,7 @@ npm run dev                   # http://localhost:5173
 ### Pruebas
 
 ```bash
-cd apps/api && npm test -- --coverage   # unitarias + integración (cobertura 97%)
+cd apps/api && npm test -- --coverage   # unitarias + integración (cobertura 93.78% líneas / 82.21% ramas)
 cd frontend && npm run test:unit       # unitarias (Vitest)
 cd frontend && npm run test:e2e        # E2E (levanta API y web)
 ```
@@ -277,7 +277,7 @@ Despliegue (resumen): Blueprint `render.yaml` → `DATABASE_URL` del PostgreSQL 
 
 ## Sincronización entre entornos (local · GitHub · Notion · Obsidian)
 
-Un **manifiesto de hechos canónicos** (`tools/alignment-check/manifest.json`) centraliza los datos compartidos —URLs, stack, cifras de trazabilidad (17·68·30·66·69·6), conteos de pruebas (386 · 21 · 10), visibilidad del repositorio y última release— y un verificador comprueba que los cuatro entornos manejen la misma información **sin incongruencias**. No son espejos: cada entorno conserva su rol; el mecanismo garantiza que los hechos compartidos sean idénticos y, ante cada ❌, indica exactamente **qué actualizar** (`→ hint`).
+Un **manifiesto de hechos canónicos** (`tools/alignment-check/manifest.json`) centraliza los datos compartidos —URLs, stack, cifras de trazabilidad (17·68·30·66·69·6), conteos de pruebas (288 · 52 · 14), visibilidad del repositorio y última release— y un verificador comprueba que los cuatro entornos manejen la misma información **sin incongruencias**. No son espejos: cada entorno conserva su rol; el mecanismo garantiza que los hechos compartidos sean idénticos y, ante cada ❌, indica exactamente **qué actualizar** (`→ hint`).
 
 ```bash
 node tools/alignment-check/check-alignment.mjs        # local + GitHub (+ API) + Obsidian
@@ -333,7 +333,7 @@ bash tools/alignment-check/install-git-hook.sh   # hook pre-push: bloquea el pus
 
 ## Créditos
 
-**Institución:** SENA — Análisis y Desarrollo de Software (ADSO), Ficha 2026, Centro de Comercio y Turismo, Regional Quindío.
+**Institución:** SENA — Análisis y Desarrollo de Software (ADSO), Ficha 3292136, Centro de Comercio y Turismo, Regional Quindío.
 **Año:** 2026. Construido con tecnologías 100 % open source.
 
 ### Créditos de imágenes
@@ -368,6 +368,6 @@ El flujo de trabajo, las convenciones de commits y los gates de calidad están e
 
 ## Licencia
 
-**Todos los derechos reservados** — proyecto formativo SENA ADSO (Ficha 2026). Ver [`LICENSE`](LICENSE) para el detalle.
+**Todos los derechos reservados** — proyecto formativo SENA ADSO (Ficha 3292136). Ver [`LICENSE`](LICENSE) para el detalle.
 
 > Las fotografías de terceros conservan sus licencias originales (CC BY-SA / Unsplash), detalladas en «Créditos de imágenes».

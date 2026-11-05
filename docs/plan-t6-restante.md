@@ -23,7 +23,7 @@
 
 Implementada según el diseño previsto: tabla `email_verification_tokens` + columna `correo_verificado_en`, `RequestEmailVerificationUseCase` y `VerifyEmailUseCase`, endpoints `POST /verify-email` y `POST /resend-verification`, envío automático tras el registro, `verificado` en el perfil público y pantalla `VerifyEmailScreen` con reenvío de enlace.
 
-> Mejora futura: proveedor SMTP real en producción (hoy `FileEmailService` escribe en `MAIL_DIR`). La regla de bloqueo de acciones sensibles para correos sin verificar se definirá al implementar M03/M08.
+> `SmtpEmailService` es obligatorio en producción (`SMTP_HOST`); `FileEmailService` queda solo para desarrollo y pruebas. La regla de bloqueo de acciones sensibles para correos sin verificar se definirá al implementar M03/M08.
 
 ### 2.2 Perfiles específicos de empresa y transportista
 
@@ -58,7 +58,7 @@ Implementada según el diseño previsto: tabla `email_verification_tokens` + col
 6. `POST /api/v1/products` con `SessionAuthGuard`, autorización productor/administrador, `producerId` desde la sesión y formulario `PublishProductScreen` con carga a Cloudinary.
 7. E2E 14/14: demo/fallback contra `/api/v1/products`, autenticación, marketplace y publicación real de una cosecha con imagen.
 
-**Mejoras futuras:** búsqueda geoespacial de productos por radio si el catálogo lo requiere; prueba E2E de publicación con un preset Cloudinary real o simulado.
+**Mejoras futuras:** búsqueda geoespacial de productos por radio si el catálogo lo requiere; prueba E2E de publicación con Cloudinary real (hoy la firma y la CDN están simuladas).
 
 **Estimación:** 2.3a/2.3b completadas.
 
@@ -73,7 +73,7 @@ La edición permite actualizar únicamente el bloque del rol en sesión:
 - Transportista: vehículo, placa, capacidad, cobertura, cadena de frío y vigencias.
 
 Frontend: `ProfileScreen` + botón **Mi perfil** en el panel. Evidencia: 267
-pruebas backend, cobertura 82.23 % de ramas, 49 unitarios frontend y 14/14 E2E.
+pruebas backend, cobertura 82.21 % de ramas, 52 unitarios frontend y 14/14 E2E.
 
 **Mejoras futuras:** historial de cambios de perfil y carga de documentos
 (SOAT, licencia, cámara de comercio) a Cloudinary firmado.
@@ -86,7 +86,7 @@ pruebas backend, cobertura 82.23 % de ramas, 49 unitarios frontend y 14/14 E2E.
   de rol y propiedad (BOLA).
 - Frontend: la subida usa la firma; el modal persiste las imágenes y actualiza
   la galería sin duplicarlas.
-- Evidencia: 282 tests backend (82.64 % ramas), 49 unitarios frontend y 14/14 E2E.
+- Evidencia: 288 tests backend (82.21 % ramas), 52 unitarios frontend y 14/14 E2E.
 - Pendiente de decisión: moderación administrativa y política de aprobación.
 
 ### 2.6 Bloqueos por decisión de producto

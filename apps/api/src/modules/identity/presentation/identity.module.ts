@@ -237,6 +237,7 @@ import type { PasswordResetTokenRepository } from '../domain/interfaces/Password
     RequestEmailVerificationUseCase,
     VerifyEmailUseCase,
     SessionAuthGuard,
+    AuthThrottlerGuard,
     TOKEN_SERVICE,
     USER_REPOSITORY,
   ],

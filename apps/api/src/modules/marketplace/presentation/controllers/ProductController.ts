@@ -48,6 +48,8 @@ export class ProductController {
   ) {}
 
   @Get()
+  @UseGuards(AuthThrottlerGuard)
+  @Throttle({ default: { limit: 60, ttl: 60_000 } })
   async findAll(
     @Query(new ZodValidationPipe(productsQuerySchema, 'Parámetros de búsqueda inválidos'))
     query: ProductsQuery,

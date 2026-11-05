@@ -43,13 +43,13 @@ import type { ProductRepository } from '../domain/interfaces/ProductRepository';
     {
       provide: PublishProductUseCase,
       useFactory: (productRepository: ProductRepository) =>
-        new PublishProductUseCase(productRepository),
+        new PublishProductUseCase(productRepository, env.CLOUDINARY_UPLOAD_FOLDER),
       inject: [PRODUCT_REPOSITORY],
     },
     {
       provide: UpdateProductImagesUseCase,
       useFactory: (productRepository: ProductRepository) =>
-        new UpdateProductImagesUseCase(productRepository),
+        new UpdateProductImagesUseCase(productRepository, env.CLOUDINARY_UPLOAD_FOLDER),
       inject: [PRODUCT_REPOSITORY],
     },
   ],

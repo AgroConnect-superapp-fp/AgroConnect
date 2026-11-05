@@ -15,7 +15,7 @@ export const requestLogger = pinoHttp({
     return correlationId ?? randomUUID();
   },
   autoLogging: {
-    ignore: (req) => req.url === '/health',
+    ignore: (req) => req.url === '/health' || req.url === '/health/ready',
   },
   customLogLevel: (_req, res, err) => {
     if (err || res.statusCode >= 500) return 'error';

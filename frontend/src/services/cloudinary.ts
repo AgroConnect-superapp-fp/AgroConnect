@@ -326,7 +326,7 @@ export async function uploadImage({
       lastError = error instanceof Error ? error : new Error(String(error));
 
       // Don't retry on abort or validation errors
-      if (lastError.name === 'AbortError' || lastError.message.includes('400')) {
+      if (lastError.name === 'AbortError' || /status 4\d\d/.test(lastError.message)) {
         throw lastError;
       }
 

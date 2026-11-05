@@ -256,10 +256,24 @@ export class PrismaUserRepository implements UserRepository {
         data: { revoked: true, rotatedAt: new Date() },
       });
       if (revoked.count !== 1) {
-        await tx.refreshToken.updateMany({
-          where: { familyId: current.familyId, revoked: false },
-          data: { revoked: true },
+        // Dos pestañas pueden leer el mismo token antes de que una lo rote.
+        // Si otra petición acaba de rotarlo, NO revocamos la familia: eso
+        // invalidaría el token nuevo de la petición ganadora. Solo tratamos
+        // como reuso una rotación antigua fuera de la ventana de gracia.
+        const latest = await tx.refreshToken.findUnique({
+          where: { id: current.id },
         });
+        const rotatedRecently =
+          latest?.rotatedAt !== null &&
+          latest?.rotatedAt !== undefined &&
+          Date.now() - latest.rotatedAt.getTime() < 30_000;
+
+        if (!rotatedRecently) {
+          await tx.refreshToken.updateMany({
+            where: { familyId: current.familyId, revoked: false },
+            data: { revoked: true },
+          });
+        }
         return false;
       }
 
@@ -337,22 +351,24 @@ export class PrismaUserRepository implements UserRepository {
   }
 
   async updateProducerProfile(userId: string, data: ProducerProfileUpdate): Promise<void> {
-    await this.prisma.producerProfile.update({
-      where: { userId },
-      data: {
-        farmName: data.farmName,
-        municipality: data.municipality,
-        village: data.village,
-      },
-    });
+    await this.prisma.$transaction(async (tx) => {
+      await tx.producerProfile.update({
+        where: { userId },
+        data: {
+          farmName: data.farmName,
+          municipality: data.municipality,
+          village: data.village,
+        },
+      });
 
-    if (data.latitude !== undefined && data.longitude !== undefined) {
-      await this.prisma.$executeRaw`
-        UPDATE producer_profiles
-        SET coordenadas = ST_SetSRID(ST_MakePoint(${data.longitude}, ${data.latitude}), 4326)::geography
-        WHERE user_id = ${userId}::uuid
-      `;
-    }
+      if (data.latitude !== undefined && data.longitude !== undefined) {
+        await tx.$executeRaw`
+          UPDATE producer_profiles
+          SET coordenadas = ST_SetSRID(ST_MakePoint(${data.longitude}, ${data.latitude}), 4326)::geography
+          WHERE user_id = ${userId}::uuid
+        `;
+      }
+    });
   }
 
   async updateCompanyProfile(userId: string, data: CompanyProfileUpdate): Promise<void> {

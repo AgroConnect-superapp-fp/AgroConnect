@@ -47,6 +47,49 @@ function isFailure<T>(body: ApiBody<T>): body is ApiFailureBody {
  * `timeoutMs` es opcional: auth no lo usa (el cold start de Render puede tardar
  * hasta un minuto); el marketplace sí lo usa para no dejar la UI bloqueada.
  */
+let refreshInFlight: Promise<boolean> | null = null;
+
+/**
+ * Renueva la cookie de acceso una sola vez aunque varias peticiones reciban
+ * 401 al mismo tiempo. El refresh token viaja en la cookie httpOnly; el
+ * navegador la adjunta y la rota, sin que JavaScript lea ningún token.
+ */
+async function refreshAccessToken(): Promise<boolean> {
+  if (!refreshInFlight) {
+    refreshInFlight = fetch(`${API_URL}/api/v1/auth/refresh`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      signal: AbortSignal.timeout(15_000),
+    })
+      .then((response) => response.ok)
+      .catch(() => false)
+      .finally(() => {
+        refreshInFlight = null;
+      });
+  }
+
+  return refreshInFlight;
+}
+
+function buildHeaders(options: RequestInit): Headers {
+  const headers = new Headers(options.headers);
+  // CsrfGuard exige este header en peticiones mutantes. Un formulario HTML
+  // cross-site no puede enviarlo sin pasar por el preflight CORS.
+  headers.set('X-Requested-With', 'XMLHttpRequest');
+  // Content-Type solo cuando hay body: en GET provoca un preflight innecesario.
+  if (options.body !== undefined && options.body !== null) {
+    headers.set('Content-Type', 'application/json');
+  }
+  return headers;
+}
+
+function shouldAttemptRefresh(path: string): boolean {
+  if (path === '/api/v1/auth/refresh') return false;
+  if (!path.startsWith('/api/v1/auth/')) return true;
+  return path === '/api/v1/auth/logout';
+}
+
 export async function apiRequest<T>(
   path: string,
   options: RequestInit = {},
@@ -54,24 +97,26 @@ export async function apiRequest<T>(
 ): Promise<T> {
   const controller = timeoutMs ? new AbortController() : null;
   const timer = controller ? setTimeout(() => controller.abort(), timeoutMs) : null;
+  const requestInit: RequestInit = {
+    ...options,
+    credentials: 'include',
+    signal: controller?.signal ?? options.signal,
+    headers: buildHeaders(options),
+  };
 
   let response: Response;
 
   try {
-    response = await fetch(`${API_URL}${path}`, {
-      ...options,
-      // La sesión viaja en cookies httpOnly: el navegador las adjunta (y las
-      // renueva) automáticamente. El JavaScript NUNCA lee ni envía tokens.
-      credentials: 'include',
-      signal: controller?.signal ?? options.signal,
-      headers: {
-        'Content-Type': 'application/json',
-        // CsrfGuard exige este header en toda petición mutante. Un formulario
-        // HTML cross-site no puede enviarlo sin pasar por el preflight CORS.
-        'X-Requested-With': 'XMLHttpRequest',
-        ...(options.headers ?? {}),
-      },
-    });
+    response = await fetch(`${API_URL}${path}`, requestInit);
+
+    if (response.status === 401 && shouldAttemptRefresh(path)) {
+      const refreshed = await refreshAccessToken();
+      if (refreshed) {
+        response = await fetch(`${API_URL}${path}`, requestInit);
+      } else if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('agroconnect:session-expired'));
+      }
+    }
   } catch (error) {
     const timedOut = controller?.signal.aborted === true;
     throw new ApiError(

@@ -50,6 +50,10 @@ test('un productor publica una cosecha con una imagen', async ({ page }) => {
     },
   });
   expect(registered.status()).toBe(201);
+  const registeredBody = (await registered.json()) as {
+    data: { usuario: { id: string } };
+  };
+  const producerId = registeredBody.data.usuario.id;
 
   const verifyToken = await readVerificationToken(correo);
   const verified = await page.request.post(`${BACKEND_URL}/api/v1/auth/verify-email`, {
@@ -75,7 +79,7 @@ test('un productor publica una cosecha con una imagen', async ({ page }) => {
           apiKey: 'e2e-key',
           timestamp: Math.floor(Date.now() / 1000),
           signature: 'e2e-signature',
-          folder: `agroconnect/products/e2e-${suffix}`,
+          folder: `agroconnect/products/${producerId}`,
           allowedFormats: ['jpg', 'jpeg', 'png', 'webp', 'avif'],
           maxBytes: 10 * 1024 * 1024,
         },
@@ -87,7 +91,7 @@ test('un productor publica una cosecha con una imagen', async ({ page }) => {
       status: 200,
       contentType: 'application/json',
       body: JSON.stringify({
-        public_id: `e2e/${suffix}`,
+        public_id: `agroconnect/products/${producerId}/e2e-${suffix}.png`,
         secure_url: `https://res.cloudinary.com/demo/image/upload/e2e-${suffix}.png`,
         width: 192,
         height: 192,

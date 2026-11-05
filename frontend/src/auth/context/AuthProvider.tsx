@@ -76,14 +76,22 @@ export function AuthProvider({ children }: { children: ReactNode }): React.React
     });
   }, [applySession]);
 
+  useEffect(() => {
+    const handleExpired = (): void => {
+      setUsuario(null);
+      setStatus('anonymous');
+    };
+
+    window.addEventListener('agroconnect:session-expired', handleExpired);
+    return () => window.removeEventListener('agroconnect:session-expired', handleExpired);
+  }, []);
+
   const logout = useCallback(async () => {
     // La sesión demo no tiene cookie de servidor: no hay nada que revocar.
+    // Si el servidor falla, NO limpiamos el estado local: la cookie httpOnly
+    // seguiría viva y un reload volvería a autenticar al usuario.
     if (usuario?.id !== DEMO_USER_ID) {
-      try {
-        await authApi.logout();
-      } catch {
-        // La sesión local se cierra aunque el servidor no responda.
-      }
+      await authApi.logout();
     }
 
     setUsuario(null);

@@ -58,8 +58,8 @@ Migrar la **lectura** del marketplace a la API propia:
   servidor, contrato tipado, eliminación de la anon key del bundle y un chunk
   de marketplace mucho menor. El fallback demo sigue cubriendo la indisponibilidad.
 - **Negativas:** se agregan una migración y un modelo que deben mantenerse; el
-  seed es manual y la subida usa el preset unsigned de Cloudinary, por lo que
-  la configuración del preset es un requisito operativo.
+  seed es manual y la subida usa una firma server-side de Cloudinary (ADR-021), por lo que
+  la configuración de las credenciales de firma es un requisito operativo.
 - **Operación:** el marketplace ya no depende de Supabase. La autenticación y
   `/health/ready` siguen dependiendo de la base PostgreSQL de la API hasta que
   se complete el despliegue en el nuevo entorno.

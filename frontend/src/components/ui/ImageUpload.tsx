@@ -60,24 +60,30 @@ export function ImageUpload({
    */
   const handleFileSelect = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>): void => {
-      const files = event.target.files;
+      const selected = event.target.files ? Array.from(event.target.files) : [];
       setValidationError(null);
+      // Permite volver a seleccionar el mismo archivo después de un error.
+      event.target.value = '';
 
-      if (files && files.length > 0) {
-        // Validate max files
-        if (previews.length + files.length > maxFiles) {
+      if (selected.length > 0) {
+        const invalid = selected.find((file) => !file.type.startsWith('image/'));
+        if (invalid) {
+          setValidationError(`"${invalid.name}" no es una imagen válida.`);
+          return;
+        }
+
+        if (previews.length + selected.length > maxFiles) {
           setValidationError(`Máximo ${maxFiles} archivos permitidos.`);
           return;
         }
 
-        // Generate previews
-        const newPreviews = Array.from(files).map((file) => ({
+        const newPreviews = selected.map((file) => ({
           file,
           url: URL.createObjectURL(file),
         }));
 
         setPreviews((prev) => [...prev, ...newPreviews]);
-        void handleUpload(files);
+        void handleUpload(selected);
       }
     },
     [handleUpload, maxFiles, previews.length]
@@ -93,16 +99,20 @@ export function ImageUpload({
       setIsDragging(false);
       setValidationError(null);
 
-      const files = event.dataTransfer.files;
+      const files = Array.from(event.dataTransfer.files);
       if (files.length > 0) {
-        // Validate max files
+        const invalid = files.find((file) => !file.type.startsWith('image/'));
+        if (invalid) {
+          setValidationError(`"${invalid.name}" no es una imagen válida.`);
+          return;
+        }
+
         if (previews.length + files.length > maxFiles) {
           setValidationError(`Máximo ${maxFiles} archivos permitidos.`);
           return;
         }
 
-        // Generate previews
-        const newPreviews = Array.from(files).map((file) => ({
+        const newPreviews = files.map((file) => ({
           file,
           url: URL.createObjectURL(file),
         }));

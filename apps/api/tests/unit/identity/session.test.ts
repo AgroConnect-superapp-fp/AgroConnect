@@ -83,12 +83,10 @@ describe('SessionTokenInterceptor', () => {
       body: {},
     });
 
-    interceptor
-      .intercept(contextFor(request), { handle: () => of(null) })
-      .subscribe(() => {
-        expect((request.body as Record<string, unknown>).refreshToken).toBe('token-de-cookie');
-        done();
-      });
+    interceptor.intercept(contextFor(request), { handle: () => of(null) }).subscribe(() => {
+      expect((request.body as Record<string, unknown>).refreshToken).toBe('token-de-cookie');
+      done();
+    });
   });
 
   it('no sobrescribe un refresh token ya presente en el cuerpo', (done) => {
@@ -97,22 +95,18 @@ describe('SessionTokenInterceptor', () => {
       body: { refreshToken: 'token-del-cuerpo' },
     });
 
-    interceptor
-      .intercept(contextFor(request), { handle: () => of(null) })
-      .subscribe(() => {
-        expect((request.body as Record<string, unknown>).refreshToken).toBe('token-del-cuerpo');
-        done();
-      });
+    interceptor.intercept(contextFor(request), { handle: () => of(null) }).subscribe(() => {
+      expect((request.body as Record<string, unknown>).refreshToken).toBe('token-del-cuerpo');
+      done();
+    });
   });
 
-  it('no falla cuando la petición no tiene cuerpo', (done) => {
+  it('normaliza a {} cuando la petición no tiene cuerpo', (done) => {
     const request = requestWith({ body: undefined });
 
-    interceptor
-      .intercept(contextFor(request), { handle: () => of(null) })
-      .subscribe(() => {
-        expect(request.body).toBeUndefined();
-        done();
-      });
+    interceptor.intercept(contextFor(request), { handle: () => of(null) }).subscribe(() => {
+      expect(request.body).toEqual({});
+      done();
+    });
   });
 });

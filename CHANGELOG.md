@@ -51,6 +51,26 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 - **Despliegue PostgreSQL propio:** runbook operativo y script
   `npm run smoke:cloudinary` para validar credenciales firmadas sin subir PII.
 
+### Corregido
+
+- **Migraciones y runtime alineados:** el CLI de Prisma recibe `DATABASE_SCHEMA`
+  como `?schema=...`; se evita migrar a `public` mientras la API lee
+  `agroconnect`.
+- **Sesión:** refresh automático ante 401, logout que no oculta fallos del
+  servidor, normalización de body vacío en refresh/logout y ventana de gracia
+  para rotaciones concurrentes entre pestañas.
+- **Imágenes:** `moderationStatus` se fuerza a `pending` para productores,
+  se valida que el `publicId` pertenezca a su carpeta y se limitan longitudes
+  de metadatos.
+- **Marketplace:** catálogo vacío ya no activa datos demo; el fallback solo
+  aparece ante un error real. El modal no descarta imágenes silenciosamente.
+- **Contratos/CI:** `productivity` es entero, OpenAPI documenta el sobre real y
+  los códigos 202, el frontend ejecuta sus 52 unitarios en CI y el manifiesto
+  de alineación queda en 288/52/14.
+- **Endurecimiento:** rate limit en lecturas públicas, `Cache-Control: no-store`
+  en auth/perfil, transacción en actualización de coordenadas y mapeo de
+  `P2025` a 404.
+
 ### Cambiado
 
 - **Marketplace frontend:** `services/productsApi.ts` reemplaza

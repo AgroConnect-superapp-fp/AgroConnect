@@ -63,7 +63,9 @@ export async function fetchProducts(
     return products.map(toProperty);
   } catch (error) {
     console.error('[Products API] Error:', error);
-    return [];
+    // La UI debe distinguir un catálogo vacío de una API caída. El fallback
+    // demo solo se activa cuando esta promesa se rechaza.
+    throw error;
   }
 }
 

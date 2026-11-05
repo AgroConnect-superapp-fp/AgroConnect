@@ -36,7 +36,13 @@ export function ProfileScreen({ onBack }: ProfileScreenProps): React.ReactElemen
   );
   const [success, setSuccess] = useState<string | null>(null);
 
-  const [producer, setProducer] = useState({ nombre: '', municipio: '', vereda: '' });
+  const [producer, setProducer] = useState({
+    nombre: '',
+    municipio: '',
+    vereda: '',
+    latitud: '',
+    longitud: '',
+  });
   const [company, setCompany] = useState({
     razonSocial: '',
     direccion: '',
@@ -67,6 +73,12 @@ export function ProfileScreen({ onBack }: ProfileScreenProps): React.ReactElemen
             nombre: data.productor.nombre,
             municipio: data.productor.municipio,
             vereda: data.productor.vereda,
+            latitud:
+              data.productor.latitud !== undefined ? String(data.productor.latitud) : '',
+            longitud:
+              data.productor.longitud !== undefined
+                ? String(data.productor.longitud)
+                : '',
           });
         }
         if (data.empresa) {
@@ -117,11 +129,25 @@ export function ProfileScreen({ onBack }: ProfileScreenProps): React.ReactElemen
       let payload: ProfileUpdatePayload;
 
       if (role === 'productor') {
+        const latitude =
+          producer.latitud.trim() === '' ? undefined : Number(producer.latitud);
+        const longitude =
+          producer.longitud.trim() === '' ? undefined : Number(producer.longitud);
+
+        if ((latitude === undefined) !== (longitude === undefined)) {
+          setError('Ingresa latitud y longitud juntas, o deja ambas vacías.');
+          setSaving(false);
+          return;
+        }
+
         payload = {
           productor: {
             nombre: producer.nombre.trim(),
             municipio: producer.municipio.trim(),
             vereda: producer.vereda.trim(),
+            ...(latitude !== undefined && longitude !== undefined
+              ? { latitud: latitude, longitud: longitude }
+              : {}),
           },
         };
       } else if (role === 'comprador_b2b') {
@@ -153,6 +179,41 @@ export function ProfileScreen({ onBack }: ProfileScreenProps): React.ReactElemen
 
       const updated = await updateMyProfile(payload);
       setProfile(updated);
+      if (updated.productor) {
+        setProducer({
+          nombre: updated.productor.nombre,
+          municipio: updated.productor.municipio,
+          vereda: updated.productor.vereda,
+          latitud:
+            updated.productor.latitud !== undefined
+              ? String(updated.productor.latitud)
+              : '',
+          longitud:
+            updated.productor.longitud !== undefined
+              ? String(updated.productor.longitud)
+              : '',
+        });
+      }
+      if (updated.empresa) {
+        setCompany({
+          razonSocial: updated.empresa.razonSocial,
+          direccion: updated.empresa.direccion ?? '',
+          tipoEmpresa: updated.empresa.tipoEmpresa ?? '',
+          departamento: updated.empresa.departamento ?? '',
+          municipio: updated.empresa.municipio ?? '',
+        });
+      }
+      if (updated.transportista) {
+        setTransporter({
+          tipoVehiculo: updated.transportista.tipoVehiculo,
+          placa: updated.transportista.placa,
+          capacidadKg: String(updated.transportista.capacidadKg),
+          cobertura: updated.transportista.cobertura.join(', '),
+          cadenaFrio: updated.transportista.cadenaFrio,
+          soatVence: updated.transportista.soatVence,
+          licenciaVence: updated.transportista.licenciaVence,
+        });
+      }
       setSuccess('Perfil actualizado correctamente.');
     } catch (cause) {
       setError(
@@ -260,6 +321,24 @@ export function ProfileScreen({ onBack }: ProfileScreenProps): React.ReactElemen
                 value={producer.vereda}
                 onChange={(value) => setProducer({ ...producer, vereda: value })}
                 placeholder="Boquía"
+              />
+              <FormField
+                id="profile-productor-latitud"
+                label="Latitud (opcional)"
+                type="number"
+                value={producer.latitud}
+                onChange={(value) => setProducer({ ...producer, latitud: value })}
+                inputMode="decimal"
+                placeholder="4.6371"
+              />
+              <FormField
+                id="profile-productor-longitud"
+                label="Longitud (opcional)"
+                type="number"
+                value={producer.longitud}
+                onChange={(value) => setProducer({ ...producer, longitud: value })}
+                inputMode="decimal"
+                placeholder="-75.5703"
               />
             </>
           )}

@@ -28,7 +28,7 @@ export class FindNearbyPlotsUseCase {
         400,
       );
     }
-    if (radiusKm <= 0 || radiusKm > 100) {
+    if (radiusKm < 1 || radiusKm > 100) {
       throw new DomainError(
         'VALIDATION_ERROR',
         'El radio de búsqueda debe estar entre 1 y 100 km',

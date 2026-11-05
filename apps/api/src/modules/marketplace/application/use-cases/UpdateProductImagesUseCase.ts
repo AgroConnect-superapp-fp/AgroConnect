@@ -1,6 +1,8 @@
 import { DomainError } from '../../../../shared/errors/errors';
+import { isPrismaNotFound } from '../../../../shared/infrastructure/prismaErrors';
 import type { Product, ProductImage } from '../../domain/entities/Product';
 import type { ProductRepository } from '../../domain/interfaces/ProductRepository';
+import { sanitizeProductImages } from '../productImages';
 
 export interface ProductImageActor {
   id: string;
@@ -8,7 +10,10 @@ export interface ProductImageActor {
 }
 
 export class UpdateProductImagesUseCase {
-  constructor(private readonly productRepository: ProductRepository) {}
+  constructor(
+    private readonly productRepository: ProductRepository,
+    private readonly uploadFolder = 'agroconnect/products',
+  ) {}
 
   async execute(
     actor: ProductImageActor,
@@ -36,6 +41,20 @@ export class UpdateProductImagesUseCase {
       throw new DomainError('FORBIDDEN', 'Solo el propietario puede editar este producto', 403);
     }
 
-    return this.productRepository.updateImages(productId, images);
+    const sanitized = sanitizeProductImages(
+      images,
+      actor,
+      this.uploadFolder,
+      new Set(product.props.images.map((image) => image.publicId)),
+    );
+
+    try {
+      return await this.productRepository.updateImages(productId, sanitized);
+    } catch (error) {
+      if (isPrismaNotFound(error)) {
+        throw new DomainError('NOT_FOUND', 'El producto no existe', 404);
+      }
+      throw error;
+    }
   }
 }

@@ -180,7 +180,13 @@ export class UpdateProfileUseCase {
         : current.transporter.licenseExpiresAt,
     };
 
-    TransporterProfile.create({ id: 'profile', userId, ...merged });
+    TransporterProfile.validateUpdate(
+      { id: 'profile', userId, ...merged },
+      {
+        soat: update.soatExpiresAt !== undefined,
+        license: update.licenseExpiresAt !== undefined,
+      },
+    );
 
     await this.userRepository.updateTransporterProfile(userId, {
       ...(update.vehicleType !== undefined ? { vehicleType: update.vehicleType } : {}),

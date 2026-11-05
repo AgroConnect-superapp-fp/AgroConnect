@@ -74,11 +74,11 @@ describe('productsApi', () => {
     );
   });
 
-  it('devuelve [] si la API falla para activar el fallback demo', async () => {
+  it('propaga el error para que la UI active el fallback demo', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
     mockedRequest.mockRejectedValue(new Error('backend down'));
 
-    await expect(fetchProducts()).resolves.toEqual([]);
+    await expect(fetchProducts()).rejects.toThrow('backend down');
   });
 });
 

@@ -3,8 +3,8 @@ services:
   # al backend Express legacy (ADR-009 / Strangler Fig).
   #
   # El build se ejecuta desde la raíz del monorepo porque apps/api consume
-  # @agroconnect/contracts (workspace) y comparte el esquema Prisma de
-  # backend/prisma mediante symlink.
+  # @agroconnect/contracts (workspace) y usa el esquema Prisma de
+  # apps/api/prisma/schema.prisma.
   - type: web
     name: agroconnect-api
     runtime: node

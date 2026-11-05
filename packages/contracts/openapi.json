@@ -96,16 +96,6 @@
           "Auth"
         ],
         "summary": "Renueva la sesión con la cookie httpOnly de refresh",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RefreshRequestBody"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Sesión renovada; cookies httpOnly rotadas"
@@ -137,16 +127,6 @@
           "Auth"
         ],
         "summary": "Revoca la sesión y limpia las cookies",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LogoutRequestBody"
-              }
-            }
-          }
-        },
         "responses": {
           "204": {
             "description": "Sesión revocada"
@@ -180,7 +160,7 @@
           }
         },
         "responses": {
-          "200": {
+          "202": {
             "description": "Respuesta neutra; no revela si el correo existe"
           },
           "400": {
@@ -291,7 +271,7 @@
           }
         },
         "responses": {
-          "200": {
+          "202": {
             "description": "Respuesta neutra; no revela si el correo existe"
           },
           "400": {
@@ -376,7 +356,24 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProfileSnapshot"
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ProfileSnapshot"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
                 }
               }
             }
@@ -416,7 +413,24 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProfileSnapshot"
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ProfileSnapshot"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
                 }
               }
             }
@@ -535,7 +549,24 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProductList"
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ProductList"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
                 }
               }
             }
@@ -572,7 +603,24 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Product"
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Product"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
                 }
               }
             }
@@ -628,7 +676,24 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Product"
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Product"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
                 }
               }
             }
@@ -666,7 +731,24 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UploadSignature"
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/UploadSignature"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
                 }
               }
             }
@@ -1115,7 +1197,7 @@
             "exclusiveMinimum": 0
           },
           "productivity": {
-            "type": "number",
+            "type": "integer",
             "minimum": 0,
             "maximum": 100
           },
@@ -1149,13 +1231,16 @@
               "properties": {
                 "publicId": {
                   "type": "string",
-                  "minLength": 1
+                  "minLength": 1,
+                  "maxLength": 255
                 },
                 "url": {
-                  "type": "string"
+                  "type": "string",
+                  "maxLength": 2048
                 },
                 "alt": {
-                  "type": "string"
+                  "type": "string",
+                  "maxLength": 200
                 },
                 "width": {
                   "type": "number",
@@ -1170,7 +1255,8 @@
                   "minimum": 0
                 },
                 "uploadedAt": {
-                  "type": "string"
+                  "type": "string",
+                  "maxLength": 40
                 },
                 "moderationStatus": {
                   "type": "string",
@@ -1181,7 +1267,8 @@
                   ]
                 },
                 "lqip": {
-                  "type": "string"
+                  "type": "string",
+                  "maxLength": 8192
                 }
               },
               "required": [
@@ -1206,6 +1293,12 @@
               "minItems": 2,
               "maxItems": 2
             }
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
           }
         },
         "required": [
@@ -1559,7 +1652,7 @@
             "maximum": 100000
           },
           "productivity": {
-            "type": "number",
+            "type": "integer",
             "minimum": 0,
             "maximum": 100
           },
@@ -1592,13 +1685,16 @@
               "properties": {
                 "publicId": {
                   "type": "string",
-                  "minLength": 1
+                  "minLength": 1,
+                  "maxLength": 255
                 },
                 "url": {
-                  "type": "string"
+                  "type": "string",
+                  "maxLength": 2048
                 },
                 "alt": {
-                  "type": "string"
+                  "type": "string",
+                  "maxLength": 200
                 },
                 "width": {
                   "type": "number",
@@ -1613,7 +1709,8 @@
                   "minimum": 0
                 },
                 "uploadedAt": {
-                  "type": "string"
+                  "type": "string",
+                  "maxLength": 40
                 },
                 "moderationStatus": {
                   "type": "string",
@@ -1624,7 +1721,8 @@
                   ]
                 },
                 "lqip": {
-                  "type": "string"
+                  "type": "string",
+                  "maxLength": 8192
                 }
               },
               "required": [
@@ -1679,13 +1777,16 @@
               "properties": {
                 "publicId": {
                   "type": "string",
-                  "minLength": 1
+                  "minLength": 1,
+                  "maxLength": 255
                 },
                 "url": {
-                  "type": "string"
+                  "type": "string",
+                  "maxLength": 2048
                 },
                 "alt": {
-                  "type": "string"
+                  "type": "string",
+                  "maxLength": 200
                 },
                 "width": {
                   "type": "number",
@@ -1700,7 +1801,8 @@
                   "minimum": 0
                 },
                 "uploadedAt": {
-                  "type": "string"
+                  "type": "string",
+                  "maxLength": 40
                 },
                 "moderationStatus": {
                   "type": "string",
@@ -1711,7 +1813,8 @@
                   ]
                 },
                 "lqip": {
-                  "type": "string"
+                  "type": "string",
+                  "maxLength": 8192
                 }
               },
               "required": [

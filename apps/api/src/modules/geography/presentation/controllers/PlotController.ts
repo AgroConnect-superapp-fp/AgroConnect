@@ -1,9 +1,11 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { nearbyPlotsQuerySchema } from '@agroconnect/contracts';
 import type { NearbyPlotsQuery } from '@agroconnect/contracts';
 import { FindNearbyPlotsUseCase } from '../../application/use-cases/FindNearbyPlotsUseCase';
 import { ZodValidationPipe } from '../../../../shared/http/zod-validation.pipe';
 import { success } from '../../../../shared/http/responses';
+import { AuthThrottlerGuard } from '../../../identity/presentation/guards/AuthThrottlerGuard';
 
 /**
  * Controlador de parcelas.
@@ -25,6 +27,8 @@ export class PlotController {
   constructor(private readonly findNearbyPlotsUseCase: FindNearbyPlotsUseCase) {}
 
   @Get('nearby')
+  @UseGuards(AuthThrottlerGuard)
+  @Throttle({ default: { limit: 60, ttl: 60_000 } })
   async findNearby(
     @Query(new ZodValidationPipe(nearbyPlotsQuerySchema, 'Parámetros de búsqueda inválidos'))
     query: NearbyPlotsQuery,

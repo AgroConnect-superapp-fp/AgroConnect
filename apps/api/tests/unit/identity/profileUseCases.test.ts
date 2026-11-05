@@ -205,6 +205,54 @@ describe('UpdateProfileUseCase', () => {
     });
   });
 
+  it('permite corregir datos aunque el SOAT anterior esté vencido', async () => {
+    const sut = buildSut();
+    const user = sut.repository.seedUser({
+      email: 'transporte-vencido@example.com',
+      roleName: 'transportista',
+    });
+    sut.repository.transporterProfiles.set(user.id, {
+      vehicleType: 'camion',
+      plate: 'ABC123',
+      capacityKg: 3500,
+      coverageMunicipalities: ['Armenia'],
+      coldChain: true,
+      soatExpiresAt: new Date('2020-01-01T23:59:59.999Z'),
+      licenseExpiresAt: new Date('2020-01-01T23:59:59.999Z'),
+    });
+
+    const profile = await sut.updateProfile.execute(
+      { id: user.id, role: 'transportista' },
+      { transporter: { capacityKg: 5000 } },
+    );
+
+    expect(profile.transporter?.capacityKg).toBe(5000);
+  });
+
+  it('rechaza una fecha de SOAT nueva que ya esté vencida', async () => {
+    const sut = buildSut();
+    const user = sut.repository.seedUser({
+      email: 'transporte-fecha-vencida@example.com',
+      roleName: 'transportista',
+    });
+    sut.repository.transporterProfiles.set(user.id, {
+      vehicleType: 'camion',
+      plate: 'ABC123',
+      capacityKg: 3500,
+      coverageMunicipalities: ['Armenia'],
+      coldChain: true,
+      soatExpiresAt: new Date('2020-01-01T23:59:59.999Z'),
+      licenseExpiresAt: new Date('2020-01-01T23:59:59.999Z'),
+    });
+
+    await expect(
+      sut.updateProfile.execute(
+        { id: user.id, role: 'transportista' },
+        { transporter: { soatExpiresAt: '2020-01-01' } },
+      ),
+    ).rejects.toMatchObject({ code: 'VALIDATION_ERROR' });
+  });
+
   it('rechaza fechas, capacidad y cobertura inválidas del transportista', async () => {
     const sut = buildSut();
     const user = sut.repository.seedUser({

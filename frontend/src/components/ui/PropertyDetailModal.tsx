@@ -40,6 +40,8 @@ export function PropertyDetailModal({
 }: PropertyDetailModalProps): React.ReactElement {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [savingImages, setSavingImages] = useState(false);
+  const existingImageCount = property.images?.length ?? 0;
+  const remainingImageSlots = Math.max(0, 6 - existingImageCount);
   const cropInfo = getCropInfo(property.crop);
   const certificationInfo = getCertificationInfo(property.certification);
 
@@ -56,10 +58,17 @@ export function PropertyDetailModal({
     async (newImages: PropertyImage[]): Promise<void> => {
       if (newImages.length === 0 || savingImages) return;
 
+      if (existingImageCount + newImages.length > 6) {
+        setUploadError(
+          `Solo puedes tener 6 imágenes por producto. Te quedan ${remainingImageSlots} espacios.`
+        );
+        return;
+      }
+
       setSavingImages(true);
       setUploadError(null);
       try {
-        const images = [...(property.images ?? []), ...newImages].slice(0, 6);
+        const images = [...(property.images ?? []), ...newImages];
         const updated = await updateProductImages(property.id, images);
         onPropertyUpdated?.(updated);
       } catch (error) {
@@ -72,7 +81,14 @@ export function PropertyDetailModal({
         setSavingImages(false);
       }
     },
-    [onPropertyUpdated, property.id, property.images, savingImages]
+    [
+      existingImageCount,
+      onPropertyUpdated,
+      property.id,
+      property.images,
+      remainingImageSlots,
+      savingImages,
+    ]
   );
 
   // Close on Escape key press (WCAG accessibility requirement)
@@ -152,12 +168,19 @@ export function PropertyDetailModal({
                   Guardando imágenes en el producto…
                 </p>
               )}
-              <ImageUpload
-                folder={`properties/${property.id}`}
-                tags={[property.crop, property.department.toLowerCase()]}
-                maxFiles={5}
-                onImagesUploaded={(newImages) => void handleImagesUploaded(newImages)}
-              />
+              {remainingImageSlots > 0 ? (
+                <ImageUpload
+                  key={existingImageCount}
+                  folder={`properties/${property.id}`}
+                  tags={[property.crop, property.department.toLowerCase()]}
+                  maxFiles={remainingImageSlots}
+                  onImagesUploaded={(newImages) => void handleImagesUploaded(newImages)}
+                />
+              ) : (
+                <p className="rounded-lg border border-dashed border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-600">
+                  Este producto ya tiene el máximo de 6 imágenes.
+                </p>
+              )}
             </div>
           </div>
 

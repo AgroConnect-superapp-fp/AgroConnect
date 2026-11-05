@@ -1,4 +1,5 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
+import type { NextFunction, Request, Response } from 'express';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { env } from './shared/config/env';
@@ -25,6 +26,14 @@ export function configureApp(app: NestExpressApplication): void {
   app.use(requestLogger);
   app.use(helmet());
   app.use(cookieParser());
+
+  // Evita que PII de sesión/perfil quede en cachés de navegador o proxies.
+  app.use((request: Request, response: Response, next: NextFunction) => {
+    if (request.path.startsWith('/api/v1/auth') || request.path.startsWith('/api/v1/profile')) {
+      response.setHeader('Cache-Control', 'no-store');
+    }
+    next();
+  });
 
   app.enableCors({
     origin: env.CORS_ORIGIN.split(',').map((origin) => origin.trim()),

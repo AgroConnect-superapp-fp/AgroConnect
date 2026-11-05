@@ -149,15 +149,18 @@ function App(): React.ReactElement {
       const data = await fetchProducts();
 
       if (data.length === 0) {
-        setProperties(MOCK_PROPERTIES);
-        setUsingMockData(true);
+        // Catálogo vacío real: no es un fallo de conexión.
+        setProperties([]);
+        setUsingMockData(false);
       } else {
         setProperties(data);
         setUsingMockData(false);
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
-      setError(errorMessage);
+      // Fallback explícito solo cuando la API falla; el banner avisa al usuario.
+      console.error('[Marketplace] Fallback a datos demo:', err);
+      setProperties(MOCK_PROPERTIES);
+      setUsingMockData(true);
     } finally {
       setLoading(false);
     }

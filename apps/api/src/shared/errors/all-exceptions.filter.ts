@@ -123,7 +123,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     // En errores 5xx el mensaje real puede filtrar detalles de infraestructura
     // (pool de conexiones, SQL, rutas), así que se sustituye por uno genérico.
     const isServerError = error.statusCode >= 500;
-    const isServiceUnavailable = error.code === 'SERVICE_UNAVAILABLE';
+    const isServiceUnavailable = error.statusCode >= 500 && error.code === 'SERVICE_UNAVAILABLE';
 
     response.status(error.statusCode).json({
       success: false,

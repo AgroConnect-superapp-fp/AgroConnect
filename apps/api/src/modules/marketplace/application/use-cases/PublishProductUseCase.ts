@@ -6,6 +6,7 @@ import type {
   ProductImage,
 } from '../../domain/entities/Product';
 import type { ProductRepository } from '../../domain/interfaces/ProductRepository';
+import { sanitizeProductImages } from '../productImages';
 
 export interface ProductActor {
   id: string;
@@ -39,7 +40,10 @@ export interface PublishProductCommand {
  * para proteger el dominio si se invoca desde otro adaptador.
  */
 export class PublishProductUseCase {
-  constructor(private readonly productRepository: ProductRepository) {}
+  constructor(
+    private readonly productRepository: ProductRepository,
+    private readonly uploadFolder = 'agroconnect/products',
+  ) {}
 
   async execute(actor: ProductActor, command: PublishProductCommand): Promise<Product> {
     if (actor.role !== 'productor' && actor.role !== 'administrador') {
@@ -84,7 +88,7 @@ export class PublishProductUseCase {
       lat: command.lat,
       lng: command.lng,
       producerId: actor.id,
-      images: command.images,
+      images: sanitizeProductImages(command.images, actor, this.uploadFolder),
       coordinates: command.coordinates,
     });
   }

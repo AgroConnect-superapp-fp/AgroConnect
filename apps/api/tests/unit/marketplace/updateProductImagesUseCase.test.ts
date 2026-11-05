@@ -29,12 +29,42 @@ describe('UpdateProductImagesUseCase', () => {
     const updated = await useCase.execute(
       { id: 'producer-1', role: 'productor' },
       '00000000-0000-4000-8000-000000000001',
-      [{ publicId: 'agroconnect/products/user/cosecha', alt: 'Cosecha' }],
+      [{ publicId: 'agroconnect/products/producer-1/cosecha', alt: 'Cosecha' }],
     );
 
     expect(updated.props.images).toEqual([
-      { publicId: 'agroconnect/products/user/cosecha', alt: 'Cosecha' },
+      {
+        publicId: 'agroconnect/products/producer-1/cosecha',
+        alt: 'Cosecha',
+        moderationStatus: 'pending',
+      },
     ]);
+  });
+
+  it('impide autodeclarar una imagen como aprobada y reutilizar otra carpeta', async () => {
+    const repository = new InMemoryProductRepository();
+    repository.seedProduct(buildProduct());
+    const useCase = new UpdateProductImagesUseCase(repository);
+
+    const updated = await useCase.execute(
+      { id: 'producer-1', role: 'productor' },
+      '00000000-0000-4000-8000-000000000001',
+      [
+        {
+          publicId: 'agroconnect/products/producer-1/cosecha',
+          moderationStatus: 'approved',
+        },
+      ],
+    );
+    expect(updated.props.images[0]?.moderationStatus).toBe('pending');
+
+    await expect(
+      useCase.execute(
+        { id: 'producer-1', role: 'productor' },
+        '00000000-0000-4000-8000-000000000001',
+        [{ publicId: 'agroconnect/products/otro-productor/cosecha' }],
+      ),
+    ).rejects.toMatchObject({ code: 'FORBIDDEN', statusCode: 403 });
   });
 
   it('rechaza a un productor que no es propietario', async () => {

@@ -13,7 +13,7 @@ import { logger } from '../shared/logger/logger';
  * (`DATABASE_SCHEMA`) y mismos niveles de log.
  *
  * El esquema Prisma es ÚNICO en el monorepo: `apps/api/prisma/schema.prisma`
- * es un enlace simbólico a `backend/prisma/schema.prisma`, y el cliente
+ * es `apps/api/prisma/schema.prisma`, y el cliente
  * generado para esta aplicación vive en `apps/api/src/generated/prisma`.
  */
 @Injectable()
@@ -39,7 +39,12 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
   }
 
   async onModuleDestroy(): Promise<void> {
-    await this.$disconnect();
-    await this.pool.end();
+    try {
+      await this.$disconnect();
+    } finally {
+      // El adapter puede haber cerrado ya el pool; `end()` debe ser idempotente
+      // y no impedir el apagado ordenado si eso ocurre.
+      await this.pool.end().catch(() => undefined);
+    }
   }
 }

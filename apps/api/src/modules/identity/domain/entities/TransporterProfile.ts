@@ -20,6 +20,27 @@ export class TransporterProfile {
   private constructor(private readonly props: TransporterProfileProps) {}
 
   static create(props: TransporterProfileProps): TransporterProfile {
+    const plate = TransporterProfile.validateCommon(props);
+    TransporterProfile.validateDates(props, { soat: true, license: true });
+    return new TransporterProfile({ ...props, plate });
+  }
+
+  /**
+   * Valida una actualización parcial sin bloquear cambios ajenos a documentos
+   * vencidos. Si el transportista solo corrige su placa, no debe quedar
+   * atrapado porque el SOAT anterior ya venció; si envía una fecha nueva, esa
+   * fecha sí debe estar vigente.
+   */
+  static validateUpdate(
+    props: TransporterProfileProps,
+    changedDates: { soat: boolean; license: boolean },
+  ): string {
+    const plate = TransporterProfile.validateCommon(props);
+    TransporterProfile.validateDates(props, changedDates);
+    return plate;
+  }
+
+  private static validateCommon(props: TransporterProfileProps): string {
     const plate = props.plate.trim().toUpperCase();
 
     if (!PLATE_REGEX.test(plate)) {
@@ -34,15 +55,20 @@ export class TransporterProfile {
       throw new InvalidDataError('Indica entre 1 y 20 municipios de cobertura');
     }
 
-    if (props.soatExpiresAt.getTime() < Date.now()) {
+    return plate;
+  }
+
+  private static validateDates(
+    props: TransporterProfileProps,
+    changed: { soat: boolean; license: boolean },
+  ): void {
+    if (changed.soat && props.soatExpiresAt.getTime() < Date.now()) {
       throw new InvalidDataError('El SOAT debe estar vigente');
     }
 
-    if (props.licenseExpiresAt.getTime() < Date.now()) {
+    if (changed.license && props.licenseExpiresAt.getTime() < Date.now()) {
       throw new InvalidDataError('La licencia debe estar vigente');
     }
-
-    return new TransporterProfile({ ...props, plate });
   }
 
   get id(): string {

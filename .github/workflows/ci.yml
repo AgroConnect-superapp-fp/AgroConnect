@@ -2,14 +2,14 @@ name: CI — AgroConnect
 
 on:
   push:
-    branches: [main, develop, 'feature/**', 'hotfix/**']
+    branches: [main, develop, "feature/**", "hotfix/**"]
     # Un push que solo cambia documentación no necesita reconstruir ni
     # desplegar. Los PR siguen ejecutando todos los gates.
     paths-ignore:
-      - 'docs/**'
-      - '**/*.md'
-      - 'scripts/**'
-      - 'obsidian-vault/**'
+      - "docs/**"
+      - "**/*.md"
+      - "scripts/**"
+      - "obsidian-vault/**"
   pull_request:
     branches: [main, develop]
 
@@ -18,7 +18,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: '24'
+  NODE_VERSION: "24"
   DATABASE_URL_TEST: postgresql://agroconnect:agroconnect_dev@localhost:5432/agroconnect_test?schema=public
 
 jobs:
@@ -123,6 +123,9 @@ jobs:
       - name: Type check
         run: npx tsc -b
 
+      - name: Pruebas unitarias
+        run: npm test
+
       - name: Build de producción
         run: npm run build
 
@@ -189,7 +192,7 @@ jobs:
         run: npm run test:e2e
         working-directory: frontend
         env:
-          CI: 'true'
+          CI: "true"
           TEST_DATABASE_URL: ${{ env.DATABASE_URL_TEST }}
 
       - name: Publicar reporte de Playwright

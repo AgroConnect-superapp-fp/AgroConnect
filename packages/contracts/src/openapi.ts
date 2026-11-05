@@ -59,7 +59,15 @@ const response = (description: string, schemaRef?: string) => ({
     ? {
         content: {
           "application/json": {
-            schema: { $ref: `#/components/schemas/${schemaRef}` },
+            schema: {
+              type: "object",
+              required: ["success", "data", "message"],
+              properties: {
+                success: { type: "boolean", const: true },
+                data: { $ref: `#/components/schemas/${schemaRef}` },
+                message: { type: "string" },
+              },
+            },
           },
         },
       }
@@ -80,11 +88,12 @@ const authOperation = (
   summary: string,
   schemaRef: string,
   responses: Record<string, unknown>,
+  requiresBody = true,
 ) => ({
   post: {
     tags: ["Auth"],
     summary,
-    requestBody: jsonBody(schemaRef),
+    ...(requiresBody ? { requestBody: jsonBody(schemaRef) } : {}),
     responses,
   },
 });
@@ -155,6 +164,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
           ...validationErrors,
           ...rateLimited,
         },
+        false,
       ),
       "/auth/logout": authOperation(
         "Revoca la sesión y limpia las cookies",
@@ -163,12 +173,13 @@ export function buildOpenApiDocument(): OpenApiDocument {
           "204": response("Sesión revocada"),
           ...validationErrors,
         },
+        false,
       ),
       "/auth/forgot-password": authOperation(
         "Envía un correo con el enlace de recuperación",
         "ForgotPasswordRequestBody",
         {
-          "200": response("Respuesta neutra; no revela si el correo existe"),
+          "202": response("Respuesta neutra; no revela si el correo existe"),
           ...validationErrors,
           ...rateLimited,
         },
@@ -197,7 +208,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
         "Reenvía el correo de verificación",
         "ResendVerificationRequestBody",
         {
-          "200": response("Respuesta neutra; no revela si el correo existe"),
+          "202": response("Respuesta neutra; no revela si el correo existe"),
           ...validationErrors,
           ...rateLimited,
         },

@@ -38,3 +38,8 @@ export function isDatabaseUnavailable(error: unknown): boolean {
     message,
   );
 }
+
+/** Detecta P2025 (registro no encontrado durante update/delete). */
+export function isPrismaNotFound(error: unknown): boolean {
+  return isPrismaKnownError(error) && error.code === 'P2025';
+}

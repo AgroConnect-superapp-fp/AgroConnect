@@ -13,20 +13,23 @@ test('el marketplace y el detalle no tienen violaciones axe WCAG AA', async ({
 }) => {
   test.setTimeout(180_000);
 
-  // Respuesta vacía determinista: activa el fallback demo sin depender de la
-  // base de datos ni del camino de error de red.
+  // Error determinista: activa el fallback demo sin depender de la base de
+  // datos. Un catálogo vacío ya NO activa el fallback (se muestra el estado
+  // vacío real desde el arreglo de MarketplacePrototype).
   await page.route('**/api/v1/products*', (route) =>
     route.fulfill({
-      status: 200,
+      status: 500,
       contentType: 'application/json',
       headers: {
         'access-control-allow-origin': 'http://localhost:5173',
         'access-control-allow-credentials': 'true',
       },
       body: JSON.stringify({
-        success: true,
-        data: [],
-        message: 'Catálogo vacío para el gate de accesibilidad',
+        success: false,
+        error: {
+          code: 'INTERNAL_ERROR',
+          message: 'Fallo simulado para el gate de accesibilidad',
+        },
       }),
     })
   );

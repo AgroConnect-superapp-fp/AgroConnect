@@ -4,7 +4,16 @@ import type { TokenPair } from '../../domain/interfaces/TokenService';
 import { env } from '../../../../shared/config/env';
 import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE } from './session';
 
-const REFRESH_MAX_AGE_SECONDS = 7 * 24 * 60 * 60;
+function durationToSeconds(value: string, fallback: number): number {
+  const match = /^(\d+)([smhd])$/.exec(value.trim());
+  if (!match) return fallback;
+  const amount = Number(match[1]);
+  const unit = match[2];
+  const multipliers: Record<string, number> = { s: 1, m: 60, h: 3600, d: 86400 };
+  return amount * (multipliers[unit ?? ''] ?? 1);
+}
+
+const REFRESH_MAX_AGE_SECONDS = durationToSeconds(env.JWT_REFRESH_EXPIRES_IN, 7 * 24 * 60 * 60);
 
 /**
  * Emisión y revocación de las cookies de sesión.
@@ -34,12 +43,12 @@ export class SessionCookieService {
     response.cookie(
       ACCESS_TOKEN_COOKIE,
       tokens.accessToken,
-      this.options(tokens.expiresIn, '/api/v1')
+      this.options(tokens.expiresIn, '/api/v1'),
     );
     response.cookie(
       REFRESH_TOKEN_COOKIE,
       tokens.refreshToken,
-      this.options(REFRESH_MAX_AGE_SECONDS, '/api/v1/auth')
+      this.options(REFRESH_MAX_AGE_SECONDS, '/api/v1/auth'),
     );
   }
 
