@@ -2,38 +2,40 @@
 
 **Fecha de generación:** 2026-07-03  
 **Fuentes:** Notion PT-ERS-01 (RF), Notion Base de Casos de Uso (CU), Notion Base de Historias de Usuario (HU).  
-**Totales oficiales SENA:** 17 módulos, 68 RF, 66 CU, 69 HU.  
+**Totales oficiales SENA:** 17 módulos, 68 RF, 66 CU, 69 HU.
+
+> **D7 aprobada (2026-11-05):** equivalencias HU06→HU14, HU15→HU08 y HU04→HU11; HU33→CU#31. Este resumen se regenerará con la tabla aprobada; HU08/HU28/HU30 siguen sin equivalencia explícita.
 
 ## Resumen de Totales
 
 | Artefacto | Esperado | Mapeados | Estado |
-|-----------|----------|----------|--------|
-| RF | 68 | 68 | ✅ |
-| CU | 66 | 66 | ✅ |
-| HU | 69 | 69 | ✅ |
-| Módulos | 17 | 17 | ✅ |
+| --------- | -------- | -------- | ------ |
+| RF        | 68       | 68       | ✅     |
+| CU        | 66       | 66       | ✅     |
+| HU        | 69       | 69       | ✅     |
+| Módulos   | 17       | 17       | ✅     |
 
 ## Matriz por Módulo
 
-| Módulo | Nombre | RF | CU | HU | RF→CU | CU→HU |
-|--------|--------|----|----|----|-------|-------|
-| M01 | Gestión de Inicio y Panel General | 4 | 5 | 4 | Sí | Sí |
-| M02 | Gestión de Usuarios y Perfiles | 6 | 6 | 6 | Sí | Sí |
-| M03 | Marketplace Agropecuario | 6 | 8 | 7 | Sí | Sí |
-| M04 | Gestión de Inventarios | 3 | 2 | 3 | Sí | Sí |
-| M05 | Comunicación Interna | 3 | 3 | 3 | Sí | Sí |
-| M06 | Gestión Logística | 3 | 4 | 3 | Sí | Sí |
-| M07 | Gestión de Pedidos | 3 | 4 | 5 | Sí | Sí |
-| M08 | Pagos y Transacciones | 2 | 3 | 3 | Sí | Sí |
-| M09 | Panel Administrativo | 3 | 3 | 3 | Sí | Sí |
-| M10 | Seguridad y Control | 3 | 3 | 3 | Sí | Sí |
-| M11 | Soporte y Ayuda | 2 | 3 | 3 | Sí | Sí |
-| M12 | Inteligencia Artificial AgroBot | 4 | 4 | 3 | Sí | Sí |
-| M13 | Gestión de Compras | 4 | 4 | 2 | Sí | Sí |
-| M14 | Funcionamiento Multicanal y Sincronización Offline | 9 | 6 | 5 | Sí | Sí |
-| M15 | Pagos y Métodos Locales | 5 | 4 | 4 | Sí | Sí |
-| M16 | Geolocalización y Logística Rural | 4 | 3 | 3 | Sí | Sí |
-| M17 | Manejo de Productos Perecederos | 4 | 1 | 9 | Sí | Sí |
+| Módulo | Nombre                                             | RF  | CU  | HU  | RF→CU | CU→HU |
+| ------ | -------------------------------------------------- | --- | --- | --- | ----- | ----- |
+| M01    | Gestión de Inicio y Panel General                  | 4   | 5   | 4   | Sí    | Sí    |
+| M02    | Gestión de Usuarios y Perfiles                     | 6   | 6   | 6   | Sí    | Sí    |
+| M03    | Marketplace Agropecuario                           | 6   | 8   | 7   | Sí    | Sí    |
+| M04    | Gestión de Inventarios                             | 3   | 2   | 3   | Sí    | Sí    |
+| M05    | Comunicación Interna                               | 3   | 3   | 3   | Sí    | Sí    |
+| M06    | Gestión Logística                                  | 3   | 4   | 3   | Sí    | Sí    |
+| M07    | Gestión de Pedidos                                 | 3   | 4   | 5   | Sí    | Sí    |
+| M08    | Pagos y Transacciones                              | 2   | 3   | 3   | Sí    | Sí    |
+| M09    | Panel Administrativo                               | 3   | 3   | 3   | Sí    | Sí    |
+| M10    | Seguridad y Control                                | 3   | 3   | 3   | Sí    | Sí    |
+| M11    | Soporte y Ayuda                                    | 2   | 3   | 3   | Sí    | Sí    |
+| M12    | Inteligencia Artificial AgroBot                    | 4   | 4   | 3   | Sí    | Sí    |
+| M13    | Gestión de Compras                                 | 4   | 4   | 2   | Sí    | Sí    |
+| M14    | Funcionamiento Multicanal y Sincronización Offline | 9   | 6   | 5   | Sí    | Sí    |
+| M15    | Pagos y Métodos Locales                            | 5   | 4   | 4   | Sí    | Sí    |
+| M16    | Geolocalización y Logística Rural                  | 4   | 3   | 3   | Sí    | Sí    |
+| M17    | Manejo de Productos Perecederos                    | 4   | 1   | 9   | Sí    | Sí    |
 
 ## Detalle por Módulo
 
