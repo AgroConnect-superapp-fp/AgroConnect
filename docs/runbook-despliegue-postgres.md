@@ -48,6 +48,21 @@ Configurar en el proveedor (Render u otro) sin commitear valores:
   (las tres primeras se configuran juntas; sin ellas la firma de subida responde 503)
 - `LOG_LEVEL=info`, `NODE_ENV=production`
 
+## 3. Migraciones, seed y administrador
+
+Después de aplicar migraciones, provisiona la cuenta administradora que usará
+la pantalla de moderación:
+
+```bash
+ADMIN_EMAIL='admin@<dominio>' ADMIN_PASSWORD='<password-fuerte>' \
+ADMIN_NAME='Administrador AgroConnect' ADMIN_DOCUMENT='<documento>' \
+ADMIN_PHONE='<celular>' DATABASE_URL='<url>' DATABASE_SCHEMA=agroconnect \
+  npm run create:admin -w @agroconnect/api
+```
+
+El script no imprime la contraseña y aborta si el correo, documento o celular
+ya existen. No hay auto-registro de administradores.
+
 ## 3. Migraciones y seed
 
 ```bash

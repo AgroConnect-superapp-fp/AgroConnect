@@ -24,7 +24,8 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
     "prisma:status": "prisma migrate status",
-    "seed:products": "ts-node --transpile-only scripts/seed-products.ts"
+    "seed:products": "ts-node --transpile-only scripts/seed-products.ts",
+    "create:admin": "ts-node --transpile-only scripts/create-admin.ts"
   },
   "dependencies": {
     "@agroconnect/contracts": "*",

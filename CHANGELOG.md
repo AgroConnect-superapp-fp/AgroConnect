@@ -58,6 +58,8 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
   (ADR-022) y moderación previa (ADR-023); D7 aprobada por Fabián Gallego.
 - **UI de moderación:** pantalla `ModerationScreen` en el panel administrador
   para listar pendientes y aprobar/rechazar.
+- **Provisión de administradores:** script `create:admin` idempotente y seguro
+  para crear la cuenta que opera la moderación, sin auto-registro.
 
 ### Corregido
 

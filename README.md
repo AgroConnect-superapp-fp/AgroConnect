@@ -180,7 +180,7 @@ Características: contraseñas con **Argon2id** (bcrypt legacy con rehash transp
 - Marketplace React sobre `GET /api/v1/products` (NestJS + Prisma + PostgreSQL): mapa, KPIs, distribución por cultivo y tarjetas de fincas.
 - Filtros de búsqueda, cultivo, departamento, municipio y certificación, con paginación validada por contrato Zod.
 - Publicación autenticada (`POST /api/v1/products`) con `SessionAuthGuard`, autorización por rol y carga de imágenes desde el panel del productor.
-- **Moderación previa:** las publicaciones nacen en `pending`; `GET /products` solo muestra `approved` y el administrador aprueba/rechaza desde `GET /products/pending`, `PATCH /products/:id/moderation` y la pantalla **Revisar publicaciones** de su panel. Las cuentas administrador se aprovisionan internamente; no hay auto-registro.
+- **Moderación previa:** las publicaciones nacen en `pending`; `GET /products` solo muestra `approved` y el administrador aprueba/rechaza desde `GET /products/pending`, `PATCH /products/:id/moderation` y la pantalla **Revisar publicaciones** de su panel. Las cuentas administrador se aprovisionan con `npm run create:admin -w @agroconnect/api`; no hay auto-registro.
 - **Vitrina:** sin precio, unidad ni inventario hasta cerrar pagos y logística (ADR-022).
 - Subida firmada a Cloudinary (`POST /api/v1/uploads/signature`): el secreto se queda en el backend y el navegador recibe una firma de corta duración.
 - Edición de imágenes por propietario (`PATCH /api/v1/products/:id`) desde el modal; el productor no puede modificar productos ajenos.
