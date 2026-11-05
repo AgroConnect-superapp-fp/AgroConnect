@@ -27,7 +27,7 @@
     "database": "PostgreSQL 16 + PostGIS 3.4"
   },
   "tests": {
-    "backend": 289,
+    "backend": 297,
     "frontendUnit": 52,
     "e2e": 14
   },

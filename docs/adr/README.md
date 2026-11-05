@@ -30,5 +30,7 @@ Hay dos series de ADR:
 | [ADR-019](0019-marketplace-api-propia.md)               | Marketplace sobre API propia y retiro de Supabase/PostgREST                         | Aceptada — 2.3a/2.3b implementadas |
 | [ADR-020](0020-perfiles-empresa-transportista.md)       | Perfiles de empresa y transportista (2c)                                            | Aceptada — implementada            |
 | [ADR-021](0021-cloudinary-firmado-imagenes-producto.md) | Subida firmada a Cloudinary y edición de imágenes por propietario                   | Aceptada — implementada            |
+| [ADR-022](0022-marketplace-vitrina.md)                  | Marketplace vitrina sin precio/inventario en el MVP                                 | Aceptada — implementada            |
+| [ADR-023](0023-moderacion-previa-productos.md)          | Moderación previa de productos con rol administrador                                | Aceptada — implementada            |
 
 Para una decisión nueva, copia la estructura de cualquier ADR: Estado, Fecha, Decisores, Relacionado, Contexto, Decisión, Alternativas y Consecuencias. Enlázala aquí y en el índice de ADRs de Obsidian.

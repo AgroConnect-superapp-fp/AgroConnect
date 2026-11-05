@@ -50,7 +50,7 @@ Referencias: OWASP ASVS 4.0.3 nivel 2 y OWASP API Security Top 10 (2023). Este d
 | Secretos solo por variables de entorno, validados al arrancar   | ✅     | `config/env.ts` (zod)                                                                                                                     |
 | Subidas a Cloudinary firmadas por el backend                    | ✅     | `POST /uploads/signature` (SHA-1, carpeta por usuario, formatos permitidos, 20/min)                                                       |
 | Límite de tamaño de subida                                      | 🟡     | `ImageUpload` valida 10 MB; Cloudinary aplica el límite real a nivel de cuenta. No existe un `max_file_size` firmado para subida directa. |
-| Moderación de imágenes aprobada por administrador               | ⏳     | `moderationStatus` existe en el contrato; falta flujo administrativo y política                                                           |
+| Moderación previa de productos/imágenes                         | ✅     | `Product.moderationStatus` + endpoints admin; el catálogo público solo muestra `approved` (ADR-023)                                       |
 
 ## Registro y monitoreo (ASVS V7)
 

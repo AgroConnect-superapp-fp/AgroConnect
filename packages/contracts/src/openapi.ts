@@ -27,6 +27,7 @@ import {
   productsQuerySchema,
   publishProductSchema,
   updateProductImagesSchema,
+  updateProductModerationSchema,
 } from "./productSchemas";
 import { uploadSignatureSchema } from "./uploadSchemas";
 
@@ -272,6 +273,41 @@ export function buildOpenApiDocument(): OpenApiDocument {
             "201": response("Producto publicado", "Product"),
             "401": response("Sesión ausente, expirada o inválida"),
             "403": response("El rol no puede publicar productos"),
+            ...validationErrors,
+          },
+        },
+      },
+      "/products/pending": {
+        get: {
+          tags: ["Marketplace"],
+          summary:
+            "Lista productos pendientes de moderación (solo administrador)",
+          responses: {
+            "200": response("Productos pendientes", "ProductList"),
+            "401": response("Sesión ausente, expirada o inválida"),
+            "403": response("El usuario no es administrador"),
+            ...validationErrors,
+          },
+        },
+      },
+      "/products/{id}/moderation": {
+        patch: {
+          tags: ["Marketplace"],
+          summary: "Aprueba o rechaza un producto (solo administrador)",
+          parameters: [
+            {
+              name: "id",
+              in: "path",
+              required: true,
+              schema: { type: "string", format: "uuid" },
+            },
+          ],
+          requestBody: jsonBody("UpdateProductModerationRequestBody"),
+          responses: {
+            "200": response("Producto moderado", "Product"),
+            "401": response("Sesión ausente, expirada o inválida"),
+            "403": response("El usuario no es administrador"),
+            "404": response("Producto no encontrado"),
             ...validationErrors,
           },
         },

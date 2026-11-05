@@ -268,6 +268,7 @@ async function main(): Promise<void> {
         lat,
         lng,
         images,
+        moderationStatus: 'approved' as const,
         coordinates: polygon(lat, lng),
       };
 

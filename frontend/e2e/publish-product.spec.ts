@@ -125,32 +125,13 @@ test('un productor publica una cosecha con una imagen', async ({ page }) => {
   await expect(page.getByText('Subiendo imágenes…')).toBeHidden({ timeout: 10_000 });
   await page.getByTestId('publish-submit').click();
 
+  await expect(page.getByTestId('publish-pending')).toBeVisible();
+  await expect(page.getByText(/pendiente de revisión/i)).toBeVisible();
+
+  await page.getByTestId('publish-go-marketplace').click();
   await expect(
     page.getByRole('heading', { name: /Productores Destacados/ })
   ).toBeVisible();
-  await expect(page.getByText(productName)).toBeVisible();
-
-  await page.getByRole('button', { name: 'Ver Detalles y Fotos' }).first().click();
-  const dialog = page.getByRole('dialog');
-  await expect(dialog).toBeVisible();
-
-  const patchResponse = page.waitForResponse(
-    (response) =>
-      response.url().includes('/api/v1/products/') &&
-      response.request().method() === 'PATCH'
-  );
-  await dialog.locator('input[type="file"]').setInputFiles({
-    name: 'segunda.png',
-    mimeType: 'image/png',
-    buffer: image,
-  });
-  const patched = await patchResponse;
-  expect(patched.status()).toBe(200);
-
-  const listed = await page.request.get(
-    `${BACKEND_URL}/api/v1/products?search=${encodeURIComponent(productName)}`
-  );
-  expect(listed.status()).toBe(200);
-  const body = (await listed.json()) as { data: Array<{ images: unknown[] }> };
-  expect(body.data[0]?.images).toHaveLength(2);
+  // La publicación nace pending y no debe aparecer hasta ser aprobada.
+  await expect(page.getByText(productName)).toHaveCount(0);
 });

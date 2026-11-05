@@ -23,6 +23,7 @@ function toProperty(product: Product): Property {
     area: product.area,
     productivity: product.productivity,
     certification: product.certification as Property['certification'],
+    moderationStatus: product.moderationStatus,
     lat: product.lat,
     lng: product.lng,
     images: product.images,

@@ -30,6 +30,12 @@ export class InMemoryProductRepository implements ProductRepository {
     return this.products.find((product) => product.id === id) ?? null;
   }
 
+  async findPending(limit = 100, offset = 0): Promise<Product[]> {
+    return this.products
+      .filter((product) => product.moderationStatus === 'pending')
+      .slice(offset, offset + limit);
+  }
+
   async create(data: NewProductData): Promise<Product> {
     const product = new Product({
       id: randomUUID(),
@@ -39,12 +45,33 @@ export class InMemoryProductRepository implements ProductRepository {
     return product;
   }
 
-  async updateImages(id: string, images: Product['props']['images']): Promise<Product> {
+  async updateImages(
+    id: string,
+    images: Product['props']['images'],
+    moderationStatus?: Product['props']['moderationStatus'],
+  ): Promise<Product> {
     const index = this.products.findIndex((product) => product.id === id);
     if (index === -1) {
       throw new Error('producto no encontrado');
     }
-    const updated = new Product({ ...this.products[index]!.props, images });
+    const updated = new Product({
+      ...this.products[index]!.props,
+      images,
+      ...(moderationStatus ? { moderationStatus } : {}),
+    });
+    this.products[index] = updated;
+    return updated;
+  }
+
+  async updateModerationStatus(
+    id: string,
+    status: NonNullable<Product['props']['moderationStatus']>,
+  ): Promise<Product> {
+    const index = this.products.findIndex((product) => product.id === id);
+    if (index === -1) {
+      throw new Error('producto no encontrado');
+    }
+    const updated = new Product({ ...this.products[index]!.props, moderationStatus: status });
     this.products[index] = updated;
     return updated;
   }

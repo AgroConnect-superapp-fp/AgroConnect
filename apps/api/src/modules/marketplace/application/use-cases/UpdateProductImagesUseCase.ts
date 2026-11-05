@@ -49,7 +49,11 @@ export class UpdateProductImagesUseCase {
     );
 
     try {
-      return await this.productRepository.updateImages(productId, sanitized);
+      return await this.productRepository.updateImages(
+        productId,
+        sanitized,
+        actor.role === 'administrador' ? undefined : 'pending',
+      );
     } catch (error) {
       if (isPrismaNotFound(error)) {
         throw new DomainError('NOT_FOUND', 'El producto no existe', 404);

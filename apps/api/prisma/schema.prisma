@@ -158,6 +158,14 @@ enum ProductCertification {
   @@map("product_certification")
 }
 
+enum ProductModerationStatus {
+  pending
+  approved
+  rejected
+
+  @@map("product_moderation_status")
+}
+
 model Product {
   id            String                @id @default(uuid()) @db.Uuid
   name          String
@@ -169,8 +177,9 @@ model Product {
   crop          ProductCrop
   areaHectares  Float                 @map("area_hectares")
   productivity  Int
-  certification ProductCertification?
-  lat           Float
+  certification    ProductCertification?
+  moderationStatus ProductModerationStatus @default(pending) @map("moderation_status")
+  lat              Float
   lng           Float
   producerId    String?               @map("producer_id") @db.Uuid
   producer      User?                 @relation(fields: [producerId], references: [id], onDelete: SetNull)
@@ -183,6 +192,7 @@ model Product {
   @@index([department, municipality])
   @@index([createdAt])
   @@index([producerId])
+  @@index([moderationStatus])
   @@map("products")
 }
 

@@ -20,6 +20,7 @@ const product: Product = {
   area: 50,
   productivity: 85,
   certification: 'organic',
+  moderationStatus: 'approved',
   lat: 4.6249,
   lng: -74.0679,
   images: [{ publicId: 'cld-sample-4', alt: 'Café' }],

@@ -7,6 +7,8 @@ import { PRODUCT_REPOSITORY } from '../application/tokens';
 import { ListProductsUseCase } from '../application/use-cases/ListProductsUseCase';
 import { PublishProductUseCase } from '../application/use-cases/PublishProductUseCase';
 import { UpdateProductImagesUseCase } from '../application/use-cases/UpdateProductImagesUseCase';
+import { ModerateProductUseCase } from '../application/use-cases/ModerateProductUseCase';
+import { ListPendingProductsUseCase } from '../application/use-cases/ListPendingProductsUseCase';
 import { PrismaProductRepository } from '../infrastructure/repositories/PrismaProductRepository';
 import { ProductController } from './controllers/ProductController';
 import type { ProductRepository } from '../domain/interfaces/ProductRepository';
@@ -50,6 +52,18 @@ import type { ProductRepository } from '../domain/interfaces/ProductRepository';
       provide: UpdateProductImagesUseCase,
       useFactory: (productRepository: ProductRepository) =>
         new UpdateProductImagesUseCase(productRepository, env.CLOUDINARY_UPLOAD_FOLDER),
+      inject: [PRODUCT_REPOSITORY],
+    },
+    {
+      provide: ModerateProductUseCase,
+      useFactory: (productRepository: ProductRepository) =>
+        new ModerateProductUseCase(productRepository),
+      inject: [PRODUCT_REPOSITORY],
+    },
+    {
+      provide: ListPendingProductsUseCase,
+      useFactory: (productRepository: ProductRepository) =>
+        new ListPendingProductsUseCase(productRepository),
       inject: [PRODUCT_REPOSITORY],
     },
   ],

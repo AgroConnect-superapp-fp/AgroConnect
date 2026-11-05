@@ -67,6 +67,20 @@ describe('UpdateProductImagesUseCase', () => {
     ).rejects.toMatchObject({ code: 'FORBIDDEN', statusCode: 403 });
   });
 
+  it('devuelve a pending el producto cuando un productor cambia imágenes', async () => {
+    const repository = new InMemoryProductRepository();
+    repository.seedProduct(new Product({ ...buildProduct().props, moderationStatus: 'approved' }));
+    const useCase = new UpdateProductImagesUseCase(repository);
+
+    const updated = await useCase.execute(
+      { id: 'producer-1', role: 'productor' },
+      '00000000-0000-4000-8000-000000000001',
+      [{ publicId: 'agroconnect/products/producer-1/cosecha' }],
+    );
+
+    expect(updated.props.moderationStatus).toBe('pending');
+  });
+
   it('rechaza a un productor que no es propietario', async () => {
     const repository = new InMemoryProductRepository();
     repository.seedProduct(buildProduct());

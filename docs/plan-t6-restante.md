@@ -86,20 +86,24 @@ pruebas backend, cobertura 82.21 % de ramas, 52 unitarios frontend y 14/14 E2E.
   de rol y propiedad (BOLA).
 - Frontend: la subida usa la firma; el modal persiste las imágenes y actualiza
   la galería sin duplicarlas.
-- Evidencia: 289 tests backend (82.3 % ramas), 52 unitarios frontend y 14/14 E2E.
-- Pendiente de decisión: moderación administrativa y política de aprobación.
+- Evidencia: 297 tests backend (82.32 % ramas), 52 unitarios frontend y 14/14 E2E.
+- Moderación previa implementada: `pending` por defecto, catálogo público solo `approved` y endpoints administrativos (ADR-023).
 
-### 2.6 Bloqueos por decisión de producto
+### 2.6 Decisiones de producto
 
-Estos puntos no se implementan por inferencia: cambian reglas de negocio y
-requieren aprobación del Product Owner.
+Decisiones aprobadas por Fabián Gallego el 2026-11-05; el despliegue sigue
+pendiente de acceso.
 
-| Tema              | Decisión necesaria                                                                                                                        | Estado |
-| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ------ |
-| Moderación        | ¿Aprobación manual antes de publicar o publicación inmediata con revisión posterior? ¿Quién modera y qué pasa con las imágenes `pending`? | ⏳     |
-| Precio/inventario | ¿El producto es vitrina (sin precio/stock) o marketplace transaccional? Si es transaccional: moneda, unidad, stock y reservas.            | ⏳     |
-| D7                | Aprobación humana de la tabla de equivalencias HU ↔ CU.                                                                                   | ⏳     |
-| Despliegue        | Proveer PostgreSQL, Cloudinary y accesos Render/Vercel.                                                                                   | ⏳     |
+| Tema              | Decisión necesaria                                                      | Estado        |
+| ----------------- | ----------------------------------------------------------------------- | ------------- |
+| Moderación        | Aprobación previa por administrador; publicaciones nuevas en `pending`. | ✅ 2026-11-05 |
+| Precio/inventario | Vitrina sin precio/stock hasta cerrar pagos y logística.                | ✅ 2026-11-05 |
+| D7                | Tabla de equivalencias aprobada por Fabián Gallego.                     | ✅ 2026-11-05 |
+| Despliegue        | Proveer PostgreSQL, Cloudinary y accesos Render/Vercel.                 | ⏳            |
+
+Decisiones registradas en ADR-022 y ADR-023. D7: la aprobación cubre la tabla
+de equivalencias (HU06→HU14, HU15→HU08, HU04→HU11) y HU33→CU#31; HU08, HU28 y
+HU30 no tienen equivalencia explícita en el SSOT y no se inventan.
 
 ## 3. Orden recomendado
 

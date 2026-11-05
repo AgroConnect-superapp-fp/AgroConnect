@@ -6,7 +6,7 @@ import type {
   ProductFilters,
   ProductRepository,
 } from '../../domain/interfaces/ProductRepository';
-import type { ProductImage } from '../../domain/entities/Product';
+import type { ProductImage, ProductModerationStatus } from '../../domain/entities/Product';
 
 /**
  * Repositorio de productos del marketplace sobre Prisma.
@@ -19,7 +19,7 @@ export class PrismaProductRepository implements ProductRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
   async findAll(filters: ProductFilters): Promise<Product[]> {
-    const where: Prisma.ProductWhereInput = {};
+    const where: Prisma.ProductWhereInput = { moderationStatus: 'approved' };
 
     if (filters.search) {
       where.OR = [
@@ -58,6 +58,16 @@ export class PrismaProductRepository implements ProductRepository {
     return row ? this.toDomain(row) : null;
   }
 
+  async findPending(limit = 100, offset = 0): Promise<Product[]> {
+    const rows = await this.prisma.product.findMany({
+      where: { moderationStatus: 'pending' },
+      orderBy: { createdAt: 'asc' },
+      skip: offset,
+      take: limit,
+    });
+    return rows.map((row) => this.toDomain(row));
+  }
+
   async create(data: NewProductData): Promise<Product> {
     const row = await this.prisma.product.create({
       data: {
@@ -82,10 +92,25 @@ export class PrismaProductRepository implements ProductRepository {
     return this.toDomain(row);
   }
 
-  async updateImages(id: string, images: ProductImage[]): Promise<Product> {
+  async updateImages(
+    id: string,
+    images: ProductImage[],
+    moderationStatus?: ProductModerationStatus,
+  ): Promise<Product> {
     const row = await this.prisma.product.update({
       where: { id },
-      data: { images: images as unknown as Prisma.InputJsonValue },
+      data: {
+        images: images as unknown as Prisma.InputJsonValue,
+        ...(moderationStatus ? { moderationStatus } : {}),
+      },
+    });
+    return this.toDomain(row);
+  }
+
+  async updateModerationStatus(id: string, status: ProductModerationStatus): Promise<Product> {
+    const row = await this.prisma.product.update({
+      where: { id },
+      data: { moderationStatus: status },
     });
     return this.toDomain(row);
   }
@@ -102,6 +127,7 @@ export class PrismaProductRepository implements ProductRepository {
     areaHectares: number;
     productivity: number;
     certification: string | null;
+    moderationStatus: string;
     lat: number;
     lng: number;
     producerId: string | null;
@@ -122,6 +148,7 @@ export class PrismaProductRepository implements ProductRepository {
       area: row.areaHectares,
       productivity: row.productivity,
       certification: (row.certification ?? undefined) as Product['props']['certification'],
+      moderationStatus: row.moderationStatus as ProductModerationStatus,
       lat: row.lat,
       lng: row.lng,
       producerId: row.producerId ?? undefined,

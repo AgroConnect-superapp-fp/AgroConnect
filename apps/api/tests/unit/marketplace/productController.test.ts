@@ -3,6 +3,8 @@ import { ProductController } from '../../../src/modules/marketplace/presentation
 import type { ListProductsUseCase } from '../../../src/modules/marketplace/application/use-cases/ListProductsUseCase';
 import type { PublishProductUseCase } from '../../../src/modules/marketplace/application/use-cases/PublishProductUseCase';
 import type { UpdateProductImagesUseCase } from '../../../src/modules/marketplace/application/use-cases/UpdateProductImagesUseCase';
+import type { ModerateProductUseCase } from '../../../src/modules/marketplace/application/use-cases/ModerateProductUseCase';
+import type { ListPendingProductsUseCase } from '../../../src/modules/marketplace/application/use-cases/ListPendingProductsUseCase';
 import { Product } from '../../../src/modules/marketplace/domain/entities/Product';
 import { ZodValidationPipe } from '../../../src/shared/http/zod-validation.pipe';
 import type { AuthenticatedRequest } from '../../../src/shared/http/authenticated-user';
@@ -15,20 +17,38 @@ function buildController() {
   const execute = jest.fn();
   const publishExecute = jest.fn();
   const updateImagesExecute = jest.fn();
+  const moderateExecute = jest.fn();
+  const pendingExecute = jest.fn();
   const useCase = { execute } as unknown as ListProductsUseCase;
   const publishUseCase = { execute: publishExecute } as unknown as PublishProductUseCase;
   const updateImagesUseCase = {
     execute: updateImagesExecute,
   } as unknown as UpdateProductImagesUseCase;
+  const moderateUseCase = { execute: moderateExecute } as unknown as ModerateProductUseCase;
+  const pendingUseCase = { execute: pendingExecute } as unknown as ListPendingProductsUseCase;
   const pipe = new ZodValidationPipe(productsQuerySchema, 'Parámetros de búsqueda inválidos');
 
-  const controller = new ProductController(useCase, publishUseCase, updateImagesUseCase);
+  const controller = new ProductController(
+    useCase,
+    publishUseCase,
+    updateImagesUseCase,
+    moderateUseCase,
+    pendingUseCase,
+  );
   const call = async (query: unknown) => {
     const parsed = pipe.transform(query);
     return controller.findAll(parsed);
   };
 
-  return { execute, publishExecute, updateImagesExecute, controller, call };
+  return {
+    execute,
+    publishExecute,
+    updateImagesExecute,
+    moderateExecute,
+    pendingExecute,
+    controller,
+    call,
+  };
 }
 
 describe('ProductController.findAll', () => {

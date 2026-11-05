@@ -27,6 +27,7 @@ describe('Products (e2e)', () => {
   const name = `Finca de Pruebas ${suffix}`;
   const producerId = randomUUID();
   const buyerId = randomUUID();
+  const adminId = randomUUID();
   const tokenService = new JwtTokenService(
     env.JWT_ACCESS_SECRET,
     env.JWT_REFRESH_SECRET,
@@ -37,6 +38,7 @@ describe('Products (e2e)', () => {
   );
   let producerToken = '';
   let buyerToken = '';
+  let adminToken = '';
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
@@ -53,6 +55,9 @@ describe('Products (e2e)', () => {
     });
     const buyerRole = await prisma.role.findUniqueOrThrow({
       where: { name: 'comprador_b2c' },
+    });
+    const adminRole = await prisma.role.findUniqueOrThrow({
+      where: { name: 'administrador' },
     });
     await prisma.user.createMany({
       data: [
@@ -80,6 +85,18 @@ describe('Products (e2e)', () => {
           acceptsDataProcessing: true,
           emailVerifiedAt: new Date(),
         },
+        {
+          id: adminId,
+          fullName: 'Administrador E2E',
+          document: `A${suffix}`,
+          email: `admin.${suffix}@example.com`,
+          phone: `36${suffix.padStart(8, '0')}`,
+          passwordHash: 'hash',
+          roleId: adminRole.id,
+          status: 'ACTIVO',
+          acceptsDataProcessing: true,
+          emailVerifiedAt: new Date(),
+        },
       ],
     });
     producerToken = tokenService.generateTokens({
@@ -89,6 +106,10 @@ describe('Products (e2e)', () => {
     buyerToken = tokenService.generateTokens({
       userId: buyerId,
       role: 'comprador_b2c',
+    }).accessToken;
+    adminToken = tokenService.generateTokens({
+      userId: adminId,
+      role: 'administrador',
     }).accessToken;
 
     await prisma.product.create({
@@ -107,6 +128,7 @@ describe('Products (e2e)', () => {
         lat: 4.5339,
         lng: -75.6811,
         producerId,
+        moderationStatus: 'approved',
         images: [
           {
             publicId: 'cld-sample-4',
@@ -131,7 +153,7 @@ describe('Products (e2e)', () => {
   afterAll(async () => {
     await prisma.product.deleteMany({ where: { id: productId } });
     await prisma.product.deleteMany({ where: { producerId } });
-    await prisma.user.deleteMany({ where: { id: { in: [producerId, buyerId] } } });
+    await prisma.user.deleteMany({ where: { id: { in: [producerId, buyerId, adminId] } } });
     await app.close();
   });
 
@@ -302,6 +324,93 @@ describe('Products (e2e)', () => {
         success: false,
         error: { code: 'VALIDATION_ERROR' },
       });
+    });
+  });
+
+  describe('Moderación previa de productos', () => {
+    const pendingName = `Cosecha pendiente ${suffix}`;
+    let pendingId = '';
+
+    it('publica en pending y no aparece en el catálogo público', async () => {
+      const created = await request(server)
+        .post('/api/v1/products')
+        .set('Cookie', `access_token=${producerToken}`)
+        .send({
+          name: pendingName,
+          department: 'Quindío',
+          municipality: 'Salento',
+          crop: 'coffee',
+          area: 2,
+          productivity: 70,
+          lat: 4.5,
+          lng: -75.6,
+        });
+
+      expect(created.status).toBe(201);
+      expect(created.body.data).toMatchObject({
+        name: pendingName,
+        moderationStatus: 'pending',
+      });
+      pendingId = created.body.data.id as string;
+
+      const publicList = await request(server)
+        .get('/api/v1/products')
+        .query({ search: pendingName });
+
+      expect(publicList.status).toBe(200);
+      expect(publicList.body.data).toHaveLength(0);
+    });
+
+    it('rechaza la lista de pendientes a un productor', async () => {
+      const response = await request(server)
+        .get('/api/v1/products/pending')
+        .set('Cookie', `access_token=${producerToken}`);
+
+      expect(response.status).toBe(403);
+      expect(response.body).toMatchObject({
+        success: false,
+        error: { code: 'FORBIDDEN' },
+      });
+    });
+
+    it('permite al administrador aprobar y publicar el producto', async () => {
+      const pending = await request(server)
+        .get('/api/v1/products/pending')
+        .set('Cookie', `access_token=${adminToken}`);
+
+      expect(pending.status).toBe(200);
+      expect(pending.body.data).toEqual(
+        expect.arrayContaining([expect.objectContaining({ id: pendingId })]),
+      );
+
+      const approved = await request(server)
+        .patch(`/api/v1/products/${pendingId}/moderation`)
+        .set('Cookie', `access_token=${adminToken}`)
+        .send({ status: 'approved' });
+
+      expect(approved.status).toBe(200);
+      expect(approved.body.data).toMatchObject({
+        id: pendingId,
+        moderationStatus: 'approved',
+      });
+
+      const publicList = await request(server)
+        .get('/api/v1/products')
+        .query({ search: pendingName });
+
+      expect(publicList.status).toBe(200);
+      expect(publicList.body.data).toEqual(
+        expect.arrayContaining([expect.objectContaining({ id: pendingId })]),
+      );
+    });
+
+    it('rechaza a un productor intentar moderar', async () => {
+      const response = await request(server)
+        .patch(`/api/v1/products/${pendingId}/moderation`)
+        .set('Cookie', `access_token=${producerToken}`)
+        .send({ status: 'rejected' });
+
+      expect(response.status).toBe(403);
     });
   });
 

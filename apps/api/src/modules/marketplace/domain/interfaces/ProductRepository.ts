@@ -1,4 +1,10 @@
-import type { Product, ProductCertification, ProductCrop, ProductImage } from '../entities/Product';
+import type {
+  Product,
+  ProductCertification,
+  ProductCrop,
+  ProductImage,
+  ProductModerationStatus,
+} from '../entities/Product';
 
 /**
  * Filtros de lectura del marketplace.
@@ -37,6 +43,12 @@ export interface NewProductData {
 export interface ProductRepository {
   findAll(filters: ProductFilters): Promise<Product[]>;
   findById(id: string): Promise<Product | null>;
+  findPending(limit?: number, offset?: number): Promise<Product[]>;
   create(data: NewProductData): Promise<Product>;
-  updateImages(id: string, images: ProductImage[]): Promise<Product>;
+  updateImages(
+    id: string,
+    images: ProductImage[],
+    moderationStatus?: ProductModerationStatus,
+  ): Promise<Product>;
+  updateModerationStatus(id: string, status: ProductModerationStatus): Promise<Product>;
 }

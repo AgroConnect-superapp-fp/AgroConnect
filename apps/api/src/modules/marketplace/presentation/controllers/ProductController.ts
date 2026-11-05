@@ -17,15 +17,19 @@ import {
   productsQuerySchema,
   publishProductSchema,
   updateProductImagesSchema,
+  updateProductModerationSchema,
 } from '@agroconnect/contracts';
 import type {
   ProductsQuery,
   PublishProductInput,
   UpdateProductImagesInput,
+  UpdateProductModerationInput,
 } from '@agroconnect/contracts';
 import { ListProductsUseCase } from '../../application/use-cases/ListProductsUseCase';
 import { PublishProductUseCase } from '../../application/use-cases/PublishProductUseCase';
 import { UpdateProductImagesUseCase } from '../../application/use-cases/UpdateProductImagesUseCase';
+import { ModerateProductUseCase } from '../../application/use-cases/ModerateProductUseCase';
+import { ListPendingProductsUseCase } from '../../application/use-cases/ListPendingProductsUseCase';
 import { ZodValidationPipe } from '../../../../shared/http/zod-validation.pipe';
 import { success } from '../../../../shared/http/responses';
 import type { AuthenticatedRequest } from '../../../../shared/http/authenticated-user';
@@ -45,6 +49,8 @@ export class ProductController {
     private readonly listProductsUseCase: ListProductsUseCase,
     private readonly publishProductUseCase: PublishProductUseCase,
     private readonly updateProductImagesUseCase: UpdateProductImagesUseCase,
+    private readonly moderateProductUseCase: ModerateProductUseCase,
+    private readonly listPendingProductsUseCase: ListPendingProductsUseCase,
   ) {}
 
   @Get()
@@ -68,6 +74,22 @@ export class ProductController {
     return success(publicProducts, 'Productos del marketplace obtenidos');
   }
 
+  @Get('pending')
+  @UseGuards(SessionAuthGuard, AuthThrottlerGuard)
+  @Throttle({ default: { limit: 30, ttl: 60_000 } })
+  async findPending(@Req() request: AuthenticatedRequest): Promise<unknown> {
+    const user = request.user!;
+    const products = await this.listPendingProductsUseCase.execute({
+      id: user.id,
+      role: user.role,
+    });
+
+    return success(
+      products.map((product) => product.props),
+      'Productos pendientes de moderación',
+    );
+  }
+
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @UseGuards(SessionAuthGuard, AuthThrottlerGuard)
@@ -85,6 +107,28 @@ export class ProductController {
     const product = await this.publishProductUseCase.execute(request.user, body);
 
     return success(product.props, 'Producto publicado correctamente');
+  }
+
+  @Patch(':id/moderation')
+  @UseGuards(SessionAuthGuard, AuthThrottlerGuard)
+  @Throttle({ default: { limit: 30, ttl: 60_000 } })
+  async moderate(
+    @Req() request: AuthenticatedRequest,
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Body(new ZodValidationPipe(updateProductModerationSchema, 'Estado de moderación inválido'))
+    body: UpdateProductModerationInput,
+  ): Promise<unknown> {
+    const user = request.user!;
+    const product = await this.moderateProductUseCase.execute(
+      { id: user.id, role: user.role },
+      id,
+      body.status,
+    );
+
+    return success(
+      product.props,
+      `Producto ${body.status === 'approved' ? 'aprobado' : 'rechazado'}`,
+    );
   }
 
   @Patch(':id')

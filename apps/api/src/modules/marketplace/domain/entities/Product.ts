@@ -13,6 +13,8 @@ export type ProductCrop =
 export type ProductCertification =
   'organic' | 'rainforest_alliance' | 'fair_trade' | 'conventional' | 'global_gap';
 
+export type ProductModerationStatus = 'pending' | 'approved' | 'rejected';
+
 export interface ProductImage {
   publicId: string;
   url?: string;
@@ -37,6 +39,7 @@ export interface ProductProps {
   area: number;
   productivity: number;
   certification?: ProductCertification;
+  moderationStatus?: ProductModerationStatus;
   lat: number;
   lng: number;
   producerId?: string;
@@ -47,7 +50,11 @@ export interface ProductProps {
 }
 
 export class Product {
-  constructor(public readonly props: ProductProps) {}
+  public readonly props: ProductProps;
+
+  constructor(props: ProductProps) {
+    this.props = { ...props, moderationStatus: props.moderationStatus ?? 'pending' };
+  }
 
   get id(): string {
     return this.props.id;
@@ -59,5 +66,9 @@ export class Product {
 
   isOrganic(): boolean {
     return this.props.certification === 'organic';
+  }
+
+  get moderationStatus(): ProductModerationStatus {
+    return this.props.moderationStatus ?? 'pending';
   }
 }

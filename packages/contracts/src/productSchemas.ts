@@ -18,6 +18,12 @@ export const MARKETPLACE_CROPS = [
   "oil_palm",
 ] as const;
 
+export const PRODUCT_MODERATION_STATUSES = [
+  "pending",
+  "approved",
+  "rejected",
+] as const;
+
 export const MARKETPLACE_CERTIFICATIONS = [
   "organic",
   "rainforest_alliance",
@@ -50,6 +56,7 @@ export const productSchema = z.object({
   area: z.number().positive(),
   productivity: z.number().int().min(0).max(100),
   certification: z.enum(MARKETPLACE_CERTIFICATIONS).optional(),
+  moderationStatus: z.enum(PRODUCT_MODERATION_STATUSES),
   lat: z.number().min(-90).max(90),
   lng: z.number().min(-180).max(180),
   producerId: z.string().optional(),
@@ -152,8 +159,8 @@ export type PublishProductInput = z.infer<typeof publishProductSchema>;
 /**
  * Cuerpo de `PATCH /api/v1/products/:id`.
  *
- * Por ahora solo se editan las imágenes: precio, inventario y moderación
- * requieren decisiones de producto y flujos administrativos propios.
+ * Por ahora solo se editan las imágenes. Cualquier cambio de un productor
+ * devuelve el producto a `pending` para una nueva revisión.
  */
 export const updateProductImagesSchema = z.object({
   images: z.array(productImageSchema).max(6, "Máximo 6 imágenes por producto"),
@@ -161,4 +168,13 @@ export const updateProductImagesSchema = z.object({
 
 export type UpdateProductImagesInput = z.infer<
   typeof updateProductImagesSchema
+>;
+
+/** Cuerpo de `PATCH /api/v1/products/:id/moderation` (solo administrador). */
+export const updateProductModerationSchema = z.object({
+  status: z.enum(["approved", "rejected"]),
+});
+
+export type UpdateProductModerationInput = z.infer<
+  typeof updateProductModerationSchema
 >;

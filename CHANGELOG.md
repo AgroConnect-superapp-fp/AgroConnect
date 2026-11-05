@@ -23,7 +23,7 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
   del perfil del rol en sesión (finca, empresa o transportista), con contrato
   Zod/OpenAPI, autorización por rol, persistencia Prisma/PostGIS y pantalla
   `ProfileScreen` accesible desde el panel. El NIT, el rol y los identificadores
-  no son editables. 267 pruebas backend (93.92 % líneas, 82.23 % ramas) y
+  no son editables. 297 pruebas backend (94.01 % líneas, 82.32 % ramas) y
   14/14 E2E.
 
 - **Marketplace sobre API propia (2.3a):** modelo Prisma `Product` con enums de
@@ -50,6 +50,12 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
   precache; el build ya no falla por `totalBytes` y reporta 20 entradas.
 - **Despliegue PostgreSQL propio:** runbook operativo y script
   `npm run smoke:cloudinary` para validar credenciales firmadas sin subir PII; acepta variables separadas o `CLOUDINARY_URL`.
+- **Moderación previa de productos:** `Product.moderationStatus`
+  (`pending/approved/rejected`), publicación en `pending`, catálogo público
+  solo con `approved`, `GET /products/pending` y
+  `PATCH /products/:id/moderation` para administradores, y aviso al productor.
+- **Decisiones de producto:** marketplace vitrina sin precio/inventario
+  (ADR-022) y moderación previa (ADR-023); D7 aprobada por Fabián Gallego.
 
 ### Corregido
 
@@ -66,7 +72,7 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
   aparece ante un error real. El modal no descarta imágenes silenciosamente.
 - **Contratos/CI:** `productivity` es entero, OpenAPI documenta el sobre real y
   los códigos 202, el frontend ejecuta sus 52 unitarios en CI y el manifiesto
-  de alineación queda en 288/52/14.
+  de alineación queda en 297/52/14.
 - **Endurecimiento:** rate limit en lecturas públicas, `Cache-Control: no-store`
   en auth/perfil, transacción en actualización de coordenadas y mapeo de
   `P2025` a 404.

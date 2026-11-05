@@ -169,6 +169,7 @@ export interface Property {
   area: number;
   productivity: number;
   certification?: CertificationType;
+  moderationStatus?: 'pending' | 'approved' | 'rejected';
   lat: number;
   lng: number;
   images?: PropertyImage[];

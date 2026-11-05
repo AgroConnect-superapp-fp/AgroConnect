@@ -81,10 +81,10 @@ que requieren criterio de producto o arquitectura.
 
 - **Situación:** `matriz_trazabilidad_cu_hu.csv` tiene 74 relaciones y el
   total oficial es 69 HU/66 CU; `detalle` tiene 203 filas.
-- **Estado:** parcialmente implementada (2026-11-02); **bloqueada por decisión
-  humana (2026-11-04)**. M17 corregido: HU70–HU76 (inexistentes) reemplazadas
-  por HU61–HU67 con CU#66. Quedan 6 HU sin CU (HU06, HU08, HU15, HU28, HU30,
-  HU33).
+- **Estado:** aprobada por Fabián Gallego el **2026-11-05**. M17 corregido:
+  HU70–HU76 (inexistentes) reemplazadas por HU61–HU67 con CU#66. La tabla de
+  equivalencias aprobada mapea HU06→HU14, HU15→HU08 y HU04→HU11; HU33→CU#31.
+  HU08, HU28 y HU30 siguen sin equivalencia explícita en el SSOT.
 - **Hallazgo Notion:** solo HU33 está en la matriz detallada (RF-33 → CU#31).
   El Anexo de Equivalencias advierte que HU06→HU14, HU15→HU08 y HU04→HU11
   pertenecen a una renumeración **v0.1 pendiente de aprobación**; no se debe

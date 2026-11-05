@@ -643,6 +643,134 @@
         }
       }
     },
+    "/products/pending": {
+      "get": {
+        "tags": [
+          "Marketplace"
+        ],
+        "summary": "Lista productos pendientes de moderación (solo administrador)",
+        "responses": {
+          "200": {
+            "description": "Productos pendientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ProductList"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud malformada o cuerpo inválido"
+          },
+          "401": {
+            "description": "Sesión ausente, expirada o inválida"
+          },
+          "403": {
+            "description": "El usuario no es administrador"
+          },
+          "422": {
+            "description": "Reglas de negocio incumplidas (detalles por campo)"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        }
+      }
+    },
+    "/products/{id}/moderation": {
+      "patch": {
+        "tags": [
+          "Marketplace"
+        ],
+        "summary": "Aprueba o rechaza un producto (solo administrador)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProductModerationRequestBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Producto moderado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Product"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud malformada o cuerpo inválido"
+          },
+          "401": {
+            "description": "Sesión ausente, expirada o inválida"
+          },
+          "403": {
+            "description": "El usuario no es administrador"
+          },
+          "404": {
+            "description": "Producto no encontrado"
+          },
+          "422": {
+            "description": "Reglas de negocio incumplidas (detalles por campo)"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        }
+      }
+    },
     "/products/{id}": {
       "patch": {
         "tags": [
@@ -1211,6 +1339,14 @@
               "global_gap"
             ]
           },
+          "moderationStatus": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "approved",
+              "rejected"
+            ]
+          },
           "lat": {
             "type": "number",
             "minimum": -90,
@@ -1310,6 +1446,7 @@
           "crop",
           "area",
           "productivity",
+          "moderationStatus",
           "lat",
           "lng",
           "images",

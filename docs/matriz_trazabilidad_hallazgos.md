@@ -47,6 +47,18 @@ Se consultó la página oficial **Matriz de Trazabilidad RF↔CU↔HU v4.0** y e
   - La tabla está en estado **v0.1 de trabajo** y exige aprobación de Ferrer y
     Fabián antes de renumerar fichas, casos de prueba, CU o trazabilidad.
 
-**Conclusión:** D7 no se puede cerrar todavía. Agregar relaciones a los CSV sin
-esa aprobación inventaría trazabilidad o consolidaría una numeración que el
-propio SSOT marca como provisional. No se modificaron los CSV.
+## Aprobación D7 (2026-11-05)
+
+Fabián Gallego aprobó la tabla de equivalencias:
+
+- HU06 actual → **HU14 oficial**.
+- HU15 actual → **HU08 oficial**.
+- HU04 actual → **HU11 oficial**.
+- HU33 → **CU#31** (confirmado en la matriz detallada).
+
+La aprobación habilita la renumeración y la actualización de trazabilidad. No
+se inventan relaciones para HU08, HU28 ni HU30 porque el SSOT no las contiene;
+quedan como cobertura pendiente documentada.
+
+**Conclusión:** D7 aprobada. La regeneración de CSV/matriz debe ejecutarse con
+la tabla aprobada y sin inferir las tres relaciones ausentes.

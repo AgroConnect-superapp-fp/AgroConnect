@@ -47,6 +47,7 @@ export function PublishProductScreen({
   const [description, setDescription] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [publishedProduct, setPublishedProduct] = useState<Property | null>(null);
   const { uploadState, handleUpload, reset } = useImageUpload('agroconnect/products', [
     'marketplace',
   ]);
@@ -121,7 +122,7 @@ export function PublishProductScreen({
         images: uploadState.uploadedImages,
         coordinates: [],
       });
-      onPublished(product);
+      setPublishedProduct(product);
     } catch (caught) {
       setError(
         caught instanceof ApiError
@@ -131,6 +132,41 @@ export function PublishProductScreen({
     } finally {
       setSubmitting(false);
     }
+  }
+
+  if (publishedProduct) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-emerald-50 via-white to-amber-50 px-4">
+        <div
+          data-testid="publish-pending"
+          className="w-full max-w-xl rounded-2xl border border-emerald-200 bg-white p-6 shadow-sm sm:p-8"
+        >
+          <div className="text-4xl" aria-hidden="true">
+            📝
+          </div>
+          <h1 className="mt-3 text-2xl font-bold text-gray-900">
+            Publicación enviada a revisión
+          </h1>
+          <p className="mt-2 text-sm leading-relaxed text-gray-600">
+            Tu cosecha <strong>{publishedProduct.name}</strong> quedó pendiente de
+            revisión por un administrador. Aparecerá en el marketplace cuando sea
+            aprobada.
+          </p>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <Button
+              type="button"
+              data-testid="publish-go-marketplace"
+              onClick={() => onPublished(publishedProduct)}
+            >
+              Ir al marketplace
+            </Button>
+            <Button type="button" variant="ghost" onClick={onBack}>
+              Volver al panel
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -147,8 +183,8 @@ export function PublishProductScreen({
         <div className="rounded-2xl border border-emerald-100 bg-white p-6 shadow-sm sm:p-8">
           <h1 className="text-2xl font-bold text-gray-900">Publicar una cosecha</h1>
           <p className="mt-1 text-sm text-gray-600">
-            Los datos quedarán visibles en el marketplace. Las imágenes se suben a
-            Cloudinary antes de publicar.
+            Los datos quedarán en revisión antes de aparecer en el marketplace. Las
+            imágenes se suben a Cloudinary antes de publicar.
           </p>
 
           <form
