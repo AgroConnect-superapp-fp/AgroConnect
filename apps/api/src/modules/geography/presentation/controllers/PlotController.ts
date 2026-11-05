@@ -34,7 +34,15 @@ export class PlotController {
     query: NearbyPlotsQuery,
   ): Promise<unknown> {
     const plots = await this.findNearbyPlotsUseCase.execute(query.lat, query.lng, query.radius);
+    const publicPlots = plots.map((plot) => ({
+      id: plot.id,
+      name: plot.name,
+      areaHectares: plot.areaHectares,
+      municipality: plot.municipality,
+      department: plot.department,
+      createdAt: plot.createdAt,
+    }));
 
-    return success(plots, 'Búsqueda de parcelas cercanas realizada');
+    return success(publicPlots, 'Búsqueda de parcelas cercanas realizada');
   }
 }

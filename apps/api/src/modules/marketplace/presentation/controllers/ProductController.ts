@@ -58,10 +58,14 @@ export class ProductController {
 
     // La entidad de dominio encapsula sus campos en `props`; la API expone un
     // DTO plano para no filtrar detalles de implementación al cliente.
-    return success(
-      products.map((product) => product.props),
-      'Productos del marketplace obtenidos',
-    );
+    const publicProducts = products.map((product) => {
+      const publicProps = { ...product.props };
+      // El UUID del productor es un identificador interno; no se publica.
+      delete publicProps.producerId;
+      return publicProps;
+    });
+
+    return success(publicProducts, 'Productos del marketplace obtenidos');
   }
 
   @Post()

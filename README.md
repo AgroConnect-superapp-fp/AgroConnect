@@ -188,7 +188,7 @@ Características: contraseñas con **Argon2id** (bcrypt legacy con rehash transp
 
 ### Calidad
 
-- 288 pruebas backend (NestJS; 93.78 % líneas, 82.21 % ramas) · 52 pruebas unitarias de frontend (Vitest) · 14 pruebas E2E (Playwright: autenticación real, modo demo, marketplace, publicación, perfiles, imágenes y accesibilidad axe).
+- 289 pruebas backend (NestJS; 93.85 % líneas, 82.3 % ramas) · 52 pruebas unitarias de frontend (Vitest) · 14 pruebas E2E (Playwright: autenticación real, modo demo, marketplace, publicación, perfiles, imágenes y accesibilidad axe).
 
 ---
 
@@ -231,7 +231,7 @@ npm run dev                   # http://localhost:5173
 ### Pruebas
 
 ```bash
-cd apps/api && npm test -- --coverage   # unitarias + integración (cobertura 93.78% líneas / 82.21% ramas)
+cd apps/api && npm test -- --coverage   # unitarias + integración (cobertura 93.85% líneas / 82.3% ramas)
 cd frontend && npm run test:unit       # unitarias (Vitest)
 cd frontend && npm run test:e2e        # E2E (levanta API y web)
 ```
@@ -277,7 +277,7 @@ Despliegue (resumen): Blueprint `render.yaml` → `DATABASE_URL` del PostgreSQL 
 
 ## Sincronización entre entornos (local · GitHub · Notion · Obsidian)
 
-Un **manifiesto de hechos canónicos** (`tools/alignment-check/manifest.json`) centraliza los datos compartidos —URLs, stack, cifras de trazabilidad (17·68·30·66·69·6), conteos de pruebas (288 · 52 · 14), visibilidad del repositorio y última release— y un verificador comprueba que los cuatro entornos manejen la misma información **sin incongruencias**. No son espejos: cada entorno conserva su rol; el mecanismo garantiza que los hechos compartidos sean idénticos y, ante cada ❌, indica exactamente **qué actualizar** (`→ hint`).
+Un **manifiesto de hechos canónicos** (`tools/alignment-check/manifest.json`) centraliza los datos compartidos —URLs, stack, cifras de trazabilidad (17·68·30·66·69·6), conteos de pruebas (289 · 52 · 14), visibilidad del repositorio y última release— y un verificador comprueba que los cuatro entornos manejen la misma información **sin incongruencias**. No son espejos: cada entorno conserva su rol; el mecanismo garantiza que los hechos compartidos sean idénticos y, ante cada ❌, indica exactamente **qué actualizar** (`→ hint`).
 
 ```bash
 node tools/alignment-check/check-alignment.mjs        # local + GitHub (+ API) + Obsidian

@@ -7,6 +7,7 @@ import { AppModule } from '../../src/app.module';
 import { configureApp } from '../../src/app.setup';
 import { PrismaService } from '../../src/prisma/prisma.service';
 import { JwtTokenService } from '../../src/modules/identity/infrastructure/services/JwtTokenService';
+import { productSchema } from '@agroconnect/contracts';
 import { env } from '../../src/shared/config/env';
 
 /**
@@ -142,10 +143,16 @@ describe('Products (e2e)', () => {
       success: true,
       message: 'Productos del marketplace obtenidos',
     });
+    const contractProduct = (response.body.data as Array<Record<string, unknown>>).find(
+      (product) => product['id'] === productId,
+    );
+    expect(productSchema.safeParse(contractProduct).success).toBe(true);
+
     expect(response.body.data).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           id: productId,
+
           name,
           owner: 'Productor de Pruebas',
           crop: 'coffee',
@@ -166,6 +173,16 @@ describe('Products (e2e)', () => {
         }),
       ]),
     );
+  });
+
+  it('no expone el UUID interno del productor', async () => {
+    const response = await request(server).get('/api/v1/products').query({ limit: 100 });
+    const item = (response.body.data as Array<Record<string, unknown>>).find(
+      (product) => product['id'] === productId,
+    );
+
+    expect(item).toBeDefined();
+    expect(item).not.toHaveProperty('producerId');
   });
 
   it('busca por nombre sin distinguir mayúsculas', async () => {

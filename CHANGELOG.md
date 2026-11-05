@@ -70,6 +70,10 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 - **Endurecimiento:** rate limit en lecturas públicas, `Cache-Control: no-store`
   en auth/perfil, transacción en actualización de coordenadas y mapeo de
   `P2025` a 404.
+- **Anti email bombing:** cooldown por cuenta en recuperación de contraseña
+  (5 min) y reenvío de verificación (60 s), además del rate limit por IP.
+- **Minimización de datos:** `GET /products` ya no expone `producerId` y
+  `GET /plots/nearby` ya no expone `farmerId`.
 
 ### Cambiado
 

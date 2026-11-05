@@ -1,5 +1,6 @@
 import { InMemoryUserRepository } from '../../fakes/InMemoryUserRepository';
 import { InMemoryEmailVerificationTokenRepository } from '../../fakes/InMemoryEmailVerificationTokenRepository';
+import { EmailVerificationToken } from '../../../src/modules/identity/domain/entities/EmailVerificationToken';
 import { FakeEmailService } from '../../fakes/FakeEmailService';
 import { FakeTokenService } from '../../fakes/FakeTokenService';
 import { RequestEmailVerificationUseCase } from '../../../src/modules/identity/application/use-cases/RequestEmailVerificationUseCase';
@@ -96,11 +97,27 @@ describe('RequestEmailVerificationUseCase', () => {
     expect(sut.emailService.sentVerifications).toHaveLength(0);
   });
 
-  it('invalida los tokens anteriores al reenviar la verificación', async () => {
+  it('aplica cooldown y, fuera de él, invalida el token anterior', async () => {
     const sut = buildSut();
     sut.userRepository.seedUser({ email: 'maria.lopez@example.com' });
 
     await sut.requestVerification.execute({ correo: 'maria.lopez@example.com' });
+    await sut.requestVerification.execute({ correo: 'maria.lopez@example.com' });
+
+    expect(sut.verificationRepository.tokens).toHaveLength(1);
+    expect(sut.emailService.sentVerifications).toHaveLength(1);
+
+    const current = sut.verificationRepository.tokens[0];
+    if (!current) throw new Error('No se creó el token inicial');
+    sut.verificationRepository.tokens[0] = EmailVerificationToken.create({
+      id: current.id,
+      userId: current.userId,
+      tokenHash: current.tokenHash,
+      expiresAt: current.expiresAt,
+      usedAt: null,
+      createdAt: new Date(Date.now() - 2 * 60 * 1000),
+    });
+
     await sut.requestVerification.execute({ correo: 'maria.lopez@example.com' });
 
     const usables = sut.verificationRepository.tokens.filter((token) => token.usedAt === null);

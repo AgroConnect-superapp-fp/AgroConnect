@@ -7,6 +7,7 @@ import type { TokenService } from '../../domain/interfaces/TokenService';
 import type { ForgotPasswordInput } from '../dtos/authDtos';
 
 export const PASSWORD_RESET_TTL_MINUTES = 30;
+export const PASSWORD_RESET_COOLDOWN_MS = 5 * 60 * 1000;
 
 export class RequestPasswordResetUseCase {
   constructor(
@@ -22,6 +23,16 @@ export class RequestPasswordResetUseCase {
     const user = await this.userRepository.findByEmail(email.value);
 
     if (!user || !user.isActive()) {
+      return;
+    }
+
+    // Cooldown por cuenta: evita email bombing aunque el atacante rote IPs.
+    if (
+      await this.passwordResetTokenRepository.hasRecentToken(
+        user.id,
+        new Date(Date.now() - PASSWORD_RESET_COOLDOWN_MS),
+      )
+    ) {
       return;
     }
 

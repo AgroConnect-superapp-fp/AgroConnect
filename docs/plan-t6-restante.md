@@ -86,7 +86,7 @@ pruebas backend, cobertura 82.21 % de ramas, 52 unitarios frontend y 14/14 E2E.
   de rol y propiedad (BOLA).
 - Frontend: la subida usa la firma; el modal persiste las imágenes y actualiza
   la galería sin duplicarlas.
-- Evidencia: 288 tests backend (82.21 % ramas), 52 unitarios frontend y 14/14 E2E.
+- Evidencia: 289 tests backend (82.3 % ramas), 52 unitarios frontend y 14/14 E2E.
 - Pendiente de decisión: moderación administrativa y política de aprobación.
 
 ### 2.6 Bloqueos por decisión de producto
