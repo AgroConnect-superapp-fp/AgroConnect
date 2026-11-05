@@ -10,6 +10,7 @@ import { ResetPasswordScreen } from './auth/screens/ResetPasswordScreen';
 import { VerifyEmailScreen } from './auth/screens/VerifyEmailScreen';
 import { DashboardScreen } from './auth/screens/DashboardScreen';
 import { ProfileScreen } from './auth/screens/ProfileScreen';
+import { ModerationScreen } from './auth/screens/ModerationScreen';
 import { PublishProductScreen } from './marketplace/PublishProductScreen';
 import type { RoleName } from './auth/types';
 
@@ -25,6 +26,7 @@ type View =
   | 'verify'
   | 'dashboard'
   | 'profile'
+  | 'moderation'
   | 'publish'
   | 'marketplace';
 
@@ -102,11 +104,16 @@ function AppContent(): React.ReactElement {
       return <ProfileScreen onBack={() => setView('dashboard')} />;
     }
 
+    if (view === 'moderation') {
+      return <ModerationScreen onBack={() => setView('dashboard')} />;
+    }
+
     return (
       <DashboardScreen
         onOpenMarketplace={() => setView('marketplace')}
         onPublishProduct={() => setView('publish')}
         onOpenProfile={() => setView('profile')}
+        onOpenModeration={() => setView('moderation')}
       />
     );
   }

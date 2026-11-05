@@ -73,7 +73,7 @@ La edición permite actualizar únicamente el bloque del rol en sesión:
 - Transportista: vehículo, placa, capacidad, cobertura, cadena de frío y vigencias.
 
 Frontend: `ProfileScreen` + botón **Mi perfil** en el panel. Evidencia: 267
-pruebas backend, cobertura 82.21 % de ramas, 52 unitarios frontend y 14/14 E2E.
+pruebas backend, cobertura 82.32 % de ramas, 53 unitarios frontend y 14/14 E2E.
 
 **Mejoras futuras:** historial de cambios de perfil y carga de documentos
 (SOAT, licencia, cámara de comercio) a Cloudinary firmado.
@@ -86,7 +86,7 @@ pruebas backend, cobertura 82.21 % de ramas, 52 unitarios frontend y 14/14 E2E.
   de rol y propiedad (BOLA).
 - Frontend: la subida usa la firma; el modal persiste las imágenes y actualiza
   la galería sin duplicarlas.
-- Evidencia: 297 tests backend (82.32 % ramas), 52 unitarios frontend y 14/14 E2E.
+- Evidencia: 297 tests backend (82.32 % ramas), 53 unitarios frontend y 14/14 E2E.
 - Moderación previa implementada: `pending` por defecto, catálogo público solo `approved` y endpoints administrativos (ADR-023).
 
 ### 2.6 Decisiones de producto

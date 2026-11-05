@@ -6,7 +6,13 @@ vi.mock('./apiClient', () => ({
 }));
 
 import { apiRequest } from './apiClient';
-import { fetchProducts, publishProduct, searchProducts } from './productsApi';
+import {
+  fetchPendingProducts,
+  fetchProducts,
+  moderateProduct,
+  publishProduct,
+  searchProducts,
+} from './productsApi';
 
 const mockedRequest = vi.mocked(apiRequest);
 
@@ -80,6 +86,33 @@ describe('productsApi', () => {
     mockedRequest.mockRejectedValue(new Error('backend down'));
 
     await expect(fetchProducts()).rejects.toThrow('backend down');
+  });
+});
+
+describe('moderación de productos', () => {
+  it('lista pendientes y envía la decisión administrativa', async () => {
+    mockedRequest.mockResolvedValueOnce([product]).mockResolvedValueOnce({
+      ...product,
+      moderationStatus: 'approved',
+    });
+
+    await expect(fetchPendingProducts()).resolves.toEqual([product]);
+    expect(mockedRequest).toHaveBeenNthCalledWith(
+      1,
+      '/api/v1/products/pending',
+      {},
+      15_000
+    );
+
+    await expect(moderateProduct(product.id, 'approved')).resolves.toMatchObject({
+      moderationStatus: 'approved',
+    });
+    expect(mockedRequest).toHaveBeenNthCalledWith(
+      2,
+      `/api/v1/products/${product.id}/moderation`,
+      { method: 'PATCH', body: JSON.stringify({ status: 'approved' }) },
+      15_000
+    );
   });
 });
 

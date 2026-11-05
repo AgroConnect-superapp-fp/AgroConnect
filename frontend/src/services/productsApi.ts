@@ -112,3 +112,21 @@ export async function publishProduct(payload: PublishProductInput): Promise<Prop
 
   return toProperty(product);
 }
+
+export function fetchPendingProducts(): Promise<Product[]> {
+  return apiRequest<Product[]>('/api/v1/products/pending', {}, 15_000);
+}
+
+export function moderateProduct(
+  productId: string,
+  status: 'approved' | 'rejected'
+): Promise<Product> {
+  return apiRequest<Product>(
+    `/api/v1/products/${productId}/moderation`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify({ status }),
+    },
+    15_000
+  );
+}

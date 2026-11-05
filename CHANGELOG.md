@@ -56,6 +56,8 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
   `PATCH /products/:id/moderation` para administradores, y aviso al productor.
 - **Decisiones de producto:** marketplace vitrina sin precio/inventario
   (ADR-022) y moderación previa (ADR-023); D7 aprobada por Fabián Gallego.
+- **UI de moderación:** pantalla `ModerationScreen` en el panel administrador
+  para listar pendientes y aprobar/rechazar.
 
 ### Corregido
 
@@ -71,8 +73,8 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 - **Marketplace:** catálogo vacío ya no activa datos demo; el fallback solo
   aparece ante un error real. El modal no descarta imágenes silenciosamente.
 - **Contratos/CI:** `productivity` es entero, OpenAPI documenta el sobre real y
-  los códigos 202, el frontend ejecuta sus 52 unitarios en CI y el manifiesto
-  de alineación queda en 297/52/14.
+  los códigos 202, el frontend ejecuta sus 53 unitarios en CI y el manifiesto
+  de alineación queda en 297/53/14.
 - **Endurecimiento:** rate limit en lecturas públicas, `Cache-Control: no-store`
   en auth/perfil, transacción en actualización de coordenadas y mapeo de
   `P2025` a 404.

@@ -7,6 +7,7 @@ interface DashboardScreenProps {
   onOpenMarketplace: () => void;
   onPublishProduct: () => void;
   onOpenProfile: () => void;
+  onOpenModeration: () => void;
   showSuccessBanner?: boolean;
   onDismissSuccessBanner?: () => void;
 }
@@ -46,6 +47,7 @@ export function DashboardScreen({
   onOpenMarketplace,
   onPublishProduct,
   onOpenProfile,
+  onOpenModeration,
   showSuccessBanner = false,
   onDismissSuccessBanner,
 }: DashboardScreenProps): React.ReactElement {
@@ -162,6 +164,23 @@ export function DashboardScreen({
             </div>
           </div>
         </section>
+
+        {usuario.rol === 'administrador' && (
+          <section className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm">
+            <h2 className="text-lg font-bold text-amber-950">Moderación pendiente</h2>
+            <p className="mt-1 text-sm text-amber-900">
+              Revisa las publicaciones nuevas antes de que aparezcan en el marketplace.
+            </p>
+            <Button
+              variant="secondary"
+              data-testid="dashboard-moderation"
+              onClick={onOpenModeration}
+              className="mt-3"
+            >
+              Revisar publicaciones
+            </Button>
+          </section>
+        )}
 
         {usuario.rol === 'productor' && (
           <section className="mt-6 rounded-2xl border border-emerald-200 bg-white p-5 shadow-sm">

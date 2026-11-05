@@ -180,7 +180,7 @@ Características: contraseñas con **Argon2id** (bcrypt legacy con rehash transp
 - Marketplace React sobre `GET /api/v1/products` (NestJS + Prisma + PostgreSQL): mapa, KPIs, distribución por cultivo y tarjetas de fincas.
 - Filtros de búsqueda, cultivo, departamento, municipio y certificación, con paginación validada por contrato Zod.
 - Publicación autenticada (`POST /api/v1/products`) con `SessionAuthGuard`, autorización por rol y carga de imágenes desde el panel del productor.
-- **Moderación previa:** las publicaciones nacen en `pending`; `GET /products` solo muestra `approved` y el administrador aprueba/rechaza desde `GET /products/pending` y `PATCH /products/:id/moderation`.
+- **Moderación previa:** las publicaciones nacen en `pending`; `GET /products` solo muestra `approved` y el administrador aprueba/rechaza desde `GET /products/pending`, `PATCH /products/:id/moderation` y la pantalla **Revisar publicaciones** de su panel. Las cuentas administrador se aprovisionan internamente; no hay auto-registro.
 - **Vitrina:** sin precio, unidad ni inventario hasta cerrar pagos y logística (ADR-022).
 - Subida firmada a Cloudinary (`POST /api/v1/uploads/signature`): el secreto se queda en el backend y el navegador recibe una firma de corta duración.
 - Edición de imágenes por propietario (`PATCH /api/v1/products/:id`) desde el modal; el productor no puede modificar productos ajenos.
@@ -190,7 +190,7 @@ Características: contraseñas con **Argon2id** (bcrypt legacy con rehash transp
 
 ### Calidad
 
-- 297 pruebas backend (NestJS; 94.01 % líneas, 82.32 % ramas) · 52 pruebas unitarias de frontend (Vitest) · 14 pruebas E2E (Playwright: autenticación real, modo demo, marketplace, publicación, perfiles, imágenes y accesibilidad axe).
+- 297 pruebas backend (NestJS; 94.01 % líneas, 82.32 % ramas) · 53 pruebas unitarias de frontend (Vitest) · 14 pruebas E2E (Playwright: autenticación real, modo demo, marketplace, publicación, perfiles, imágenes y accesibilidad axe).
 
 ---
 
@@ -279,7 +279,7 @@ Despliegue (resumen): Blueprint `render.yaml` → `DATABASE_URL` del PostgreSQL 
 
 ## Sincronización entre entornos (local · GitHub · Notion · Obsidian)
 
-Un **manifiesto de hechos canónicos** (`tools/alignment-check/manifest.json`) centraliza los datos compartidos —URLs, stack, cifras de trazabilidad (17·68·30·66·69·6), conteos de pruebas (297 · 52 · 14), visibilidad del repositorio y última release— y un verificador comprueba que los cuatro entornos manejen la misma información **sin incongruencias**. No son espejos: cada entorno conserva su rol; el mecanismo garantiza que los hechos compartidos sean idénticos y, ante cada ❌, indica exactamente **qué actualizar** (`→ hint`).
+Un **manifiesto de hechos canónicos** (`tools/alignment-check/manifest.json`) centraliza los datos compartidos —URLs, stack, cifras de trazabilidad (17·68·30·66·69·6), conteos de pruebas (297 · 53 · 14), visibilidad del repositorio y última release— y un verificador comprueba que los cuatro entornos manejen la misma información **sin incongruencias**. No son espejos: cada entorno conserva su rol; el mecanismo garantiza que los hechos compartidos sean idénticos y, ante cada ❌, indica exactamente **qué actualizar** (`→ hint`).
 
 ```bash
 node tools/alignment-check/check-alignment.mjs        # local + GitHub (+ API) + Obsidian

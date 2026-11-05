@@ -28,7 +28,7 @@
   },
   "tests": {
     "backend": 297,
-    "frontendUnit": 52,
+    "frontendUnit": 53,
     "e2e": 14
   },
   "sources": {
