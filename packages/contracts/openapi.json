@@ -289,6 +289,322 @@
         }
       }
     },
+    "/plots": {
+      "get": {
+        "tags": [
+          "Geography"
+        ],
+        "summary": "Lista paginada de las parcelas del agricultor autenticado (solo productor o administrador)",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Parcelas del agricultor autenticado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/PlotList"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud malformada o cuerpo inválido"
+          },
+          "401": {
+            "description": "Sesión ausente, expirada o inválida"
+          },
+          "403": {
+            "description": "El rol no puede gestionar parcelas"
+          },
+          "422": {
+            "description": "Reglas de negocio incumplidas (detalles por campo)"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Geography"
+        ],
+        "summary": "Registra una parcela con su geometría (PostGIS)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePlotRequestBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Parcela creada; centroide y área calculados por PostGIS",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Plot"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud malformada o cuerpo inválido"
+          },
+          "401": {
+            "description": "Sesión ausente, expirada o inválida"
+          },
+          "403": {
+            "description": "El rol no puede registrar parcelas"
+          },
+          "422": {
+            "description": "Reglas de negocio incumplidas (detalles por campo)"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        }
+      }
+    },
+    "/plots/{id}": {
+      "get": {
+        "tags": [
+          "Geography"
+        ],
+        "summary": "Obtiene una parcela del agricultor autenticado",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Parcela solicitada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Plot"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud malformada o cuerpo inválido"
+          },
+          "401": {
+            "description": "Sesión ausente, expirada o inválida"
+          },
+          "403": {
+            "description": "La parcela pertenece a otro agricultor"
+          },
+          "404": {
+            "description": "Parcela no encontrada"
+          },
+          "422": {
+            "description": "Reglas de negocio incumplidas (detalles por campo)"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Geography"
+        ],
+        "summary": "Actualiza parcialmente una parcela del agricultor autenticado",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePlotRequestBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Parcela actualizada; centroide y área recalculados por PostGIS",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Plot"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud malformada o cuerpo inválido"
+          },
+          "401": {
+            "description": "Sesión ausente, expirada o inválida"
+          },
+          "403": {
+            "description": "La parcela pertenece a otro agricultor"
+          },
+          "404": {
+            "description": "Parcela no encontrada"
+          },
+          "422": {
+            "description": "Reglas de negocio incumplidas (detalles por campo)"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Geography"
+        ],
+        "summary": "Elimina (soft delete) una parcela del agricultor autenticado",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Parcela eliminada"
+          },
+          "400": {
+            "description": "Solicitud malformada o cuerpo inválido"
+          },
+          "401": {
+            "description": "Sesión ausente, expirada o inválida"
+          },
+          "403": {
+            "description": "La parcela pertenece a otro agricultor"
+          },
+          "404": {
+            "description": "Parcela no encontrada"
+          },
+          "422": {
+            "description": "Reglas de negocio incumplidas (detalles por campo)"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        }
+      }
+    },
     "/plots/nearby": {
       "get": {
         "tags": [
@@ -330,7 +646,31 @@
         ],
         "responses": {
           "200": {
-            "description": "Parcelas dentro del radio de búsqueda"
+            "description": "Parcelas dentro del radio de búsqueda, con su distancia en km",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/NearbyPlotList"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "Solicitud malformada o cuerpo inválido"
@@ -1223,6 +1563,400 @@
           "lat",
           "lng"
         ]
+      },
+      "ListMyPlotsQuery": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "limit": {
+            "default": 20,
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "offset": {
+            "default": 0,
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        }
+      },
+      "NearbyPlotList": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "name": {
+              "type": "string"
+            },
+            "areaHectares": {
+              "type": "number"
+            },
+            "municipality": {
+              "type": "string"
+            },
+            "department": {
+              "type": "string"
+            },
+            "createdAt": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "distanceKm": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "id",
+            "name",
+            "areaHectares",
+            "municipality",
+            "department",
+            "createdAt",
+            "distanceKm"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "CreatePlotRequestBody": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 120
+          },
+          "municipality": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 120
+          },
+          "department": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 120
+          },
+          "boundary": {
+            "minItems": 1,
+            "maxItems": 1,
+            "type": "array",
+            "items": {
+              "minItems": 3,
+              "maxItems": 500,
+              "type": "array",
+              "items": {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "number",
+                    "minimum": -79,
+                    "maximum": -66.8
+                  },
+                  {
+                    "type": "number",
+                    "minimum": -4.2,
+                    "maximum": 13.3
+                  }
+                ],
+                "items": false,
+                "minItems": 2,
+                "maxItems": 2
+              }
+            }
+          }
+        },
+        "required": [
+          "name",
+          "municipality",
+          "department",
+          "boundary"
+        ],
+        "additionalProperties": false
+      },
+      "UpdatePlotRequestBody": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 120
+          },
+          "municipality": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 120
+          },
+          "department": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 120
+          },
+          "boundary": {
+            "minItems": 1,
+            "maxItems": 1,
+            "type": "array",
+            "items": {
+              "minItems": 3,
+              "maxItems": 500,
+              "type": "array",
+              "items": {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "number",
+                    "minimum": -79,
+                    "maximum": -66.8
+                  },
+                  {
+                    "type": "number",
+                    "minimum": -4.2,
+                    "maximum": 13.3
+                  }
+                ],
+                "items": false,
+                "minItems": 2,
+                "maxItems": 2
+              }
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "Plot": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "name": {
+            "type": "string"
+          },
+          "municipality": {
+            "type": "string"
+          },
+          "department": {
+            "type": "string"
+          },
+          "farmerId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "areaHectares": {
+            "type": "number"
+          },
+          "centroid": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "lat": {
+                    "type": "number"
+                  },
+                  "lng": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "lat",
+                  "lng"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "boundary": {
+            "anyOf": [
+              {
+                "minItems": 1,
+                "maxItems": 1,
+                "type": "array",
+                "items": {
+                  "minItems": 3,
+                  "maxItems": 500,
+                  "type": "array",
+                  "items": {
+                    "type": "array",
+                    "prefixItems": [
+                      {
+                        "type": "number",
+                        "minimum": -79,
+                        "maximum": -66.8
+                      },
+                      {
+                        "type": "number",
+                        "minimum": -4.2,
+                        "maximum": 13.3
+                      }
+                    ],
+                    "items": false,
+                    "minItems": 2,
+                    "maxItems": 2
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "createdAt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updatedAt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "municipality",
+          "department",
+          "farmerId",
+          "areaHectares",
+          "centroid",
+          "boundary",
+          "createdAt",
+          "updatedAt"
+        ],
+        "additionalProperties": false
+      },
+      "PlotList": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "name": {
+              "type": "string"
+            },
+            "municipality": {
+              "type": "string"
+            },
+            "department": {
+              "type": "string"
+            },
+            "farmerId": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "areaHectares": {
+              "type": "number"
+            },
+            "centroid": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "lat": {
+                      "type": "number"
+                    },
+                    "lng": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "lat",
+                    "lng"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "boundary": {
+              "anyOf": [
+                {
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "type": "array",
+                  "items": {
+                    "minItems": 3,
+                    "maxItems": 500,
+                    "type": "array",
+                    "items": {
+                      "type": "array",
+                      "prefixItems": [
+                        {
+                          "type": "number",
+                          "minimum": -79,
+                          "maximum": -66.8
+                        },
+                        {
+                          "type": "number",
+                          "minimum": -4.2,
+                          "maximum": 13.3
+                        }
+                      ],
+                      "items": false,
+                      "minItems": 2,
+                      "maxItems": 2
+                    }
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "createdAt": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "updatedAt": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "id",
+            "name",
+            "municipality",
+            "department",
+            "farmerId",
+            "areaHectares",
+            "centroid",
+            "boundary",
+            "createdAt",
+            "updatedAt"
+          ],
+          "additionalProperties": false
+        }
       },
       "ProductsQuery": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",

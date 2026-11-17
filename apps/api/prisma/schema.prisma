@@ -199,16 +199,23 @@ model Product {
 model Plot {
   id           String                                 @id @default(uuid()) @db.Uuid
   name         String
-  areaHectares Float                                  @map("area_hectares")
+  areaHectares Float                                  @default(0) @map("area_hectares")
   municipality String
   department   String
   farmerId     String                                 @map("farmer_id") @db.Uuid
+  /// Centroide calculado por PostGIS (ST_Centroid) en el trigger de la tabla.
   centroid     Unsupported("geography(Point, 4326)")?
+  /// Polígono de la parcela: fuente de verdad de la geometría (SRID 4326).
+  geom         Unsupported("geometry(Polygon, 4326)")?
   createdAt    DateTime                               @default(now()) @map("created_at")
+  updatedAt    DateTime                               @default(now()) @map("updated_at")
+  /// Soft delete: las consultas activas filtran `deleted_at IS NULL`.
+  deletedAt    DateTime?                              @map("deleted_at")
 
   farmer User @relation(fields: [farmerId], references: [id])
 
   @@index([farmerId])
+  @@index([deletedAt])
   @@map("plots")
 }
 

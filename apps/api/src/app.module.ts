@@ -5,6 +5,7 @@ import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { HealthModule } from './health/health.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { IdentityModule } from './modules/identity/presentation/identity.module';
+import { RolesGuard } from './modules/identity/presentation/guards/roles.guard';
 import { GeographyModule } from './modules/geography/presentation/geography.module';
 import { MarketplaceModule } from './modules/marketplace/presentation/marketplace.module';
 import { UploadsModule } from './modules/uploads/presentation/uploads.module';
@@ -48,6 +49,9 @@ import { PinoNestLogger } from './shared/logger/nest-logger.service';
     PinoNestLogger,
     { provide: APP_FILTER, useClass: AllExceptionsFilter },
     { provide: APP_GUARD, useClass: CsrfGuard },
+    // Guard de autorización por rol: se registra aquí para que NestJS pueda
+    // resolverlo cuando un controlador lo referencia con `@UseGuards(RolesGuard)`.
+    RolesGuard,
   ],
   exports: [PinoNestLogger],
 })

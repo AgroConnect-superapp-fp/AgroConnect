@@ -20,7 +20,15 @@ import {
   resetPasswordSchema,
   verifyEmailSchema,
 } from "./authSchemas";
-import { nearbyPlotsQuerySchema } from "./plotSchemas";
+import {
+  createPlotSchema,
+  listMyPlotsQuerySchema,
+  nearbyPlotListSchema,
+  nearbyPlotsQuerySchema,
+  plotListSchema,
+  plotSchema,
+  updatePlotSchema,
+} from "./plotSchemas";
 import { profileSnapshotSchema, profileUpdateSchema } from "./profileSchemas";
 import {
   productSchema,
@@ -98,6 +106,14 @@ const authOperation = (
     responses,
   },
 });
+
+/** Parámetro de ruta `id` compartido por los endpoints de una parcela. */
+const plotIdParameter = {
+  name: "id",
+  in: "path" as const,
+  required: true,
+  schema: { type: "string", format: "uuid" },
+};
 
 /**
  * Convierte el JSON Schema de un objeto Zod en parámetros `in: query` de
@@ -214,6 +230,80 @@ export function buildOpenApiDocument(): OpenApiDocument {
           ...rateLimited,
         },
       ),
+      "/plots": {
+        get: {
+          tags: ["Geography"],
+          summary:
+            "Lista paginada de las parcelas del agricultor autenticado (solo productor o administrador)",
+          parameters: queryParameters(
+            z.toJSONSchema(listMyPlotsQuerySchema, { io: "input" }),
+          ),
+          responses: {
+            "200": response("Parcelas del agricultor autenticado", "PlotList"),
+            "401": response("Sesión ausente, expirada o inválida"),
+            "403": response("El rol no puede gestionar parcelas"),
+            ...validationErrors,
+          },
+        },
+        post: {
+          tags: ["Geography"],
+          summary: "Registra una parcela con su geometría (PostGIS)",
+          requestBody: jsonBody("CreatePlotRequestBody"),
+          responses: {
+            "201": response(
+              "Parcela creada; centroide y área calculados por PostGIS",
+              "Plot",
+            ),
+            "401": response("Sesión ausente, expirada o inválida"),
+            "403": response("El rol no puede registrar parcelas"),
+            ...validationErrors,
+          },
+        },
+      },
+      "/plots/{id}": {
+        get: {
+          tags: ["Geography"],
+          summary: "Obtiene una parcela del agricultor autenticado",
+          parameters: [plotIdParameter],
+          responses: {
+            "200": response("Parcela solicitada", "Plot"),
+            "401": response("Sesión ausente, expirada o inválida"),
+            "403": response("La parcela pertenece a otro agricultor"),
+            "404": response("Parcela no encontrada"),
+            ...validationErrors,
+          },
+        },
+        patch: {
+          tags: ["Geography"],
+          summary:
+            "Actualiza parcialmente una parcela del agricultor autenticado",
+          parameters: [plotIdParameter],
+          requestBody: jsonBody("UpdatePlotRequestBody"),
+          responses: {
+            "200": response(
+              "Parcela actualizada; centroide y área recalculados por PostGIS",
+              "Plot",
+            ),
+            "401": response("Sesión ausente, expirada o inválida"),
+            "403": response("La parcela pertenece a otro agricultor"),
+            "404": response("Parcela no encontrada"),
+            ...validationErrors,
+          },
+        },
+        delete: {
+          tags: ["Geography"],
+          summary:
+            "Elimina (soft delete) una parcela del agricultor autenticado",
+          parameters: [plotIdParameter],
+          responses: {
+            "204": { description: "Parcela eliminada" },
+            "401": response("Sesión ausente, expirada o inválida"),
+            "403": response("La parcela pertenece a otro agricultor"),
+            "404": response("Parcela no encontrada"),
+            ...validationErrors,
+          },
+        },
+      },
       "/plots/nearby": {
         get: {
           tags: ["Geography"],
@@ -225,7 +315,10 @@ export function buildOpenApiDocument(): OpenApiDocument {
             z.toJSONSchema(nearbyPlotsQuerySchema, { io: "input" }),
           ),
           responses: {
-            "200": response("Parcelas dentro del radio de búsqueda"),
+            "200": response(
+              "Parcelas dentro del radio de búsqueda, con su distancia en km",
+              "NearbyPlotList",
+            ),
             ...validationErrors,
           },
         },
@@ -361,6 +454,14 @@ export function buildOpenApiDocument(): OpenApiDocument {
         NearbyPlotsQuery: z.toJSONSchema(nearbyPlotsQuerySchema, {
           io: "input",
         }),
+        ListMyPlotsQuery: z.toJSONSchema(listMyPlotsQuerySchema, {
+          io: "input",
+        }),
+        NearbyPlotList: z.toJSONSchema(nearbyPlotListSchema),
+        CreatePlotRequestBody: z.toJSONSchema(createPlotSchema),
+        UpdatePlotRequestBody: z.toJSONSchema(updatePlotSchema),
+        Plot: z.toJSONSchema(plotSchema),
+        PlotList: z.toJSONSchema(plotListSchema),
         ProductsQuery: z.toJSONSchema(productsQuerySchema, { io: "input" }),
         Product: z.toJSONSchema(productSchema),
         ProfileUpdateRequestBody: z.toJSONSchema(profileUpdateSchema),

@@ -43,3 +43,53 @@ export function isDatabaseUnavailable(error: unknown): boolean {
 export function isPrismaNotFound(error: unknown): boolean {
   return isPrismaKnownError(error) && error.code === 'P2025';
 }
+
+/** SQLSTATE de PostgreSQL para la violación de una restricción CHECK. */
+const CHECK_VIOLATION_SQLSTATE = '23514';
+
+/**
+ * Lee el SQLSTATE del `meta` de un error de Prisma.
+ *
+ * Con driver adapters, el error de Postgres viaja en `meta.code` (p. ej.
+ * `23514` para un CHECK violado) y el detalle en `meta.message`.
+ */
+function readMetaCode(meta: unknown): string | null {
+  if (typeof meta !== 'object' || meta === null) {
+    return null;
+  }
+
+  const record = meta as Record<string, unknown>;
+  const code = record['code'];
+  return typeof code === 'string' ? code : null;
+}
+
+/**
+ * Detecta la violación de un CHECK de PostgreSQL (SQLSTATE 23514).
+ *
+ * Es el caso de una geometría inválida (polígono auto-intersectado o
+ * degenerado): el error debe traducirse a un 422 de dominio, nunca a un 500.
+ */
+export function isCheckConstraintViolation(error: unknown): boolean {
+  if (!isPrismaKnownError(error)) {
+    return false;
+  }
+
+  if (readMetaCode(error.meta) === CHECK_VIOLATION_SQLSTATE) {
+    return true;
+  }
+
+  return /violates check constraint|check constraint/i.test(error.message);
+}
+
+/**
+ * Extrae el nombre de la restricción CHECK violada (o `null` si no se puede
+ * determinar). Permite responder con un mensaje específico para cada CHECK.
+ */
+export function checkConstraintName(error: unknown): string | null {
+  if (!isPrismaKnownError(error)) {
+    return null;
+  }
+
+  const match = /constraint "([^"]+)"/i.exec(error.message);
+  return match?.[1] ?? null;
+}
