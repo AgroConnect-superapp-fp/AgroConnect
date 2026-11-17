@@ -306,7 +306,7 @@ El marketplace es una vitrina: no gestiona precio, unidad ni inventario. La mode
 | Límite real de Cloudinary | Riesgo de producción | Verificar plan, cuota y estrategia de fallback |
 | Referencias históricas en CHANGELOG/ADR | Trazabilidad | Revisar y actualizar en el próximo corte |
 | Decisiones de moderación P2 | Flujo de rechazo incompleto | Resolver motivo obligatorio/opcional, notificación, auditoría y paginación |
-| BD `agroconnect_test` acumulada | Datos de corridas previas (832 usuarios al 17/11); la generación aleatoria de placa se amplió a formato `ABC12D` (26 000 combinaciones) y consulta a BD | `npm run test:reset-db -w @agroconnect/api` (simulación por defecto); la limpieza real queda aprobada para una sesión aparte |
+| BD `agroconnect_test` acumulada | Datos de corridas previas; la generación aleatoria de placa se amplió a formato `ABC12D` (26 000 combinaciones) y consulta a BD | Cerrado el 17/11: limpieza ejecutada (`test:reset-db --yes`, 10 tablas) y suite 46/428 en verde sobre base limpia (10,7 s); la base queda limpia con los 5 roles |
 | `.env.example` sin variables del seed | El onboarding falla con `exit 1` si no se declaran `SEED_ADMIN_PASSWORD` y `SEED_PRODUCER_PASSWORD` | Añadirlas manualmente (el agente no puede editar archivos `.env*`) |
 | Validación 400/422 en `marketplace` e `identity` | Inconsistencia con la semántica del contrato (400 = cuerpo malformado, 422 = regla de negocio) | Cerrado en `6b835b3`: marketplace alineado a 422 con guardas numéricas; `geography` ya estaba alineado |
 | `@swc/jest` no adoptado | La suite de API tardaba más de lo necesario | Cerrado en `ae38f89`: `ts-jest` → `@swc/jest` (98,7 s → 23,4 s) con cobertura ≥80 % en ramas |
