@@ -127,6 +127,6 @@ describe('UpdateProductImagesUseCase', () => {
         '00000000-0000-4000-8000-000000000001',
         Array.from({ length: 7 }, (_, index) => ({ publicId: `img-${index}` })),
       ),
-    ).rejects.toMatchObject({ code: 'VALIDATION_ERROR', statusCode: 400 });
+    ).rejects.toMatchObject({ code: 'VALIDATION_ERROR', statusCode: 422 });
   });
 });

@@ -113,8 +113,12 @@ export async function publishProduct(payload: PublishProductInput): Promise<Prop
   return toProperty(product);
 }
 
-export function fetchPendingProducts(): Promise<Product[]> {
-  return apiRequest<Product[]>('/api/v1/products/pending', {}, 15_000);
+export function fetchPendingProducts(limit = 100): Promise<Product[]> {
+  return apiRequest<Product[]>(
+    `/api/v1/products/pending?limit=${limit}`,
+    {},
+    15_000
+  );
 }
 
 export function moderateProduct(

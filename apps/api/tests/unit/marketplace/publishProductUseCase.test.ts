@@ -66,17 +66,17 @@ describe('PublishProductUseCase', () => {
 
     await expect(sut.useCase.execute(actor, { ...command, area: 0 })).rejects.toMatchObject({
       code: 'VALIDATION_ERROR',
-      statusCode: 400,
+      statusCode: 422,
     });
     await expect(
       sut.useCase.execute(actor, { ...command, productivity: 101 }),
     ).rejects.toMatchObject({
       code: 'VALIDATION_ERROR',
-      statusCode: 400,
+      statusCode: 422,
     });
     await expect(sut.useCase.execute(actor, { ...command, lat: 91 })).rejects.toMatchObject({
       code: 'VALIDATION_ERROR',
-      statusCode: 400,
+      statusCode: 422,
     });
   });
 
@@ -88,7 +88,7 @@ describe('PublishProductUseCase', () => {
 
     await expect(sut.useCase.execute(actor, { ...command, images })).rejects.toMatchObject({
       code: 'VALIDATION_ERROR',
-      statusCode: 400,
+      statusCode: 422,
     });
   });
 });

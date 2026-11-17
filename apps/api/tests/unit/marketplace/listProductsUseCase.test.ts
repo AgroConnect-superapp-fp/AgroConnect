@@ -69,11 +69,11 @@ describe('ListProductsUseCase', () => {
 
     await expect(sut.useCase.execute({ limit: 0, offset: 0 })).rejects.toMatchObject({
       code: 'VALIDATION_ERROR',
-      statusCode: 400,
+      statusCode: 422,
     });
     await expect(sut.useCase.execute({ limit: 101, offset: 0 })).rejects.toMatchObject({
       code: 'VALIDATION_ERROR',
-      statusCode: 400,
+      statusCode: 422,
     });
   });
 
@@ -82,7 +82,7 @@ describe('ListProductsUseCase', () => {
 
     await expect(sut.useCase.execute({ limit: 50, offset: -1 })).rejects.toMatchObject({
       code: 'VALIDATION_ERROR',
-      statusCode: 400,
+      statusCode: 422,
     });
   });
 });

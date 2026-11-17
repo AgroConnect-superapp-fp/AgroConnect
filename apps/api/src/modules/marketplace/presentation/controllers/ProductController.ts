@@ -14,12 +14,14 @@ import {
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import {
+  pendingProductsQuerySchema,
   productsQuerySchema,
   publishProductSchema,
   updateProductImagesSchema,
   updateProductModerationSchema,
 } from '@agroconnect/contracts';
 import type {
+  PendingProductsQuery,
   ProductsQuery,
   PublishProductInput,
   UpdateProductImagesInput,
@@ -77,12 +79,21 @@ export class ProductController {
   @Get('pending')
   @UseGuards(SessionAuthGuard, AuthThrottlerGuard)
   @Throttle({ default: { limit: 30, ttl: 60_000 } })
-  async findPending(@Req() request: AuthenticatedRequest): Promise<unknown> {
+  async findPending(
+    @Req() request: AuthenticatedRequest,
+    @Query(
+      new ZodValidationPipe(
+        pendingProductsQuerySchema,
+        'Parámetros de moderación inválidos',
+      ),
+    )
+    query: PendingProductsQuery,
+  ): Promise<unknown> {
     const user = request.user!;
-    const products = await this.listPendingProductsUseCase.execute({
-      id: user.id,
-      role: user.role,
-    });
+    const products = await this.listPendingProductsUseCase.execute(
+      { id: user.id, role: user.role },
+      { limit: query.limit, offset: query.offset },
+    );
 
     return success(
       products.map((product) => product.props),

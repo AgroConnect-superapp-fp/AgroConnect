@@ -103,12 +103,42 @@ describe('Identity (e2e)', () => {
   });
 
   it('registra un transportista y persiste su perfil de vehículo', async () => {
+    const prisma = app.get(PrismaService);
+
+    /**
+     * Elige una placa libre antes de registrar.
+     *
+     * La base de datos de pruebas arrastra datos de corridas anteriores y el
+     * espacio `TRA###` (900 combinaciones) provoca colisiones intermitentes en
+     * la restricción única `transporter_profiles_placa_key`. Se usa el formato
+     * `ABC12D` (26 000 combinaciones) y se consulta la base para evitar el
+     * fallo sin borrar datos ajenos a la prueba.
+     */
+    const freePlaca = async (): Promise<string> => {
+      const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+      for (let attempt = 0; attempt < 50; attempt += 1) {
+        const digits = String(Math.floor(Math.random() * 100)).padStart(2, '0');
+        const letter = letters[Math.floor(Math.random() * letters.length)];
+        const candidate = `TRA${digits}${letter}`;
+        const existing = await prisma.transporterProfile.findUnique({
+          where: { plate: candidate },
+        });
+
+        if (!existing) {
+          return candidate;
+        }
+      }
+
+      throw new Error('No se encontró una placa libre en la base de datos de pruebas');
+    };
+
     const payload = registerPayload({
       rol: 'transportista',
       finca: undefined,
       transportista: {
         tipoVehiculo: 'camion',
-        placa: `TRA${Math.floor(100 + Math.random() * 899)}`,
+        placa: await freePlaca(),
         capacidadKg: 3500,
         cobertura: ['Armenia', 'Salento'],
         cadenaFrio: true,
@@ -124,7 +154,6 @@ describe('Identity (e2e)', () => {
       data: { usuario: { rol: 'transportista' } },
     });
 
-    const prisma = app.get(PrismaService);
     const profile = await prisma.transporterProfile.findUnique({
       where: { userId: response.body.data.usuario.id as string },
     });

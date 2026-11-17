@@ -99,7 +99,7 @@ describe('moderación de productos', () => {
     await expect(fetchPendingProducts()).resolves.toEqual([product]);
     expect(mockedRequest).toHaveBeenNthCalledWith(
       1,
-      '/api/v1/products/pending',
+      '/api/v1/products/pending?limit=100',
       {},
       15_000
     );

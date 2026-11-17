@@ -13,12 +13,12 @@ export class ListProductsUseCase {
   constructor(private readonly productRepository: ProductRepository) {}
 
   async execute(filters: ProductFilters): Promise<Product[]> {
-    if (filters.limit < 1 || filters.limit > 100) {
-      throw new DomainError('VALIDATION_ERROR', 'El límite debe estar entre 1 y 100', 400);
+    if (!Number.isInteger(filters.limit) || filters.limit < 1 || filters.limit > 100) {
+      throw new DomainError('VALIDATION_ERROR', 'El límite debe estar entre 1 y 100', 422);
     }
 
-    if (filters.offset < 0) {
-      throw new DomainError('VALIDATION_ERROR', 'El offset no puede ser negativo', 400);
+    if (!Number.isInteger(filters.offset) || filters.offset < 0) {
+      throw new DomainError('VALIDATION_ERROR', 'El offset no puede ser negativo', 422);
     }
 
     return this.productRepository.findAll({

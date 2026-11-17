@@ -361,9 +361,46 @@ describe('Products (e2e)', () => {
       expect(publicList.body.data).toHaveLength(0);
     });
 
+    it('pagina la lista de pendientes para el administrador', async () => {
+      const first = await request(server)
+        .get('/api/v1/products/pending')
+        .query({ limit: 1, offset: 0 })
+        .set('Cookie', `access_token=${adminToken}`);
+
+      expect(first.status).toBe(200);
+      expect(first.body.data).toHaveLength(1);
+
+      const second = await request(server)
+        .get('/api/v1/products/pending')
+        .query({ limit: 1, offset: 1 })
+        .set('Cookie', `access_token=${adminToken}`);
+
+      expect(second.status).toBe(200);
+      expect(second.body.data.length).toBeLessThanOrEqual(1);
+
+      // La segunda página no puede repetir el producto de la primera.
+      if (second.body.data.length > 0) {
+        expect(second.body.data[0].id).not.toBe(first.body.data[0].id);
+      }
+    });
+
+    it('rechaza un límite de pendientes fuera de rango con 422', async () => {
+      const response = await request(server)
+        .get('/api/v1/products/pending')
+        .query({ limit: 0 })
+        .set('Cookie', `access_token=${adminToken}`);
+
+      expect(response.status).toBe(422);
+      expect(response.body).toMatchObject({
+        success: false,
+        error: { code: 'VALIDATION_ERROR' },
+      });
+    });
+
     it('rechaza la lista de pendientes a un productor', async () => {
       const response = await request(server)
         .get('/api/v1/products/pending')
+        .query({ limit: 1 })
         .set('Cookie', `access_token=${producerToken}`);
 
       expect(response.status).toBe(403);
@@ -374,14 +411,29 @@ describe('Products (e2e)', () => {
     });
 
     it('permite al administrador aprobar y publicar el producto', async () => {
-      const pending = await request(server)
-        .get('/api/v1/products/pending')
-        .set('Cookie', `access_token=${adminToken}`);
+      /**
+       * La cola de moderación de la base de pruebas acumula productos de
+       * corridas anteriores, así que el producto se localiza recorriendo las
+       * páginas en lugar de asumir que cabe en la primera.
+       */
+      let found: { id: string } | undefined;
+      for (let offset = 0; offset < 1_000 && !found; offset += 100) {
+        const page = await request(server)
+          .get('/api/v1/products/pending')
+          .query({ limit: 100, offset })
+          .set('Cookie', `access_token=${adminToken}`);
 
-      expect(pending.status).toBe(200);
-      expect(pending.body.data).toEqual(
-        expect.arrayContaining([expect.objectContaining({ id: pendingId })]),
-      );
+        expect(page.status).toBe(200);
+        found = (page.body.data as Array<{ id: string }>).find(
+          (product) => product.id === pendingId,
+        );
+
+        if (!found && page.body.data.length < 100) {
+          break;
+        }
+      }
+
+      expect(found).toMatchObject({ id: pendingId });
 
       const approved = await request(server)
         .patch(`/api/v1/products/${pendingId}/moderation`)

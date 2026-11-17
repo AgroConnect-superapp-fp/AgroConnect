@@ -101,6 +101,28 @@ export type ProductImage = z.infer<typeof productImageSchema>;
 export type ProductsQuery = z.infer<typeof productsQuerySchema>;
 
 /**
+ * Query de `GET /api/v1/products/pending`.
+ *
+ * La moderación usa una página por defecto más pequeña que el catálogo
+ * público; el panel puede pedir hasta 100 elementos por página.
+ */
+export const pendingProductsQuerySchema = z.object({
+  limit: z.coerce
+    .number({ error: "El límite debe ser numérico" })
+    .int("El límite debe ser un entero")
+    .min(1, "El límite debe estar entre 1 y 100")
+    .max(100, "El límite debe estar entre 1 y 100")
+    .default(20),
+  offset: z.coerce
+    .number({ error: "El offset debe ser numérico" })
+    .int("El offset debe ser un entero")
+    .min(0, "El offset no puede ser negativo")
+    .default(0),
+});
+
+export type PendingProductsQuery = z.infer<typeof pendingProductsQuerySchema>;
+
+/**
  * Cuerpo de `POST /api/v1/products`.
  *
  * El `producerId` NO viaja en el cuerpo: lo toma el servidor de la sesión

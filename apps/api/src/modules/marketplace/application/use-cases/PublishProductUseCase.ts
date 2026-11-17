@@ -54,24 +54,35 @@ export class PublishProductUseCase {
       );
     }
 
-    if (command.area <= 0 || command.area > 100_000) {
+    if (!Number.isFinite(command.area) || command.area <= 0 || command.area > 100_000) {
       throw new DomainError(
         'VALIDATION_ERROR',
         'El área debe estar entre 0 y 100000 hectáreas',
-        400,
+        422,
       );
     }
 
-    if (command.productivity < 0 || command.productivity > 100) {
-      throw new DomainError('VALIDATION_ERROR', 'La productividad debe estar entre 0 y 100', 400);
+    if (
+      !Number.isInteger(command.productivity) ||
+      command.productivity < 0 ||
+      command.productivity > 100
+    ) {
+      throw new DomainError('VALIDATION_ERROR', 'La productividad debe estar entre 0 y 100', 422);
     }
 
-    if (command.lat < -90 || command.lat > 90 || command.lng < -180 || command.lng > 180) {
-      throw new DomainError('VALIDATION_ERROR', 'Coordenadas inválidas', 400);
+    if (
+      !Number.isFinite(command.lat) ||
+      !Number.isFinite(command.lng) ||
+      command.lat < -90 ||
+      command.lat > 90 ||
+      command.lng < -180 ||
+      command.lng > 180
+    ) {
+      throw new DomainError('VALIDATION_ERROR', 'Coordenadas inválidas', 422);
     }
 
     if (command.images.length > 6) {
-      throw new DomainError('VALIDATION_ERROR', 'Máximo 6 imágenes por producto', 400);
+      throw new DomainError('VALIDATION_ERROR', 'Máximo 6 imágenes por producto', 422);
     }
 
     return this.productRepository.create({

@@ -16,6 +16,8 @@ import type {
 export class InMemoryProductRepository implements ProductRepository {
   products: Product[] = [];
   lastFilters: ProductFilters | null = null;
+  lastPendingLimit: number | null = null;
+  lastPendingOffset: number | null = null;
 
   seedProduct(product: Product): void {
     this.products.push(product);
@@ -31,6 +33,9 @@ export class InMemoryProductRepository implements ProductRepository {
   }
 
   async findPending(limit = 100, offset = 0): Promise<Product[]> {
+    this.lastPendingLimit = limit;
+    this.lastPendingOffset = offset;
+
     return this.products
       .filter((product) => product.moderationStatus === 'pending')
       .slice(offset, offset + limit);

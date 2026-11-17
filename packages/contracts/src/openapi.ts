@@ -31,6 +31,7 @@ import {
 } from "./plotSchemas";
 import { profileSnapshotSchema, profileUpdateSchema } from "./profileSchemas";
 import {
+  pendingProductsQuerySchema,
   productSchema,
   productsQuerySchema,
   publishProductSchema,
@@ -375,6 +376,9 @@ export function buildOpenApiDocument(): OpenApiDocument {
           tags: ["Marketplace"],
           summary:
             "Lista productos pendientes de moderación (solo administrador)",
+          parameters: queryParameters(
+            z.toJSONSchema(pendingProductsQuerySchema, { io: "input" }),
+          ),
           responses: {
             "200": response("Productos pendientes", "ProductList"),
             "401": response("Sesión ausente, expirada o inválida"),

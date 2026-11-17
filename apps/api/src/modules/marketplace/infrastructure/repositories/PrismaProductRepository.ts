@@ -61,7 +61,7 @@ export class PrismaProductRepository implements ProductRepository {
   async findPending(limit = 100, offset = 0): Promise<Product[]> {
     const rows = await this.prisma.product.findMany({
       where: { moderationStatus: 'pending' },
-      orderBy: { createdAt: 'asc' },
+      orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
       skip: offset,
       take: limit,
     });

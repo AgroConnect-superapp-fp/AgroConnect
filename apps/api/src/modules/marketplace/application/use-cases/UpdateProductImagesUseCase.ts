@@ -29,7 +29,7 @@ export class UpdateProductImagesUseCase {
     }
 
     if (images.length > 6) {
-      throw new DomainError('VALIDATION_ERROR', 'Máximo 6 imágenes por producto', 400);
+      throw new DomainError('VALIDATION_ERROR', 'Máximo 6 imágenes por producto', 422);
     }
 
     const product = await this.productRepository.findById(productId);
