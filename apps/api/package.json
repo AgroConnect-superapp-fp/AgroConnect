@@ -26,6 +26,7 @@
     "prisma:deploy": "prisma migrate deploy",
     "prisma:status": "prisma migrate status",
     "prisma:seed": "ts-node scripts/seed.ts",
+    "test:reset-db": "ts-node --transpile-only scripts/reset-test-db.ts",
     "seed:products": "ts-node --transpile-only scripts/seed-products.ts",
     "create:admin": "ts-node --transpile-only scripts/create-admin.ts"
   },
