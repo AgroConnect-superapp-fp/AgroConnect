@@ -248,7 +248,7 @@ La decisión D7, aprobada el 2026-11-05, establece las siguientes equivalencias:
 - HU33 → CU#31.
 - HU08, HU28 y HU30 no tienen equivalencia; no deben inventarse.
 
-La regeneración de los CSV de trazabilidad sigue bloqueada por colisiones de numeración y por la falta de equivalencia de esas tres historias.
+Estado al 2026-11-17: se aplicó lo que no requiere numeración nueva (relación `CU#31→HU33` en `cu_hu.csv`, traza `RF-33 → CU#31 → HU33` en `rf_cu_hu_detalle.csv` y registro de las equivalencias en la columna `Fuente Asignacion` de `detalle.csv`). La renumeración sigue bloqueada por la numeración oficial del Product Backlog v2.0 para los códigos desplazados HU08, HU11 y HU14; el detalle está en `docs/matriz_trazabilidad_hallazgos.md` y la verificación se ejecuta con `python3 scripts/build_traceability_matrix.py --check`.
 
 ---
 
@@ -334,7 +334,7 @@ El marketplace es una vitrina: no gestiona precio, unidad ni inventario. La mode
 | Redespliegue en Render | Producción con build antiguo; 404 en `/api/v1/products` y `/api/v1/profile/me` | `RENDER_API_KEY` o deploy hook | Infraestructura / usuario | Abierto |
 | Jira | Fases 4 y 6 | Cuenta nueva, API token y variables en `~/.config/secrets.env` | Usuario | Bloqueado |
 | Notion | Fases 5 y 6 | Compartir la página de plantillas SENA con la integración | Usuario / administrador de Notion | Bloqueado |
-| CSV D7 | Regeneración de trazabilidad | Resolver colisiones de numeración y equivalencias de HU08/HU28/HU30 | Requisitos / Trazabilidad | Bloqueado |
+| CSV D7 | Renumeración a Product Backlog v2.0 | Numeración oficial de HU08, HU11 y HU14 desplazados; la relación CU#31→HU33 ya está aplicada | Requisitos / Trazabilidad | Bloqueado |
 | Moderación P2 | Flujo de rechazo | Decidir motivo obligatorio/opcional, notificación, auditoría y paginación | Producto / UX / Backend | Bloqueado |
 | Fixture admin E2E | Cobertura de moderación | Crear fixture y prueba automatizada | QA / Backend | Pendiente |
 | Límite de Cloudinary | Subidas en producción | Verificar cuota y fallback | Backend / Infraestructura | Pendiente |

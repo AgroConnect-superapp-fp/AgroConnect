@@ -31,7 +31,7 @@ RF-29,Integración de pagos electrónicos,M08,CU#21,Registrar Transacción,HU31,
 RF-30,Registro de transacciones,M08,CU#46,Generar Reporte de Transacciones para Contabilidad,HU31,Registro de transacciones,Fuerte,Fuerte
 RF-31,Monitoreo del sistema,M09,CU#31,Monitorear Sistema (Admin),HU32,Monitoreo del sistema,Fuerte,Fuerte
 RF-32,Generación de reportes,M09,CU#16,Generar Reportes,HU10,Generar reportes,Fuerte,Fuerte
-RF-33,Gestión de incidencias,M09,CU#31,Monitorear Sistema (Admin),HU32,Monitoreo del sistema,Fuerte,Fuerte
+RF-33,Gestión de incidencias,M09,CU#31,Monitorear Sistema (Admin),HU33,Gestión de incidencias,Fuerte,Fuerte
 RF-34,Control de accesos RBAC,M10,CU#17,Gestionar Accesos,HU34,Control de accesos,Fuerte,Fuerte
 RF-35,Registro de actividad,M10,CU#18,Registrar Actividad del Sistema,HU35,Registro de actividad,Fuerte,Fuerte
 RF-36,Copias de seguridad automáticas,M10,CU#48,Habilitar Autenticación de Dos Factores (2FA),HU36,Copias de seguridad,Fuerte,Fuerte

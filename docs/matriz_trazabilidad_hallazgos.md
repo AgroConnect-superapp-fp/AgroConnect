@@ -18,14 +18,22 @@
 ## Totales verificados
 
 - `detalle.csv`: 68 RF + 66 CU + 69 HU = **203 filas**.
-- `cu_hu.csv`: **74 relaciones**, 66 CU únicos y **63 HU únicas**; faltan 6 HU por relación.
+- `cu_hu.csv`: **75 relaciones**, 66 CU únicos y **64 HU únicas**. Las 5 HU sin
+  relación CU son **HU06, HU08, HU15, HU28 y HU30 de la numeración original**;
+  sus equivalencias D7 ya viven en la matriz con los códigos oficiales
+  (HU06→HU14, HU15→HU08, HU04→HU11, HU33→CU#31).
 - `rf_cu.csv`: 68 RF; `rf_cu_hu_detalle.csv`: 68 RF; `rf_cu_hu.csv`: 17 módulos.
 
 ## Recomendación
 
-1. Validar las 6 relaciones en la matriz de Notion (SSOT) y agregarlas al CSV; no se infieren por título para no inventar trazabilidad.
-2. Si alguna HU no tiene CU por diseño, marcarla como cobertura pendiente en el informe general.
-3. Regenerar los `.md` derivados con `scripts/build_traceability_matrix.py` cuando Notion esté disponible.
+1. Renumerar fichas, CU y trazabilidad a la numeración v2.0 cuando exista la
+   tabla oficial: desbloquea HU06/HU15 y cierra la ambigüedad de HU08, HU11 y
+   HU14 desplazados.
+2. Declarar en el informe general las HU sin CU por diseño (HU08, HU28 y HU30
+   de la numeración original) como cobertura pendiente documentada.
+3. Mantener `cu_hu.csv` como fuente curada: el generador solo añade pares
+   faltantes y nunca borra relaciones manuales. Ejecutar
+   `python3 scripts/build_traceability_matrix.py --check` antes de cada entrega.
 
 > El chequeo automático `traceability-check` reporta 8 HU porque escanea patrones en archivos, no la matriz; no es un indicador fiable para este total.
 
@@ -62,3 +70,39 @@ quedan como cobertura pendiente documentada.
 
 **Conclusión:** D7 aprobada. La regeneración de CSV/matriz debe ejecutarse con
 la tabla aprobada y sin inferir las tres relaciones ausentes.
+
+## Aplicación parcial de D7 (2026-11-17)
+
+Se aplicó lo que la decisión aprobada permite sin inventar trazabilidad:
+
+- `cu_hu.csv`: se añadió `CU#31 → HU33` (relación confirmada en la matriz
+  detallada de Notion). `CU#31 → HU32` se conserva porque el módulo M09 asocia
+  ambos HU.
+- `rf_cu_hu_detalle.csv`: la fila RF-33 ahora traza `RF-33 → CU#31 → HU33`.
+- `detalle.csv`: las fichas HU04, HU06 y HU15 registran su equivalencia oficial
+  (HU11, HU14 y HU08) en `Fuente Asignacion`; HU33 registra `D7: confirmado
+  CU#31`. Las cuatro dejan de estar marcadas como dudosas.
+
+### Bloqueo vigente: colisión de numeración
+
+La renumeración completa exige la numeración oficial del Product Backlog v2.0
+para las fichas que hoy ocupan los códigos destino:
+
+| Código destino | Ocupado hoy por | Equivalencia D7 que llega |
+| --- | --- | --- |
+| HU08 | Control de inventario (M04) | HU15 actual (Búsqueda de usuarios) |
+| HU11 | Negociación empresarial (M03) | HU04 actual (Publicar productos) |
+| HU14 | Panel general (M01) | HU06 actual (Solicitud de compra) |
+
+Sin esa numeración, renombrar produciría códigos duplicados. Por eso no se
+renumera y los CSV conservan la numeración de trabajo.
+
+### Verificación
+
+```bash
+python3 scripts/build_traceability_matrix.py --check
+```
+
+Valida conteos (68 RF, 66 CU, 69 HU), unicidad, ausencia de huecos, 17 módulos,
+la relación CU#31→HU33 y que no se hayan inventado relaciones para HU08, HU28
+ni HU30.

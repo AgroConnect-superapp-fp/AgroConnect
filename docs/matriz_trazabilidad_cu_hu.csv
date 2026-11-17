@@ -30,6 +30,7 @@ CU#28,Recibir Notificaciones del Sistema,M01,HU13,Control de sesiones,1.0,Fuerte
 CU#29,Registrar Transportista,M06,HU25,Registro de transportistas,1.0,Fuerte
 CU#30,Consultar Historial de Pedidos,M07,HU29,Historial de pedidos,1.0,Fuerte
 CU#31,Monitorear Sistema (Admin),M09,HU32,Monitoreo del sistema,1.0,Fuerte
+CU#31,Monitorear Sistema (Admin),M09,HU33,Gestión de incidencias,1.0,Fuerte
 CU#32,Gestionar Carrito de Compras,M13,HU43,Gestionar carrito de compras,1.0,Fuerte
 CU#33,Confirmar Pedido,M07,HU44,Confirmar pedido,1.0,Fuerte
 CU#34,Consultar Historial de Compras,M13,HU45,Historial de compras,1.0,Fuerte
