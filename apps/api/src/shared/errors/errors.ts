@@ -23,6 +23,7 @@ export type ErrorCode =
   | 'SERVICE_UNAVAILABLE'
   | 'NOT_FOUND'
   | 'BAD_REQUEST'
+  | 'PAYLOAD_TOO_LARGE'
   | 'UNAUTHORIZED'
   | 'FORBIDDEN'
   | 'CONFLICT'

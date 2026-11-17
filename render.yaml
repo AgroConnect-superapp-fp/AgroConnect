@@ -39,8 +39,6 @@ services:
         value: agroconnect-api
       - key: JWT_AUDIENCE
         value: agroconnect-web
-      - key: BCRYPT_SALT_ROUNDS
-        value: "12"
       - key: CORS_ORIGIN
         value: https://agroconnectpreview.vercel.app
       - key: APP_BASE_URL

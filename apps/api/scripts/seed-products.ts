@@ -9,9 +9,7 @@
  * veces sin duplicar filas. No se ejecuta en producción automáticamente.
  */
 import 'dotenv/config';
-import { PrismaPg } from '@prisma/adapter-pg';
-import { Pool } from 'pg';
-import { PrismaClient } from '../src/generated/prisma/client';
+import { createPrismaContext } from './lib/prisma';
 import type {
   ProductCertification,
   ProductCrop,
@@ -252,12 +250,11 @@ async function main(): Promise<void> {
     throw new Error('DATABASE_URL es obligatoria para ejecutar el seed.');
   }
 
-  const pool = new Pool({ connectionString });
-  const prisma = new PrismaClient({
-    adapter: new PrismaPg(pool, {
-      schema: process.env['DATABASE_SCHEMA'] ?? 'public',
-    }),
-  });
+  const context = createPrismaContext(
+    connectionString,
+    process.env['DATABASE_SCHEMA'] ?? 'public',
+  );
+  const { prisma } = context;
 
   try {
     for (const product of PRODUCTS) {
@@ -281,8 +278,7 @@ async function main(): Promise<void> {
 
     console.log(`Seed del marketplace completado: ${PRODUCTS.length} productos.`);
   } finally {
-    await prisma.$disconnect();
-    await pool.end();
+    await context.close();
   }
 }
 

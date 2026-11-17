@@ -8,7 +8,6 @@ process.env.JWT_REFRESH_SECRET =
   process.env.JWT_REFRESH_SECRET ?? 'test_refresh_secret_with_at_least_32_characters_ok';
 process.env.JWT_ACCESS_EXPIRES_IN = '15m';
 process.env.JWT_REFRESH_EXPIRES_IN = '7d';
-process.env.BCRYPT_SALT_ROUNDS = '10';
 process.env.RATE_LIMIT_WINDOW_MS = '900000';
 // Límite bajo a propósito: la e2e del módulo identity necesita agotarlo
 // para comprobar la respuesta 429 del guard de rate limiting.

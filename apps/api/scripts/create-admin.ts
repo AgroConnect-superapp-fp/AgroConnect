@@ -12,12 +12,9 @@
  */
 import 'dotenv/config';
 import { randomUUID } from 'node:crypto';
-import { PrismaPg } from '@prisma/adapter-pg';
-import { Pool } from 'pg';
-import { PrismaClient } from '../src/generated/prisma/client';
 import { env } from '../src/shared/config/env';
-import { Argon2PasswordHasher } from '../src/modules/identity/infrastructure/services/Argon2PasswordHasher';
-import { Password } from '../src/modules/identity/domain/value-objects/Password';
+import { createPrismaContext } from './lib/prisma';
+import { assertPasswordPolicy, hashPassword } from './lib/password';
 
 async function main(): Promise<void> {
   const email = process.env.ADMIN_EMAIL?.trim().toLowerCase();
@@ -32,11 +29,9 @@ async function main(): Promise<void> {
     );
   }
 
-  const validatedPassword = Password.create(password);
-  const pool = new Pool({ connectionString: env.DATABASE_URL });
-  const prisma = new PrismaClient({
-    adapter: new PrismaPg(pool, { schema: env.DATABASE_SCHEMA }),
-  });
+  const validatedPassword = assertPasswordPolicy(password);
+  const context = createPrismaContext(env.DATABASE_URL, env.DATABASE_SCHEMA);
+  const { prisma } = context;
 
   try {
     const role = await prisma.role.findUnique({ where: { name: 'administrador' } });
@@ -52,7 +47,7 @@ async function main(): Promise<void> {
       throw new Error('Ya existe una cuenta con ese correo, documento o celular.');
     }
 
-    const passwordHash = await new Argon2PasswordHasher().hash(validatedPassword.value);
+    const passwordHash = await hashPassword(validatedPassword.value);
     const user = await prisma.user.create({
       data: {
         id: randomUUID(),
@@ -74,8 +69,7 @@ async function main(): Promise<void> {
     console.log(`  correo: ${user.email}`);
     console.log(`  nombre: ${user.fullName}`);
   } finally {
-    await prisma.$disconnect().catch(() => undefined);
-    await pool.end().catch(() => undefined);
+    await context.close();
   }
 }
 

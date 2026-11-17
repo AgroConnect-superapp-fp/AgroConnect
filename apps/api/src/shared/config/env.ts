@@ -7,6 +7,19 @@ import { z } from 'zod';
  * (`backend/src/config/env.ts`) para que `.env`, `.env.example` y `render.yaml`
  * sirvan tal cual durante la migración progresiva (ADR-009 / ADR-015).
  */
+/**
+ * Orígenes CORS declarados en `CORS_ORIGIN` (lista separada por comas).
+ *
+ * Se normalizan aquí y se vuelven a validar en `superRefine`: un origen con
+ * comodines o sin URL absoluta no puede pasar.
+ */
+export function parseCorsOrigins(raw: string): string[] {
+  return raw
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter((origin) => origin.length > 0);
+}
+
 export const envSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
@@ -19,7 +32,6 @@ export const envSchema = z
     JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
     JWT_ISSUER: z.string().default('agroconnect-api'),
     JWT_AUDIENCE: z.string().default('agroconnect-web'),
-    BCRYPT_SALT_ROUNDS: z.coerce.number().int().min(10).max(15).default(12),
     RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(900_000),
     RATE_LIMIT_MAX_ATTEMPTS: z.coerce.number().int().positive().default(5),
     CORS_ORIGIN: z.string().default('http://localhost:5173'),
@@ -44,6 +56,13 @@ export const envSchema = z
     CLOUDINARY_API_KEY: z.string().optional(),
     CLOUDINARY_API_SECRET: z.string().optional(),
     CLOUDINARY_UPLOAD_FOLDER: z.string().default('agroconnect/products'),
+    // Documentación interactiva (Swagger UI). Expone la superficie completa de
+    // la API, así que en producción queda apagada salvo ENABLE_API_DOCS=true.
+    // El mismo patrón booleano de SMTP_SECURE: 'true'/'false' como texto.
+    ENABLE_API_DOCS: z
+      .union([z.literal('true'), z.literal('false')])
+      .default('false')
+      .transform((value) => value === 'true'),
     LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
   })
   .superRefine((data, ctx) => {
@@ -74,9 +93,78 @@ export const envSchema = z
           'SMTP_HOST es obligatorio en producción: la verificación de correo (D5) bloquea el login hasta verificar',
       });
     }
+
+    // CORS con `credentials: true`: un origen `*` hace que el paquete `cors`
+    // refleje cualquier Origin, de modo que cualquier sitio podría leer las
+    // respuestas autenticadas. Se exige una lista explícita de URLs absolutas
+    // y, en producción, solo `https://`.
+    const corsOrigins = parseCorsOrigins(data.CORS_ORIGIN);
+    if (corsOrigins.length === 0) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['CORS_ORIGIN'],
+        message: 'CORS_ORIGIN debe declarar al menos un origen',
+      });
+    }
+
+    for (const origin of corsOrigins) {
+      if (origin.includes('*')) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['CORS_ORIGIN'],
+          message:
+            `CORS_ORIGIN no admite comodines ("${origin}"). Con credenciales habilitadas, ` +
+            'un origen comodín permite que cualquier sitio lea respuestas autenticadas. ' +
+            'Declara los orígenes uno por uno.',
+        });
+        continue;
+      }
+
+      let parsed: URL | null = null;
+      try {
+        parsed = new URL(origin);
+      } catch {
+        parsed = null;
+      }
+
+      if (!parsed) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['CORS_ORIGIN'],
+          message: `El origen CORS "${origin}" no es una URL absoluta (debe incluir esquema y host)`,
+        });
+        continue;
+      }
+
+      if (data.NODE_ENV === 'production' && parsed.protocol !== 'https:') {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['CORS_ORIGIN'],
+          message: `En producción el origen CORS "${origin}" debe usar https://`,
+        });
+      }
+    }
+
+    // Defensa en profundidad: con el mismo secreto, un refresh token puede
+    // aceptarse como access token (y al revés).
+    if (data.JWT_ACCESS_SECRET === data.JWT_REFRESH_SECRET) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['JWT_REFRESH_SECRET'],
+        message:
+          'JWT_ACCESS_SECRET y JWT_REFRESH_SECRET deben ser distintos: ' +
+          'compartir el mismo secreto permite usar un refresh token como access token',
+      });
+    }
   });
 
-export type Env = z.infer<typeof envSchema>;
+export type Env = z.infer<typeof envSchema> & {
+  /**
+   * Orígenes CORS ya validados y normalizados. Es la lista que consume
+   * `app.setup.ts`; nunca se construye a partir de la cadena cruda.
+   */
+  readonly CORS_ORIGINS: readonly string[];
+};
 
 /**
  * Valida un objeto de entorno y devuelve el objeto tipado.
@@ -92,7 +180,20 @@ export function parseEnv(source: Record<string, unknown>): Env {
     throw new Error(`Configuración de entorno inválida:\n${missing}`);
   }
 
-  return parsed.data;
+  const data = parsed.data;
+
+  // `ENABLE_API_DOCS` sigue el patrón booleano del resto del entorno, pero su
+  // valor por defecto depende del modo: fuera de producción la documentación
+  // está disponible para el equipo; en producción hay que pedirla explícitamente
+  // con ENABLE_API_DOCS=true porque revela la superficie completa de la API.
+  const docsRequested = source['ENABLE_API_DOCS'];
+
+  return {
+    ...data,
+    CORS_ORIGINS: parseCorsOrigins(data.CORS_ORIGIN),
+    ENABLE_API_DOCS:
+      docsRequested === undefined ? data.NODE_ENV !== 'production' : data.ENABLE_API_DOCS,
+  };
 }
 
 /**

@@ -163,6 +163,28 @@ describe('AllExceptionsFilter', () => {
     });
   });
 
+  it('traduce un 413 de cuerpo demasiado grande a PAYLOAD_TOO_LARGE', () => {
+    const { host, captured } = createHost();
+
+    filter.catch(
+      new HttpException(
+        'El cuerpo de la petición supera el límite de 32kb.',
+        HttpStatus.PAYLOAD_TOO_LARGE,
+      ),
+      host,
+    );
+
+    expect(captured.statusCode).toBe(413);
+    expect(captured.body).toEqual({
+      success: false,
+      error: {
+        code: 'PAYLOAD_TOO_LARGE',
+        message: 'El cuerpo de la petición supera el límite de 32kb.',
+      },
+      correlationId: 'corr-123',
+    });
+  });
+
   it('traduce un ZodError suelto a VALIDATION_ERROR 422 con detalles', () => {
     const { host, captured } = createHost();
     const zodError = new ZodError([

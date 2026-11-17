@@ -28,6 +28,7 @@ export interface ErrorBody {
 
 const STATUS_TO_CODE: Readonly<Record<number, ErrorCode>> = {
   [HttpStatus.BAD_REQUEST]: 'BAD_REQUEST',
+  [HttpStatus.PAYLOAD_TOO_LARGE]: 'PAYLOAD_TOO_LARGE',
   [HttpStatus.UNAUTHORIZED]: 'UNAUTHORIZED',
   [HttpStatus.FORBIDDEN]: 'FORBIDDEN',
   [HttpStatus.NOT_FOUND]: 'NOT_FOUND',

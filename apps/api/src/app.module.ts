@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { HealthModule } from './health/health.module';
+import { DocsModule } from './docs/docs.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { IdentityModule } from './modules/identity/presentation/identity.module';
 import { RolesGuard } from './modules/identity/presentation/guards/roles.guard';
@@ -40,6 +41,7 @@ import { PinoNestLogger } from './shared/logger/nest-logger.service';
     JwtModule.register({}),
     PrismaModule,
     HealthModule,
+    DocsModule,
     IdentityModule,
     GeographyModule,
     MarketplaceModule,
