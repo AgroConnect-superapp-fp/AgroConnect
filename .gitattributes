@@ -11,7 +11,9 @@ docs/matriz_trazabilidad_*.csv -text whitespace=cr-at-eol
 *.js -text
 *.mjs -text
 *.json -text
-*.md -text
+# En Markdown, dos espacios finales son un salto de línea intencional
+# (hard break), no espacio sobrante: se excluye de `blank-at-eol`.
+*.md -text whitespace=-blank-at-eol
 *.yml -text
 *.yaml -text
 *.prisma -text

@@ -4,7 +4,7 @@
 
 ### Documento de conciliación entre el estado reportado al 28/10/2026 y la verificación técnica al 17/11/2026
 
-**Versión:** 1.1 — verificada, con pendientes A, B y E cerrados  
+**Versión:** 1.2 — verificada; pendientes A, B y E cerrados y fase 3 planificada  
 **Estado:** Aprobada técnicamente; pendiente de firma institucional  
 **Documento fuente:** `AgroConnect_Estado_Avance_Sprint_2026-10-28.pdf`
 
@@ -114,8 +114,8 @@ La tabla conserva el estado literal del PDF y lo contrasta con la verificación 
 | 2.5 | BACKEND SÍ | CERRADA | Cookie `httpOnly` implementada y probada; `5267e8b` migra el frontend a cookie-only y elimina el fallback Bearer | Cierre del pendiente B |
 | 2.6 | CERRADA | CERRADA | `SmtpEmailService` con Nodemailer; `FileEmailService` solo para desarrollo/pruebas | Sin cambios |
 | 2.7 | PENDIENTE | CERRADA | CRUD `/plots` con PostGIS, `/plots/nearby` con `ST_DWithin`, tres migraciones y E2E contra PostGIS real | Cierre del pendiente A |
-| 2.8 | PARCIAL | CERRADA | Dependency-cruiser (123 módulos, 383 dependencias, 0 violaciones), Swagger en `/docs`, seed con guard de seguridad y Testcontainers PostGIS (6/6) | Cierre del pendiente E; `@swc/jest` queda como mejora opcional |
-| 3 | PENDIENTE | PENDIENTE | Sin router, sin TanStack Query y sin `src/shared/ui` | Alcance del pendiente F |
+| 2.8 | PARCIAL | CERRADA | Dependency-cruiser (123 módulos, 383 dependencias, 0 violaciones), Swagger en `/docs`, seed con guard de seguridad y Testcontainers PostGIS (6/6) | Cierre del pendiente E; `@swc/jest` adoptado en `ae38f89` (98,7 s → 23,4 s, 4,2×) |
+| 3 | PENDIENTE | PLANIFICADA | Sin router, sin TanStack Query y sin `src/shared/ui`; alcance, decisiones e incrementos ya definidos | Plan en `docs/plan-fase-3-frontend.md` (pendiente F) |
 | 4 | BLOQUEADA | BLOQUEADA | Jira anterior 404; se requiere cuenta nueva y API token | Depende del usuario |
 | 5 | BLOQUEADA | BLOQUEADA | Plantillas SENA en Notion sin compartir con la integración; solo hay exportaciones PDF | Depende del administrador de Notion |
 | 6 | PENDIENTE | PENDIENTE | La sincronización de cuatro entornos depende de 4 y 5 | No puede iniciar sin las fases 4 y 5 |
@@ -301,15 +301,15 @@ El marketplace es una vitrina: no gestiona precio, unidad ni inventario. La mode
 | --- | --- | --- |
 | Endpoints de administración de usuarios | Fase 2.4 incompleta | Definir alcance y contrato; implementar y probar |
 | Fixture de administrador para E2E | Cobertura E2E limitada | Crear fixture reproducible y prueba de moderación |
-| Paginación de `GET /products/pending` | Escalabilidad del panel de moderación | Definir página/tamaño y orden; implementar |
+| Paginación de `GET /products/pending` | Escalabilidad del panel de moderación | Cerrado en `6b835b3`: `limit` 1..100 (default 20), `offset` y orden `createdAt,id` |
 | Prueba automatizada de `create:admin` | Operación no cubierta | Añadir prueba de integración del script |
 | Límite real de Cloudinary | Riesgo de producción | Verificar plan, cuota y estrategia de fallback |
 | Referencias históricas en CHANGELOG/ADR | Trazabilidad | Revisar y actualizar en el próximo corte |
 | Decisiones de moderación P2 | Flujo de rechazo incompleto | Resolver motivo obligatorio/opcional, notificación, auditoría y paginación |
-| BD `agroconnect_test` acumulada | 656 usuarios y 46 perfiles de corridas previas; la generación aleatoria de placa (900 combinaciones) puede colisionar y producir fallos E2E intermitentes | Limpiar la BD o crear una base efímera por corrida |
+| BD `agroconnect_test` acumulada | Datos de corridas previas (832 usuarios al 17/11); la generación aleatoria de placa se amplió a formato `ABC12D` (26 000 combinaciones) y consulta a BD | `npm run test:reset-db -w @agroconnect/api` (simulación por defecto); la limpieza real queda aprobada para una sesión aparte |
 | `.env.example` sin variables del seed | El onboarding falla con `exit 1` si no se declaran `SEED_ADMIN_PASSWORD` y `SEED_PRODUCER_PASSWORD` | Añadirlas manualmente (el agente no puede editar archivos `.env*`) |
-| Validación 400/422 en `marketplace` e `identity` | Inconsistencia con la semántica del contrato (400 = cuerpo malformado, 422 = regla de negocio) | Unificar en la próxima iteración; `geography` ya está alineado |
-| `@swc/jest` no adoptado | La suite de API tarda más de lo necesario | Evaluar la migración como mejora de rendimiento, sin impacto funcional |
+| Validación 400/422 en `marketplace` e `identity` | Inconsistencia con la semántica del contrato (400 = cuerpo malformado, 422 = regla de negocio) | Cerrado en `6b835b3`: marketplace alineado a 422 con guardas numéricas; `geography` ya estaba alineado |
+| `@swc/jest` no adoptado | La suite de API tardaba más de lo necesario | Cerrado en `ae38f89`: `ts-jest` → `@swc/jest` (98,7 s → 23,4 s) con cobertura ≥80 % en ramas |
 
 ---
 
@@ -429,4 +429,4 @@ Los comandos de Prisma deben ejecutarse desde `apps/api`; el resto, desde la ra�
 ---
 
 **Fin del documento.**  
-Versión 1.1 — verificada el 17/11/2026. Los pendientes A, B y E constan como cerrados con la evidencia de §5. Las firmas de §10 permanecen pendientes.
+Versión 1.2 — verificada el 17/11/2026. Los pendientes A, B y E constan como cerrados con la evidencia de §5. El pendiente F queda planificado en `docs/plan-fase-3-frontend.md`. Las firmas de §10 permanecen pendientes.
