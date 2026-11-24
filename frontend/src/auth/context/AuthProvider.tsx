@@ -13,6 +13,7 @@ export function AuthProvider({ children }: { children: ReactNode }): React.React
     'loading'
   );
   const [usuario, setUsuario] = useState<PublicUser | null>(null);
+  const [restored, setRestored] = useState(false);
   // Cookie-only puro: NINGÚN token vive en JavaScript. apps/api emite las
   // cookies httpOnly `access_token` (corta vida) y `refresh_token` (7 días),
   // y el navegador las adjunta a cada request vía `credentials: 'include'`.
@@ -25,10 +26,16 @@ export function AuthProvider({ children }: { children: ReactNode }): React.React
   // promesa compartida garantiza UNA sola renovación por ciclo de montaje.
   const refreshInFlight = useRef<Promise<void> | null>(null);
 
-  const applySession = useCallback((session: AuthSession) => {
-    setUsuario(session.usuario);
-    setStatus('authenticated');
-  }, []);
+  const applySession = useCallback(
+    (session: AuthSession, options?: { restored?: boolean }) => {
+      setUsuario(session.usuario);
+      setStatus('authenticated');
+      // Solo el refresh silencioso al arrancar marca `restored`: login y demo
+      // tienen su propia navegación y no deben rebotar a /panel.
+      setRestored(options?.restored ?? false);
+    },
+    []
+  );
 
   useEffect(() => {
     if (refreshInFlight.current) {
@@ -37,7 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }): React.React
 
     refreshInFlight.current = authApi
       .refresh()
-      .then(applySession)
+      .then((session) => applySession(session, { restored: true }))
       .catch(() => {
         // Sin cookie válida no hay sesión: queda anónimo.
         setStatus('anonymous');
@@ -96,11 +103,12 @@ export function AuthProvider({ children }: { children: ReactNode }): React.React
 
     setUsuario(null);
     setStatus('anonymous');
+    setRestored(false);
   }, [usuario]);
 
   const value = useMemo(
-    () => ({ status, usuario, login, register, loginDemo, logout }),
-    [status, usuario, login, register, loginDemo, logout]
+    () => ({ status, restored, usuario, login, register, loginDemo, logout }),
+    [status, restored, usuario, login, register, loginDemo, logout]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

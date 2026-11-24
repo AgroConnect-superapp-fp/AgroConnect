@@ -5,6 +5,8 @@ export type AuthStatus = 'loading' | 'anonymous' | 'authenticated';
 
 export interface AuthContextValue {
   status: AuthStatus;
+  /** La sesión vino de una cookie restaurada al arrancar (no de login/demo). */
+  restored: boolean;
   usuario: PublicUser | null;
   login: (payload: LoginPayload) => Promise<void>;
   register: (payload: RegisterPayload) => Promise<void>;
