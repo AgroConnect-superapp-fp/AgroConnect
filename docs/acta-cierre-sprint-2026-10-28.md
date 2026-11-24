@@ -2,9 +2,9 @@
 
 ## AgroConnect — Plataforma agropecuaria B2B/B2C
 
-### Documento de conciliación entre el estado reportado al 28/10/2026 y la verificación técnica al 17/11/2026
+### Documento de conciliación entre el estado reportado al 28/10/2026 y la verificación técnica al 24/11/2026
 
-**Versión:** 1.2 — verificada; pendientes A, B y E cerrados y fase 3 planificada  
+**Versión:** 1.3 — verificada; pendientes A, B y E cerrados; fase 3 en ejecución (F1 completada)  
 **Estado:** Aprobada técnicamente; pendiente de firma institucional  
 **Documento fuente:** `AgroConnect_Estado_Avance_Sprint_2026-10-28.pdf`
 
@@ -16,7 +16,7 @@
 | Ciudad | Armenia, Quindío |
 | Fecha de corte documental | 28 de octubre de 2026 |
 | Fecha de generación del acta | 16 de noviembre de 2026 |
-| Fecha de actualización | 17 de noviembre de 2026 |
+| Fecha de actualización | 24 de noviembre de 2026 |
 | Rama y commit del PDF | `develop @ 588b234` |
 | Rama verificada | `feature/property-map-phase-2` |
 | Commit base de la verificación | `ff72e9d` |
@@ -94,7 +94,7 @@ Sin embargo, la lectura granular del propio PDF muestra que la fase 0 seguía `P
 - Fases 4, 5 y 6: Jira, Notion y sincronización, bloqueadas por accesos externos.
 - Despliegue de producción desactualizado en Render, con 404 en endpoints ya implementados.
 - Decisiones de política pendientes para el flujo de moderación P2.
-- Base de frontend: router, TanStack Query, cliente OpenAPI y componentes compartidos.
+- Base de frontend: F1 (router y URLs) completada en `6e93652`; quedan TanStack Query, cliente OpenAPI y componentes compartidos.
 - Inconsistencia de status de validación en `marketplace` e `identity` (400 en dominio frente a 422 en el contrato Zod), ya corregida en `geography`.
 
 ---
@@ -115,13 +115,13 @@ La tabla conserva el estado literal del PDF y lo contrasta con la verificación 
 | 2.6 | CERRADA | CERRADA | `SmtpEmailService` con Nodemailer; `FileEmailService` solo para desarrollo/pruebas | Sin cambios |
 | 2.7 | PENDIENTE | CERRADA | CRUD `/plots` con PostGIS, `/plots/nearby` con `ST_DWithin`, tres migraciones y E2E contra PostGIS real | Cierre del pendiente A |
 | 2.8 | PARCIAL | CERRADA | Dependency-cruiser (123 módulos, 383 dependencias, 0 violaciones), Swagger en `/docs`, seed con guard de seguridad y Testcontainers PostGIS (6/6) | Cierre del pendiente E; `@swc/jest` adoptado en `ae38f89` (98,7 s → 23,4 s, 4,2×) |
-| 3 | PENDIENTE | PLANIFICADA | Sin router, sin TanStack Query y sin `src/shared/ui`; alcance, decisiones e incrementos ya definidos | Plan en `docs/plan-fase-3-frontend.md` (pendiente F) |
+| 3 | PENDIENTE | EN EJECUCIÓN · F1 CERRADA | `6e93652`: `react-router@7` con rutas `lazy`, guardas de sesión/rol, `returnTo` seguro y compatibilidad con enlaces de correo. 25 pruebas nuevas (suite frontend 78/78), `tsc` y ESLint en cero, E2E 14/14, bundle inicial ~129,5 KB gzip | F2–F5 según `docs/plan-fase-3-frontend.md` |
 | 4 | BLOQUEADA | BLOQUEADA | Jira anterior 404; se requiere cuenta nueva y API token | Depende del usuario |
 | 5 | BLOQUEADA | BLOQUEADA | Plantillas SENA en Notion sin compartir con la integración; solo hay exportaciones PDF | Depende del administrador de Notion |
 | 6 | PENDIENTE | PENDIENTE | La sincronización de cuatro entornos depende de 4 y 5 | No puede iniciar sin las fases 4 y 5 |
 | 7 | BACKLOG | BACKLOG | Roadmap post-MVP | Fuera del alcance del sprint |
 
-**Lectura de cierre:** las fases 1, 2.1, 2.2, 2.3, 2.5, 2.6, 2.7 y 2.8 están cerradas; 0 y 2.4 están parciales; 3 y 6 están pendientes; 4 y 5 están bloqueadas; 7 permanece en backlog. Por tanto, la afirmación del resumen ejecutivo del PDF según la cual "las fases 0, 1 y 2 están cerradas" debe interpretarse como cierre de los hitos principales de la fase 2, no como cierre total de todas sus subfases. Con los pendientes A, B y E cerrados, el resto de la fase 2 queda limitado a los endpoints de administración de usuarios (2.4) y a los accesos externos de la fase 0.
+**Lectura de cierre:** las fases 1, 2.1, 2.2, 2.3, 2.5, 2.6, 2.7 y 2.8 están cerradas; 0 y 2.4 están parciales; 3 está en ejecución con F1 cerrada y 6 pendiente; 4 y 5 están bloqueadas; 7 permanece en backlog. Por tanto, la afirmación del resumen ejecutivo del PDF según la cual "las fases 0, 1 y 2 están cerradas" debe interpretarse como cierre de los hitos principales de la fase 2, no como cierre total de todas sus subfases. Con los pendientes A, B y E cerrados, el resto de la fase 2 queda limitado a los endpoints de administración de usuarios (2.4) y a los accesos externos de la fase 0.
 
 ---
 
@@ -429,4 +429,4 @@ Los comandos de Prisma deben ejecutarse desde `apps/api`; el resto, desde la ra�
 ---
 
 **Fin del documento.**  
-Versión 1.2 — verificada el 17/11/2026. Los pendientes A, B y E constan como cerrados con la evidencia de §5. El pendiente F queda planificado en `docs/plan-fase-3-frontend.md`. Las firmas de §10 permanecen pendientes.
+Versión 1.3 — verificada el 24/11/2026. Los pendientes A, B y E constan como cerrados con la evidencia de §5. El pendiente F está en ejecución: F1 cerrada en `6e93652` y F2–F5 planificadas en `docs/plan-fase-3-frontend.md`. Las firmas de §10 permanecen pendientes.

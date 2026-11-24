@@ -1,7 +1,7 @@
 # Plan Fase 3 — Router, capa de datos y sistema de componentes
 
 **Fecha:** 17 de noviembre de 2026
-**Estado:** Planificado (alcance del pendiente F)
+**Estado:** F1 completada (24/11/2026); F2–F5 planificadas
 **Referencias:** acta de cierre del sprint 2026-10-28 §3 (fila 3), `SPEC.md` §10 (performance budget rural-first), ADR-022 y ADR-023.
 
 ---
@@ -83,7 +83,14 @@ Guardas como wrappers de ruta: `RequireAuth` y `RequireRole(['administrador'])`,
 
 ### F1 — Router y URLs (estimación: 2–3 días)
 
-- Instalar `react-router@7`; crear `src/app/router.tsx` y `src/app/routes.tsx`.
+> **Estado: COMPLETADA (24/11/2026 · `6e93652`).** Implementada en `src/app/`
+> (el árbol de rutas quedó en `screenRoutes.tsx`): rutas `lazy`, guardas de
+> sesión/rol, `returnTo` seguro y compatibilidad con `?resetToken=` y
+> `?verifyToken=`. Evidencia: 25 pruebas nuevas, suite frontend 17 archivos/78
+> tests, `tsc` y ESLint en cero, E2E 14/14 y bundle inicial medido en ~129,5 KB
+> gzip (presupuesto 200 KB). LCP/TTI en 3G se miden en F4, con el shell dividido.
+
+- Instalar `react-router@7`; crear `src/app/router.tsx`, `src/app/guards.tsx` y `src/app/screenRoutes.tsx`.
 - Convertir `App.tsx` en `RouterProvider` + `AuthProvider`; eliminar la unión `View`.
 - Rutas `lazy` para todas las pantallas (hoy solo el marketplace lo es).
 - Redirección de compatibilidad: `/?resetToken=...` → `/reset?token=...`; `/?verifyToken=...` → `/verificar?token=...`.
