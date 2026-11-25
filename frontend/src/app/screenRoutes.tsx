@@ -1,4 +1,4 @@
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useEffect, useState } from 'react';
 import {
   Navigate,
   Outlet,
@@ -97,6 +97,7 @@ export function WelcomeRoute(): React.ReactElement {
 
   return (
     <WelcomeScreen
+      showDemo={status !== 'authenticated'}
       onCreateAccount={() => navigate('/roles')}
       onLogin={() => navigate('/login')}
       onDemo={() => {
@@ -153,10 +154,27 @@ export function ForgotPasswordRoute(): React.ReactElement {
   return <ForgotPasswordScreen onBack={() => navigate('/login')} />;
 }
 
+/**
+ * Lee el token de la URL una sola vez y lo borra del historial. Así el enlace
+ * del correo no queda visible en la barra de direcciones ni en el `Referer`.
+ */
+function useUrlToken(): string | null {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [token] = useState(() => new URLSearchParams(location.search).get('token'));
+
+  useEffect(() => {
+    if (token) {
+      navigate(`${location.pathname}${location.hash}`, { replace: true });
+    }
+  }, [token, navigate, location.pathname, location.hash]);
+
+  return token;
+}
+
 export function ResetRoute(): React.ReactElement {
   const navigate = useNavigate();
-  const [params] = useSearchParams();
-  const token = params.get('token');
+  const token = useUrlToken();
 
   if (!token) {
     return <Navigate to="/recuperar" replace />;
@@ -173,8 +191,7 @@ export function ResetRoute(): React.ReactElement {
 
 export function VerifyRoute(): React.ReactElement {
   const navigate = useNavigate();
-  const [params] = useSearchParams();
-  const token = params.get('token');
+  const token = useUrlToken();
 
   if (!token) {
     return <Navigate to="/login" replace />;
@@ -248,6 +265,9 @@ export function MarketplaceRoute(): React.ReactElement {
 
 export function NotFoundRoute(): React.ReactElement {
   const navigate = useNavigate();
+  const { status } = useAuth();
+  const authenticated = status === 'authenticated';
+  const target = authenticated ? '/panel' : '/';
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-emerald-50 px-6 text-center">
@@ -256,14 +276,15 @@ export function NotFoundRoute(): React.ReactElement {
       </p>
       <h1 className="font-serif text-3xl text-slate-900">Esta página no existe</h1>
       <p className="max-w-md text-slate-600">
-        Revisa la dirección o vuelve al inicio para continuar.
+        Revisa la dirección o vuelve {authenticated ? 'al panel' : 'al inicio'} para
+        continuar.
       </p>
       <button
         type="button"
-        onClick={() => navigate('/', { replace: true })}
+        onClick={() => navigate(target, { replace: true })}
         className="min-h-12 rounded-lg bg-agro-green px-6 text-sm font-semibold text-white hover:bg-agro-green/90"
       >
-        Volver al inicio
+        {authenticated ? 'Volver al panel' : 'Volver al inicio'}
       </button>
     </main>
   );

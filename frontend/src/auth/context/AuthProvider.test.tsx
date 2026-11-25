@@ -147,8 +147,10 @@ describe('AuthProvider (sesión cookie-only)', () => {
     expectNothingPersisted();
   });
 
-  it('la sesión demo vive solo en memoria y su cierre no llama a la API', async () => {
+  it('la sesión demo vive solo en memoria y su cierre revoca una cookie real residual', async () => {
     mockedRefresh.mockRejectedValue(new Error('sin cookie'));
+    // Aunque la revocación falle, la demo debe poder cerrarse localmente.
+    mockedLogout.mockRejectedValue(new Error('sin cookie'));
 
     mountAuth();
     await waitFor(() =>
@@ -165,8 +167,30 @@ describe('AuthProvider (sesión cookie-only)', () => {
     await waitFor(() =>
       expect(screen.getByTestId('status').textContent).toBe('anonymous')
     );
-    expect(mockedLogout).not.toHaveBeenCalled();
+    expect(mockedLogout).toHaveBeenCalledTimes(1);
     expectNothingPersisted();
+  });
+
+  it('no permite reemplazar una sesión real por la demo', async () => {
+    mockedRefresh.mockRejectedValue(new Error('sin cookie'));
+    mockedLogin.mockResolvedValue(session);
+
+    mountAuth();
+    await waitFor(() =>
+      expect(screen.getByTestId('status').textContent).toBe('anonymous')
+    );
+
+    await click('login');
+    await waitFor(() =>
+      expect(screen.getByTestId('status').textContent).toBe('authenticated')
+    );
+    expect(screen.getByTestId('usuario').textContent).toBe('María Fernanda López');
+
+    await click('demo');
+
+    expect(screen.getByTestId('status').textContent).toBe('authenticated');
+    expect(screen.getByTestId('usuario').textContent).toBe('María Fernanda López');
+    expect(mockedLogout).not.toHaveBeenCalled();
   });
 
   it('en StrictMode el refresh silencioso del montaje se ejecuta una sola vez', async () => {

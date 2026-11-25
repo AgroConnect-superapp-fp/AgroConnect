@@ -245,6 +245,10 @@ function polygon(lat: number, lng: number): [number, number][] {
 }
 
 async function main(): Promise<void> {
+  if (process.env['NODE_ENV'] === 'production') {
+    throw new Error('El seed de productos está prohibido en producción.');
+  }
+
   const connectionString = process.env['DATABASE_URL'];
   if (!connectionString) {
     throw new Error('DATABASE_URL es obligatoria para ejecutar el seed.');

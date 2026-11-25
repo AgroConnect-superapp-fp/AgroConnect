@@ -31,7 +31,9 @@ export function RequireAuth(): React.ReactElement {
   }
 
   if (status === 'anonymous') {
-    const returnTo = encodeURIComponent(`${location.pathname}${location.search}`);
+    const returnTo = encodeURIComponent(
+      `${location.pathname}${location.search}${location.hash}`
+    );
     return <Navigate to={`/login?returnTo=${returnTo}`} replace />;
   }
 

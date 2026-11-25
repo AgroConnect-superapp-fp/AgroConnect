@@ -23,8 +23,7 @@ interface ProfileScreenProps {
 }
 
 export function ProfileScreen({ onBack }: ProfileScreenProps): React.ReactElement {
-  const { usuario } = useAuth();
-  const isDemo = usuario?.id === 'demo-visitante';
+  const { usuario, isDemo } = useAuth();
   const role = usuario?.rol ?? 'comprador_b2c';
   const canEdit =
     role === 'productor' || role === 'comprador_b2b' || role === 'transportista';

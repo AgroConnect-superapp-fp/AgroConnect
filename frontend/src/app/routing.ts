@@ -1,34 +1,55 @@
-import type { RoleName } from '../auth/types';
+import { SELF_REGISTRATION_ROLE_OPTIONS, type RoleName } from '../auth/types';
 
-const ROLES: readonly RoleName[] = [
-  'productor',
-  'comprador_b2c',
-  'comprador_b2b',
-  'transportista',
-  'administrador',
-];
+/** Roles que un visitante puede elegir al registrarse (sin `administrador`). */
+const SELF_REGISTRABLE_ROLES: readonly RoleName[] = SELF_REGISTRATION_ROLE_OPTIONS.map(
+  (option) => option.id
+);
 
 /** Rol de registro por defecto cuando el parámetro falta o es inválido. */
 export const DEFAULT_ROLE: RoleName = 'productor';
 
 /**
- * Valida el parámetro `?rol=` del registro contra el catálogo real de roles.
- * Evita que una URL manipulada llegue al formulario con un rol inexistente.
+ * Valida el parámetro `?rol=` del registro contra los roles auto-registrables.
+ * El backend ya rechaza `administrador`; el frontend evita mostrarlo siquiera.
  */
 export function parseRole(value: string | null): RoleName {
-  return ROLES.includes(value as RoleName) ? (value as RoleName) : DEFAULT_ROLE;
+  return SELF_REGISTRABLE_ROLES.includes(value as RoleName)
+    ? (value as RoleName)
+    : DEFAULT_ROLE;
 }
 
 /**
- * Solo acepta rutas internas como destino de retorno. Descarta URLs absolutas
- * y protocol-relative (`//host`) para cerrar redirecciones abiertas.
+ * Origen ficticio para resolver rutas relativas sin depender del host actual.
+ * Cualquier valor que cambie el origen se considera redirección externa.
+ */
+const INTERNAL_ORIGIN = 'https://agroconnect.invalid';
+const FORBIDDEN_RETURN_TO = /\\|%5c|%09|%0a|%0d/i;
+
+/**
+ * Solo acepta rutas internas como destino de retorno. Normaliza con `URL` y
+ * compara el origen, lo que cierra variantes como `/\evil.example`,
+ * `//host` o `/%5Cevil.example` que el parser interpreta como externas.
  */
 export function safeReturnTo(value: string | null, fallback = '/panel'): string {
   if (!value || !value.startsWith('/') || value.startsWith('//')) {
     return fallback;
   }
 
-  return value;
+  if (FORBIDDEN_RETURN_TO.test(value)) {
+    return fallback;
+  }
+
+  try {
+    const url = new URL(value, INTERNAL_ORIGIN);
+
+    if (url.origin !== INTERNAL_ORIGIN) {
+      return fallback;
+    }
+
+    return `${url.pathname}${url.search}${url.hash}`;
+  } catch {
+    return fallback;
+  }
 }
 
 /**

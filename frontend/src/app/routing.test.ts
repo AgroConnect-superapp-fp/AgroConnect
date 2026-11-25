@@ -2,14 +2,15 @@ import { describe, expect, it } from 'vitest';
 import { legacyTokenTarget, parseRole, safeReturnTo } from './routing';
 
 describe('parseRole', () => {
-  it.each([
-    'productor',
-    'comprador_b2c',
-    'comprador_b2b',
-    'transportista',
-    'administrador',
-  ])('acepta el rol válido %s', (rol) => {
-    expect(parseRole(rol)).toBe(rol);
+  it.each(['productor', 'comprador_b2c', 'comprador_b2b', 'transportista'])(
+    'acepta el rol auto-registrable %s',
+    (rol) => {
+      expect(parseRole(rol)).toBe(rol);
+    }
+  );
+
+  it('descarta administrador: el backend lo rechaza en el registro público', () => {
+    expect(parseRole('administrador')).toBe('productor');
   });
 
   it('usa productor cuando el parámetro falta', () => {
@@ -22,16 +23,21 @@ describe('parseRole', () => {
 });
 
 describe('safeReturnTo', () => {
-  it('conserva una ruta interna con query', () => {
-    expect(safeReturnTo('/moderacion?limit=10')).toBe('/moderacion?limit=10');
+  it('conserva una ruta interna con query y hash', () => {
+    expect(safeReturnTo('/moderacion?limit=10#top')).toBe('/moderacion?limit=10#top');
   });
 
-  it('descarta URLs absolutas para evitar redirecciones abiertas', () => {
-    expect(safeReturnTo('https://evil.example/login')).toBe('/panel');
-  });
-
-  it('descarta rutas protocol-relative', () => {
-    expect(safeReturnTo('//evil.example')).toBe('/panel');
+  it.each([
+    'https://evil.example/login',
+    '//evil.example',
+    '////evil.example',
+    '/\\evil.example',
+    '/%5Cevil.example',
+    '/%09/evil.example',
+    '/%0A/evil.example',
+    'javascript:alert(1)',
+  ])('descarta el destino externo %s', (value) => {
+    expect(safeReturnTo(value)).toBe('/panel');
   });
 
   it('usa el fallback cuando el parámetro falta o está vacío', () => {

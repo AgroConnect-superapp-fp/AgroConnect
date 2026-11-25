@@ -1,6 +1,11 @@
+import { randomBytes } from 'node:crypto';
 import { defineConfig, devices } from '@playwright/test';
 
 const BACKEND_URL = 'http://localhost:4100';
+// Secretos efímeros por corrida: aunque son de test, no se versionan valores
+// reutilizables que pudieran confundirse con configuración real.
+const E2E_JWT_ACCESS_SECRET = randomBytes(32).toString('hex');
+const E2E_JWT_REFRESH_SECRET = randomBytes(32).toString('hex');
 const FRONTEND_URL = 'http://localhost:5173';
 const TEST_DATABASE_URL =
   process.env.TEST_DATABASE_URL ??
@@ -27,7 +32,9 @@ export default defineConfig({
       // cookie-only: el E2E valida el flujo completo con cookies httpOnly.
       command: 'npm --prefix ../apps/api run dev',
       url: `${BACKEND_URL}/health`,
-      reuseExistingServer: !process.env.CI,
+      // Nunca se reutiliza un servidor ajeno: podría apuntar a la base de
+      // desarrollo y el E2E escribiría fuera de la base de test.
+      reuseExistingServer: false,
       timeout: 120_000,
       env: {
         NODE_ENV: 'test',
@@ -35,8 +42,8 @@ export default defineConfig({
         DATABASE_URL: TEST_DATABASE_URL,
         RATE_LIMIT_MAX_ATTEMPTS: '100',
         LOG_LEVEL: 'fatal',
-        JWT_ACCESS_SECRET: 'e2e_access_secret_with_at_least_32_characters_ok',
-        JWT_REFRESH_SECRET: 'e2e_refresh_secret_with_at_least_32_characters_ok',
+        JWT_ACCESS_SECRET: E2E_JWT_ACCESS_SECRET,
+        JWT_REFRESH_SECRET: E2E_JWT_REFRESH_SECRET,
         // Sin SMTP el correo de verificación se escribe en disco
         // (FileEmailService): el E2E no depende de un servidor de correo real.
         SMTP_HOST: '',
@@ -45,7 +52,9 @@ export default defineConfig({
     {
       command: 'npm run dev -- --port 5173 --strictPort',
       url: FRONTEND_URL,
-      reuseExistingServer: !process.env.CI,
+      // El servidor de Vite se levanta con la API de test configurada; no se
+      // reutiliza un dev server que pueda apuntar a otro backend.
+      reuseExistingServer: false,
       timeout: 120_000,
       env: {
         VITE_API_URL: BACKEND_URL,

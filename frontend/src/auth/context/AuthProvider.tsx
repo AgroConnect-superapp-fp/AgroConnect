@@ -68,7 +68,15 @@ export function AuthProvider({ children }: { children: ReactNode }): React.React
     await authApi.register(payload);
   }, []);
 
+  const isDemo = usuario?.id === DEMO_USER_ID;
+
   const loginDemo = useCallback(() => {
+    // Nunca se reemplaza una sesión real por la demo: la cookie httpOnly
+    // seguiría viva y el logout posterior podría no revocarla.
+    if (status === 'authenticated' && !isDemo) {
+      return;
+    }
+
     // Sesión demo SOLO en memoria: no toca la API ni persiste nada.
     applySession({
       usuario: {
@@ -81,12 +89,13 @@ export function AuthProvider({ children }: { children: ReactNode }): React.React
         fechaRegistro: new Date().toISOString(),
       },
     });
-  }, [applySession]);
+  }, [applySession, status, isDemo]);
 
   useEffect(() => {
     const handleExpired = (): void => {
       setUsuario(null);
       setStatus('anonymous');
+      setRestored(false);
     };
 
     window.addEventListener('agroconnect:session-expired', handleExpired);
@@ -94,21 +103,30 @@ export function AuthProvider({ children }: { children: ReactNode }): React.React
   }, []);
 
   const logout = useCallback(async () => {
-    // La sesión demo no tiene cookie de servidor: no hay nada que revocar.
-    // Si el servidor falla, NO limpiamos el estado local: la cookie httpOnly
-    // seguiría viva y un reload volvería a autenticar al usuario.
-    if (usuario?.id !== DEMO_USER_ID) {
-      await authApi.logout();
+    if (isDemo) {
+      // Puede existir una cookie real si el usuario entró a la demo antes de
+      // esta sesión: se intenta revocar en el servidor y, pase lo que pase, se
+      // limpia el estado local (la demo no tiene sesión que conservar).
+      await authApi.logout().catch(() => undefined);
+
+      setUsuario(null);
+      setStatus('anonymous');
+      setRestored(false);
+      return;
     }
+
+    // Sesión real: si el servidor falla, NO limpiamos el estado local porque
+    // la cookie httpOnly seguiría viva y un reload volvería a autenticar.
+    await authApi.logout();
 
     setUsuario(null);
     setStatus('anonymous');
     setRestored(false);
-  }, [usuario]);
+  }, [isDemo]);
 
   const value = useMemo(
-    () => ({ status, restored, usuario, login, register, loginDemo, logout }),
-    [status, restored, usuario, login, register, loginDemo, logout]
+    () => ({ status, restored, isDemo, usuario, login, register, loginDemo, logout }),
+    [status, restored, isDemo, usuario, login, register, loginDemo, logout]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

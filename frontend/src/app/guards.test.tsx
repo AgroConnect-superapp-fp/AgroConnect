@@ -1,10 +1,32 @@
 // @vitest-environment jsdom
 import { cleanup, render, screen } from '@testing-library/react';
-import { createMemoryRouter, RouterProvider, type RouteObject } from 'react-router';
+import { createMemoryRouter, RouterProvider } from 'react-router';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { AuthContext, type AuthContextValue } from '../auth/context/authContext';
 import type { PublicUser, RoleName } from '../auth/types';
-import { PublicOnly, RequireAuth, RequireRole, SessionGate } from './guards';
+
+// Se stubean solo las pantallas pesadas: las guardas y `WelcomeRoute` se
+// prueban contra el árbol de rutas real que usa la aplicación.
+vi.mock('./screenRoutes', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('./screenRoutes')>();
+
+  return {
+    ...actual,
+    RolesRoute: () => <p>roles</p>,
+    RegisterRoute: () => <p>registro</p>,
+    LoginRoute: () => <p>login</p>,
+    ForgotPasswordRoute: () => <p>recuperar</p>,
+    ResetRoute: () => <p>reset</p>,
+    VerifyRoute: () => <p>verificar</p>,
+    MarketplaceRoute: () => <p>marketplace</p>,
+    DashboardRoute: () => <p>panel</p>,
+    ProfileRoute: () => <p>perfil</p>,
+    ModerationRoute: () => <p>moderacion</p>,
+    PublishRoute: () => <p>publicar</p>,
+  };
+});
+
+import { routes } from './routes';
 
 afterEach(cleanup);
 
@@ -12,6 +34,7 @@ function createAuthValue(overrides: Partial<AuthContextValue> = {}): AuthContext
   return {
     status: 'anonymous',
     restored: false,
+    isDemo: false,
     usuario: null,
     login: vi.fn(async () => undefined),
     register: vi.fn(async () => undefined),
@@ -33,43 +56,16 @@ function createUser(rol: RoleName): PublicUser {
   };
 }
 
-const testRoutes: RouteObject[] = [
-  {
-    element: <SessionGate />,
-    children: [
-      {
-        element: <PublicOnly />,
-        children: [{ path: '/login', element: <p>login</p> }],
-      },
-      { path: '/', element: <p>inicio</p> },
-      {
-        element: <RequireAuth />,
-        children: [
-          { path: '/panel', element: <p>panel</p> },
-          {
-            path: '/moderacion',
-            element: (
-              <RequireRole roles={['administrador']}>
-                <p>moderacion</p>
-              </RequireRole>
-            ),
-          },
-          {
-            path: '/publicar',
-            element: (
-              <RequireRole roles={['productor']}>
-                <p>publicar</p>
-              </RequireRole>
-            ),
-          },
-        ],
-      },
-    ],
-  },
-];
+function authenticated(rol: RoleName, overrides: Partial<AuthContextValue> = {}) {
+  return createAuthValue({
+    status: 'authenticated',
+    usuario: createUser(rol),
+    ...overrides,
+  });
+}
 
 function renderAt(initialEntry: string, auth: AuthContextValue) {
-  const router = createMemoryRouter(testRoutes, { initialEntries: [initialEntry] });
+  const router = createMemoryRouter(routes, { initialEntries: [initialEntry] });
   render(
     <AuthContext.Provider value={auth}>
       <RouterProvider router={router} />
@@ -96,10 +92,7 @@ describe('RequireAuth', () => {
   });
 
   it('permite el paso a un usuario autenticado', async () => {
-    renderAt(
-      '/panel',
-      createAuthValue({ status: 'authenticated', usuario: createUser('productor') })
-    );
+    renderAt('/panel', authenticated('productor'));
 
     expect(await screen.findByText('panel')).toBeTruthy();
   });
@@ -107,28 +100,19 @@ describe('RequireAuth', () => {
 
 describe('RequireRole', () => {
   it('permite el paso al rol autorizado', async () => {
-    renderAt(
-      '/moderacion',
-      createAuthValue({ status: 'authenticated', usuario: createUser('administrador') })
-    );
+    renderAt('/moderacion', authenticated('administrador'));
 
     expect(await screen.findByText('moderacion')).toBeTruthy();
   });
 
   it('devuelve al panel a un usuario con otro rol', async () => {
-    renderAt(
-      '/moderacion',
-      createAuthValue({ status: 'authenticated', usuario: createUser('productor') })
-    );
+    renderAt('/moderacion', authenticated('productor'));
 
     expect(await screen.findByText('panel')).toBeTruthy();
   });
 
   it('reserva la publicación para productores', async () => {
-    renderAt(
-      '/publicar',
-      createAuthValue({ status: 'authenticated', usuario: createUser('administrador') })
-    );
+    renderAt('/publicar', authenticated('administrador'));
 
     expect(await screen.findByText('panel')).toBeTruthy();
   });
@@ -136,10 +120,7 @@ describe('RequireRole', () => {
 
 describe('PublicOnly', () => {
   it('expulsa del login a un usuario con sesión', async () => {
-    renderAt(
-      '/login',
-      createAuthValue({ status: 'authenticated', usuario: createUser('comprador_b2c') })
-    );
+    renderAt('/login', authenticated('comprador_b2c'));
 
     expect(await screen.findByText('panel')).toBeTruthy();
   });
@@ -148,5 +129,48 @@ describe('PublicOnly', () => {
     renderAt('/login', createAuthValue());
 
     expect(await screen.findByText('login')).toBeTruthy();
+  });
+});
+
+describe('árbol de rutas real', () => {
+  it('solo redirige la portada a /panel cuando la sesión se restauró', async () => {
+    const router = renderAt('/', authenticated('productor', { restored: true }));
+
+    expect(await screen.findByText('panel')).toBeTruthy();
+    expect(router.state.location.pathname).toBe('/panel');
+  });
+
+  it('mantiene la portada pública para login/demo recientes', async () => {
+    renderAt('/', authenticated('productor'));
+
+    expect(await screen.findByText(/Bienvenido a AgroConnect/i)).toBeTruthy();
+  });
+
+  it('traduce el enlace heredado ?resetToken= a /reset', async () => {
+    const router = renderAt('/?resetToken=abc123', createAuthValue());
+
+    expect(await screen.findByText('reset')).toBeTruthy();
+    expect(router.state.location.pathname).toBe('/reset');
+  });
+
+  it('traduce el enlace heredado ?verifyToken= a /verificar', async () => {
+    const router = renderAt('/?verifyToken=xyz789', createAuthValue());
+
+    expect(await screen.findByText('verificar')).toBeTruthy();
+    expect(router.state.location.pathname).toBe('/verificar');
+  });
+
+  it('muestra el 404 y devuelve al inicio a un visitante', async () => {
+    renderAt('/ruta-inexistente', createAuthValue());
+
+    expect(await screen.findByText('Esta página no existe')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Volver al inicio' })).toBeTruthy();
+  });
+
+  it('devuelve al panel a un usuario autenticado desde el 404', async () => {
+    renderAt('/ruta-inexistente', authenticated('productor'));
+
+    expect(await screen.findByText('Esta página no existe')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Volver al panel' })).toBeTruthy();
   });
 });
