@@ -4,7 +4,7 @@
 
 ### Documento de conciliación entre el estado reportado al 28/10/2026 y la verificación técnica al 24/11/2026
 
-**Versión:** 1.3 — verificada; pendientes A, B y E cerrados; fase 3 en ejecución (F1 completada)  
+**Versión:** 1.4 — verificada; pendientes A, B y E cerrados; fase 3 en ejecución (F1 completada y endurecida)  
 **Estado:** Aprobada técnicamente; pendiente de firma institucional  
 **Documento fuente:** `AgroConnect_Estado_Avance_Sprint_2026-10-28.pdf`
 
@@ -115,7 +115,7 @@ La tabla conserva el estado literal del PDF y lo contrasta con la verificación 
 | 2.6 | CERRADA | CERRADA | `SmtpEmailService` con Nodemailer; `FileEmailService` solo para desarrollo/pruebas | Sin cambios |
 | 2.7 | PENDIENTE | CERRADA | CRUD `/plots` con PostGIS, `/plots/nearby` con `ST_DWithin`, tres migraciones y E2E contra PostGIS real | Cierre del pendiente A |
 | 2.8 | PARCIAL | CERRADA | Dependency-cruiser (123 módulos, 383 dependencias, 0 violaciones), Swagger en `/docs`, seed con guard de seguridad y Testcontainers PostGIS (6/6) | Cierre del pendiente E; `@swc/jest` adoptado en `ae38f89` (98,7 s → 23,4 s, 4,2×) |
-| 3 | PENDIENTE | EN EJECUCIÓN · F1 CERRADA | `6e93652`: `react-router@7` con rutas `lazy`, guardas de sesión/rol, `returnTo` seguro y compatibilidad con enlaces de correo. 25 pruebas nuevas (suite frontend 78/78), `tsc` y ESLint en cero, E2E 14/14, bundle inicial ~129,5 KB gzip | F2–F5 según `docs/plan-fase-3-frontend.md` |
+| 3 | PENDIENTE | EN EJECUCIÓN · F1 CERRADA | `6e93652`: `react-router@7` con rutas `lazy`, guardas de sesión/rol, `returnTo` seguro y compatibilidad con enlaces de correo. 25 pruebas nuevas (suite frontend 78/78), `tsc` y ESLint en cero, E2E 14/14, bundle inicial ~129,5 KB gzip. Doble revisión (código y seguridad) y hardening en `4f5e8f9` (§5.8) | F2–F5 según `docs/plan-fase-3-frontend.md` |
 | 4 | BLOQUEADA | BLOQUEADA | Jira anterior 404; se requiere cuenta nueva y API token | Depende del usuario |
 | 5 | BLOQUEADA | BLOQUEADA | Plantillas SENA en Notion sin compartir con la integración; solo hay exportaciones PDF | Depende del administrador de Notion |
 | 6 | PENDIENTE | PENDIENTE | La sincronización de cuatro entornos depende de 4 y 5 | No puede iniciar sin las fases 4 y 5 |
@@ -249,6 +249,23 @@ La decisión D7, aprobada el 2026-11-05, establece las siguientes equivalencias:
 - HU08, HU28 y HU30 no tienen equivalencia; no deben inventarse.
 
 Estado al 2026-11-17: se aplicó lo que no requiere numeración nueva (relación `CU#31→HU33` en `cu_hu.csv`, traza `RF-33 → CU#31 → HU33` en `rf_cu_hu_detalle.csv` y registro de las equivalencias en la columna `Fuente Asignacion` de `detalle.csv`). La renumeración sigue bloqueada por la numeración oficial del Product Backlog v2.0 para los códigos desplazados HU08, HU11 y HU14; el detalle está en `docs/matriz_trazabilidad_hallazgos.md` y la verificación se ejecuta con `python3 scripts/build_traceability_matrix.py --check`.
+
+### 5.8 Revisión de código y seguridad de F1
+
+F1 se sometió a dos revisiones independientes sobre `6e93652`: revisión senior de código (SOLID, arquitectura, pruebas y legibilidad) y auditoría de seguridad (OWASP Top 10). La auditoría no encontró hallazgos críticos ni altos; la revisión de código marcó un bloqueante de redirección abierta. Ambos informes se cerraron en `4f5e8f9`.
+
+| Hallazgo | Origen | Corrección verificada |
+| --- | --- | --- |
+| Redirección abierta con `/\host` y variantes codificadas en `returnTo` | Código (bloqueante) | `safeReturnTo` normaliza con `URL`, compara origen y rechaza `\`, `%5c`, `%09`, `%0a`, `%0d`; casos cubiertos en `routing.test.ts` |
+| El 404 y `parseRole` no consideraban la sesión ni los roles auto-registrables | Código | 404 devuelve a `/panel` si hay sesión; el registro limita el rol a los roles auto-registrables (el backend ya rechazaba `administrador`) |
+| `returnTo` perdía el hash y las pruebas usaban un árbol de rutas paralelo | Código | El hash se conserva; `routes.tsx` se separa del router y las guardas se prueban con `createMemoryRouter` sobre el árbol real |
+| La demo podía convivir con una sesión real y su logout no revocaba la cookie | Seguridad (medio) | `isDemo` explícito en el contexto, demo oculta y bloqueada con sesión real, y logout de demo intenta revocar la cookie y siempre limpia el estado local |
+| Tokens de reset/verificación visibles en la barra de direcciones y en el `Referer` | Seguridad (medio) | El token se captura y se elimina de la URL con `replace`; `Referrer-Policy: no-referrer` para `/reset` y `/verificar` |
+| Aislamiento frágil de E2E (reutilización de servidores, base sin validar, secretos fijos) | Seguridad (bajos) | `reuseExistingServer: false`, guardia de base `_test`, rutas resueltas desde el archivo y secretos JWT efímeros por corrida |
+| Archivo de correos legible por terceros y seed sin guardia de entorno | Seguridad (bajos) | Directorio `0700` y archivo `0600` en `FileEmailService`; el seed aborta con `NODE_ENV=production` |
+| Dependencia desactualizada | Informativo | `react-router` actualizado a `7.18.7` |
+
+Gates del hardening (24/11/2026): frontend `tsc` y ESLint en cero, **91/91** pruebas unitarias (17 archivos), E2E **14/14** en 32,3 s y build de producción correcto; API `tsc`, ESLint y **347/347** pruebas unitarias en verde. La clasificación de errores de red frente a `401` en el arranque de sesión y las tres vulnerabilidades altas preexistentes de `npm audit` quedan como residuales P2.
 
 ---
 
@@ -429,4 +446,4 @@ Los comandos de Prisma deben ejecutarse desde `apps/api`; el resto, desde la ra�
 ---
 
 **Fin del documento.**  
-Versión 1.3 — verificada el 24/11/2026. Los pendientes A, B y E constan como cerrados con la evidencia de §5. El pendiente F está en ejecución: F1 cerrada en `6e93652` y F2–F5 planificadas en `docs/plan-fase-3-frontend.md`. Las firmas de §10 permanecen pendientes.
+Versión 1.4 — verificada el 24/11/2026. Los pendientes A, B y E constan como cerrados con la evidencia de §5. El pendiente F está en ejecución: F1 cerrada en `6e93652`, endurecida tras la doble revisión en `4f5e8f9` (§5.8) y F2–F5 planificadas en `docs/plan-fase-3-frontend.md`. Las firmas de §10 permanecen pendientes.
