@@ -1,6 +1,6 @@
 {
   "project": "AgroConnect",
-  "updated": "2026-11-04",
+  "updated": "2026-11-26",
   "urls": {
     "app": "https://agroconnectpreview.vercel.app",
     "api": "https://agroconnect-api-5t7n.onrender.com",
@@ -27,9 +27,9 @@
     "database": "PostgreSQL 16 + PostGIS 3.4"
   },
   "tests": {
-    "backend": 297,
-    "frontendUnit": 53,
-    "e2e": 14
+    "backend": 428,
+    "frontendUnit": 123,
+    "e2e": 17
   },
   "sources": {
     "localReadme": "README.md",
