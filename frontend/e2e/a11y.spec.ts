@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { E2E_ADMIN } from './fixtures';
 
 /**
  * Gate de accesibilidad del marketplace (D9).
@@ -65,4 +66,67 @@ test('el marketplace y el detalle no tienen violaciones axe WCAG AA', async ({
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
     .analyze();
   expect(dialog.violations).toEqual([]);
+});
+
+/**
+ * Gate de accesibilidad de las pantallas públicas de autenticación.
+ *
+ * No requiere credenciales ni base de datos: login y el primer paso del
+ * registro son formularios estáticos.
+ */
+test('login y registro no tienen violaciones axe WCAG AA', async ({ page }) => {
+  test.setTimeout(180_000);
+
+  await page.goto('/login');
+  await expect(page.getByRole('heading', { name: 'Inicia sesión' })).toBeVisible();
+  await page.addStyleTag({
+    content:
+      '*, *::before, *::after { animation: none !important; transition: none !important; }',
+  });
+
+  const login = await new AxeBuilder({ page })
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+    .analyze();
+  expect(login.violations).toEqual([]);
+
+  await page.goto('/registro?rol=productor');
+  await expect(page.getByRole('heading', { name: 'Crea tu cuenta' })).toBeVisible();
+  await page.addStyleTag({
+    content:
+      '*, *::before, *::after { animation: none !important; transition: none !important; }',
+  });
+
+  const registro = await new AxeBuilder({ page })
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+    .analyze();
+  expect(registro.violations).toEqual([]);
+});
+
+/**
+ * Gate de accesibilidad de moderación con la cuenta administradora del
+ * fixture E2E. Requiere que `global-setup.ts` haya sembrado la base de test.
+ */
+test('moderación no tiene violaciones axe WCAG AA', async ({ page }) => {
+  test.setTimeout(180_000);
+
+  await page.goto('/login');
+  await page.getByLabel('Correo electrónico').fill(E2E_ADMIN.email);
+  await page.getByLabel('Contraseña').fill(E2E_ADMIN.password);
+  await page.getByRole('button', { name: 'Iniciar sesión' }).click();
+  await page.waitForURL(/\/panel/);
+
+  await page.goto('/moderacion');
+  await expect(
+    page.getByRole('heading', { name: 'Moderación de publicaciones' })
+  ).toBeVisible();
+
+  await page.addStyleTag({
+    content:
+      '*, *::before, *::after { animation: none !important; transition: none !important; }',
+  });
+
+  const moderacion = await new AxeBuilder({ page })
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+    .analyze();
+  expect(moderacion.violations).toEqual([]);
 });

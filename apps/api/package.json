@@ -28,6 +28,7 @@
     "prisma:seed": "ts-node scripts/seed.ts",
     "test:reset-db": "ts-node --transpile-only scripts/reset-test-db.ts",
     "seed:products": "ts-node --transpile-only scripts/seed-products.ts",
+    "seed:e2e-admin": "ts-node --transpile-only scripts/seed-e2e-admin.ts",
     "create:admin": "ts-node --transpile-only scripts/create-admin.ts"
   },
   "dependencies": {
