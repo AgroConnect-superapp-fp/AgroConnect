@@ -190,7 +190,7 @@ Características: contraseñas con **Argon2id** (bcrypt legacy con rehash transp
 
 ### Calidad
 
-- 428 pruebas backend (NestJS; cobertura del gate ≥80 % en ramas) · 123 pruebas unitarias de frontend (Vitest) · 17 pruebas E2E (Playwright: autenticación real, modo demo, marketplace, mapa móvil, publicación, perfiles, imágenes y accesibilidad axe).
+- 428 pruebas backend (NestJS; 91.89 % líneas / 80.81 % ramas) · 123 pruebas unitarias de frontend (Vitest) · 17 pruebas E2E (Playwright: autenticación real, modo demo, marketplace, mapa móvil, publicación, perfiles, imágenes y accesibilidad axe).
 
 ---
 
@@ -233,7 +233,7 @@ npm run dev                   # http://localhost:5173
 ### Pruebas
 
 ```bash
-cd apps/api && npm test -- --coverage   # unitarias + integración (gate: ≥80 % ramas)
+cd apps/api && npm test -- --coverage   # unitarias + integración (91.89 % líneas / 80.81 % ramas)
 cd frontend && npm run test:unit       # unitarias (Vitest)
 cd frontend && npm run test:e2e        # E2E (levanta API y web)
 ```

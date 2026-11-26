@@ -158,7 +158,7 @@ La fase 2.1 se cerró con el PR #51 (`5423e52`). Los siete hallazgos y sus corre
 | Cobertura de statements (API) | 92,36 % (1803/1952) | Verificada |
 | Cobertura de funciones (API) | 94,53 % (415/439) | Verificada |
 
-Gates ejecutados el 17/11/2026: `lint`, `typecheck`, `build`, `test`, `arch:check`, `generate:openapi`, `check:drift`, `prisma migrate status` (dev y test) y `npm audit`. El PDF reporta 13/13 tareas Turbo; en esta acta se deja constancia de los gates ejecutados y de la ausencia de regresiones observadas, sin recontar el total de tareas. **Nota:** las cifras de esta sección son el corte del 17/11/2026; el estado del 26/11/2026 es 428 API + 123 frontend + 17 E2E (568), documentado en §5.9 y en las filas 3/F de §7.1.
+Gates ejecutados el 17/11/2026: `lint`, `typecheck`, `build`, `test`, `arch:check`, `generate:openapi`, `check:drift`, `prisma migrate status` (dev y test) y `npm audit`. El PDF reporta 13/13 tareas Turbo; en esta acta se deja constancia de los gates ejecutados y de la ausencia de regresiones observadas, sin recontar el total de tareas. **Nota:** las cifras de esta sección son el corte del 17/11/2026; el estado del 26/11/2026 es 428 API + 123 frontend + 17 E2E (568), con cobertura API de 91,89 % líneas / 80,81 % ramas, documentado en §5.9 y en las filas 3/F de §7.1.
 
 Evidencia de los gates del backend:
 
@@ -347,7 +347,7 @@ El marketplace es una vitrina: no gestiona precio, unidad ni inventario. La mode
 | ID | Discrepancia | PDF dice | Realidad verificada | Explicación | Acción |
 | --- | --- | --- | --- | --- | --- |
 | D1 | Total de pruebas | 373 | 488 (421 + 53 + 14) al 17/11; 568 (428 + 123 + 17) al 26/11 | El PDF no discrimina por suite; las cifras crecieron con el port geoespacial, F3 y el mapa móvil | Usar el conteo vigente (568) en el próximo informe y conservar 488 como corte histórico |
-| D2 | E2E | 10/10 | 14/14 | La suite se amplió después del corte del 28/10 | Actualizar la cifra en el próximo informe |
+| D2 | E2E | 10/10 | 14/14 al 24/11; 17/17 al 26/11 | La suite se amplió con F3 y el mapa móvil | Usar 17/17 en el próximo informe |
 | D3 | Estado de la fase 0 | Resumen: fases 0–2 cerradas; tabla: fase 0 PARCIAL | Fase 0 PARCIAL | La fase 0 depende de Jira y Notion; prevalece la lectura granular | Corregir la redacción del próximo informe |
 | D4 | Commit de corte | `588b234` | `ff72e9d` | El PDF se generó en un corte anterior; el repositorio avanzó con perfiles, moderación y correcciones | Mantener ambos como "corte PDF" y "verificación actual" |
 | D5 | Rutas de los hallazgos | `backend/src/...` | `apps/api/src/...` | El código se movió al monorepo; la desviación ya está registrada en la fase 2.3 | Actualizar referencias en el acta; no reescribir el PDF |
