@@ -1,7 +1,13 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Property } from '../../types/property';
-import { CombinedSearchProvider, findPropertyByName } from './mapSearchUtils';
+import {
+  clearSearchInput,
+  CombinedSearchProvider,
+  findPropertyByName,
+  flyToAndOpenPopup,
+  flyToPlace,
+} from './mapSearchUtils';
 
 const property: Property = {
   id: 'p-1',
@@ -15,6 +21,8 @@ const property: Property = {
   lat: 4.5339,
   lng: -75.6811,
 };
+
+vi.mock('./mapUtils', () => ({ findMarkerByCoordinates: vi.fn() }));
 
 const fetchMock = vi.fn();
 
@@ -108,5 +116,69 @@ describe('CombinedSearchProvider', () => {
 
     expect(results).toHaveLength(1);
     expect(results[0]?.raw.type).toBe('property');
+  });
+});
+
+describe('controles del mapa', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('limpia el input y el dropdown de búsqueda', () => {
+    const container = document.createElement('div');
+    const input = document.createElement('input');
+    input.value = 'café';
+    const results = document.createElement('div');
+    results.className = 'results';
+    const wrapper = document.createElement('div');
+    wrapper.className = 'leaflet-control-geosearch';
+    wrapper.append(input, results);
+    container.append(wrapper);
+
+    clearSearchInput(container);
+
+    expect(input.value).toBe('');
+    vi.advanceTimersByTime(60);
+    expect(results.innerHTML).toBe('');
+  });
+
+  it('vuela a un lugar y limpia la búsqueda', () => {
+    const container = document.createElement('div');
+    const map = {
+      getContainer: () => container,
+      flyTo: vi.fn(),
+    } as unknown as L.Map;
+
+    flyToPlace(map, 4.53, -75.68, 12);
+
+    expect(map.flyTo).toHaveBeenCalledWith([4.53, -75.68], 12, { duration: 1.2 });
+  });
+
+  it('vuela a una propiedad y abre su popup', async () => {
+    const container = document.createElement('div');
+    const marker = { openPopup: vi.fn(), fire: vi.fn() };
+    const map = {
+      getContainer: () => container,
+      flyTo: vi.fn(),
+      closePopup: vi.fn(),
+      eachLayer: vi.fn(),
+    } as unknown as L.Map;
+
+    const { findMarkerByCoordinates } = await import('./mapUtils');
+    vi.mocked(findMarkerByCoordinates).mockReturnValue(marker as never);
+
+    const onPopupOpen = vi.fn();
+    flyToAndOpenPopup(map, property, { current: true }, onPopupOpen);
+
+    vi.advanceTimersByTime(1800);
+    vi.advanceTimersByTime(250);
+
+    expect(map.flyTo).toHaveBeenCalled();
+    expect(marker.openPopup).toHaveBeenCalled();
+    expect(onPopupOpen).toHaveBeenCalledWith('p-1');
   });
 });
