@@ -1519,6 +1519,393 @@ export interface paths {
         };
         trace?: never;
     };
+    "/admin/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lista usuarios con búsqueda y filtros (solo administrador) */
+        get: {
+            parameters: {
+                query?: {
+                    search?: string;
+                    rol?: "productor" | "comprador_b2c" | "comprador_b2b" | "transportista" | "administrador";
+                    estado?: "ACTIVO" | "INACTIVO" | "SUSPENDIDO";
+                    limit?: number;
+                    offset?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Usuarios encontrados con su total y paginación */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @constant */
+                            success: true;
+                            data: components["schemas"]["AdminUserList"];
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Solicitud malformada o cuerpo inválido */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sesión ausente, expirada o inválida */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description El usuario no es administrador */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Reglas de negocio incumplidas (detalles por campo) */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Demasiadas solicitudes: límite de tasa aplicado */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Error interno del servidor */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/users/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Obtiene el detalle administrativo de un usuario */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Usuario solicitado */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @constant */
+                            success: true;
+                            data: components["schemas"]["AdminUser"];
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Solicitud malformada o cuerpo inválido */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sesión ausente, expirada o inválida */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description El usuario no es administrador */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Usuario no encontrado */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Reglas de negocio incumplidas (detalles por campo) */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Demasiadas solicitudes: límite de tasa aplicado */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Error interno del servidor */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/users/{id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Cambia el estado de un usuario (solo administrador) */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpdateUserStatusRequestBody"];
+                };
+            };
+            responses: {
+                /** @description Estado actualizado */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @constant */
+                            success: true;
+                            data: components["schemas"]["AdminUser"];
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Solicitud malformada o cuerpo inválido */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sesión ausente, expirada o inválida */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description El usuario no es administrador */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Usuario no encontrado */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Intento de auto-modificación o de dejar sin administradores activos */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Reglas de negocio incumplidas (detalles por campo) */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Demasiadas solicitudes: límite de tasa aplicado */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Error interno del servidor */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/admin/users/{id}/role": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Cambia el rol de un usuario (solo administrador) */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpdateUserRoleRequestBody"];
+                };
+            };
+            responses: {
+                /** @description Rol actualizado */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @constant */
+                            success: true;
+                            data: components["schemas"]["AdminUser"];
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Solicitud malformada o cuerpo inválido */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Sesión ausente, expirada o inválida */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description El usuario no es administrador */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Usuario no encontrado */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Intento de auto-modificación o de dejar sin administradores activos */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Reglas de negocio incumplidas (detalles por campo) */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Demasiadas solicitudes: límite de tasa aplicado */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Error interno del servidor */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        trace?: never;
+    };
     "/uploads/signature": {
         parameters: {
             query?: never;
@@ -1913,6 +2300,58 @@ export interface components {
             folder: string;
             allowedFormats: string[];
             maxBytes: number;
+        };
+        AdminUser: {
+            /** Format: uuid */
+            id: string;
+            nombre: string;
+            correo: string;
+            documento: string;
+            celular: string;
+            /** @enum {string} */
+            rol: "productor" | "comprador_b2c" | "comprador_b2b" | "transportista" | "administrador";
+            /** @enum {string} */
+            estado: "ACTIVO" | "INACTIVO" | "SUSPENDIDO";
+            verificado: boolean;
+            fechaRegistro: string;
+        };
+        AdminUserList: {
+            items: {
+                /** Format: uuid */
+                id: string;
+                nombre: string;
+                correo: string;
+                documento: string;
+                celular: string;
+                /** @enum {string} */
+                rol: "productor" | "comprador_b2c" | "comprador_b2b" | "transportista" | "administrador";
+                /** @enum {string} */
+                estado: "ACTIVO" | "INACTIVO" | "SUSPENDIDO";
+                verificado: boolean;
+                fechaRegistro: string;
+            }[];
+            total: number;
+            limit: number;
+            offset: number;
+        };
+        AdminUsersQuery: {
+            search?: string;
+            /** @enum {string} */
+            rol?: "productor" | "comprador_b2c" | "comprador_b2b" | "transportista" | "administrador";
+            /** @enum {string} */
+            estado?: "ACTIVO" | "INACTIVO" | "SUSPENDIDO";
+            /** @default 20 */
+            limit: number;
+            /** @default 0 */
+            offset: number;
+        };
+        UpdateUserStatusRequestBody: {
+            /** @enum {string} */
+            estado: "ACTIVO" | "INACTIVO" | "SUSPENDIDO";
+        };
+        UpdateUserRoleRequestBody: {
+            /** @description Nombre del rol: productor | comprador_b2c | comprador_b2b | transportista | administrador */
+            rol: string;
         };
         ProductList: components["schemas"]["Product"][];
     };

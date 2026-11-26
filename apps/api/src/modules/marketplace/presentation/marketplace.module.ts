@@ -3,6 +3,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { PrismaModule } from '../../../prisma/prisma.module';
 import { env } from '../../../shared/config/env';
 import { IdentityModule } from '../../identity/presentation/identity.module';
+import { RolesGuard } from '../../identity/presentation/guards/roles.guard';
 import { PRODUCT_REPOSITORY } from '../application/tokens';
 import { ListProductsUseCase } from '../application/use-cases/ListProductsUseCase';
 import { PublishProductUseCase } from '../application/use-cases/PublishProductUseCase';
@@ -35,6 +36,7 @@ import type { ProductRepository } from '../domain/interfaces/ProductRepository';
   ],
   controllers: [ProductController],
   providers: [
+    RolesGuard,
     { provide: PRODUCT_REPOSITORY, useClass: PrismaProductRepository },
     {
       provide: ListProductsUseCase,

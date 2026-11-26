@@ -11,6 +11,13 @@
  */
 import { z } from "zod";
 import {
+  adminUserListSchema,
+  adminUserSchema,
+  adminUsersQuerySchema,
+  updateUserRoleSchema,
+  updateUserStatusSchema,
+} from "./adminUserSchemas";
+import {
   forgotPasswordSchema,
   loginSchema,
   logoutSchema,
@@ -431,6 +438,78 @@ export function buildOpenApiDocument(): OpenApiDocument {
           },
         },
       },
+      "/admin/users": {
+        get: {
+          tags: ["Admin"],
+          summary: "Lista usuarios con búsqueda y filtros (solo administrador)",
+          parameters: queryParameters(
+            z.toJSONSchema(adminUsersQuerySchema, { io: "input" }),
+          ),
+          responses: {
+            "200": response(
+              "Usuarios encontrados con su total y paginación",
+              "AdminUserList",
+            ),
+            "401": response("Sesión ausente, expirada o inválida"),
+            "403": response("El usuario no es administrador"),
+            ...validationErrors,
+            ...rateLimited,
+          },
+        },
+      },
+      "/admin/users/{id}": {
+        get: {
+          tags: ["Admin"],
+          summary: "Obtiene el detalle administrativo de un usuario",
+          parameters: [plotIdParameter],
+          responses: {
+            "200": response("Usuario solicitado", "AdminUser"),
+            "401": response("Sesión ausente, expirada o inválida"),
+            "403": response("El usuario no es administrador"),
+            "404": response("Usuario no encontrado"),
+            ...validationErrors,
+            ...rateLimited,
+          },
+        },
+      },
+      "/admin/users/{id}/status": {
+        patch: {
+          tags: ["Admin"],
+          summary: "Cambia el estado de un usuario (solo administrador)",
+          parameters: [plotIdParameter],
+          requestBody: jsonBody("UpdateUserStatusRequestBody"),
+          responses: {
+            "200": response("Estado actualizado", "AdminUser"),
+            "401": response("Sesión ausente, expirada o inválida"),
+            "403": response("El usuario no es administrador"),
+            "404": response("Usuario no encontrado"),
+            "409": response(
+              "Intento de auto-modificación o de dejar sin administradores activos",
+            ),
+            ...validationErrors,
+            ...rateLimited,
+          },
+        },
+      },
+      "/admin/users/{id}/role": {
+        patch: {
+          tags: ["Admin"],
+          summary: "Cambia el rol de un usuario (solo administrador)",
+          parameters: [plotIdParameter],
+          requestBody: jsonBody("UpdateUserRoleRequestBody"),
+          responses: {
+            "200": response("Rol actualizado", "AdminUser"),
+            "401": response("Sesión ausente, expirada o inválida"),
+            "403": response("El usuario no es administrador"),
+            "404": response("Usuario no encontrado"),
+            "409": response(
+              "Intento de auto-modificación o de dejar sin administradores activos",
+            ),
+            ...validationErrors,
+            ...rateLimited,
+          },
+        },
+      },
       "/uploads/signature": {
         post: {
           tags: ["Uploads"],
@@ -478,6 +557,13 @@ export function buildOpenApiDocument(): OpenApiDocument {
           updateProductModerationSchema,
         ),
         UploadSignature: z.toJSONSchema(uploadSignatureSchema),
+        AdminUser: z.toJSONSchema(adminUserSchema),
+        AdminUserList: z.toJSONSchema(adminUserListSchema),
+        AdminUsersQuery: z.toJSONSchema(adminUsersQuerySchema, {
+          io: "input",
+        }),
+        UpdateUserStatusRequestBody: z.toJSONSchema(updateUserStatusSchema),
+        UpdateUserRoleRequestBody: z.toJSONSchema(updateUserRoleSchema),
         ProductList: {
           type: "array",
           items: { $ref: "#/components/schemas/Product" },

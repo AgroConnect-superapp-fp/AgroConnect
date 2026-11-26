@@ -6,13 +6,18 @@ import { Role } from '../../domain/entities/Role';
 import { RefreshToken } from '../../domain/entities/RefreshToken';
 import type { RoleName } from '../../domain/entities/Role';
 import type {
+  AdminContinuityResult,
+  AdminUserFilters,
+  AdminUserPage,
   CompanyProfileUpdate,
   ProfileSnapshot,
   ProducerProfileUpdate,
+  ProfilePresence,
   RegisterUserData,
   TransporterProfileUpdate,
   UserRepository,
 } from '../../domain/interfaces/UserRepository';
+import type { UserStatus } from '../../domain/entities/User';
 import { InfrastructureError } from '../../../../shared/errors/errors';
 import { uniqueViolationTarget } from '../../../../shared/infrastructure/prismaErrors';
 import {
@@ -28,6 +33,13 @@ type UserRecord = Prisma.UserGetPayload<{ include: { role: true } }>;
 
 @Injectable()
 export class PrismaUserRepository implements UserRepository {
+  /**
+   * Clave compartida para serializar los cambios que afectan la continuidad
+   * administrativa. El lock se libera al hacer commit/rollback y funciona
+   * entre procesos e instancias porque vive en PostgreSQL.
+   */
+  private static readonly ADMIN_CONTINUITY_LOCK = 741_852_963;
+
   constructor(private readonly prisma: PrismaClient) {}
 
   async findRoleByName(name: RoleName): Promise<Role | null> {
@@ -419,6 +431,159 @@ export class PrismaUserRepository implements UserRepository {
       where: { id: userId },
       data: { emailVerifiedAt: new Date() },
     });
+  }
+
+  async findManyForAdmin(filters: AdminUserFilters): Promise<AdminUserPage> {
+    const where: Prisma.UserWhereInput = {};
+
+    if (filters.search) {
+      where.OR = [
+        { fullName: { contains: filters.search, mode: 'insensitive' } },
+        { email: { contains: filters.search, mode: 'insensitive' } },
+        { document: { contains: filters.search, mode: 'insensitive' } },
+        { phone: { contains: filters.search, mode: 'insensitive' } },
+      ];
+    }
+
+    if (filters.roleName) {
+      where.role = { name: filters.roleName };
+    }
+
+    if (filters.status) {
+      where.status = filters.status;
+    }
+
+    const [records, total] = await this.prisma.$transaction([
+      this.prisma.user.findMany({
+        where,
+        include: { role: true },
+        orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+        skip: filters.offset,
+        take: filters.limit,
+      }),
+      this.prisma.user.count({ where }),
+    ]);
+
+    return { items: records.map((record) => this.toDomain(record)), total };
+  }
+
+  async findProfilePresenceById(userId: string): Promise<ProfilePresence | null> {
+    const record = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        producerProfile: { select: { id: true } },
+        companyProfile: { select: { id: true } },
+        transporterProfile: { select: { id: true } },
+      },
+    });
+
+    if (!record) {
+      return null;
+    }
+
+    return {
+      producer: record.producerProfile !== null,
+      company: record.companyProfile !== null,
+      transporter: record.transporterProfile !== null,
+    };
+  }
+
+  async updateStatusPreservingAdminContinuity(
+    userId: string,
+    status: UserStatus,
+  ): Promise<AdminContinuityResult> {
+    return this.prisma.$transaction(async (tx) => {
+      await this.lockAdminContinuity(tx);
+
+      const target = await tx.user.findUnique({
+        where: { id: userId },
+        include: { role: true },
+      });
+      if (!target) {
+        return { outcome: 'NOT_FOUND' };
+      }
+
+      const isActiveAdmin = target.role.name === 'administrador' && target.status === 'ACTIVO';
+
+      if (isActiveAdmin && status !== 'ACTIVO') {
+        const activeAdmins = await tx.user.count({
+          where: { status: 'ACTIVO', role: { name: 'administrador' } },
+        });
+        if (activeAdmins <= 1) {
+          return { outcome: 'LAST_ACTIVE_ADMIN' };
+        }
+      }
+
+      // Idempotente: no revocar sesiones si el estado no cambia.
+      if (target.status === status) {
+        return { outcome: 'UPDATED', user: this.toDomain(target) };
+      }
+
+      const record = await tx.user.update({
+        where: { id: userId },
+        data: { status },
+        include: { role: true },
+      });
+
+      if (status !== 'ACTIVO') {
+        await tx.refreshToken.updateMany({
+          where: { userId, revoked: false },
+          data: { revoked: true },
+        });
+      }
+
+      return { outcome: 'UPDATED', user: this.toDomain(record) };
+    });
+  }
+
+  async updateRolePreservingAdminContinuity(
+    userId: string,
+    roleId: string,
+    roleName: RoleName,
+  ): Promise<AdminContinuityResult> {
+    return this.prisma.$transaction(async (tx) => {
+      await this.lockAdminContinuity(tx);
+
+      const target = await tx.user.findUnique({
+        where: { id: userId },
+        include: { role: true },
+      });
+      if (!target) {
+        return { outcome: 'NOT_FOUND' };
+      }
+
+      // Idempotente: no revocar sesiones si el rol no cambia.
+      if (target.roleId === roleId) {
+        return { outcome: 'UPDATED', user: this.toDomain(target) };
+      }
+
+      const isActiveAdmin = target.role.name === 'administrador' && target.status === 'ACTIVO';
+      if (isActiveAdmin && roleName !== 'administrador') {
+        const activeAdmins = await tx.user.count({
+          where: { status: 'ACTIVO', role: { name: 'administrador' } },
+        });
+        if (activeAdmins <= 1) {
+          return { outcome: 'LAST_ACTIVE_ADMIN' };
+        }
+      }
+
+      const record = await tx.user.update({
+        where: { id: userId },
+        data: { roleId },
+        include: { role: true },
+      });
+
+      await tx.refreshToken.updateMany({
+        where: { userId, revoked: false },
+        data: { revoked: true },
+      });
+
+      return { outcome: 'UPDATED', user: this.toDomain(record) };
+    });
+  }
+
+  private async lockAdminContinuity(tx: Prisma.TransactionClient): Promise<void> {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(${PrismaUserRepository.ADMIN_CONTINUITY_LOCK}::bigint)`;
   }
 
   /** Una carrera entre dos registros llega aquí como P2002: se traduce a 409, no a 500. */

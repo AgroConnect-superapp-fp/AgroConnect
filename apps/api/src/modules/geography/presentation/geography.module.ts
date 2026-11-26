@@ -10,6 +10,7 @@ import { PrismaPlotRepository } from '../infrastructure/repositories/PrismaPlotR
 import { PlotController } from './controllers/PlotController';
 import { PrismaModule } from '../../../prisma/prisma.module';
 import { IdentityModule } from '../../identity/presentation/identity.module';
+import { RolesGuard } from '../../identity/presentation/guards/roles.guard';
 import type { PlotRepository } from '../domain/interfaces/PlotRepository';
 
 /**
@@ -29,6 +30,7 @@ import type { PlotRepository } from '../domain/interfaces/PlotRepository';
   imports: [PrismaModule, IdentityModule],
   controllers: [PlotController],
   providers: [
+    RolesGuard,
     // Puerto del dominio → implementación de infraestructura.
     { provide: PLOT_REPOSITORY, useClass: PrismaPlotRepository },
 

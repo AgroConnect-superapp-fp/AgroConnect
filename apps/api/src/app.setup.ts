@@ -105,7 +105,8 @@ export function configureApp(app: NestExpressApplication): void {
     if (
       request.path.startsWith('/api/v1/auth') ||
       request.path.startsWith('/api/v1/profile') ||
-      request.path.startsWith('/api/v1/plots')
+      request.path.startsWith('/api/v1/plots') ||
+      request.path.startsWith('/api/v1/admin')
     ) {
       response.setHeader('Cache-Control', 'no-store');
     }

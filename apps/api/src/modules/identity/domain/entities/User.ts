@@ -1,7 +1,10 @@
 import { InvalidDataError } from '../errors/AuthErrors';
 import type { RoleName } from './Role';
 
-export type UserStatus = 'ACTIVO' | 'INACTIVO' | 'SUSPENDIDO';
+/** Estados de cuenta admitidos (lista canónica del dominio). */
+export const USER_STATUSES = ['ACTIVO', 'INACTIVO', 'SUSPENDIDO'] as const;
+
+export type UserStatus = (typeof USER_STATUSES)[number];
 
 export interface UserProps {
   id: string;

@@ -32,6 +32,28 @@ export const SELF_REGISTRABLE_ROLE_NAMES = [
 ] as const;
 
 /* ────────────────────────────────────────────────────────────────────────────
+ * Roles canónicos del sistema (contratos administrativos)
+ *
+ * Incluye `administrador`, que NO puede auto-registrarse pero sí asignarse
+ * desde la administración de usuarios. `SELF_REGISTRABLE_ROLE_NAMES` conserva
+ * su semántica: solo los cuatro roles públicos del registro.
+ *
+ * NOTA DE SINCRONÍA: misma lista que `ROLE_NAMES` en
+ * `apps/api/src/modules/identity/domain/entities/Role.ts`. El dominio no
+ * depende de este paquete (Clean Architecture); la lista se duplica a
+ * propósito y debe mantenerse alineada.
+ * ──────────────────────────────────────────────────────────────────────────── */
+export const ROLE_NAMES = [
+  "productor",
+  "comprador_b2c",
+  "comprador_b2b",
+  "transportista",
+  "administrador",
+] as const;
+
+export type RoleName = (typeof ROLE_NAMES)[number];
+
+/* ────────────────────────────────────────────────────────────────────────────
  * 1. Contrato API — request bodies validados por el backend
  * ──────────────────────────────────────────────────────────────────────────── */
 
