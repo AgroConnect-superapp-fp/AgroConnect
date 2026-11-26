@@ -22,6 +22,8 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
+      // El registro del SW no debe bloquear el primer paint (LCP).
+      injectRegister: 'script-defer',
       includeAssets: [
         'favicon.svg',
         'favicon.ico',
@@ -115,18 +117,9 @@ export default defineConfig({
               return 'vendor-react';
             }
 
-            // Núcleo de mapas estático (~220KB). Los plugins UMD
-            // (`leaflet-draw`, `leaflet.heat`, `leaflet-geosearch`) se dejan
-            // fuera y se cargan dinámicamente después de que `lib/leaflet`
-            // exponga `window.L`; agruparlos aquí los ejecutaba antes de esa
-            // asignación y rompía el build de producción (`L is not defined`).
-            if (
-              id.includes('/leaflet/') ||
-              id.includes('/react-leaflet/') ||
-              id.includes('/react-leaflet-markercluster/')
-            ) {
-              return 'vendor-leaflet';
-            }
+            // Leaflet y sus plugins no se agrupan a mano: viven en el chunk
+            // lazy de `PropertyMap` y solo se descargan al abrir el mapa. Un
+            // chunk manual los precargaba en el entry y retrasaba el LCP.
 
             // Image processing (~50KB)
             if (id.includes('/@cloudinary/')) {

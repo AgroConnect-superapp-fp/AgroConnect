@@ -1,6 +1,7 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useState, useSyncExternalStore } from 'react';
 import type { Property } from '../../../types/property';
 import { ErrorBoundary } from '../../../components/ui/ErrorBoundary';
+import { Button } from '../../../shared/ui/Button';
 import { FiltersPanel } from './FiltersPanel';
 
 const PropertyMap = lazy(() =>
@@ -29,6 +30,48 @@ function handleMapError(error: Error): void {
   console.error('[Marketplace] Error en el mapa:', error);
 }
 
+const MOBILE_QUERY = '(max-width: 767px)';
+
+/**
+ * En móvil el mapa se carga bajo demanda.
+ *
+ * Leaflet descarga tiles de OpenStreetMap de terceros; en 3G esos tiles
+ * dominaban el LCP (4,45 s). El botón evita descargarlos hasta que el usuario
+ * los necesita y mantiene el contenido above-the-fold como LCP. En escritorio
+ * el mapa sigue cargándose automáticamente.
+ */
+function subscribeToViewport(onChange: () => void): () => void {
+  const media = window.matchMedia(MOBILE_QUERY);
+  media.addEventListener('change', onChange);
+  return () => media.removeEventListener('change', onChange);
+}
+
+function getViewportSnapshot(): boolean {
+  return window.matchMedia(MOBILE_QUERY).matches;
+}
+
+function useIsMobile(): boolean {
+  return useSyncExternalStore(subscribeToViewport, getViewportSnapshot, () => false);
+}
+
+function MapPlaceholder({ onLoad }: { onLoad: () => void }): React.ReactElement {
+  return (
+    <div className="flex h-[600px] w-full flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-emerald-300 bg-gradient-to-br from-emerald-50 to-amber-50 p-6 text-center">
+      <span aria-hidden="true" className="text-5xl">
+        🗺️
+      </span>
+      <div>
+        <p className="text-lg font-semibold text-agro-dark">Mapa interactivo</p>
+        <p className="mt-1 max-w-md text-sm text-gray-600">
+          Cárgalo cuando lo necesites. Así ahorras datos móviles y la página aparece más
+          rápido en el campo.
+        </p>
+      </div>
+      <Button onClick={onLoad}>Cargar mapa interactivo</Button>
+    </div>
+  );
+}
+
 interface MapPanelProps {
   properties: Property[];
   showProductiveZones: boolean;
@@ -47,6 +90,10 @@ export function MapPanel({
   onToggleDrawing,
   onPolygonCreated,
 }: MapPanelProps): React.ReactElement {
+  const isMobile = useIsMobile();
+  const [mapEnabled, setMapEnabled] = useState(false);
+  const showMap = !isMobile || mapEnabled;
+
   return (
     <section className="group mb-20 animate-scaleIn rounded-2xl bg-white p-6 shadow-md delay-300 transition-all hover:-translate-y-1 hover:shadow-2xl">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -66,16 +113,20 @@ export function MapPanel({
         />
       </div>
 
-      <ErrorBoundary onError={handleMapError}>
-        <Suspense fallback={<MapLoadingFallback />}>
-          <PropertyMap
-            properties={properties}
-            showProductiveZones={showProductiveZones}
-            enableDrawing={enableDrawing}
-            onPolygonCreated={onPolygonCreated}
-          />
-        </Suspense>
-      </ErrorBoundary>
+      {showMap ? (
+        <ErrorBoundary onError={handleMapError}>
+          <Suspense fallback={<MapLoadingFallback />}>
+            <PropertyMap
+              properties={properties}
+              showProductiveZones={showProductiveZones}
+              enableDrawing={enableDrawing}
+              onPolygonCreated={onPolygonCreated}
+            />
+          </Suspense>
+        </ErrorBoundary>
+      ) : (
+        <MapPlaceholder onLoad={() => setMapEnabled(true)} />
+      )}
     </section>
   );
 }

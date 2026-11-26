@@ -7,7 +7,7 @@
  * `features/marketplace/components`.
  */
 
-import { useMemo, useState } from 'react';
+import { lazy, Suspense, useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useProducts } from './shared/api/hooks/useProducts';
 import { queryKeys } from './shared/api/queryKeys';
@@ -18,9 +18,37 @@ import { Button } from './shared/ui/Button';
 import { Skeleton } from './shared/ui/Skeleton';
 import type { Property } from './types/property';
 import { MarketplaceShell } from './features/marketplace/components/MarketplaceShell';
-import { MapPanel } from './features/marketplace/components/MapPanel';
-import { CropDistribution } from './features/marketplace/components/CropDistribution';
-import { ResultsList } from './features/marketplace/components/ResultsList';
+
+// Secciones bajo el fold: se cargan después de la cabecera para no retrasar el LCP.
+const MapPanel = lazy(() =>
+  import('./features/marketplace/components/MapPanel').then((module) => ({
+    default: module.MapPanel,
+  }))
+);
+const CropDistribution = lazy(() =>
+  import('./features/marketplace/components/CropDistribution').then((module) => ({
+    default: module.CropDistribution,
+  }))
+);
+const ResultsList = lazy(() =>
+  import('./features/marketplace/components/ResultsList').then((module) => ({
+    default: module.ResultsList,
+  }))
+);
+
+function SectionFallback({
+  label,
+  height,
+}: {
+  label: string;
+  height: string;
+}): React.ReactElement {
+  return (
+    <div className="mb-6 rounded-2xl bg-white p-4 shadow-sm">
+      <Skeleton variant="rect" className={height} label={label} />
+    </div>
+  );
+}
 
 function MarketplaceLoading(): React.ReactElement {
   return (
@@ -134,18 +162,26 @@ function App(): React.ReactElement {
       onCloseProperty={() => setSelectedProperty(null)}
       onPropertyUpdated={handlePropertyUpdated}
     >
-      <MapPanel
-        properties={properties}
-        showProductiveZones={showProductiveZones}
-        enableDrawing={enableDrawing}
-        onToggleProductiveZones={() => setShowProductiveZones((value) => !value)}
-        onToggleDrawing={() => setEnableDrawing((value) => !value)}
-        onPolygonCreated={(coordinates) => {
-          devLog('[Marketplace] Nueva parcela dibujada:', coordinates);
-        }}
-      />
-      <CropDistribution properties={properties} />
-      <ResultsList properties={properties} onSelect={setSelectedProperty} />
+      <Suspense fallback={<SectionFallback label="Cargando mapa" height="h-[600px]" />}>
+        <MapPanel
+          properties={properties}
+          showProductiveZones={showProductiveZones}
+          enableDrawing={enableDrawing}
+          onToggleProductiveZones={() => setShowProductiveZones((value) => !value)}
+          onToggleDrawing={() => setEnableDrawing((value) => !value)}
+          onPolygonCreated={(coordinates) => {
+            devLog('[Marketplace] Nueva parcela dibujada:', coordinates);
+          }}
+        />
+      </Suspense>
+      <Suspense
+        fallback={<SectionFallback label="Cargando distribución" height="h-48" />}
+      >
+        <CropDistribution properties={properties} />
+      </Suspense>
+      <Suspense fallback={<SectionFallback label="Cargando productores" height="h-64" />}>
+        <ResultsList properties={properties} onSelect={setSelectedProperty} />
+      </Suspense>
     </MarketplaceShell>
   );
 }
