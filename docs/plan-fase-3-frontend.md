@@ -138,7 +138,7 @@ Guardas como wrappers de ruta: `RequireAuth` y `RequireRole(['administrador'])`,
 | TTI en 3G simulada | Medir en F1 | < 3,5 s |
 | Violaciones axe en rutas clave | 0 en F3 | 0 |
 
-La medición se registra en el acta al cerrar F1 y F4; no se optimiza nada sin número previo. Medición Lighthouse del 26/11/2026 (móvil, 3G simulado): `/` LCP 2,4 s, TTI 2,4 s, CLS 0, score 96; `/marketplace` con la API caída (fallback demo) LCP 2,8–3,5 s, TTI 3,1–3,7 s, score 86–92. La corrida con API real fue inestable por la carga del host y no se usa como evidencia de cumplimiento: el LCP de marketplace sigue en seguimiento.
+La medición se registra en el acta al cerrar F1 y F4; no se optimiza nada sin número previo. Medición Lighthouse del 26/11/2026 (móvil, 3G simulado): `/` LCP 2,4 s, TTI 2,4 s, CLS 0, score 96. En `/marketplace` con API sana (mediana de 3 corridas) el LCP fue 4,45 s, pero el elemento LCP es un **tile de OpenStreetMap** con 82 % del tiempo en `load delay`; el contenido propio pinta ~2,4 s. Se priorizó la primera tarjeta/imagen y se quitó la animación de la cabecera (`26167f4`), sin mover el LCP porque el tile sigue siendo el elemento. Con la API caída el LCP del fallback es 2,8–3,5 s. Para cumplir 2,5 s globales hay que cargar el mapa tras interacción o con un placeholder estático: decisión de UX pendiente, no un problema de bundle.
 
 ---
 

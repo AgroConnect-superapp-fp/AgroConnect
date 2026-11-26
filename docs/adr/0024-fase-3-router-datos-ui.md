@@ -142,6 +142,10 @@ Gates al cierre de F4 (26/11/2026):
   perfil, marketplace y moderación antes de mergear.
 - **Crecimiento del bundle:** se mide en cada incremento; el límite de 200 KB es
   un gate, no una recomendación.
+- **LCP de marketplace:** el contenido propio pinta ~2,4 s, pero el tile de
+  OpenStreetMap domina el LCP (4,45 s, 82 % en `load delay`). El presupuesto de
+  2,5 s no se cumple por un recurso de terceros; se evaluará cargar el mapa tras
+  interacción o con placeholder estático.
 
 ## Seguimiento
 
