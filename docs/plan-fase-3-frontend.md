@@ -1,7 +1,7 @@
 # Plan Fase 3 — Router, capa de datos y sistema de componentes
 
 **Fecha:** 17 de noviembre de 2026
-**Estado:** F1, F2 y F3 completadas (26/11/2026); F4–F5 planificadas
+**Estado:** F1–F4 completadas (26/11/2026); F5 planificada
 **Referencias:** acta de cierre del sprint 2026-10-28 §3 (fila 3), `SPEC.md` §10 (performance budget rural-first), ADR-022 y ADR-023.
 
 ---
@@ -118,6 +118,7 @@ Guardas como wrappers de ruta: `RequireAuth` y `RequireRole(['administrador'])`,
 - Extraer de `MarketplacePrototype.tsx`: `MarketplaceShell`, `FiltersPanel`, `ResultsList`, `MapPanel` y los hooks de datos de F2.
 - Mantener Leaflet + OpenStreetMap y la regla de no calcular distancias en JS.
 - **DoD:** E2E de búsqueda geoespacial y detalle de producto; bundle inicial bajo presupuesto; sin regresiones visuales en las rutas clave.
+- **Evidencia (26/11/2026):** cerrada en `f446c5d`. `MarketplacePrototype.tsx` pasó de 835 a 136 líneas y ahora solo compone el estado de selección/overrides con `useProducts` y TanStack Query. Se extrajeron `MarketplaceShell`, `FiltersPanel`, `MapPanel`, `ResultsList`, `CropDistribution` y `MarketplaceFooter` a `frontend/src/features/marketplace/components`; Leaflet + OpenStreetMap se mantienen y las distancias siguen calculándose en PostGIS. Gates: `tsc` y ESLint en cero, **119/119** unitarias, build correcto con bundle inicial **181,2 KB gzip** (límite 200 KB) y E2E **16/16** (`/tmp/opencode/e2e-f4.log`).
 
 ### F5 — Cierre y documentación (estimación: 1–2 días)
 
