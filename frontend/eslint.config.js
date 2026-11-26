@@ -7,7 +7,14 @@ import prettier from 'eslint-config-prettier';
 import eslintPluginPrettier from 'eslint-plugin-prettier/recommended';
 
 export default tseslint.config(
-  { ignores: ['dist', 'node_modules', '*.config.js', '*.config.ts'] },
+  { ignores: [
+    'dist',
+    'node_modules',
+    '*.config.js',
+    '*.config.ts',
+    // Generado por openapi-typescript: su formato lo controla el generador.
+    'src/shared/api/openapi.d.ts',
+  ] },
 
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],

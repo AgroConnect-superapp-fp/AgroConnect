@@ -474,6 +474,9 @@ export function buildOpenApiDocument(): OpenApiDocument {
         UpdateProductImagesRequestBody: z.toJSONSchema(
           updateProductImagesSchema,
         ),
+        UpdateProductModerationRequestBody: z.toJSONSchema(
+          updateProductModerationSchema,
+        ),
         UploadSignature: z.toJSONSchema(uploadSignatureSchema),
         ProductList: {
           type: "array",

@@ -2724,6 +2724,23 @@
         ],
         "additionalProperties": false
       },
+      "UpdateProductModerationRequestBody": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "approved",
+              "rejected"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "additionalProperties": false
+      },
       "UploadSignature": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",

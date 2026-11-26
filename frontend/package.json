@@ -20,7 +20,9 @@
     "test:e2e:report": "playwright show-report",
     "quality": "npm run format && npm run lint:fix",
     "prepare": "husky",
-    "test:preview": "node scripts/smoke-preview.mjs"
+    "test:preview": "node scripts/smoke-preview.mjs",
+    "generate:api-types": "openapi-typescript ../packages/contracts/openapi.json -o src/shared/api/openapi.d.ts",
+    "check:api-types": "npm run generate:api-types && git diff --exit-code -- src/shared/api/openapi.d.ts"
   },
   "dependencies": {
     "@agroconnect/contracts": "*",
@@ -62,6 +64,7 @@
     "husky": "^9.1.7",
     "jsdom": "^30.1.3",
     "lint-staged": "^17.6.0",
+    "openapi-typescript": "^7.13.0",
     "prettier": "^3.9.9",
     "tailwindcss": "^4.3.3",
     "typescript": "~6.0.2",
