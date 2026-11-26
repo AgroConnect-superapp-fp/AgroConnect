@@ -1,7 +1,7 @@
 # Plan Fase 3 — Router, capa de datos y sistema de componentes
 
 **Fecha:** 17 de noviembre de 2026
-**Estado:** F1–F4 completadas (26/11/2026); F5 planificada
+**Estado:** F1–F5 completadas (26/11/2026); fase 3 cerrada
 **Referencias:** acta de cierre del sprint 2026-10-28 §3 (fila 3), `SPEC.md` §10 (performance budget rural-first), ADR-022 y ADR-023.
 
 ---
@@ -124,6 +124,7 @@ Guardas como wrappers de ruta: `RequireAuth` y `RequireRole(['administrador'])`,
 
 - ADR con D1–D4, README del frontend con el mapa de rutas, actualización del acta (§3, fila 3).
 - **DoD:** todos los gates del proyecto en verde y evidencia adjunta al acta.
+- **Evidencia (26/11/2026):** cerrada. `docs/adr/0024-fase-3-router-datos-ui.md` registra D1–D4, alternativas, consecuencias y seguimiento; `docs/adr/README.md` la indexa. `frontend/README.md` documenta el stack real (Tailwind 4, React Router 7, TanStack Query 5), el mapa de rutas, la estructura, la capa de datos y el gate axe. El acta sube a v1.8 y marca la fase 3 como cerrada con seguimiento (cliente OpenAPI tipado y medición LCP/TTI). Gates finales: `tsc` y ESLint en cero, **119/119** unitarias, E2E **16/16**, axe sin violaciones en `/login`, `/registro`, `/marketplace` y `/moderacion`, build con **181,2 KB gzip** inicial.
 
 ---
 

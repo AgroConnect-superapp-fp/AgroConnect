@@ -32,5 +32,6 @@ Hay dos series de ADR:
 | [ADR-021](0021-cloudinary-firmado-imagenes-producto.md) | Subida firmada a Cloudinary y edición de imágenes por propietario                   | Aceptada — implementada            |
 | [ADR-022](0022-marketplace-vitrina.md)                  | Marketplace vitrina sin precio/inventario en el MVP                                 | Aceptada — implementada            |
 | [ADR-023](0023-moderacion-previa-productos.md)          | Moderación previa de productos con rol administrador                                | Aceptada — implementada            |
+| [ADR-024](0024-fase-3-router-datos-ui.md)               | Fase 3 frontend: React Router 7, TanStack Query, `src/shared/ui` y URLs estables    | Aceptada — F1–F4 implementadas     |
 
 Para una decisión nueva, copia la estructura de cualquier ADR: Estado, Fecha, Decisores, Relacionado, Contexto, Decisión, Alternativas y Consecuencias. Enlázala aquí y en el índice de ADRs de Obsidian.
