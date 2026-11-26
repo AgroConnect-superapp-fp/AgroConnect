@@ -4,7 +4,7 @@
 
 ### Documento de conciliación entre el estado reportado al 28/10/2026 y la verificación técnica al 24/11/2026
 
-**Versión:** 1.4 — verificada; pendientes A, B y E cerrados; fase 3 en ejecución (F1 completada y endurecida)  
+**Versión:** 1.5 — verificada; pendientes A, B y E cerrados; fase 3 en ejecución (F1 endurecida, residuales P2 resueltos)  
 **Estado:** Aprobada técnicamente; pendiente de firma institucional  
 **Documento fuente:** `AgroConnect_Estado_Avance_Sprint_2026-10-28.pdf`
 
@@ -265,7 +265,12 @@ F1 se sometió a dos revisiones independientes sobre `6e93652`: revisión senior
 | Archivo de correos legible por terceros y seed sin guardia de entorno | Seguridad (bajos) | Directorio `0700` y archivo `0600` en `FileEmailService`; el seed aborta con `NODE_ENV=production` |
 | Dependencia desactualizada | Informativo | `react-router` actualizado a `7.18.7` |
 
-Gates del hardening (24/11/2026): frontend `tsc` y ESLint en cero, **91/91** pruebas unitarias (17 archivos), E2E **14/14** en 32,3 s y build de producción correcto; API `tsc`, ESLint y **347/347** pruebas unitarias en verde. La clasificación de errores de red frente a `401` en el arranque de sesión y las tres vulnerabilidades altas preexistentes de `npm audit` quedan como residuales P2.
+Gates del hardening (24/11/2026): frontend `tsc` y ESLint en cero, **91/91** pruebas unitarias (17 archivos), E2E **14/14** en 32,3 s y build de producción correcto; API `tsc`, ESLint y **347/347** pruebas unitarias en verde.
+
+Residuales P2:
+
+- **Red caída frente a sesión expirada:** resuelto en `7bc97c3`. El refresh devuelve `refreshed`, `rejected` o `unavailable`; solo un `401`/`403` del servidor anuncia `agroconnect:session-expired`. Un fallo de red, timeout o `5xx` conserva la cookie y propaga el `401` original. Regresión cubierta en `apiClient.test.ts` (6/6).
+- **`npm audit`:** las tres vulnerabilidades HIGH son una sola cadena del CLI de Prisma (`prisma → @prisma/config → effect`, ReDoS en `Schema.TemplateLiteral`). No hay exposición en runtime: el esquema lo controla el repositorio, no un usuario. No existe parche en Prisma 7.x; el “fix” de npm baja a Prisma 6.12.0, incompatible con el stack actual. Se acepta el riesgo y se revisará cuando Prisma 8 sea estable.
 
 ---
 
@@ -327,6 +332,7 @@ El marketplace es una vitrina: no gestiona precio, unidad ni inventario. La mode
 | `.env.example` sin variables del seed | El onboarding falla con `exit 1` si no se declaran `SEED_ADMIN_PASSWORD` y `SEED_PRODUCER_PASSWORD` | Añadirlas manualmente (el agente no puede editar archivos `.env*`) |
 | Validación 400/422 en `marketplace` e `identity` | Inconsistencia con la semántica del contrato (400 = cuerpo malformado, 422 = regla de negocio) | Cerrado en `6b835b3`: marketplace alineado a 422 con guardas numéricas; `geography` ya estaba alineado |
 | `@swc/jest` no adoptado | La suite de API tardaba más de lo necesario | Cerrado en `ae38f89`: `ts-jest` → `@swc/jest` (98,7 s → 23,4 s) con cobertura ≥80 % en ramas |
+| `npm audit`: 3 HIGH del CLI de Prisma | Solo build/dev; ReDoS con esquema controlado por el repositorio, no por usuario; sin parche en Prisma 7.x | Riesgo aceptado y documentado en §5.8; revisar con Prisma 8 estable |
 
 ---
 
@@ -446,4 +452,4 @@ Los comandos de Prisma deben ejecutarse desde `apps/api`; el resto, desde la ra�
 ---
 
 **Fin del documento.**  
-Versión 1.4 — verificada el 24/11/2026. Los pendientes A, B y E constan como cerrados con la evidencia de §5. El pendiente F está en ejecución: F1 cerrada en `6e93652`, endurecida tras la doble revisión en `4f5e8f9` (§5.8) y F2–F5 planificadas en `docs/plan-fase-3-frontend.md`. Las firmas de §10 permanecen pendientes.
+Versión 1.5 — verificada el 25/11/2026. Los pendientes A, B y E constan como cerrados con la evidencia de §5. El pendiente F está en ejecución: F1 cerrada en `6e93652`, endurecida tras la doble revisión en `4f5e8f9` y con los residuales P2 resueltos en `7bc97c3` (§5.8); F2–F5 siguen planificadas en `docs/plan-fase-3-frontend.md`. Las firmas de §10 permanecen pendientes.
