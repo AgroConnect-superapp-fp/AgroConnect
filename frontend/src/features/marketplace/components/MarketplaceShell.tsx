@@ -107,10 +107,10 @@ export function MarketplaceShell({
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50">
       <style>{ANIMATION_STYLES}</style>
 
-      <header className="animate-fadeInDown border-b border-gray-200 bg-white shadow-sm">
+      <header className="border-b border-gray-200 bg-white shadow-sm">
         <div className="mx-auto max-w-7xl px-6 py-5">
           <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="animate-fadeInLeft delay-100">
+            <div>
               <h1 className="flex items-center gap-2 text-4xl font-bold text-agro-green">
                 🌱 AgroConnect
               </h1>

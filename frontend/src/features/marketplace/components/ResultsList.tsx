@@ -18,7 +18,7 @@ export function ResultsList({
 }: ResultsListProps): React.ReactElement {
   return (
     <section className="mb-2 animate-fadeInUp delay-800">
-      <h2 className="mb-4 animate-fadeInLeft text-left text-2xl font-bold text-agro-dark delay-900">
+      <h2 className="mb-4 text-left text-2xl font-bold text-agro-dark">
         📋 Productores Destacados
       </h2>
       <div className="flex flex-wrap justify-center gap-4">
@@ -31,13 +31,18 @@ export function ResultsList({
                 ? property.images[0]
                 : resolveImageUrl(property.images[0].publicId, 'medium')
               : null;
-          const delayClass = `delay-${Math.min((index + 10) * 100, 1200)}`;
+          const isPriority = index === 0;
+          const delayClass = isPriority
+            ? ''
+            : `delay-${Math.min((index + 10) * 100, 1200)}`;
 
           return (
             <Card
               key={property.id}
               padding="none"
-              className={`flex w-full animate-fadeInUp flex-col overflow-hidden border-gray-100 transition-all hover:-translate-y-2 hover:shadow-xl md:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-1rem)] ${delayClass}`}
+              className={`flex w-full flex-col overflow-hidden border-gray-100 transition-all hover:-translate-y-2 hover:shadow-xl md:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-1rem)] ${
+                isPriority ? '' : 'animate-fadeInUp'
+              } ${delayClass}`}
             >
               {thumbnailUrl ? (
                 <div className="group relative h-48 overflow-hidden bg-gray-100">
@@ -46,7 +51,8 @@ export function ResultsList({
                     fallbackSrc={getCropFallbackImage(property.crop)}
                     alt={property.name}
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                    loading="lazy"
+                    loading={isPriority ? 'eager' : 'lazy'}
+                    fetchPriority={isPriority ? 'high' : 'auto'}
                   />
                   <div className="absolute right-2 top-2">
                     <span
