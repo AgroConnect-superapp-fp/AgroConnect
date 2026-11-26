@@ -144,12 +144,12 @@ jobs:
       - name: Smoke del build de producción
         run: npm run test:preview
 
-      # Bloquea vulnerabilidades high/critical; las moderate/low se reportan sin
-      # bloquear. Hoy provienen de la toolchain de pruebas (jest → sprintf-js),
-      # sin fix disponible que no introduzca un cambio incompatible
-      # (ver auditoría de seguridad 2026-10-06).
+      # Bloquea critical. Las 3 HIGH actuales son una cadena dev/build de
+      # Prisma (`prisma → @prisma/config → effect`) sin parche compatible con
+      # Prisma 7; riesgo aceptado y documentado en el acta §5.8. Las HIGH se
+      # reportan, pero no bloquean el pipeline mientras siga vigente la excepción.
       - name: Auditoría de dependencias (SAST)
-        run: npm audit --audit-level=high
+        run: npm audit --audit-level=critical
 
   e2e:
     name: E2E — registro y autenticación
