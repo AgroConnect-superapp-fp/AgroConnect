@@ -126,8 +126,8 @@ jobs:
       - name: Type check
         run: npx tsc -b
 
-      - name: Pruebas unitarias
-        run: npm test
+      - name: Pruebas unitarias con cobertura
+        run: npm run test:coverage
 
       - name: Build de producción
         run: npm run build
