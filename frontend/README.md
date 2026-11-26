@@ -15,6 +15,7 @@ Variables de entorno: copia `.env.example` a `.env.local` y completa:
 |---|---|
 | `VITE_API_URL` | URL de la API (default `http://localhost:4000`) |
 | `VITE_CLOUDINARY_CLOUD_NAME` | Nube de Cloudinary para resolver imágenes |
+| `VITE_ERROR_REPORT_URL` | Endpoint opcional para errores de cliente; si falta, no se envía nada |
 
 Las subidas a Cloudinary se firman en el backend; el frontend nunca recibe el
 secreto.
@@ -83,10 +84,13 @@ src/
 
 ```bash
 npm run test                         # Vitest (unitarias + RTL)
+npm run test:coverage                # Vitest + umbral 80 % (excluye cableado de rutas)
 npm run test:e2e                     # Playwright
 npm run test:e2e -- e2e/a11y.spec.ts # Gate axe WCAG 2.1 A/AA
 npm run test:preview                 # Smoke del build de producción
 ```
+
+La cobertura unitaria mide los archivos que carga la suite y excluye `screenRoutes.tsx` (cubierto por E2E). Sobre todo `src/`, la cobertura global es ~31 %: ampliarla es deuda técnica abierta.
 
 Los E2E viven en `e2e/` y usan `webServer` (API en `4100`, web en `5173`).
 Requieren la base `agroconnect_test` migrada; `global-setup.ts` siembra productos

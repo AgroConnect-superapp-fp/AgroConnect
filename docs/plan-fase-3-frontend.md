@@ -125,7 +125,7 @@ Guardas como wrappers de ruta: `RequireAuth` y `RequireRole(['administrador'])`,
 
 - ADR con D1–D4, README del frontend con el mapa de rutas, actualización del acta (§3, fila 3).
 - **DoD:** todos los gates del proyecto en verde y evidencia adjunta al acta.
-- **Evidencia (26/11/2026):** cerrada. `docs/adr/0024-fase-3-router-datos-ui.md` registra D1–D4, alternativas, consecuencias y seguimiento; `docs/adr/0025-tipos-openapi-sin-cliente-runtime.md` registra la decisión de tipos OpenAPI; `docs/adr/README.md` las indexa. `frontend/README.md` documenta el stack real (Tailwind 4, React Router 7, TanStack Query 5), el mapa de rutas, la estructura, la capa de datos y el gate axe. El acta sube a v1.9 y marca la fase 3 como cerrada. Gates finales: `tsc` y ESLint en cero, **123/123** unitarias, E2E **17/17**, axe sin violaciones en `/login`, `/registro`, `/marketplace` y `/moderacion`, `test:preview` en verde y build con **109,4 KB gzip** inicial.
+- **Evidencia (26/11/2026):** cerrada. `docs/adr/0024-fase-3-router-datos-ui.md` registra D1–D4, alternativas, consecuencias y seguimiento; `docs/adr/0025-tipos-openapi-sin-cliente-runtime.md` registra la decisión de tipos OpenAPI; `docs/adr/README.md` las indexa. `frontend/README.md` documenta el stack real (Tailwind 4, React Router 7, TanStack Query 5), el mapa de rutas, la estructura, la capa de datos y el gate axe. El acta sube a v1.9 y marca la fase 3 como cerrada. Gates finales: `tsc` y ESLint en cero, **141/141** unitarias, E2E **18/18**, axe sin violaciones en `/login`, `/registro`, `/marketplace` y `/moderacion`, `test:preview` en verde y build con **109,4 KB gzip** inicial.
 
 ---
 

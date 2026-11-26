@@ -28,8 +28,8 @@
   },
   "tests": {
     "backend": 428,
-    "frontendUnit": 123,
-    "e2e": 17
+    "frontendUnit": 141,
+    "e2e": 18
   },
   "sources": {
     "localReadme": "README.md",
