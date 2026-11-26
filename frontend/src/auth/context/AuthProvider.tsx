@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { queryClient } from '../../shared/api/queryClient';
 import { authApi } from '../api/authClient';
 import type { AuthSession, LoginPayload, PublicUser, RegisterPayload } from '../types';
 import { AuthContext } from './authContext';
@@ -93,6 +94,9 @@ export function AuthProvider({ children }: { children: ReactNode }): React.React
 
   useEffect(() => {
     const handleExpired = (): void => {
+      // Sin esto, el perfil o las parcelas del usuario anterior quedarían en
+      // caché y podrían mostrarse a la siguiente sesión en la misma pestaña.
+      queryClient.clear();
       setUsuario(null);
       setStatus('anonymous');
       setRestored(false);
@@ -108,6 +112,7 @@ export function AuthProvider({ children }: { children: ReactNode }): React.React
       // esta sesión: se intenta revocar en el servidor y, pase lo que pase, se
       // limpia el estado local (la demo no tiene sesión que conservar).
       await authApi.logout().catch(() => undefined);
+      queryClient.clear();
 
       setUsuario(null);
       setStatus('anonymous');
@@ -118,6 +123,7 @@ export function AuthProvider({ children }: { children: ReactNode }): React.React
     // Sesión real: si el servidor falla, NO limpiamos el estado local porque
     // la cookie httpOnly seguiría viva y un reload volvería a autenticar.
     await authApi.logout();
+    queryClient.clear();
 
     setUsuario(null);
     setStatus('anonymous');

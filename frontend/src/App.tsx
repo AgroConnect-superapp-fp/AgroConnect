@@ -1,11 +1,14 @@
 import { RouterProvider } from 'react-router';
-import { AuthProvider } from './auth/context/AuthProvider';
+import { AppProviders } from './app/providers';
 import { router } from './app/router';
+import { AuthProvider } from './auth/context/AuthProvider';
 
 export default function App(): React.ReactElement {
   return (
-    <AuthProvider>
-      <RouterProvider router={router} />
-    </AuthProvider>
+    <AppProviders>
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
+    </AppProviders>
   );
 }

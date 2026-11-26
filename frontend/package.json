@@ -24,6 +24,7 @@
   "dependencies": {
     "@agroconnect/contracts": "*",
     "@cloudinary/url-gen": "^1.22.0",
+    "@tanstack/react-query": "^5.108.4",
     "leaflet": "^1.9.4",
     "leaflet-draw": "^1.0.4",
     "leaflet-geosearch": "^4.4.0",
