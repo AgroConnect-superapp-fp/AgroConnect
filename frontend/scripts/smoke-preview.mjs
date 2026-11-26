@@ -21,12 +21,12 @@ const viteBin = join(dirname(require.resolve('vite/package.json')), 'bin/vite.js
 
 const server = spawn(
   process.execPath,
-  [viteBin, 'preview', '--port', String(PORT), '--strictPort'],
+  [viteBin, 'preview', '--host', '127.0.0.1', '--port', String(PORT), '--strictPort'],
   { stdio: 'inherit' }
 );
 
 async function waitForServer() {
-  for (let attempt = 0; attempt < 40; attempt += 1) {
+  for (let attempt = 0; attempt < 120; attempt += 1) {
     try {
       const response = await fetch(BASE_URL);
       if (response.ok) return;
