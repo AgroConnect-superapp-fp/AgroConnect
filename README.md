@@ -8,7 +8,7 @@ Centro de Comercio y Turismo · Regional Quindío · Programa Análisis y Desarr
 
 [![CI](https://github.com/AgroConnect-superapp-fp/AgroConnect/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/AgroConnect-superapp-fp/AgroConnect/actions/workflows/ci.yml)
 [![Node](https://img.shields.io/badge/node-%E2%89%A5%2024-339933?logo=node.js&logoColor=white)](.nvmrc)
-[![Pruebas](https://img.shields.io/badge/pruebas-428%20backend%20%C2%B7%20155%20unit%20%C2%B7%2018%20E2E-brightgreen)](https://github.com/AgroConnect-superapp-fp/AgroConnect/actions/workflows/ci.yml)
+[![Pruebas](https://img.shields.io/badge/pruebas-456%20backend%20%C2%B7%20155%20unit%20%C2%B7%2018%20E2E-brightgreen)](https://github.com/AgroConnect-superapp-fp/AgroConnect/actions/workflows/ci.yml)
 [![Deploy](https://img.shields.io/badge/producci%C3%B3n-Vercel%20%C2%B7%20Render-000000?logo=vercel&logoColor=white)](https://agroconnectpreview.vercel.app)
 [![Licencia](https://img.shields.io/badge/licencia-Todos%20los%20derechos%20reservados-red)](LICENSE)
 
@@ -190,7 +190,7 @@ Características: contraseñas con **Argon2id** (bcrypt legacy con rehash transp
 
 ### Calidad
 
-- 428 pruebas backend (NestJS; 91.89 % líneas / 80.81 % ramas) · 155 pruebas unitarias de frontend (Vitest; 92.77 % líneas / 80.31 % ramas de lógica crítica; cobertura global de `src` 31 %, pendiente) · 18 pruebas E2E (Playwright: autenticación real, modo demo, marketplace, mapa móvil, publicación, perfiles, imágenes y accesibilidad axe).
+- 456 pruebas backend (NestJS; 91.89 % líneas / 80.50 % ramas) · 155 pruebas unitarias de frontend (Vitest; 92.77 % líneas / 80.31 % ramas de lógica crítica; cobertura global de `src` 32,34 %, pendiente) · 18 pruebas E2E (Playwright: autenticación real, modo demo, marketplace, mapa móvil, publicación, perfiles, imágenes y accesibilidad axe).
 
 ---
 
@@ -233,7 +233,7 @@ npm run dev                   # http://localhost:5173
 ### Pruebas
 
 ```bash
-cd apps/api && npm test -- --coverage   # unitarias + integración (91.89 % líneas / 80.81 % ramas)
+cd apps/api && npm test -- --coverage   # unitarias + integración (91.89 % líneas / 80.50 % ramas)
 cd frontend && npm run test:unit       # unitarias (Vitest)
 cd frontend && npm run test:e2e        # E2E (levanta API y web)
 ```
@@ -279,7 +279,7 @@ Despliegue (resumen): Blueprint `render.yaml` → `DATABASE_URL` del PostgreSQL 
 
 ## Sincronización entre entornos (local · GitHub · Notion · Obsidian)
 
-Un **manifiesto de hechos canónicos** (`tools/alignment-check/manifest.json`) centraliza los datos compartidos —URLs, stack, cifras de trazabilidad (17·68·30·66·69·6), conteos de pruebas (428 · 155 · 18), visibilidad del repositorio y última release— y un verificador comprueba que los cuatro entornos manejen la misma información **sin incongruencias**. No son espejos: cada entorno conserva su rol; el mecanismo garantiza que los hechos compartidos sean idénticos y, ante cada ❌, indica exactamente **qué actualizar** (`→ hint`).
+Un **manifiesto de hechos canónicos** (`tools/alignment-check/manifest.json`) centraliza los datos compartidos —URLs, stack, cifras de trazabilidad (17·68·30·66·69·6), conteos de pruebas (456 · 155 · 18), visibilidad del repositorio y última release— y un verificador comprueba que los cuatro entornos manejen la misma información **sin incongruencias**. No son espejos: cada entorno conserva su rol; el mecanismo garantiza que los hechos compartidos sean idénticos y, ante cada ❌, indica exactamente **qué actualizar** (`→ hint`).
 
 ```bash
 node tools/alignment-check/check-alignment.mjs        # local + GitHub (+ API) + Obsidian

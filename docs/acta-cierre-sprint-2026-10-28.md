@@ -4,7 +4,7 @@
 
 ### Documento de conciliación entre el estado reportado al 28/10/2026 y la verificación técnica al 24/11/2026
 
-**Versión:** 1.9 — verificada; pendientes A, B y E cerrados; fase 3 cerrada (F1–F5) y hardening de producción  
+**Versión:** 2.2 — cierre técnico; pendientes A, B, E, F y P-01 cerrados; fase 3 cerrada (F1–F5)  
 **Estado:** Aprobada técnicamente; pendiente de firma institucional  
 **Documento fuente:** `AgroConnect_Estado_Avance_Sprint_2026-10-28.pdf`
 
@@ -16,11 +16,11 @@
 | Ciudad | Armenia, Quindío |
 | Fecha de corte documental | 28 de octubre de 2026 |
 | Fecha de generación del acta | 16 de noviembre de 2026 |
-| Fecha de actualización | 24 de noviembre de 2026 |
+| Fecha de actualización | 26 de noviembre de 2026 (P-01) |
 | Rama y commit del PDF | `develop @ 588b234` |
 | Rama verificada | `feature/property-map-phase-2` |
-| Commit base de la verificación | `ff72e9d` |
-| Estado del árbol verificado | Limpio al 16/11; los cambios del cierre se incorporan en `9d884c2` (parcelas) y `eac538e` (calidad backend) |
+| Commit base de la verificación | `2be7ec7` |
+| Estado del árbol verificado | Código P-01 en `2be7ec7`; cierre documental en curso |
 | PRs abiertos reportados en el PDF | 0 |
 
 ---
@@ -53,7 +53,7 @@ No forman parte de esta acta:
 
 ### 1.4 Método y fuentes
 
-La verificación se realizó sobre el repositorio local, en la rama `feature/property-map-phase-2`, con HEAD base `ff72e9d` y los cambios del cierre en el árbol de trabajo. Se contrastaron el PDF, el manifiesto `tools/alignment-check/manifest.json`, los ADRs de `docs/adr/`, las matrices de trazabilidad, el historial de Git, las suites de pruebas y los gates de lint, typecheck, build, arquitectura, contratos y alineación. Las cifras del PDF se conservan como estado histórico del 28/10/2026; las cifras del acta corresponden a la verificación del 17/11/2026.
+La verificación se realizó sobre el repositorio local, en la rama `feature/property-map-phase-2`, con HEAD `2be7ec7` y el cierre documental en curso. Se contrastaron el PDF, el manifiesto `tools/alignment-check/manifest.json`, los ADRs de `docs/adr/`, las matrices de trazabilidad, el historial de Git, las suites de pruebas y los gates de lint, typecheck, build, arquitectura, contratos y alineación. Las cifras del PDF se conservan como estado histórico del 28/10/2026; las cifras del acta corresponden a la verificación del 17/11/2026.
 
 ---
 
@@ -65,13 +65,13 @@ Sin embargo, la lectura granular del propio PDF muestra que la fase 0 seguía `P
 
 ### 2.1 Indicadores clave
 
-| Indicador | PDF — 28/10/2026 | Verificación — 17/11/2026 | Lectura |
+| Indicador | PDF — 28/10/2026 | Verificación — 26/11/2026 | Lectura |
 | --- | --- | --- | --- |
-| Pruebas automatizadas | 373 | 488 (421 API + 53 web + 14 E2E) | Diferencia de conteo; ver §8-D1 |
-| E2E Playwright | 10/10 | 14/14 | La suite se amplió después del corte; ver §8-D2 |
+| Pruebas automatizadas | 373 | 629 (456 API + 155 web + 18 E2E) | Diferencia de conteo; ver §8-D1 |
+| E2E Playwright | 10/10 | 18/18 | La suite se amplió después del corte; ver §8-D2 |
 | Tareas Turbo | 13/13 en verde | Gates en verde: `lint`, `typecheck`, `build`, `test`, `arch:check` y `check:drift` | No se recontó el total de tareas Turbo; no se observaron regresiones |
 | Vulnerabilidades HIGH | 0 | 0 (`npm audit`: 0 vulnerabilidades en raíz y API) | Confirmado y mejorado |
-| Cobertura (API) | No reportada | 92,30 % líneas / 80,69 % ramas / 92,36 % statements / 94,53 % funciones | Umbral del 80 % cumplido; ver §5.1 |
+| Cobertura (API) | No reportada | 91,89 % líneas / 80,50 % ramas / 91,45 % statements / 94,86 % funciones | Umbral del 80 % cumplido; ver §5.1 |
 | Trazabilidad canónica | No reportada en el KPI | 17 módulos, 68 RF, 30 RNF, 66 CU, 69 HU, 6 actores | Fuente: manifiesto de alineación |
 
 ### 2.2 Logros consolidados
@@ -80,18 +80,20 @@ Sin embargo, la lectura granular del propio PDF muestra que la fase 0 seguía `P
 - Monorepo contract-first con npm workspaces, Turborepo, lockfile único y `packages/contracts`.
 - Backend NestJS 11 con Prisma 7, PostgreSQL 16 + PostGIS, Helmet, Pino con `correlationId`, validación Zod, filtro global de errores, throttling y cookie de sesión `httpOnly`.
 - Identidad con ocho casos de uso, SMTP real y flujo de registro, login, refresh y logout verificado.
+- Administración de usuarios (RF-07/08/09): listado/búsqueda, detalle, cambio de estado y rol, con protección del último administrador y revocación de sesiones.
+- Endurecimiento P-01: lock asesor de PostgreSQL, guard de roles registrado en los módulos, `no-store` en `/admin`, logs sin query PII y validación de perfil antes de cambiar de rol.
 - Marketplace con moderación previa (`pending`, `approved`, `rejected`), perfiles de productor/empresa y cargas firmadas a Cloudinary.
 - Port geoespacial cerrado: CRUD de parcelas con validación de polígono en dominio, área y centroide calculados por PostGIS, búsqueda por proximidad con `ST_DWithin` y autorización por rol.
 - Kit de calidad backend cerrado: gate de arquitectura con dependency-cruiser, Swagger en `/docs`, seed reproducible con guard de seguridad y pruebas de integración contra PostGIS real con Testcontainers.
 - Endurecimiento HTTP: límite de cuerpo JSON de 32 kB con `413 PAYLOAD_TOO_LARGE`, CORS validado y registrado antes del parser, `x-correlation-id` validado por expresión regular y `Cache-Control: no-store` en rutas autenticadas.
 - `npm audit` en 0 vulnerabilidades mediante `overrides.glob` en el `package.json` raíz.
 - CI con Node 24, verificación de contratos y gates de calidad.
-- Diecisiete ADRs en el repositorio, incluidas las decisiones de Cloudinary firmado, marketplace vitrina y moderación previa.
+- Diecinueve ADRs en el repositorio, incluidas las decisiones de Cloudinary firmado, marketplace vitrina, moderación previa, router/datos/UI y tipos OpenAPI.
 - Doce migraciones locales, incluidas las tres del port geoespacial (`20261116000000`, `20261116000001` y `20261116000002`).
 
 ### 2.3 Brechas principales
 
-- Fases 4, 5 y 6: Jira, Notion y sincronización, bloqueadas por accesos externos.
+- Fases 4, 5 y 6: Jira, Notion y sincronización, bloqueadas por accesos externos. La administración de usuarios (P-01) quedó cerrada en backend.
 - Despliegue de producción desactualizado en Render, con 404 en endpoints ya implementados.
 - Decisiones de política pendientes para el flujo de moderación P2.
 - Base de frontend: F1 (router y URLs) en `6e93652`, F2 (TanStack Query) en `5c41fea`, F3 (`src/shared/ui` + gate axe) en `7b00dbc`, F4 (división del shell del marketplace) en `f446c5d`, F5 (ADR-024, README y acta) y hardening de producción en `9fbe7d8`; el cliente OpenAPI se resolvió con ADR-025 (tipos generados) y el LCP de marketplace sigue en seguimiento.
@@ -106,11 +108,11 @@ La tabla conserva el estado literal del PDF y lo contrasta con la verificación 
 | Fase | Estado en el PDF (28/10) | Estado real verificado (16/11) | Evidencia | Observación |
 | --- | --- | --- | --- | --- |
 | 0 | PARCIAL | PARCIAL | Rama y PRs operativos; Jira anterior responde 404; plantillas Notion sin compartir | Cierra cuando se resuelvan los accesos externos |
-| 1 | CERRADA | CERRADA | PR #52 · `ae1ffc2`; ADRs 008–015 y workflow de ingeniería | El repositorio acumula 17 ADRs: 0001, 0008–0023 |
+| 1 | CERRADA | CERRADA | PR #52 · `ae1ffc2`; ADRs 008–015 y workflow de ingeniería | El repositorio acumula 19 ADRs: 0001 y 0008–0025 |
 | 2.1 | CERRADA | CERRADA | PR #51 · `5423e52`; siete hallazgos P0 corregidos | Rutas reales bajo `apps/api/src/...`; ver §8-D5 |
 | 2.2 | CERRADA | CERRADA | PR #54 · `6326ecc`, `71196a8`; monorepo, contratos, build dual y CI | Sin cambios de alcance |
 | 2.3 | CERRADA | CERRADA | PR #57 · `8b5e6bc`; NestJS 11, Prisma 7, identidad, SMTP, cookie y throttling | El PDF dice `backend/`; el código real está en `apps/api` |
-| 2.4 | PARCIAL | PARCIAL con avance | PR #59 · `0c5a88b`; dominio y 8 CU portados. `84db165` implementa `GET/PATCH /api/v1/profile/me`, rol y UI "Mi perfil" | Siguen pendientes los endpoints de administración de usuarios |
+| 2.4 | PARCIAL | CERRADA | PR #59 · `0c5a88b`; dominio y 8 CU portados. `84db165` implementa `GET/PATCH /api/v1/profile/me`, rol y UI "Mi perfil". P-01 añade `GET /admin/users`, detalle, cambio de estado y rol, con 28 pruebas nuevas | Cierre en backend; UI administrativa queda como pendiente de producto |
 | 2.5 | BACKEND SÍ | CERRADA | Cookie `httpOnly` implementada y probada; `5267e8b` migra el frontend a cookie-only y elimina el fallback Bearer | Cierre del pendiente B |
 | 2.6 | CERRADA | CERRADA | `SmtpEmailService` con Nodemailer; `FileEmailService` solo para desarrollo/pruebas | Sin cambios |
 | 2.7 | PENDIENTE | CERRADA | CRUD `/plots` con PostGIS, `/plots/nearby` con `ST_DWithin`, tres migraciones y E2E contra PostGIS real | Cierre del pendiente A |
@@ -121,7 +123,7 @@ La tabla conserva el estado literal del PDF y lo contrasta con la verificación 
 | 6 | PENDIENTE | PENDIENTE | La sincronización de cuatro entornos depende de 4 y 5 | No puede iniciar sin las fases 4 y 5 |
 | 7 | BACKLOG | BACKLOG | Roadmap post-MVP | Fuera del alcance del sprint |
 
-**Lectura de cierre:** las fases 1, 2.1, 2.2, 2.3, 2.5, 2.6, 2.7 y 2.8 están cerradas; 0 y 2.4 están parciales; 3 está en ejecución con F1, F2 y F3 cerradas y 6 pendiente; 4 y 5 están bloqueadas; 7 permanece en backlog. Por tanto, la afirmación del resumen ejecutivo del PDF según la cual "las fases 0, 1 y 2 están cerradas" debe interpretarse como cierre de los hitos principales de la fase 2, no como cierre total de todas sus subfases. Con los pendientes A, B y E cerrados, el resto de la fase 2 queda limitado a los endpoints de administración de usuarios (2.4) y a los accesos externos de la fase 0.
+**Lectura de cierre:** las fases 1, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8 y 3 están cerradas; 0 está parcial; 6 pendiente; 4 y 5 están bloqueadas; 7 permanece en backlog. Por tanto, la afirmación del resumen ejecutivo del PDF según la cual "las fases 0, 1 y 2 están cerradas" debe interpretarse como cierre de los hitos principales de la fase 2, no como cierre total de todas sus subfases. Con los pendientes A, B, E, F y P-01 cerrados, la fase 2 queda cerrada; el frente abierto es la fase 0 por accesos externos.
 
 ---
 
@@ -149,21 +151,21 @@ La fase 2.1 se cerró con el PR #51 (`5423e52`). Los siete hallazgos y sus corre
 
 | Suite | Cantidad | Estado |
 | --- | --- | --- |
-| Backend / API | 421 (45 suites) | En verde |
-| Frontend / web | 53 (15 archivos) | En verde |
-| E2E Playwright | 14 | En verde |
-| Total automatizado | 488 | En verde |
-| Cobertura de líneas (API) | 92,30 % (1716/1859) | Verificada |
-| Cobertura de ramas (API) | 80,69 % (836/1036) | Verificada, umbral 80 % |
-| Cobertura de statements (API) | 92,36 % (1803/1952) | Verificada |
-| Cobertura de funciones (API) | 94,53 % (415/439) | Verificada |
+| Backend / API | 456 (48 suites) | En verde |
+| Frontend / web | 155 (25 archivos) | En verde |
+| E2E Playwright | 18 | En verde |
+| Total automatizado | 629 | En verde |
+| Cobertura de líneas (API) | 91,89 % (1859/2023) | Verificada |
+| Cobertura de ramas (API) | 80,50 % (933/1159) | Verificada, umbral 80 % |
+| Cobertura de statements (API) | 91,45 % (1990/2176) | Verificada |
+| Cobertura de funciones (API) | 94,86 % (443/467) | Verificada |
 
-Gates ejecutados el 17/11/2026: `lint`, `typecheck`, `build`, `test`, `arch:check`, `generate:openapi`, `check:drift`, `prisma migrate status` (dev y test) y `npm audit`. El PDF reporta 13/13 tareas Turbo; en esta acta se deja constancia de los gates ejecutados y de la ausencia de regresiones observadas, sin recontar el total de tareas. **Nota:** las cifras de esta sección son el corte del 17/11/2026; el estado del 26/11/2026 es 428 API + 155 frontend + 18 E2E (601), con cobertura API de 91,89 % líneas / 80,81 % ramas y frontend de 92,77 % líneas / 80,31 % ramas de lógica crítica (cobertura global de `src` ~31 %, pendiente), documentado en §5.9 y en las filas 3/F de §7.1.
+Gates ejecutados el 17/11/2026: `lint`, `typecheck`, `build`, `test`, `arch:check`, `generate:openapi`, `check:drift`, `prisma migrate status` (dev y test) y `npm audit`. El PDF reporta 13/13 tareas Turbo; en esta acta se deja constancia de los gates ejecutados y de la ausencia de regresiones observadas, sin recontar el total de tareas. **Nota:** las cifras de esta sección son el corte del 17/11/2026; el estado del 26/11/2026 es 456 API + 155 frontend + 18 E2E (629), con cobertura API de 91,89 % líneas / 80,50 % ramas y frontend de 92,77 % líneas / 80,31 % ramas de lógica crítica (cobertura global de `src` 32,34 % líneas / 28,33 % ramas, pendiente), documentado en §5.9 y en las filas 3/F de §7.1.
 
 Evidencia de los gates del backend:
 
 - `typecheck`, `lint`, `arch:check` y `test` con código de salida 0.
-- `arch:check`: `✔ no dependency violations found (123 modules, 383 dependencies cruised)`.
+- `arch:check`: `✔ no dependency violations found (129 modules, 422 dependencies cruised)`.
 - `npm audit`: 0 vulnerabilidades en raíz y en `@agroconnect/api`.
 - `prisma migrate status`: 12 migraciones, `Database schema is up to date!` en `agroconnect_dev` y `agroconnect_test`.
 - `check:drift`: `✓ openapi.json sincronizado con los esquemas Zod (sin drift)`.
@@ -201,7 +203,7 @@ Los mensajes se presentan de forma abreviada; el hash es la referencia canónica
 
 ### 5.4 ADRs
 
-El repositorio contiene 17 archivos en `docs/adr/`: `0001`, `0008` a `0015`, `0016` a `0020` y `0021` a `0023`, además del `README.md`. Las decisiones más relevantes para este cierre son:
+El repositorio contiene 19 ADRs numerados en `docs/adr/`: `0001`, `0008` a `0015`, `0016` a `0020` y `0021` a `0025`, además del `README.md`. Las decisiones más relevantes para este cierre son:
 
 | ADR | Decisión |
 | --- | --- |
@@ -327,7 +329,7 @@ El marketplace es una vitrina: no gestiona precio, unidad ni inventario. La mode
 
 | Residual | Impacto | Acción |
 | --- | --- | --- |
-| Endpoints de administración de usuarios | Fase 2.4 incompleta | Definir alcance y contrato; implementar y probar |
+| Endpoints de administración de usuarios | Fase 2.4 incompleta | **Cerrado en P-01**: 4 endpoints, 28 pruebas nuevas y E2E contra PostgreSQL |
 | Fixture de administrador para E2E | Cobertura E2E limitada | Crear fixture reproducible y prueba de moderación |
 | Paginación de `GET /products/pending` | Escalabilidad del panel de moderación | Cerrado en `6b835b3`: `limit` 1..100 (default 20), `offset` y orden `createdAt,id` |
 | Prueba automatizada de `create:admin` | Operación no cubierta | Añadir prueba de integración del script |
@@ -346,13 +348,13 @@ El marketplace es una vitrina: no gestiona precio, unidad ni inventario. La mode
 
 | ID | Discrepancia | PDF dice | Realidad verificada | Explicación | Acción |
 | --- | --- | --- | --- | --- | --- |
-| D1 | Total de pruebas | 373 | 488 (421 + 53 + 14) al 17/11; 601 (428 + 155 + 18) al 26/11 | El PDF no discrimina por suite; las cifras crecieron con el port geoespacial, F3 y el mapa móvil | Usar el conteo vigente (568) en el próximo informe y conservar 488 como corte histórico |
-| D2 | E2E | 10/10 | 14/14 al 24/11; 17/17 al 26/11 | La suite se amplió con F3 y el mapa móvil | Usar 17/17 en el próximo informe |
+| D1 | Total de pruebas | 373 | 488 (421 + 53 + 14) al 17/11; 629 (456 + 155 + 18) al 26/11 | El PDF no discrimina por suite; las cifras crecieron con el port geoespacial, F3, P-01 y el mapa móvil | Usar el conteo vigente (629) en el próximo informe y conservar 488 como corte histórico |
+| D2 | E2E | 10/10 | 14/14 al 24/11; 18/18 al 26/11 | La suite se amplió con F3 y el mapa móvil | Usar 18/18 en el próximo informe |
 | D3 | Estado de la fase 0 | Resumen: fases 0–2 cerradas; tabla: fase 0 PARCIAL | Fase 0 PARCIAL | La fase 0 depende de Jira y Notion; prevalece la lectura granular | Corregir la redacción del próximo informe |
-| D4 | Commit de corte | `588b234` | `ff72e9d` | El PDF se generó en un corte anterior; el repositorio avanzó con perfiles, moderación y correcciones | Mantener ambos como "corte PDF" y "verificación actual" |
+| D4 | Commit de corte | `588b234` | `2be7ec7` | El PDF se generó en un corte anterior; el repositorio avanzó con perfiles, moderación, P-01 y correcciones | Mantener ambos como "corte PDF" y "verificación actual" |
 | D5 | Rutas de los hallazgos | `backend/src/...` | `apps/api/src/...` | El código se movió al monorepo; la desviación ya está registrada en la fase 2.3 | Actualizar referencias en el acta; no reescribir el PDF |
-| D6 | `GET/PATCH /me` | Fase 2.4: faltan | Implementados en `84db165` | El PDF es anterior a la implementación de perfiles | Reclasificar 2.4 como "PARCIAL con avance" |
-| D8 | Cobertura reportada | No reportada en el PDF; acta v1.0: 94,01 % líneas / 82,32 % ramas | 92,30 % líneas / 80,69 % ramas (API, 45 suites) | La acta v1.0 no indicaba la suite medida; al incorporar las pruebas del port geoespacial la cobertura de API desciende, pero permanece por encima del umbral del 80 % | Reportar siempre cobertura por suite y con numerador/denominador |
+| D6 | `GET/PATCH /me` y admin | Fase 2.4: faltan | Perfiles en `84db165`; administración en P-01 | El PDF es anterior a la implementación | Fase 2.4 cerrada en backend |
+| D8 | Cobertura reportada | No reportada en el PDF; acta v1.0: 94,01 % líneas / 82,32 % ramas | 91,89 % líneas / 80,50 % ramas (API, 48 suites) | La cobertura baja al incorporar más código, pero permanece por encima del umbral del 80 % | Reportar siempre cobertura por suite y con numerador/denominador |
 
 ---
 
@@ -458,4 +460,4 @@ Los comandos de Prisma deben ejecutarse desde `apps/api`; el resto, desde la ra�
 ---
 
 **Fin del documento.**  
-Versión 1.9 — verificada el 26/11/2026. Los pendientes A, B y E constan como cerrados con la evidencia de §5. El pendiente F quedó cerrado: F1 cerrada en `6e93652`, endurecida tras la doble revisión en `4f5e8f9` y con los residuales P2 resueltos en `7bc97c3` (§5.8); F2 cerrada en `5c41fea`; F3 cerrada en `7b00dbc` con `src/shared/ui`, migración de autenticación y gate axe en `/login`, `/registro`, `/marketplace` y `/moderacion`; F4 cerrada en `f446c5d` con el shell del marketplace dividido en `src/features/marketplace/components` y bundle inicial de 109,4 KB gzip; F5 cerrada con `docs/adr/0024-fase-3-router-datos-ui.md`, el README del frontend y esta acta; hardening de producción en `9fbe7d8`, priorización above-the-fold en `26167f4`, división diferida de Leaflet en `267b8cf` y decisión de tipos OpenAPI en ADR-025. El LCP móvil de marketplace quedó en 2,83 s, a 0,33 s del objetivo, sin tiles de terceros en el LCP; el bundle inicial es 109,4 KB gzip. Las firmas de §10 permanecen pendientes.
+Versión 2.2 — verificada el 26/11/2026. Los pendientes A, B, E, F y P-01 constan como cerrados con la evidencia de §5. El pendiente F quedó cerrado: F1 cerrada en `6e93652`, endurecida tras la doble revisión en `4f5e8f9` y con los residuales P2 resueltos en `7bc97c3` (§5.8); F2 cerrada en `5c41fea`; F3 cerrada en `7b00dbc` con `src/shared/ui`, migración de autenticación y gate axe en `/login`, `/registro`, `/marketplace` y `/moderacion`; F4 cerrada en `f446c5d` con el shell del marketplace dividido en `src/features/marketplace/components` y bundle inicial de 109,4 KB gzip; F5 cerrada con `docs/adr/0024-fase-3-router-datos-ui.md`, el README del frontend y esta acta; hardening de producción en `9fbe7d8`, priorización above-the-fold en `26167f4`, división diferida de Leaflet en `267b8cf` y decisión de tipos OpenAPI en ADR-025. El LCP móvil de marketplace quedó en 2,83 s, a 0,33 s del objetivo, sin tiles de terceros en el LCP; el bundle inicial es 109,4 KB gzip. Las firmas de §10 permanecen pendientes.
