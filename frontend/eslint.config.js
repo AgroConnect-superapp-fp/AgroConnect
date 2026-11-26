@@ -42,8 +42,9 @@ export default tseslint.config(
       ],
       '@typescript-eslint/no-empty-object-type': 'off',
 
-      // Permitir console.log en desarrollo
-      'no-console': 'off',
+      // SPEC §12: prohibido console.log en producción. Se permite el logger
+      // de desarrollo (devLog) y los errores/avisos legítimos.
+      'no-console': ['error', { allow: ['error', 'warn'] }],
 
       'prefer-const': 'error',
       'no-var': 'error',
