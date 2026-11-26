@@ -111,4 +111,83 @@ describe('apiRequest', () => {
 
     expect(onExpired).toHaveBeenCalledTimes(1);
   });
+
+  it('devuelve undefined en 204', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(new Response(null, { status: 204 }))
+    );
+    await expect(
+      apiRequest('/api/v1/auth/logout', { method: 'POST' })
+    ).resolves.toBeUndefined();
+  });
+
+  it('propaga el error de negocio del sobre', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        jsonResponse(
+          {
+            success: false,
+            error: {
+              code: 'VALIDATION_ERROR',
+              message: 'Datos inválidos',
+              details: ['x'],
+            },
+          },
+          400
+        )
+      )
+    );
+    await expect(apiRequest('/api/v1/products')).rejects.toMatchObject({
+      status: 400,
+      code: 'VALIDATION_ERROR',
+      details: ['x'],
+    });
+  });
+
+  it('usa INTERNAL_ERROR si la respuesta falla sin sobre', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse({}, 500)));
+    await expect(apiRequest('/api/v1/products')).rejects.toMatchObject({
+      status: 500,
+      code: 'INTERNAL_ERROR',
+    });
+  });
+
+  it('usa INTERNAL_ERROR si la respuesta exitosa no trae data', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse({ success: true })));
+    await expect(apiRequest('/api/v1/products')).rejects.toMatchObject({
+      status: 200,
+      code: 'INTERNAL_ERROR',
+    });
+  });
+
+  it('no intenta refresh en otras rutas de auth', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(null, { status: 401 }));
+    vi.stubGlobal('fetch', fetchMock);
+    await expect(apiRequest('/api/v1/auth/login')).rejects.toMatchObject({ status: 401 });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('convierte el timeout en NETWORK_ERROR', async () => {
+    vi.useFakeTimers();
+    const fetchMock = vi.fn((_url: string, init?: RequestInit) => {
+      return new Promise((_resolve, reject) => {
+        init?.signal?.addEventListener('abort', () =>
+          reject(new DOMException('aborted', 'AbortError'))
+        );
+      });
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    const expectation = expect(
+      apiRequest('/api/v1/products', {}, 10)
+    ).rejects.toMatchObject({
+      status: 0,
+      code: 'NETWORK_ERROR',
+      message: expect.stringContaining('tardó demasiado'),
+    });
+    await vi.advanceTimersByTimeAsync(10);
+    await expectation;
+    vi.useRealTimers();
+  });
 });

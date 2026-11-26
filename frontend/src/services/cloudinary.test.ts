@@ -31,8 +31,8 @@ class MockXhr {
   upload = new EventTarget();
   status = 200;
   responseText = JSON.stringify({ public_id: 'foto', secure_url: 'https://x' });
-  private loadHandler?: () => void;
-  private errorHandler?: () => void;
+  protected loadHandler?: () => void;
+  protected errorHandler?: () => void;
   open = vi.fn();
   abort = vi.fn();
   addEventListener = vi.fn((event: string, handler: () => void) => {
@@ -91,6 +91,7 @@ describe('cloudinary URL helpers', () => {
     );
     expect(getLqipUrl('https://example.com/a.jpg')).toBe('https://example.com/a.jpg');
     expect(getLqipUrl('no-es-url')).toContain('res.cloudinary.com');
+    expect(getLqipUrl('http://%')).toBe('http://%');
   });
 });
 
@@ -127,6 +128,47 @@ describe('validateImageFile', () => {
         new File([new Uint8Array(11 * 1024 * 1024)], 'a.jpg', { type: 'image/jpeg' })
       )
     ).resolves.toMatchObject({ valid: false, error: expect.stringContaining('grande') });
+  });
+
+  it('rechaza imágenes corruptas y errores de lectura', async () => {
+    class CorruptImage extends MockImage {
+      override naturalWidth = 0;
+      override naturalHeight = 0;
+    }
+    vi.stubGlobal('Image', CorruptImage);
+    await expect(
+      validateImageFile(new File(['x'], 'a.jpg', { type: 'image/jpeg' }), {
+        minWidth: 0,
+        minHeight: 0,
+      })
+    ).resolves.toMatchObject({
+      valid: false,
+      error: expect.stringContaining('corrupto'),
+    });
+
+    class ErrorImage extends MockImage {
+      override set src(_value: string) {
+        queueMicrotask(() => this.onerror?.());
+      }
+    }
+    vi.stubGlobal('Image', ErrorImage);
+    await expect(
+      validateImageFile(new File(['x'], 'a.jpg', { type: 'image/jpeg' }))
+    ).resolves.toMatchObject({ valid: false, error: expect.stringContaining('leer') });
+  });
+
+  it('rechaza imágenes por debajo del mínimo', async () => {
+    class SmallImage extends MockImage {
+      override naturalWidth = 50;
+      override naturalHeight = 50;
+    }
+    vi.stubGlobal('Image', SmallImage);
+    await expect(
+      validateImageFile(new File(['x'], 'a.jpg', { type: 'image/jpeg' }))
+    ).resolves.toMatchObject({
+      valid: false,
+      error: expect.stringContaining('pequeña'),
+    });
   });
 
   it('acepta una imagen con dimensiones suficientes', async () => {
@@ -173,6 +215,33 @@ describe('uploadImage', () => {
         signal: controller.signal,
       })
     ).rejects.toMatchObject({ name: 'AbortError' });
+  });
+
+  it('reintenta un fallo de red y termina con éxito', async () => {
+    vi.useFakeTimers();
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    class RetryXhr extends MockXhr {
+      static attempts = 0;
+      override send = vi.fn(() => {
+        RetryXhr.attempts += 1;
+        if (RetryXhr.attempts === 1) {
+          this.failNetwork();
+        } else {
+          this.loadHandler?.();
+        }
+      });
+    }
+    vi.stubGlobal('XMLHttpRequest', RetryXhr);
+
+    const promise = uploadImage({
+      file: new File(['x'], 'a.jpg', { type: 'image/jpeg' }),
+    });
+    await vi.advanceTimersByTimeAsync(1_000);
+    await expect(promise).resolves.toMatchObject({ public_id: 'foto' });
+    expect(RetryXhr.attempts).toBe(2);
+    expect(warnSpy).toHaveBeenCalled();
+    vi.useRealTimers();
+    warnSpy.mockRestore();
   });
 
   it('no reintenta errores 4xx', async () => {
