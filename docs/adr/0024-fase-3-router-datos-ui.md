@@ -108,7 +108,7 @@ Gates al cierre de F4 (26/11/2026):
 - E2E Playwright: **16/16** (`/tmp/opencode/e2e-f4.log`), incluidos marketplace,
   detalle, publicación, demo y axe en `/login`, `/registro`, `/marketplace` y
   `/moderacion`.
-- Bundle inicial medido desde `dist/index.html`: **162,8 KB gzip** (límite
+- Bundle inicial medido desde `dist/index.html`: **109,4 KB gzip** (límite
   200 KB de `SPEC.md` §10).
 - Sin violaciones axe WCAG 2.1 A/AA en las cuatro rutas del gate.
 
@@ -129,8 +129,8 @@ Gates al cierre de F4 (26/11/2026):
 
 - Dos dependencias nuevas (`react-router`, `@tanstack/react-query`) y una
   superficie de API que el equipo debe conocer.
-- El bundle inicial queda en 162,8 KB gzip: dentro del presupuesto, pero con
-  37,2 KB de margen. Cualquier dependencia nueva debe medirse.
+- El bundle inicial queda en 109,4 KB gzip: dentro del presupuesto, pero con
+  90,6 KB de margen. Cualquier dependencia nueva debe medirse.
 - `MarketplaceShell` conserva estilos de animación en un bloque `<style>` por
   razones de compatibilidad visual; es deuda estética, no funcional.
 
@@ -142,10 +142,10 @@ Gates al cierre de F4 (26/11/2026):
   perfil, marketplace y moderación antes de mergear.
 - **Crecimiento del bundle:** se mide en cada incremento; el límite de 200 KB es
   un gate, no una recomendación.
-- **LCP de marketplace:** el contenido propio pinta ~2,4 s, pero el tile de
-  OpenStreetMap domina el LCP (4,45 s, 82 % en `load delay`). El presupuesto de
-  2,5 s no se cumple por un recurso de terceros; se evaluará cargar el mapa tras
-  interacción o con placeholder estático.
+- **LCP de marketplace:** tras sacar Leaflet del entry y diferir el mapa móvil
+  (`26167f4`, `267b8cf`), el LCP es 2,83 s y su elemento es el `h1` propio. Queda
+  0,33 s sobre 2,5 s por render delay del entry + chunk de ruta; no hay tiles de
+  terceros en el LCP.
 
 ## Seguimiento
 

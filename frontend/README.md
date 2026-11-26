@@ -103,7 +103,7 @@ demo y el administrador E2E de forma idempotente. El gate axe cubre `/login`,
 
 ## Presupuesto
 
-Bundle inicial medido tras el hardening de producción (26/11/2026): **162,8 KB gzip** desde
+Bundle inicial medido tras el hardening de producción (26/11/2026): **109,4 KB gzip** desde
 `dist/index.html`, por debajo del límite de 200 KB de `SPEC.md` §10. Cualquier
 dependencia nueva debe medirse antes de mergear.
 
