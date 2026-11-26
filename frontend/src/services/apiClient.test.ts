@@ -57,4 +57,58 @@ describe('apiRequest', () => {
     });
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
+
+  it('no anuncia sesión expirada si el refresh falla por red', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(new Response(null, { status: 401 }))
+      .mockRejectedValueOnce(new TypeError('Failed to fetch'));
+    vi.stubGlobal('fetch', fetchMock);
+    const fakeWindow = new EventTarget();
+    const onExpired = vi.fn();
+    fakeWindow.addEventListener('agroconnect:session-expired', onExpired);
+    vi.stubGlobal('window', fakeWindow);
+
+    await expect(apiRequest('/api/v1/products')).rejects.toMatchObject({
+      status: 401,
+    });
+
+    expect(onExpired).not.toHaveBeenCalled();
+  });
+
+  it('no anuncia sesión expirada si el refresh responde 5xx', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(new Response(null, { status: 401 }))
+      .mockResolvedValueOnce(new Response(null, { status: 503 }));
+    vi.stubGlobal('fetch', fetchMock);
+    const fakeWindow = new EventTarget();
+    const onExpired = vi.fn();
+    fakeWindow.addEventListener('agroconnect:session-expired', onExpired);
+    vi.stubGlobal('window', fakeWindow);
+
+    await expect(apiRequest('/api/v1/products')).rejects.toMatchObject({
+      status: 401,
+    });
+
+    expect(onExpired).not.toHaveBeenCalled();
+  });
+
+  it('anuncia sesión expirada solo cuando el refresh rechaza la cookie', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(new Response(null, { status: 401 }))
+      .mockResolvedValueOnce(new Response(null, { status: 401 }));
+    vi.stubGlobal('fetch', fetchMock);
+    const fakeWindow = new EventTarget();
+    const onExpired = vi.fn();
+    fakeWindow.addEventListener('agroconnect:session-expired', onExpired);
+    vi.stubGlobal('window', fakeWindow);
+
+    await expect(apiRequest('/api/v1/products')).rejects.toMatchObject({
+      status: 401,
+    });
+
+    expect(onExpired).toHaveBeenCalledTimes(1);
+  });
 });

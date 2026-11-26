@@ -47,14 +47,23 @@ function isFailure<T>(body: ApiBody<T>): body is ApiFailureBody {
  * `timeoutMs` es opcional: auth no lo usa (el cold start de Render puede tardar
  * hasta un minuto); el marketplace sí lo usa para no dejar la UI bloqueada.
  */
-let refreshInFlight: Promise<boolean> | null = null;
+/**
+ * Resultado de renovar la cookie de acceso:
+ * - `refreshed`: hay sesión nueva y la petición original puede reintentarse.
+ * - `rejected`: el servidor rechazó la cookie (401/403); la sesión terminó.
+ * - `unavailable`: no se pudo consultar (red, timeout, 5xx); la cookie puede
+ *   seguir siendo válida y NO debe anunciarse una sesión expirada.
+ */
+type RefreshOutcome = 'refreshed' | 'rejected' | 'unavailable';
+
+let refreshInFlight: Promise<RefreshOutcome> | null = null;
 
 /**
  * Renueva la cookie de acceso una sola vez aunque varias peticiones reciban
  * 401 al mismo tiempo. El refresh token viaja en la cookie httpOnly; el
  * navegador la adjunta y la rota, sin que JavaScript lea ningún token.
  */
-async function refreshAccessToken(): Promise<boolean> {
+async function refreshAccessToken(): Promise<RefreshOutcome> {
   if (!refreshInFlight) {
     refreshInFlight = fetch(`${API_URL}/api/v1/auth/refresh`, {
       method: 'POST',
@@ -62,8 +71,12 @@ async function refreshAccessToken(): Promise<boolean> {
       headers: { 'X-Requested-With': 'XMLHttpRequest' },
       signal: AbortSignal.timeout(15_000),
     })
-      .then((response) => response.ok)
-      .catch(() => false)
+      .then((response): RefreshOutcome => {
+        if (response.ok) return 'refreshed';
+        if (response.status === 401 || response.status === 403) return 'rejected';
+        return 'unavailable';
+      })
+      .catch((): RefreshOutcome => 'unavailable')
       .finally(() => {
         refreshInFlight = null;
       });
@@ -110,10 +123,12 @@ export async function apiRequest<T>(
     response = await fetch(`${API_URL}${path}`, requestInit);
 
     if (response.status === 401 && shouldAttemptRefresh(path)) {
-      const refreshed = await refreshAccessToken();
-      if (refreshed) {
+      const outcome = await refreshAccessToken();
+      if (outcome === 'refreshed') {
         response = await fetch(`${API_URL}${path}`, requestInit);
-      } else if (typeof window !== 'undefined') {
+      } else if (outcome === 'rejected' && typeof window !== 'undefined') {
+        // Solo un rechazo explícito del servidor cierra la sesión local. Si la
+        // red falló, el 401 original se propaga sin borrar la sesión.
         window.dispatchEvent(new Event('agroconnect:session-expired'));
       }
     }
