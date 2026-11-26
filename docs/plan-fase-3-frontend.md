@@ -1,7 +1,7 @@
 # Plan Fase 3 — Router, capa de datos y sistema de componentes
 
 **Fecha:** 17 de noviembre de 2026
-**Estado:** F1 completada (24/11/2026); F2–F5 planificadas
+**Estado:** F1 y F2 completadas (25/11/2026); F3–F5 planificadas
 **Referencias:** acta de cierre del sprint 2026-10-28 §3 (fila 3), `SPEC.md` §10 (performance budget rural-first), ADR-022 y ADR-023.
 
 ---
@@ -103,6 +103,7 @@ Guardas como wrappers de ruta: `RequireAuth` y `RequireRole(['administrador'])`,
 - Mutaciones con invalidación: aprobar/rechazar invalida `pending` y `products`; publicar invalida `products` y `pending`.
 - Estados de carga/error con `Skeleton`, `EmptyState` y `ErrorState` (de F3).
 - **DoD:** tests de hooks con `apiClient` mockeado; sin cambios en `packages/contracts`; `npm test` y E2E de moderación en verde.
+- **Evidencia (25/11/2026):** cerrada en `5c41fea`. `QueryClientProvider` en `src/app/providers.tsx`; claves en `src/shared/api/queryKeys.ts`; hooks y mutaciones en `src/shared/api/hooks`; `plotsApi` con la distancia calculada por PostGIS. El logout y la sesión expirada vacían la caché. Gates: `tsc` y ESLint en cero, **103/103** unitarias (incluye 7 de hooks y 2 de limpieza de caché), build correcto (~109 KB gzip inicial) y E2E **14/14**.
 
 ### F3 — Sistema de componentes `src/shared/ui` (estimación: 3–5 días)
 

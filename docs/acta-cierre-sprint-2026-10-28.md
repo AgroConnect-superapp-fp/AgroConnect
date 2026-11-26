@@ -313,7 +313,7 @@ El marketplace es una vitrina: no gestiona precio, unidad ni inventario. La mode
 | C | Despliegue | Render con `TRUST_PROXY=1` y `CORS_ORIGIN` sin localhost; Blueprint; cabeceras en `frontend/vercel.json`; eliminar `vercel.json` raíz | Smoke de producción sin 404 en productos y perfil | DevOps / Infraestructura | Bloqueado por API key |
 | D | Documentación SENA | PT-ECU-01 v2.0 con 31 CU pendientes (referencias CU#23–28 y CU#37–66) y 6 actores; PT-IGS-01 secciones 1–10 con M14/M15/M17; PT-MTC-01 v2.0 secciones 1–8, Node 24, Render 512 MB y monolito modular | PDFs finales y matrices actualizadas | Documentación / SENA | Pendiente |
 | E | Calidad backend | dependency-cruiser, Swagger en `/docs`, `prisma/seed.ts` y Testcontainers PostGIS | `arch:check` 0 violaciones, `/docs` 200, seed con guard verificado, Testcontainers 6/6 | Backend / QA | Cerrado |
-| F | Base frontend | React Router 7, TanStack Query + cliente OpenAPI, `src/shared/ui` con Button/Input/Card/Modal/Toast/Skeleton/EmptyState; dividir `PropertyMap.tsx` y `MarketplacePrototype.tsx` | Build, lint, pruebas y smoke de rutas | Frontend | Pendiente |
+| F | Base frontend | React Router 7, TanStack Query + cliente OpenAPI, `src/shared/ui` con Button/Input/Card/Modal/Toast/Skeleton/EmptyState; dividir `PropertyMap.tsx` y `MarketplacePrototype.tsx` | Build, lint, pruebas y smoke de rutas | Frontend | En ejecución: F1 (`6e93652`) y F2 (`5c41fea`) cerradas; F3–F5 pendientes |
 
 **Nota sobre la fase D:** la cifra de 31 CU pendientes se conserva del PDF. Los rangos CU#23–28 y CU#37–66 son referencias de la matriz y no deben interpretarse como una lista exhaustiva hasta cruzar el detalle de los 66 CU.
 
