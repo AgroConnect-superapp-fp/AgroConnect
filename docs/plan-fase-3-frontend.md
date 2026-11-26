@@ -1,7 +1,7 @@
 # Plan Fase 3 — Router, capa de datos y sistema de componentes
 
 **Fecha:** 17 de noviembre de 2026
-**Estado:** F1 y F2 completadas (25/11/2026); F3–F5 planificadas
+**Estado:** F1, F2 y F3 completadas (26/11/2026); F4–F5 planificadas
 **Referencias:** acta de cierre del sprint 2026-10-28 §3 (fila 3), `SPEC.md` §10 (performance budget rural-first), ADR-022 y ADR-023.
 
 ---
@@ -111,6 +111,7 @@ Guardas como wrappers de ruta: `RequireAuth` y `RequireRole(['administrador'])`,
 - Reglas: foco visible, contraste WCAG AA, `aria-*` en formularios, textos en español, sin `any`.
 - Migración incremental: primero pantallas de autenticación, después marketplace.
 - **DoD:** pruebas RTL por componente + `axe-core` sin violaciones; Playwright con `@axe-core/playwright` en `/login`, `/registro`, `/marketplace` y `/moderacion`.
+- **Evidencia (26/11/2026):** cerrada en `7b00dbc`. `frontend/src/shared/ui` exporta `Button`, `Input`, `Field`, `Card`, `Badge`, `Alert`, `Modal`, `Skeleton`, `EmptyState`, `ErrorState`, `Pagination`, `Toast`/`ToastProvider`/`useToast`; `auth/components/Button.tsx` y `FormField.tsx` componen los primitivos compartidos sin cambiar su API. Se añadió `@testing-library/jest-dom` con setup global y `axe-core` para RTL (16 pruebas de UI). El gate Playwright amplió `e2e/a11y.spec.ts` a `/login`, `/registro` y `/moderacion`; esta última usa el fixture idempotente `seed:e2e-admin` sobre la base `_test`. Gates: `tsc` y ESLint en cero, **119/119** unitarias, build correcto y E2E **16/16** (`/tmp/opencode/e2e-f3.log`).
 
 ### F4 — División del shell del marketplace (estimación: 3–4 días)
 

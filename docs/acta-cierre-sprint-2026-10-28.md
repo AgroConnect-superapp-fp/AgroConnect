@@ -4,7 +4,7 @@
 
 ### Documento de conciliación entre el estado reportado al 28/10/2026 y la verificación técnica al 24/11/2026
 
-**Versión:** 1.5 — verificada; pendientes A, B y E cerrados; fase 3 en ejecución (F1 endurecida, residuales P2 resueltos)  
+**Versión:** 1.6 — verificada; pendientes A, B y E cerrados; fase 3 en ejecución (F1–F3 cerradas, F4–F5 pendientes)  
 **Estado:** Aprobada técnicamente; pendiente de firma institucional  
 **Documento fuente:** `AgroConnect_Estado_Avance_Sprint_2026-10-28.pdf`
 
@@ -94,7 +94,7 @@ Sin embargo, la lectura granular del propio PDF muestra que la fase 0 seguía `P
 - Fases 4, 5 y 6: Jira, Notion y sincronización, bloqueadas por accesos externos.
 - Despliegue de producción desactualizado en Render, con 404 en endpoints ya implementados.
 - Decisiones de política pendientes para el flujo de moderación P2.
-- Base de frontend: F1 (router y URLs) completada en `6e93652`; quedan TanStack Query, cliente OpenAPI y componentes compartidos.
+- Base de frontend: F1 (router y URLs) en `6e93652`, F2 (TanStack Query) en `5c41fea` y F3 (`src/shared/ui` + gate axe) en `7b00dbc`; queda el cliente OpenAPI tipado.
 - Inconsistencia de status de validación en `marketplace` e `identity` (400 en dominio frente a 422 en el contrato Zod), ya corregida en `geography`.
 
 ---
@@ -121,7 +121,7 @@ La tabla conserva el estado literal del PDF y lo contrasta con la verificación 
 | 6 | PENDIENTE | PENDIENTE | La sincronización de cuatro entornos depende de 4 y 5 | No puede iniciar sin las fases 4 y 5 |
 | 7 | BACKLOG | BACKLOG | Roadmap post-MVP | Fuera del alcance del sprint |
 
-**Lectura de cierre:** las fases 1, 2.1, 2.2, 2.3, 2.5, 2.6, 2.7 y 2.8 están cerradas; 0 y 2.4 están parciales; 3 está en ejecución con F1 cerrada y 6 pendiente; 4 y 5 están bloqueadas; 7 permanece en backlog. Por tanto, la afirmación del resumen ejecutivo del PDF según la cual "las fases 0, 1 y 2 están cerradas" debe interpretarse como cierre de los hitos principales de la fase 2, no como cierre total de todas sus subfases. Con los pendientes A, B y E cerrados, el resto de la fase 2 queda limitado a los endpoints de administración de usuarios (2.4) y a los accesos externos de la fase 0.
+**Lectura de cierre:** las fases 1, 2.1, 2.2, 2.3, 2.5, 2.6, 2.7 y 2.8 están cerradas; 0 y 2.4 están parciales; 3 está en ejecución con F1, F2 y F3 cerradas y 6 pendiente; 4 y 5 están bloqueadas; 7 permanece en backlog. Por tanto, la afirmación del resumen ejecutivo del PDF según la cual "las fases 0, 1 y 2 están cerradas" debe interpretarse como cierre de los hitos principales de la fase 2, no como cierre total de todas sus subfases. Con los pendientes A, B y E cerrados, el resto de la fase 2 queda limitado a los endpoints de administración de usuarios (2.4) y a los accesos externos de la fase 0.
 
 ---
 
@@ -313,7 +313,7 @@ El marketplace es una vitrina: no gestiona precio, unidad ni inventario. La mode
 | C | Despliegue | Render con `TRUST_PROXY=1` y `CORS_ORIGIN` sin localhost; Blueprint; cabeceras en `frontend/vercel.json`; eliminar `vercel.json` raíz | Smoke de producción sin 404 en productos y perfil | DevOps / Infraestructura | Bloqueado por API key |
 | D | Documentación SENA | PT-ECU-01 v2.0 con 31 CU pendientes (referencias CU#23–28 y CU#37–66) y 6 actores; PT-IGS-01 secciones 1–10 con M14/M15/M17; PT-MTC-01 v2.0 secciones 1–8, Node 24, Render 512 MB y monolito modular | PDFs finales y matrices actualizadas | Documentación / SENA | Pendiente |
 | E | Calidad backend | dependency-cruiser, Swagger en `/docs`, `prisma/seed.ts` y Testcontainers PostGIS | `arch:check` 0 violaciones, `/docs` 200, seed con guard verificado, Testcontainers 6/6 | Backend / QA | Cerrado |
-| F | Base frontend | React Router 7, TanStack Query + cliente OpenAPI, `src/shared/ui` con Button/Input/Card/Modal/Toast/Skeleton/EmptyState; dividir `PropertyMap.tsx` y `MarketplacePrototype.tsx` | Build, lint, pruebas y smoke de rutas | Frontend | En ejecución: F1 (`6e93652`) y F2 (`5c41fea`) cerradas; F3–F5 pendientes |
+| F | Base frontend | React Router 7, TanStack Query + cliente OpenAPI, `src/shared/ui` con Button/Input/Card/Modal/Toast/Skeleton/EmptyState; dividir `PropertyMap.tsx` y `MarketplacePrototype.tsx` | Build, lint, pruebas y smoke de rutas | Frontend | En ejecución: F1 (`6e93652`), F2 (`5c41fea`) y F3 (`7b00dbc`) cerradas; F4–F5 pendientes |
 
 **Nota sobre la fase D:** la cifra de 31 CU pendientes se conserva del PDF. Los rangos CU#23–28 y CU#37–66 son referencias de la matriz y no deben interpretarse como una lista exhaustiva hasta cruzar el detalle de los 66 CU.
 
@@ -452,4 +452,4 @@ Los comandos de Prisma deben ejecutarse desde `apps/api`; el resto, desde la ra�
 ---
 
 **Fin del documento.**  
-Versión 1.5 — verificada el 25/11/2026. Los pendientes A, B y E constan como cerrados con la evidencia de §5. El pendiente F está en ejecución: F1 cerrada en `6e93652`, endurecida tras la doble revisión en `4f5e8f9` y con los residuales P2 resueltos en `7bc97c3` (§5.8); F2–F5 siguen planificadas en `docs/plan-fase-3-frontend.md`. Las firmas de §10 permanecen pendientes.
+Versión 1.6 — verificada el 26/11/2026. Los pendientes A, B y E constan como cerrados con la evidencia de §5. El pendiente F está en ejecución: F1 cerrada en `6e93652`, endurecida tras la doble revisión en `4f5e8f9` y con los residuales P2 resueltos en `7bc97c3` (§5.8); F2 cerrada en `5c41fea`; F3 cerrada en `7b00dbc` con `src/shared/ui`, migración de autenticación y gate axe en `/login`, `/registro`, `/marketplace` y `/moderacion`. F4–F5 siguen planificadas en `docs/plan-fase-3-frontend.md`. Las firmas de §10 permanecen pendientes.
