@@ -90,7 +90,7 @@ npm run test:e2e -- e2e/a11y.spec.ts # Gate axe WCAG 2.1 A/AA
 npm run test:preview                 # Smoke del build de producción
 ```
 
-La cobertura unitaria mide los archivos que carga la suite y excluye `screenRoutes.tsx` (cubierto por E2E). Sobre todo `src/`, la cobertura global es ~31 %: ampliarla es deuda técnica abierta.
+La cobertura unitaria mide lógica crítica (servicios, API, hooks, routing, guards, tipos y utilidades): 92,77 % líneas / 80,31 % ramas. Excluye pantallas, `screenRoutes.tsx` y los hooks de Leaflet/upload, cubiertos por E2E. Sobre todo `src/`, la cobertura global es ~31 %: ampliarla es deuda técnica abierta.
 
 Los E2E viven en `e2e/` y usan `webServer` (API en `4100`, web en `5173`).
 Requieren la base `agroconnect_test` migrada; `global-setup.ts` siembra productos
