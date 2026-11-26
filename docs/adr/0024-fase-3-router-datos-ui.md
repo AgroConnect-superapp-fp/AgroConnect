@@ -108,7 +108,7 @@ Gates al cierre de F4 (26/11/2026):
 - E2E Playwright: **16/16** (`/tmp/opencode/e2e-f4.log`), incluidos marketplace,
   detalle, publicación, demo y axe en `/login`, `/registro`, `/marketplace` y
   `/moderacion`.
-- Bundle inicial medido desde `dist/index.html`: **181,2 KB gzip** (límite
+- Bundle inicial medido desde `dist/index.html`: **162,8 KB gzip** (límite
   200 KB de `SPEC.md` §10).
 - Sin violaciones axe WCAG 2.1 A/AA en las cuatro rutas del gate.
 
@@ -129,8 +129,8 @@ Gates al cierre de F4 (26/11/2026):
 
 - Dos dependencias nuevas (`react-router`, `@tanstack/react-query`) y una
   superficie de API que el equipo debe conocer.
-- El bundle inicial queda en 181,2 KB gzip: dentro del presupuesto, pero con
-  solo 18,8 KB de margen. Cualquier dependencia nueva debe medirse.
+- El bundle inicial queda en 162,8 KB gzip: dentro del presupuesto, pero con
+  37,2 KB de margen. Cualquier dependencia nueva debe medirse.
 - `MarketplaceShell` conserva estilos de animación en un bloque `<style>` por
   razones de compatibilidad visual; es deuda estética, no funcional.
 
@@ -145,8 +145,8 @@ Gates al cierre de F4 (26/11/2026):
 
 ## Seguimiento
 
-- Cliente OpenAPI tipado: pendiente (el contrato Zod se usa en registro y
-  validaciones puntuales; no se generó un cliente completo).
+- Cliente OpenAPI tipado: resuelto con ADR-025 (tipos generados y guard de
+  contrato en compilación; sin cliente HTTP runtime).
 - Medición LCP/TTI en 3G simulada: pendiente de un entorno de medición estable;
   el plan la referenciaba para F1/F4 y aún no se registró un número defendible.
 - Migración visual del marketplace a `src/shared/ui`: gradual, sin big-bang;

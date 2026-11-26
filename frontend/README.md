@@ -28,6 +28,7 @@ secreto.
 | `npm run lint` | ESLint con 0 warnings |
 | `npm run test` / `npm run test:unit` | Pruebas unitarias y de componentes (Vitest) |
 | `npm run test:e2e` | Playwright (levanta API y web automáticamente) |
+| `npm run test:preview` | Smoke del build: sirve `dist/` y verifica `/` y `/marketplace` |
 | `npm run quality` | Prettier + ESLint fix |
 
 ## Mapa de rutas
@@ -84,6 +85,7 @@ src/
 npm run test                         # Vitest (unitarias + RTL)
 npm run test:e2e                     # Playwright
 npm run test:e2e -- e2e/a11y.spec.ts # Gate axe WCAG 2.1 A/AA
+npm run test:preview                 # Smoke del build de producción
 ```
 
 Los E2E viven en `e2e/` y usan `webServer` (API en `4100`, web en `5173`).
@@ -101,7 +103,7 @@ demo y el administrador E2E de forma idempotente. El gate axe cubre `/login`,
 
 ## Presupuesto
 
-Bundle inicial medido al cierre de F4 (26/11/2026): **181,2 KB gzip** desde
+Bundle inicial medido tras el hardening de producción (26/11/2026): **162,8 KB gzip** desde
 `dist/index.html`, por debajo del límite de 200 KB de `SPEC.md` §10. Cualquier
 dependencia nueva debe medirse antes de mergear.
 

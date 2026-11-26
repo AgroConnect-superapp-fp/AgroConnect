@@ -33,5 +33,6 @@ Hay dos series de ADR:
 | [ADR-022](0022-marketplace-vitrina.md)                  | Marketplace vitrina sin precio/inventario en el MVP                                 | Aceptada — implementada            |
 | [ADR-023](0023-moderacion-previa-productos.md)          | Moderación previa de productos con rol administrador                                | Aceptada — implementada            |
 | [ADR-024](0024-fase-3-router-datos-ui.md)               | Fase 3 frontend: React Router 7, TanStack Query, `src/shared/ui` y URLs estables    | Aceptada — F1–F4 implementadas     |
+| [ADR-025](0025-tipos-openapi-sin-cliente-runtime.md)   | Tipos OpenAPI generados como guard de contrato, sin cliente HTTP runtime           | Aceptada — implementada            |
 
 Para una decisión nueva, copia la estructura de cualquier ADR: Estado, Fecha, Decisores, Relacionado, Contexto, Decisión, Alternativas y Consecuencias. Enlázala aquí y en el índice de ADRs de Obsidian.

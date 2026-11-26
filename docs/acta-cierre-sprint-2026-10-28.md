@@ -4,7 +4,7 @@
 
 ### Documento de conciliación entre el estado reportado al 28/10/2026 y la verificación técnica al 24/11/2026
 
-**Versión:** 1.8 — verificada; pendientes A, B y E cerrados; fase 3 cerrada (F1–F5)  
+**Versión:** 1.9 — verificada; pendientes A, B y E cerrados; fase 3 cerrada (F1–F5) y hardening de producción  
 **Estado:** Aprobada técnicamente; pendiente de firma institucional  
 **Documento fuente:** `AgroConnect_Estado_Avance_Sprint_2026-10-28.pdf`
 
@@ -94,7 +94,7 @@ Sin embargo, la lectura granular del propio PDF muestra que la fase 0 seguía `P
 - Fases 4, 5 y 6: Jira, Notion y sincronización, bloqueadas por accesos externos.
 - Despliegue de producción desactualizado en Render, con 404 en endpoints ya implementados.
 - Decisiones de política pendientes para el flujo de moderación P2.
-- Base de frontend: F1 (router y URLs) en `6e93652`, F2 (TanStack Query) en `5c41fea`, F3 (`src/shared/ui` + gate axe) en `7b00dbc`, F4 (división del shell del marketplace) en `f446c5d` y F5 (ADR-024, README y acta) cerrada; seguimiento: cliente OpenAPI tipado y medición LCP/TTI en 3G.
+- Base de frontend: F1 (router y URLs) en `6e93652`, F2 (TanStack Query) en `5c41fea`, F3 (`src/shared/ui` + gate axe) en `7b00dbc`, F4 (división del shell del marketplace) en `f446c5d`, F5 (ADR-024, README y acta) y hardening de producción en `9fbe7d8`; el cliente OpenAPI se resolvió con ADR-025 (tipos generados) y el LCP de marketplace sigue en seguimiento.
 - Inconsistencia de status de validación en `marketplace` e `identity` (400 en dominio frente a 422 en el contrato Zod), ya corregida en `geography`.
 
 ---
@@ -115,7 +115,7 @@ La tabla conserva el estado literal del PDF y lo contrasta con la verificación 
 | 2.6 | CERRADA | CERRADA | `SmtpEmailService` con Nodemailer; `FileEmailService` solo para desarrollo/pruebas | Sin cambios |
 | 2.7 | PENDIENTE | CERRADA | CRUD `/plots` con PostGIS, `/plots/nearby` con `ST_DWithin`, tres migraciones y E2E contra PostGIS real | Cierre del pendiente A |
 | 2.8 | PARCIAL | CERRADA | Dependency-cruiser (123 módulos, 383 dependencias, 0 violaciones), Swagger en `/docs`, seed con guard de seguridad y Testcontainers PostGIS (6/6) | Cierre del pendiente E; `@swc/jest` adoptado en `ae38f89` (98,7 s → 23,4 s, 4,2×) |
-| 3 | PENDIENTE | CERRADA | F1 `6e93652` (router 7, rutas `lazy`, guardas, `returnTo` seguro y enlaces de correo), F2 `5c41fea` (TanStack Query, invalidación y limpieza de caché), F3 `7b00dbc` (`src/shared/ui`, RTL + axe), F4 `f446c5d` (shell 835 → 136 líneas) y F5 (ADR-024, README con mapa de rutas y acta v1.8). Gates: `tsc`/ESLint en cero, 119/119 unitarias, E2E 16/16, axe 0 en cuatro rutas y bundle inicial 181,2 KB gzip | Seguimiento: cliente OpenAPI tipado y medición LCP/TTI en 3G |
+| 3 | PENDIENTE | CERRADA | F1 `6e93652` (router 7, rutas `lazy`, guardas, `returnTo` seguro y enlaces de correo), F2 `5c41fea` (TanStack Query, invalidación y limpieza de caché), F3 `7b00dbc` (`src/shared/ui`, RTL + axe), F4 `f446c5d` (shell 835 → 136 líneas), F5 (ADR-024 + acta) y hardening `9fbe7d8` (build de producción, smoke `test:preview`, esqueletos y fallback). Gates: `tsc`/ESLint en cero, 123/123 unitarias, E2E 16/16, axe 0 en cuatro rutas, preview smoke en verde y bundle inicial 162,8 KB gzip. OpenAPI: ADR-025 + `check:api-types` | Seguimiento: LCP/TTI de marketplace en entorno estable |
 | 4 | BLOQUEADA | BLOQUEADA | Jira anterior 404; se requiere cuenta nueva y API token | Depende del usuario |
 | 5 | BLOQUEADA | BLOQUEADA | Plantillas SENA en Notion sin compartir con la integración; solo hay exportaciones PDF | Depende del administrador de Notion |
 | 6 | PENDIENTE | PENDIENTE | La sincronización de cuatro entornos depende de 4 y 5 | No puede iniciar sin las fases 4 y 5 |
@@ -272,6 +272,12 @@ Residuales P2:
 - **Red caída frente a sesión expirada:** resuelto en `7bc97c3`. El refresh devuelve `refreshed`, `rejected` o `unavailable`; solo un `401`/`403` del servidor anuncia `agroconnect:session-expired`. Un fallo de red, timeout o `5xx` conserva la cookie y propaga el `401` original. Regresión cubierta en `apiClient.test.ts` (6/6).
 - **`npm audit`:** las tres vulnerabilidades HIGH son una sola cadena del CLI de Prisma (`prisma → @prisma/config → effect`, ReDoS en `Schema.TemplateLiteral`). No hay exposición en runtime: el esquema lo controla el repositorio, no un usuario. No existe parche en Prisma 7.x; el “fix” de npm baja a Prisma 6.12.0, incompatible con el stack actual. Se acepta el riesgo y se revisará cuando Prisma 8 sea estable.
 
+### 5.9 Hardening del build de producción y presupuesto de rendimiento
+
+La medición de Lighthouse reveló que `dist/` quedaba en blanco con `L is not defined`. El E2E usaba Vite dev y no cubría el grafo de chunks de producción: `leaflet-draw` (UMD) se agrupaba en `vendor-leaflet` y se ejecutaba antes de que `src/lib/leaflet.ts` expusiera `window.L`. La corrección `9fbe7d8` deja los plugins UMD (`leaflet-draw`, `leaflet.heat`, `leaflet-geosearch`) en chunks dinámicos, añade `test:preview` (smoke de `/` y `/marketplace` sobre `dist/`) y reduce el bundle inicial de 181,2 a **162,8 KB gzip**. El marketplace muestra esqueletos durante la carga y reintenta la red cada 400 ms antes del fallback demo.
+
+Lighthouse móvil con 3G simulado (26/11/2026): `/` LCP 2,4 s, TTI 2,4 s, CLS 0, score 96. `/marketplace` con la API caída y fallback demo: LCP 2,8–3,5 s, TTI 3,1–3,7 s, score 86–92; el LCP no cumple el objetivo de 2,5 s en ese escenario y queda en seguimiento. La corrida con API real fue inestable por la carga del host (LCP 4,3 s) y no se usa como evidencia de cumplimiento. Gates del hardening: 123/123 unitarias, E2E 16/16, preview smoke en verde y ESLint/`tsc` en cero.
+
 ---
 
 ## 6. Arquitectura y decisiones
@@ -282,7 +288,7 @@ El repositorio usa npm workspaces y Turborepo, con lockfile único y `packageMan
 
 ### 6.2 Contratos
 
-`packages/contracts` define esquemas Zod que se proyectan a OpenAPI 3.1. El contrato cubre diecisiete rutas y se valida con `check:drift` en CI. Esta decisión evita que frontend y backend diverjan en tipos y validaciones.
+`packages/contracts` define esquemas Zod que se proyectan a OpenAPI 3.1. El contrato cubre diecisiete rutas y se valida con `check:drift` en CI. Esta decisión evita que frontend y backend diverjan en tipos y validaciones. Desde el 26/11/2026 se generan tipos con `openapi-typescript` y un guard de asignabilidad en compilación (ADR-025); CI ejecuta `check:api-types`. Se corrigió la `$ref` de `UpdateProductModerationRequestBody`, que faltaba en el registro de esquemas.
 
 ### 6.3 Backend
 
@@ -290,7 +296,7 @@ El backend es un monolito modular NestJS 11 con Prisma 7 y PostgreSQL 16 + PostG
 
 ### 6.4 Frontend
 
-El frontend usa React, Vite, TypeScript y Tailwind CSS 4, con Leaflet y OpenStreetMap para la visualización geoespacial. La moderación y los perfiles ya tienen interfaz. La sesión es cookie-only desde `5267e8b`: no hay tokens en `localStorage`, el cliente usa `credentials: 'include'` y el refresh es silencioso, sin fallback Bearer.
+El frontend usa React, Vite, TypeScript y Tailwind CSS 4, con Leaflet y OpenStreetMap para la visualización geoespacial. La moderación y los perfiles ya tienen interfaz. La sesión es cookie-only desde `5267e8b`: no hay tokens en `localStorage`, el cliente usa `credentials: 'include'` y el refresh es silencioso, sin fallback Bearer. El build de producción se valida con `test:preview`, que sirve `dist/` y detecta errores de orden de chunks que el E2E de Vite dev no veía.
 
 ### 6.5 Política políglota
 
@@ -313,7 +319,7 @@ El marketplace es una vitrina: no gestiona precio, unidad ni inventario. La mode
 | C | Despliegue | Render con `TRUST_PROXY=1` y `CORS_ORIGIN` sin localhost; Blueprint; cabeceras en `frontend/vercel.json`; eliminar `vercel.json` raíz | Smoke de producción sin 404 en productos y perfil | DevOps / Infraestructura | Bloqueado por API key |
 | D | Documentación SENA | PT-ECU-01 v2.0 con 31 CU pendientes (referencias CU#23–28 y CU#37–66) y 6 actores; PT-IGS-01 secciones 1–10 con M14/M15/M17; PT-MTC-01 v2.0 secciones 1–8, Node 24, Render 512 MB y monolito modular | PDFs finales y matrices actualizadas | Documentación / SENA | Pendiente |
 | E | Calidad backend | dependency-cruiser, Swagger en `/docs`, `prisma/seed.ts` y Testcontainers PostGIS | `arch:check` 0 violaciones, `/docs` 200, seed con guard verificado, Testcontainers 6/6 | Backend / QA | Cerrado |
-| F | Base frontend | React Router 7, TanStack Query + cliente OpenAPI, `src/shared/ui` con Button/Input/Card/Modal/Toast/Skeleton/EmptyState; dividir `PropertyMap.tsx` y `MarketplacePrototype.tsx` | Build, lint, pruebas y smoke de rutas | Frontend | Cerrada: F1 (`6e93652`), F2 (`5c41fea`), F3 (`7b00dbc`), F4 (`f446c5d`) y F5 (ADR-024 + README + acta v1.8). Seguimiento: cliente OpenAPI tipado y LCP/TTI |
+| F | Base frontend | React Router 7, TanStack Query + tipos OpenAPI, `src/shared/ui` con Button/Input/Card/Modal/Toast/Skeleton/EmptyState; dividir `PropertyMap.tsx` y `MarketplacePrototype.tsx` | Build, lint, pruebas y smoke de rutas | Frontend | Cerrada: F1 (`6e93652`), F2 (`5c41fea`), F3 (`7b00dbc`), F4 (`f446c5d`), F5 (ADR-024) y hardening `9fbe7d8`. OpenAPI con ADR-025 y `check:api-types`. Seguimiento: LCP/TTI de marketplace |
 
 **Nota sobre la fase D:** la cifra de 31 CU pendientes se conserva del PDF. Los rangos CU#23–28 y CU#37–66 son referencias de la matriz y no deben interpretarse como una lista exhaustiva hasta cruzar el detalle de los 66 CU.
 
@@ -452,4 +458,4 @@ Los comandos de Prisma deben ejecutarse desde `apps/api`; el resto, desde la ra�
 ---
 
 **Fin del documento.**  
-Versión 1.8 — verificada el 26/11/2026. Los pendientes A, B y E constan como cerrados con la evidencia de §5. El pendiente F quedó cerrado: F1 cerrada en `6e93652`, endurecida tras la doble revisión en `4f5e8f9` y con los residuales P2 resueltos en `7bc97c3` (§5.8); F2 cerrada en `5c41fea`; F3 cerrada en `7b00dbc` con `src/shared/ui`, migración de autenticación y gate axe en `/login`, `/registro`, `/marketplace` y `/moderacion`; F4 cerrada en `f446c5d` con el shell del marketplace dividido en `src/features/marketplace/components` y bundle inicial de 181,2 KB gzip; F5 cerrada con `docs/adr/0024-fase-3-router-datos-ui.md`, el README del frontend y esta acta v1.8. Quedan como seguimiento el cliente OpenAPI tipado y la medición LCP/TTI en 3G. Las firmas de §10 permanecen pendientes.
+Versión 1.9 — verificada el 26/11/2026. Los pendientes A, B y E constan como cerrados con la evidencia de §5. El pendiente F quedó cerrado: F1 cerrada en `6e93652`, endurecida tras la doble revisión en `4f5e8f9` y con los residuales P2 resueltos en `7bc97c3` (§5.8); F2 cerrada en `5c41fea`; F3 cerrada en `7b00dbc` con `src/shared/ui`, migración de autenticación y gate axe en `/login`, `/registro`, `/marketplace` y `/moderacion`; F4 cerrada en `f446c5d` con el shell del marketplace dividido en `src/features/marketplace/components` y bundle inicial de 162,8 KB gzip; F5 cerrada con `docs/adr/0024-fase-3-router-datos-ui.md`, el README del frontend y esta acta; hardening de producción en `9fbe7d8` y decisión de tipos OpenAPI en ADR-025. Queda como seguimiento la medición estable del LCP de marketplace en 3G. Las firmas de §10 permanecen pendientes.

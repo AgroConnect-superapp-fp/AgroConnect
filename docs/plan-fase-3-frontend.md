@@ -119,12 +119,13 @@ Guardas como wrappers de ruta: `RequireAuth` y `RequireRole(['administrador'])`,
 - Mantener Leaflet + OpenStreetMap y la regla de no calcular distancias en JS.
 - **DoD:** E2E de búsqueda geoespacial y detalle de producto; bundle inicial bajo presupuesto; sin regresiones visuales en las rutas clave.
 - **Evidencia (26/11/2026):** cerrada en `f446c5d`. `MarketplacePrototype.tsx` pasó de 835 a 136 líneas y ahora solo compone el estado de selección/overrides con `useProducts` y TanStack Query. Se extrajeron `MarketplaceShell`, `FiltersPanel`, `MapPanel`, `ResultsList`, `CropDistribution` y `MarketplaceFooter` a `frontend/src/features/marketplace/components`; Leaflet + OpenStreetMap se mantienen y las distancias siguen calculándose en PostGIS. Gates: `tsc` y ESLint en cero, **119/119** unitarias, build correcto con bundle inicial **181,2 KB gzip** (límite 200 KB) y E2E **16/16** (`/tmp/opencode/e2e-f4.log`).
+- **Hardening posterior (26/11/2026, `9fbe7d8`):** el build de producción fallaba con `L is not defined` porque `leaflet-draw` se agrupaba con Leaflet y se evaluaba antes de `window.L`. Los plugins UMD quedaron fuera del chunk estático, se añadió `npm run test:preview` (smoke de `/` y `/marketplace` sobre `dist/`) y el bundle inicial bajó a **162,8 KB gzip**. El marketplace muestra esqueletos durante la carga y el fallback espera 400 ms entre reintentos de red.
 
 ### F5 — Cierre y documentación (estimación: 1–2 días)
 
 - ADR con D1–D4, README del frontend con el mapa de rutas, actualización del acta (§3, fila 3).
 - **DoD:** todos los gates del proyecto en verde y evidencia adjunta al acta.
-- **Evidencia (26/11/2026):** cerrada. `docs/adr/0024-fase-3-router-datos-ui.md` registra D1–D4, alternativas, consecuencias y seguimiento; `docs/adr/README.md` la indexa. `frontend/README.md` documenta el stack real (Tailwind 4, React Router 7, TanStack Query 5), el mapa de rutas, la estructura, la capa de datos y el gate axe. El acta sube a v1.8 y marca la fase 3 como cerrada con seguimiento (cliente OpenAPI tipado y medición LCP/TTI). Gates finales: `tsc` y ESLint en cero, **119/119** unitarias, E2E **16/16**, axe sin violaciones en `/login`, `/registro`, `/marketplace` y `/moderacion`, build con **181,2 KB gzip** inicial.
+- **Evidencia (26/11/2026):** cerrada. `docs/adr/0024-fase-3-router-datos-ui.md` registra D1–D4, alternativas, consecuencias y seguimiento; `docs/adr/0025-tipos-openapi-sin-cliente-runtime.md` registra la decisión de tipos OpenAPI; `docs/adr/README.md` las indexa. `frontend/README.md` documenta el stack real (Tailwind 4, React Router 7, TanStack Query 5), el mapa de rutas, la estructura, la capa de datos y el gate axe. El acta sube a v1.9 y marca la fase 3 como cerrada. Gates finales: `tsc` y ESLint en cero, **123/123** unitarias, E2E **16/16**, axe sin violaciones en `/login`, `/registro`, `/marketplace` y `/moderacion`, `test:preview` en verde y build con **162,8 KB gzip** inicial.
 
 ---
 
@@ -137,7 +138,7 @@ Guardas como wrappers de ruta: `RequireAuth` y `RequireRole(['administrador'])`,
 | TTI en 3G simulada | Medir en F1 | < 3,5 s |
 | Violaciones axe en rutas clave | 0 en F3 | 0 |
 
-La medición se registra en el acta al cerrar F1 y F4; no se optimiza nada sin número previo.
+La medición se registra en el acta al cerrar F1 y F4; no se optimiza nada sin número previo. Medición Lighthouse del 26/11/2026 (móvil, 3G simulado): `/` LCP 2,4 s, TTI 2,4 s, CLS 0, score 96; `/marketplace` con la API caída (fallback demo) LCP 2,8–3,5 s, TTI 3,1–3,7 s, score 86–92. La corrida con API real fue inestable por la carga del host y no se usa como evidencia de cumplimiento: el LCP de marketplace sigue en seguimiento.
 
 ---
 
