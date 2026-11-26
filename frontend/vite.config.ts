@@ -115,13 +115,14 @@ export default defineConfig({
               return 'vendor-react';
             }
 
-            // Mapping libraries (~220KB)
+            // Núcleo de mapas estático (~220KB). Los plugins UMD
+            // (`leaflet-draw`, `leaflet.heat`, `leaflet-geosearch`) se dejan
+            // fuera y se cargan dinámicamente después de que `lib/leaflet`
+            // exponga `window.L`; agruparlos aquí los ejecutaba antes de esa
+            // asignación y rompía el build de producción (`L is not defined`).
             if (
               id.includes('/leaflet/') ||
               id.includes('/react-leaflet/') ||
-              id.includes('/leaflet-draw/') ||
-              id.includes('/leaflet.heat/') ||
-              id.includes('/leaflet-geosearch/') ||
               id.includes('/react-leaflet-markercluster/')
             ) {
               return 'vendor-leaflet';

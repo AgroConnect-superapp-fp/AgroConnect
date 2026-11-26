@@ -19,7 +19,8 @@
     "test:e2e": "playwright test",
     "test:e2e:report": "playwright show-report",
     "quality": "npm run format && npm run lint:fix",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test:preview": "node scripts/smoke-preview.mjs"
   },
   "dependencies": {
     "@agroconnect/contracts": "*",

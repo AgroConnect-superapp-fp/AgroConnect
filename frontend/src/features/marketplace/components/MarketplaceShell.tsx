@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import type { Property } from '../../../types/property';
 import { PropertyDetailModal } from '../../../components/ui/PropertyDetailModal';
 import { MarketplaceFooter } from './MarketplaceFooter';
+import { Skeleton } from '../../../shared/ui/Skeleton';
 
 interface MarketplaceShellProps {
   properties: Property[];
@@ -9,6 +10,8 @@ interface MarketplaceShellProps {
   avgProductivity: number;
   organicCount: number;
   usingMockData: boolean;
+  /** Muestra esqueletos en los KPIs mientras llega el catálogo. */
+  loading?: boolean;
   onRetry: () => void;
   selectedProperty: Property | null;
   onCloseProperty: () => void;
@@ -93,6 +96,7 @@ export function MarketplaceShell({
   avgProductivity,
   organicCount,
   usingMockData,
+  loading = false,
   onRetry,
   selectedProperty,
   onCloseProperty,
@@ -121,25 +125,37 @@ export function MarketplaceShell({
                   <br />
                   Activas
                 </p>
-                <p className="mt-1 text-3xl font-bold text-agro-green">
-                  {properties.length}
-                </p>
+                {loading ? (
+                  <Skeleton className="mx-auto mt-2 h-8 w-12" />
+                ) : (
+                  <p className="mt-1 text-3xl font-bold text-agro-green">
+                    {properties.length}
+                  </p>
+                )}
               </div>
               <div className="group flex h-28 w-36 animate-slideInRight cursor-default flex-col items-center justify-center rounded-lg border-2 border-agro-yellow/30 bg-agro-yellow/10 p-3 text-center delay-300 transition-all hover:scale-110 hover:border-agro-yellow hover:shadow-lg">
                 <p className="text-xs font-semibold leading-tight text-gray-700 transition-colors group-hover:text-agro-yellow-ink">
                   Hectáreas
                 </p>
-                <p className="mt-1 text-3xl font-bold text-agro-dark">
-                  {totalArea.toFixed(1)}
-                </p>
+                {loading ? (
+                  <Skeleton className="mx-auto mt-2 h-8 w-16" />
+                ) : (
+                  <p className="mt-1 text-3xl font-bold text-agro-dark">
+                    {totalArea.toFixed(1)}
+                  </p>
+                )}
               </div>
               <div className="group flex h-28 w-36 animate-slideInRight animate-pulseGlowBlue cursor-default flex-col items-center justify-center rounded-lg border border-blue-200 bg-blue-50 p-3 text-center delay-400 transition-all hover:scale-110 hover:shadow-lg">
                 <p className="text-xs font-semibold leading-tight text-blue-800 transition-colors group-hover:text-blue-950">
                   Productividad
                 </p>
-                <p className="mt-1 text-3xl font-bold text-blue-800">
-                  {avgProductivity}%
-                </p>
+                {loading ? (
+                  <Skeleton className="mx-auto mt-2 h-8 w-12" />
+                ) : (
+                  <p className="mt-1 text-3xl font-bold text-blue-800">
+                    {avgProductivity}%
+                  </p>
+                )}
               </div>
               <div className="group flex h-28 w-36 animate-slideInRight cursor-default flex-col items-center justify-center rounded-lg border-2 border-green-300 bg-green-50 p-3 text-center delay-500 transition-all hover:scale-110 hover:border-lime-400 hover:shadow-lg">
                 <p className="text-xs font-semibold leading-tight text-green-700 transition-colors group-hover:text-lime-400">
@@ -147,7 +163,11 @@ export function MarketplaceShell({
                   <br />
                   Orgánica
                 </p>
-                <p className="mt-1 text-3xl font-bold text-green-700">{organicCount}</p>
+                {loading ? (
+                  <Skeleton className="mx-auto mt-2 h-8 w-12" />
+                ) : (
+                  <p className="mt-1 text-3xl font-bold text-green-700">{organicCount}</p>
+                )}
               </div>
             </div>
           </div>

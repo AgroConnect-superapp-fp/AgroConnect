@@ -15,29 +15,31 @@ import { devLog } from './utils/devLog';
 import { MOCK_PROPERTIES } from './data/mockProperties';
 import { EmptyState } from './shared/ui/EmptyState';
 import { Button } from './shared/ui/Button';
+import { Skeleton } from './shared/ui/Skeleton';
 import type { Property } from './types/property';
 import { MarketplaceShell } from './features/marketplace/components/MarketplaceShell';
 import { MapPanel } from './features/marketplace/components/MapPanel';
 import { CropDistribution } from './features/marketplace/components/CropDistribution';
 import { ResultsList } from './features/marketplace/components/ResultsList';
 
-function LoadingScreen(): React.ReactElement {
+function MarketplaceLoading(): React.ReactElement {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-50 to-green-50">
-      <div className="animate-fadeInUp text-center">
-        <div className="relative mb-6 inline-block">
-          <div className="h-20 w-20 animate-spin rounded-full border-4 border-agro-green/20 border-t-agro-green" />
-          <div className="absolute inset-0 flex items-center justify-center text-3xl">
-            🌱
+    <div aria-busy="true" className="flex flex-col gap-6">
+      <div className="rounded-2xl bg-white p-6 shadow-md">
+        <Skeleton
+          variant="rect"
+          className="h-[600px]"
+          label="Cargando mapa y propiedades"
+        />
+      </div>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {[0, 1, 2].map((index) => (
+          <div key={index} className="rounded-2xl bg-white p-4 shadow-sm">
+            <Skeleton variant="rect" className="mb-4 h-40" />
+            <Skeleton className="mb-2 h-5 w-2/3" />
+            <Skeleton className="h-4 w-1/2" />
           </div>
-        </div>
-        <h2 className="mb-2 text-2xl font-bold text-agro-dark">AgroConnect</h2>
-        <p className="mb-1 font-medium text-gray-600">
-          Conectando con el servicio de productos
-        </p>
-        <p className="text-sm text-gray-500">
-          Cargando propiedades agrícolas desde la API...
-        </p>
+        ))}
       </div>
     </div>
   );
@@ -88,7 +90,22 @@ function App(): React.ReactElement {
   };
 
   if (isLoading) {
-    return <LoadingScreen />;
+    return (
+      <MarketplaceShell
+        properties={[]}
+        totalArea={0}
+        avgProductivity={0}
+        organicCount={0}
+        usingMockData={false}
+        loading
+        onRetry={() => void refetch()}
+        selectedProperty={null}
+        onCloseProperty={() => undefined}
+        onPropertyUpdated={handlePropertyUpdated}
+      >
+        <MarketplaceLoading />
+      </MarketplaceShell>
+    );
   }
 
   if (!usingMockData && properties.length === 0) {

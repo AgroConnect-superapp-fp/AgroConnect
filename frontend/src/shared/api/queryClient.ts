@@ -2,6 +2,7 @@ import { QueryClient } from '@tanstack/react-query';
 import { ApiError } from '../../services/apiClient';
 
 const MAX_NETWORK_RETRIES = 2;
+const RETRY_DELAY_MS = 400;
 
 /**
  * Reintenta solo fallos de red o timeout, nunca errores de negocio.
@@ -27,6 +28,9 @@ export function createQueryClient(): QueryClient {
       queries: {
         staleTime: 0,
         retry: shouldRetry,
+        // En conectividad rural el fallback demo debe aparecer rápido; el
+        // backoff exponencial por defecto (1 s, 2 s…) retrasaba el LCP.
+        retryDelay: RETRY_DELAY_MS,
         refetchOnWindowFocus: false,
       },
       mutations: {
