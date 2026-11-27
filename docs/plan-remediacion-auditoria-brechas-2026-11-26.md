@@ -163,15 +163,15 @@ Sin estas decisiones, varios hallazgos no pueden cerrarse aunque se escriba docu
 | H02 | Alta | R19/R21 no coinciden entre MER, diccionario y DDL | Abierto documental | Corregir MER, cardinalidades, diccionario y rutas indirectas | 0 |
 | H03 | Media | Falta ficha reproducible por ambiente | Parcial: hay guía de despliegue, no matriz completa | Matriz de ambientes + instalación limpia | 1 |
 | H04 | Alta | `ubicacion_geo` vs `latitud/longitud`; consentimiento en ALTER separado | Parcial: el esquema real mezcla `coordinates`, `lat/lng`, `centroid/geom` | Diccionario conceptual/físico + orden de migración | 0 |
-| H05 | Crítica | RLS incompleto para productor/pedidos/lotes | Abierto objetivo: MVP sin RLS; API autoritativa | ADR-027 + RLS en modelo comercial | 1 |
+| H05 | Crítica | RLS incompleto para productor/pedidos/lotes | Implementado target: 14 políticas RLS | Integración con sesión de app | 1 |
 | H06 | Alta | Acceso, secretos y TLS sin evidencia por perfil | Parcial: auth y TLS documentados, sin pruebas de matriz | Pruebas positivas/negativas por rol + evidencia TLS | 1 |
-| H07 | Alta | Pedido sin ítems y envío único; unidad de despacho | Excluido provisional (opción A) | Acta de exclusión + ADR de unidad de despacho | 2 |
-| H08 | Alta | `detalle_pedido` sin UNIQUE de pedido/publicación | Excluido provisional (opción A) | Acta de exclusión + decisión de detalle | 2 |
-| H09 | Crítica | Validación de stock no reserva ni descuenta | Excluido provisional (opción A) | Acta de exclusión + diseño de reserva | 2 |
-| H10 | Alta | Restricciones y triggers fuera del DDL base | Parcial: catálogo + 4 E2E; faltan tablas comerciales | Catálogo + pruebas negativas | 1 |
+| H07 | Alta | Pedido sin ítems y envío único; unidad de despacho | Implementado target: varios envíos y trigger de ítems | Integración con API | 2 |
+| H08 | Alta | `detalle_pedido` sin UNIQUE de pedido/publicación | Implementado target: UNIQUE compuesto | Integración con API | 2 |
+| H09 | Crítica | Validación de stock no reserva ni descuenta | Implementado target: reserva y liberación atómicas | Integración con API | 2 |
+| H10 | Alta | Restricciones y triggers fuera del DDL base | Implementado target: 96 constraints | Integración con API | 1 |
 | H11 | Media | Índices sin planes de consulta comercial | Parcial: existen índices, sin EXPLAIN | Medir búsquedas, historial y cobertura; justificar índices | 1 |
 | H12 | Crítica | LWW y sincronización sin versión/reconciliación | Excluido provisional (opción A) | Acta de exclusión + ADR de versionado | 2 |
-| H13 | Alta | MongoDB sin validadores ni deduplicación por conversación | Excluido provisional: MongoDB fuera del MVP | Acta de exclusión + reevaluación académica | 2 |
+| H13 | Alta | MongoDB sin validadores ni deduplicación por conversación | Implementado target: 6 colecciones + validadores | Integración con API | 2 |
 | H14 | Alta | `logs_actividad` sin inmutabilidad demostrada | Implementado técnico: `audit_events` + trigger + E2E | Falta firma del auditor | 1 |
 | H15 | Alta | Migraciones con datos y offline sin ensayo | Parcial: migraciones MVP; offline excluido | Ensayo de migración actual + exclusión offline | 2 |
 | H16 | Alta | Respaldos sin RPO/RTO ni restauración coordinada | Parcial: runbooks, sin simulacro | Aprobar RPO/RTO + simulacro y acta | 1 |

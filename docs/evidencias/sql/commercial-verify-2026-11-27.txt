@@ -1,0 +1,35 @@
+ ?column?  
+-----------
+ tablas=25
+(1 row)
+
+     ?column?     
+------------------
+ politicas_rls=14
+(1 row)
+
+  ?column?  
+------------
+ triggers=6
+(1 row)
+
+    ?column?    
+----------------
+ constraints=96
+(1 row)
+
+  ?column?  
+------------
+ indices=63
+(1 row)
+
+    ?column?     
+-----------------
+ publicaciones=1
+(1 row)
+
+ ?column? 
+----------
+ envios=2
+(1 row)
+

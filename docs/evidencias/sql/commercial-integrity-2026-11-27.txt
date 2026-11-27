@@ -1,0 +1,43 @@
+BEGIN
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+        ?column?         
+-------------------------
+ stock_tras_reserva=3.00
+(1 row)
+
+DO
+psql:<stdin>:30: NOTICE:  OK stock insuficiente: Stock insuficiente para la publicación 1. Solicitado: 7.00
+DO
+psql:<stdin>:39: NOTICE:  OK unique detalle
+INSERT 0 1
+INSERT 0 1
+      ?column?       
+---------------------
+ envios_por_pedido=2
+(1 row)
+
+UPDATE 1
+         ?column?          
+---------------------------
+ stock_tras_cancelar=10.00
+(1 row)
+
+SET
+SET
+           ?column?           
+------------------------------
+ productor_ve_publicaciones=1
+(1 row)
+
+SET
+           ?column?           
+------------------------------
+ comprador_ve_publicaciones=0
+(1 row)
+
+COMMIT

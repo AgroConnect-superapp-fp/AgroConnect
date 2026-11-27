@@ -29,20 +29,20 @@ El MVP no hereda la aceptación del diseño objetivo. El diseño objetivo no se 
 | H02 | Alta | Documental | **En cierre** | Corrección R19/R21 en anexo Notion |
 | H03 | Media | Documental/técnica | **Parcial** | `docs/matriz-ambientes-datos.md`; instalación limpia local OK; staging/producción pendientes |
 | H04 | Alta | Documental | **En cierre** | Diccionario conceptual/físico en anexo Notion |
-| H05 | Crítica | Exclusión del modelo comercial + control API | **Abierto objetivo** | ADR-027; RLS no implementado en MVP |
+| H05 | Crítica | Implementación RLS | **Implementado target** | 14 políticas RLS + GRANT; falta integrar sesión de app |
 | H06 | Alta | Técnica MVP | **Parcial** | Pruebas de roles/TLS pendientes |
-| H07 | Alta | Implementación Ruta B | **Abierto** | ADR-029; pedidos/envíos por implementar |
-| H08 | Alta | Implementación Ruta B | **Abierto** | ADR-029; detalle por implementar |
-| H09 | Crítica | Implementación Ruta B | **Abierto** | ADR-029; stock/reserva por implementar |
-| H10 | Alta | Técnica MVP | **Parcial** | Catálogo + 4 pruebas E2E de constraints; faltan tablas comerciales |
-| H11 | Media | Técnica MVP | **Parcial** | Inventario de índices; faltan EXPLAIN |
-| H12 | Crítica | Implementación Ruta B | **Abierto** | ADR-029; ADR-006/versionado por implementar |
-| H13 | Alta | Implementación Ruta B | **Abierto** | ADR-029; MongoDB por implementar |
+| H07 | Alta | Implementación Ruta B | **Implementado target** | 24 tablas; varios envíos; trigger de ítems |
+| H08 | Alta | Implementación Ruta B | **Implementado target** | `UNIQUE (id_pedido,id_publicacion)` |
+| H09 | Crítica | Implementación Ruta B | **Implementado target** | Reserva atómica + liberación; prueba 7+7 y cancelación |
+| H10 | Alta | Técnica MVP | **Implementado target** | 96 constraints en esquema comercial + pruebas |
+| H11 | Media | Técnica MVP | **Parcial** | 63 índices; falta EXPLAIN con volumen |
+| H12 | Crítica | Implementación Ruta B | **Abierto** | Pendiente contrato/pruebas de sync |
+| H13 | Alta | Implementación Ruta B | **Implementado target** | 6 colecciones, validadores, TTL y unique por conversación |
 | H14 | Alta | Técnica MVP | **Implementado técnico** | `audit_events` append-only + E2E; falta firma del auditor |
 | H15 | Alta | Implementación Ruta B | **Abierto** | Instalación limpia local OK; falta migración con datos y offline |
 | H16 | Alta | Técnica MVP | **Parcial** | ADR-028; restauración local OK; falta RPO/RTO de producción |
 
-**Resumen:** Ruta B activa; **0 hallazgos cerrados por auditor**. H07, H08, H09, H12, H13 y H15 pasan a implementación. H05 sigue abierto como RLS. No hay 16/16 cerrados.
+**Resumen:** Ruta B activa; **0 hallazgos cerrados por auditor**. H05, H07, H08, H09, H10 y H13 tienen implementación target validada. H12, H15 y H16 siguen pendientes; H06/H11 requieren staging/EXPLAIN.
 
 ---
 
@@ -53,7 +53,7 @@ El MVP no hereda la aceptación del diseño objetivo. El diseño objetivo no se 
 | D-01 | Mantener el modelo comercial como diseño objetivo y excluirlo del MVP | Aprobada por el responsable; pendiente auditor/instructor |
 | D-02 | API autoritativa en MVP; RLS obligatorio en modelo comercial | Aprobada en ADR-027 |
 | D-03 | MongoDB fuera del MVP; se reevalúa si el requisito académico lo exige | Aprobada en ADR-026 |
-| D-04 | Unidad de despacho diferida al diseño de pedidos | Diferida con H07 |
+| D-04 | Varios envíos por pedido; `envios.id_pedido` sin UNIQUE | Implementada en esquema target |
 | D-05 | Sync versionado diferido al diseño de M14 | Diferida con H12 |
 | D-06 | RPO 24 h / RTO 4 h propuestos | Aceptada provisionalmente; falta simulacro |
 
@@ -98,4 +98,4 @@ Para cada hallazgo se exige:
 | Notion PT-MCBD-01 no está compartido con la integración (404) | No se puede editar la fuente oficial desde el agente | El usuario debe compartir la página o pegar el anexo v3.1 |
 | Firma del auditor/instructor | Las exclusiones son provisionales | Formalizar acta |
 | `RENDER_API_KEY` | No se puede validar staging/producción ni backups reales | Provisión de credenciales |
-| Modelo comercial no implementado | H07–H09/H12/H13 no tienen sujeto técnico en el MVP | Mantener exclusión o abrir fase B |
+| Integración API/sync pendiente | El esquema target existe, pero el API NestJS sigue usando Prisma MVP | Implementar adaptadores y contratos en la siguiente fase |
