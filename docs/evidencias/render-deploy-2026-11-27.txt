@@ -1,0 +1,7 @@
+2026-11-27T12:43:22.751943921Z ==> Build successful 🎉
+2026-11-27T12:43:52.889449478Z ==>(B Running 'npm run start -w @agroconnect/api'(B
+2026-11-27T12:43:57.892916606Z         throw new Error(`Configuración de entorno inválida:\n${missing}`);
+2026-11-27T12:43:57.892926266Z Error: Configuración de entorno inválida:
+2026-11-27T12:43:57.892929977Z   - SMTP_HOST: SMTP_HOST es obligatorio en producción: la verificación de correo (D5) bloquea el login hasta verificar
+2026-11-27T12:43:59.666493144Z ==> Exited with status 1
+2026-11-27T12:44:06.397899933Z ==>(B Running 'npm run start -w @agroconnect/api'(B

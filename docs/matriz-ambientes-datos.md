@@ -19,7 +19,7 @@
 | Migraciones | 12 | 12 | Por verificar | Por verificar |
 | RLS | 0 | 0 | Por verificar | Por verificar |
 | Backup | No aplica | No aplica | Pendiente | Pendiente |
-| Salud actual | No aplica | No aplica | Por verificar | **503 en /health/ready (27/11)** |
+| Salud actual | No aplica | No aplica | Por verificar | **503: falta SMTP_HOST en Render (27/11)** |
 | Evidencia | `inventario-2026-11-26-*` + instalación limpia | `prisma migrate status` | Bloqueado por `RENDER_API_KEY` | Bloqueado por `RENDER_API_KEY` |
 
 **Regla:** ningún ambiente se considera equivalente hasta que la ficha tenga versión, extensión, collation, timezone, migraciones y evidencia de instalación limpia.
@@ -50,7 +50,7 @@ psql "postgresql://agroconnect:agroconnect@127.0.0.1:55432/agroconnect_env_check
 
 ## 3. Brechas
 
-- Staging y producción no se verificaron por falta de `RENDER_API_KEY`. Producción respondió **503 en `/health/ready`** el 27/11/2026; `/health` agotó 30 s. Evidencia: `docs/evidencias/sql/produccion-health-2026-11-27.txt`.
+- Staging y producción no se verificaron por falta de `RENDER_API_KEY`. Producción respondió **503 en `/health/ready`** el 27/11/2026. El redeploy reveló que el proceso no arranca porque falta `SMTP_HOST` en Render. Evidencia: `docs/evidencias/render-deploy-2026-11-27.txt`.
 - No se ha ejecutado la instalación limpia anterior.
 - No se ha medido RPO/RTO real (ADR-028).
 - La matriz debe actualizarse cuando cambie la infraestructura.
