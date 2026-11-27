@@ -27,7 +27,7 @@ Referencias: OWASP ASVS 4.0.3 nivel 2 y OWASP API Security Top 10 (2023). Este d
 | --------------------------------------------------- | ------ | ---------------------------------------------------------------------------------------- |
 | Sin auto-registro de roles privilegiados            | ✅     | PR #51 (`ROLE_NOT_ALLOWED`)                                                              |
 | Autenticación obligatoria en rutas privadas (guard) | ✅     | `SessionAuthGuard` en publicación, perfiles, firma de subida y edición de imágenes       |
-| RBAC por permisos                                   | 🟡     | `PublishProductUseCase` restringe productor/administrador; falta un `RolesGuard` general |
+| RBAC por permisos                                   | ✅     | `RolesGuard` + `@Roles` en admin, parcelas y marketplace; casos de uso como segunda capa |
 | Autorización por propiedad del recurso (BOLA)       | ✅     | `PATCH /products/:id` valida `producerId` de la sesión; administrador puede moderar      |
 | Filtrado de campos de salida (sin `passwordHash`)   | ✅     | `toPublicProfile()`                                                                      |
 
@@ -48,7 +48,7 @@ Referencias: OWASP ASVS 4.0.3 nivel 2 y OWASP API Security Top 10 (2023). Este d
 | CORS con lista blanca por entorno (sin localhost en producción) | ✅     | PR #51 (`render.yaml`)                                                                                                                    |
 | CSP, HSTS, X-Frame-Options y Referrer-Policy en el frontend     | ✅     | `vercel.json` (CSP, XFO, XCTO, Referrer-Policy, HSTS)                                                                                     |
 | Secretos solo por variables de entorno, validados al arrancar   | ✅     | `config/env.ts` (zod)                                                                                                                     |
-| Subidas a Cloudinary firmadas por el backend                    | ✅     | `POST /uploads/signature` (SHA-1, carpeta por usuario, formatos permitidos, 20/min)                                                       |
+| Subidas a Cloudinary firmadas por el backend                    | ✅     | `POST /uploads/signature` (SHA-256, carpeta por usuario, formatos permitidos, 20/min)                                                       |
 | Límite de tamaño de subida                                      | 🟡     | `ImageUpload` valida 10 MB; Cloudinary aplica el límite real a nivel de cuenta. No existe un `max_file_size` firmado para subida directa. |
 | Moderación previa de productos/imágenes                         | ✅     | `Product.moderationStatus` + endpoints admin; el catálogo público solo muestra `approved` (ADR-023)                                       |
 
@@ -58,7 +58,7 @@ Referencias: OWASP ASVS 4.0.3 nivel 2 y OWASP API Security Top 10 (2023). Este d
 | --------------------------------------------------------- | ------ | ---------------------------- |
 | Logs JSON con correlationId y redacción de PII            | ✅     | `logger.ts`, `correlationId` |
 | Monitoreo de errores (Sentry)                             | ⏳     | ADR-009                      |
-| Bitácora de auditoría de acciones administrativas (RF-35) | ⏳     | Módulo `audit`               |
+| Bitácora de auditoría de acciones administrativas (RF-35) | ✅     | `audit_events` append-only + trigger; faltan más eventos |
 
 ## Cadena de suministro (CI)
 

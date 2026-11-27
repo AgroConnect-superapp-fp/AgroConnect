@@ -1,0 +1,12 @@
+Estado de producción — 2026-11-27 (post SMTP)
+Servicio: agroconnect-api
+Deploy: succeeded (1m 27s)
+SMTP_HOST/USER/PASS: agregados por el usuario
+
+GET /health -> HTTP 200
+{"status":"ok","service":"agroconnect-api"}
+
+GET /health/ready -> HTTP 503
+{"status":"error","service":"agroconnect-api","database":"down"}
+
+Lectura: el proceso arranca y el SMTP ya no bloquea. El siguiente bloqueo es la conectividad de base de datos. Revisar DATABASE_URL en Render y el estado del proyecto Supabase (posible pausa/credenciales/pooler). No se declara conformidad.

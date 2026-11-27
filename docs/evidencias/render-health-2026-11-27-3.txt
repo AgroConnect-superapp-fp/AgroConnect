@@ -1,0 +1,15 @@
+Estado de producción — 2026-11-27 (Supabase conectado)
+Servicio: agroconnect-api
+Deploy: succeeded | Live
+
+GET /health -> 200
+{"status":"ok","service":"agroconnect-api"}
+
+GET /health/ready -> 200
+{"status":"ok","service":"agroconnect-api","database":"up"}
+
+POST /api/v1/auth/login (credenciales inexistentes) -> 401 INVALID_CREDENTIALS
+Lectura: la conexión a Supabase y el schema de autenticación están operativos.
+
+GET /api/v1/products -> 404 NOT_FOUND
+Lectura: el código desplegado en main no contiene las rutas actuales del marketplace. No es un fallo de Supabase; es una diferencia de rama/despliegue.

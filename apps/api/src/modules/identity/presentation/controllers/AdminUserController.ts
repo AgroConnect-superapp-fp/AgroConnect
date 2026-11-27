@@ -59,7 +59,7 @@ export class AdminUserController {
   ): Promise<unknown> {
     const user = request.user!;
     const page = await this.listAdminUsersUseCase.execute(
-      { id: user.id, role: user.role },
+      { id: user.id, role: user.role, correlationId: request.correlationId },
       {
         search: query.search,
         rol: query.rol,
@@ -80,7 +80,10 @@ export class AdminUserController {
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
   ): Promise<unknown> {
     const user = request.user!;
-    const adminUser = await this.getAdminUserUseCase.execute({ id: user.id, role: user.role }, id);
+    const adminUser = await this.getAdminUserUseCase.execute(
+      { id: user.id, role: user.role, correlationId: request.correlationId },
+      id,
+    );
     return success(adminUser, 'Usuario obtenido correctamente');
   }
 
@@ -95,7 +98,7 @@ export class AdminUserController {
   ): Promise<unknown> {
     const user = request.user!;
     const adminUser = await this.updateUserStatusUseCase.execute(
-      { id: user.id, role: user.role },
+      { id: user.id, role: user.role, correlationId: request.correlationId },
       id,
       body.estado,
     );
@@ -113,7 +116,7 @@ export class AdminUserController {
   ): Promise<unknown> {
     const user = request.user!;
     const adminUser = await this.updateUserRoleUseCase.execute(
-      { id: user.id, role: user.role },
+      { id: user.id, role: user.role, correlationId: request.correlationId },
       id,
       body.rol,
     );

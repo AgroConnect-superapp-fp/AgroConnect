@@ -283,6 +283,18 @@ describe('Admin users (e2e)', () => {
       where: { tokenHash: producerRefreshHash },
     });
     expect(refreshToken?.revoked).toBe(true);
+
+    const audit = await prisma.auditEvent.findFirst({
+      where: { action: 'admin.user.status_changed', entityId: producerId },
+      orderBy: { occurredAt: 'desc' },
+    });
+    expect(audit).toMatchObject({
+      actorId: adminAId,
+      actorRole: 'administrador',
+      entityType: 'user',
+    });
+    expect(audit?.beforeData).toMatchObject({ estado: 'ACTIVO' });
+    expect(audit?.afterData).toMatchObject({ estado: 'INACTIVO' });
   });
 
   it('impide que un administrador cambie su propio estado o rol', async () => {
@@ -364,6 +376,32 @@ describe('Admin users (e2e)', () => {
       where: { tokenHash: buyerRefreshHash },
     });
     expect(refreshToken?.revoked).toBe(true);
+
+    const audit = await prisma.auditEvent.findFirst({
+      where: { action: 'admin.user.role_changed', entityId: buyerId },
+      orderBy: { occurredAt: 'desc' },
+    });
+    expect(audit?.beforeData).toMatchObject({ rol: 'comprador_b2c' });
+    expect(audit?.afterData).toMatchObject({ rol: 'productor' });
+  });
+
+  it('impide modificar o borrar eventos de auditoría', async () => {
+    const audit = await prisma.auditEvent.findFirst({
+      where: { action: 'admin.user.status_changed' },
+      orderBy: { occurredAt: 'desc' },
+    });
+    expect(audit).not.toBeNull();
+
+    await expect(
+      prisma.auditEvent.update({
+        where: { id: audit!.id },
+        data: { action: 'alterado' },
+      }),
+    ).rejects.toThrow(/append-only/);
+
+    await expect(prisma.auditEvent.delete({ where: { id: audit!.id } })).rejects.toThrow(
+      /append-only/,
+    );
   });
 
   it('serializa cambios concurrentes y conserva al menos un administrador activo', async () => {

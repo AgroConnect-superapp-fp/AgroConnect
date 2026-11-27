@@ -28,3 +28,11 @@ Herramientas de auditoría, trazabilidad y verificación. Se versionan desde el
   antes de ejecutarse contra producción.
 - Los scripts SQL de auditoría son de solo lectura por defecto; los `UPDATE`
   están comentados y deben habilitarse tras validar la lista.
+
+## Base de datos local (Docker)
+
+- `db-clean-install.sh`: crea `agroconnect_clean`, aplica las 13 migraciones Prisma y verifica estado.
+- `db-backup.sh`: genera `backups/*.dump` con checksum SHA-256.
+- `db-restore.sh backups/archivo.dump`: restaura en `agroconnect_restore_check` y verifica tablas.
+
+Evidencia: `docs/evidencias/sql/clean-install-docker-2026-11-27.txt` y `docs/evidencias/sql/backup-restore-docker-2026-11-27.txt`.

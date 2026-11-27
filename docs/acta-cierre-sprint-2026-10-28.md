@@ -67,11 +67,11 @@ Sin embargo, la lectura granular del propio PDF muestra que la fase 0 seguía `P
 
 | Indicador | PDF — 28/10/2026 | Verificación — 26/11/2026 | Lectura |
 | --- | --- | --- | --- |
-| Pruebas automatizadas | 373 | 629 (456 API + 155 web + 18 E2E) | Diferencia de conteo; ver §8-D1 |
+| Pruebas automatizadas | 373 | 635 (462 API + 155 web + 18 E2E) | Diferencia de conteo; ver §8-D1 |
 | E2E Playwright | 10/10 | 18/18 | La suite se amplió después del corte; ver §8-D2 |
 | Tareas Turbo | 13/13 en verde | Gates en verde: `lint`, `typecheck`, `build`, `test`, `arch:check` y `check:drift` | No se recontó el total de tareas Turbo; no se observaron regresiones |
 | Vulnerabilidades HIGH | 0 | 0 (`npm audit`: 0 vulnerabilidades en raíz y API) | Confirmado y mejorado |
-| Cobertura (API) | No reportada | 91,89 % líneas / 80,50 % ramas / 91,45 % statements / 94,86 % funciones | Umbral del 80 % cumplido; ver §5.1 |
+| Cobertura (API) | No reportada | 91,89 % líneas / 80,42 % ramas / 91,45 % statements / 94,86 % funciones | Umbral del 80 % cumplido; ver §5.1 |
 | Trazabilidad canónica | No reportada en el KPI | 17 módulos, 68 RF, 30 RNF, 66 CU, 69 HU, 6 actores | Fuente: manifiesto de alineación |
 
 ### 2.2 Logros consolidados
@@ -151,16 +151,16 @@ La fase 2.1 se cerró con el PR #51 (`5423e52`). Los siete hallazgos y sus corre
 
 | Suite | Cantidad | Estado |
 | --- | --- | --- |
-| Backend / API | 456 (48 suites) | En verde |
+| Backend / API | 462 (48 suites) | En verde |
 | Frontend / web | 155 (25 archivos) | En verde |
 | E2E Playwright | 18 | En verde |
-| Total automatizado | 629 | En verde |
+| Total automatizado | 635 | En verde |
 | Cobertura de líneas (API) | 91,89 % (1859/2023) | Verificada |
-| Cobertura de ramas (API) | 80,50 % (933/1159) | Verificada, umbral 80 % |
+| Cobertura de ramas (API) | 80,42 % (945/1175) | Verificada, umbral 80 % |
 | Cobertura de statements (API) | 91,45 % (1990/2176) | Verificada |
 | Cobertura de funciones (API) | 94,86 % (443/467) | Verificada |
 
-Gates ejecutados el 17/11/2026: `lint`, `typecheck`, `build`, `test`, `arch:check`, `generate:openapi`, `check:drift`, `prisma migrate status` (dev y test) y `npm audit`. El PDF reporta 13/13 tareas Turbo; en esta acta se deja constancia de los gates ejecutados y de la ausencia de regresiones observadas, sin recontar el total de tareas. **Nota:** las cifras de esta sección son el corte del 17/11/2026; el estado del 26/11/2026 es 456 API + 155 frontend + 18 E2E (629), con cobertura API de 91,89 % líneas / 80,50 % ramas y frontend de 92,77 % líneas / 80,31 % ramas de lógica crítica (cobertura global de `src` 32,34 % líneas / 28,33 % ramas, pendiente), documentado en §5.9 y en las filas 3/F de §7.1.
+Gates ejecutados el 17/11/2026: `lint`, `typecheck`, `build`, `test`, `arch:check`, `generate:openapi`, `check:drift`, `prisma migrate status` (dev y test) y `npm audit`. El PDF reporta 13/13 tareas Turbo; en esta acta se deja constancia de los gates ejecutados y de la ausencia de regresiones observadas, sin recontar el total de tareas. **Nota:** las cifras de esta sección son el corte del 17/11/2026; el estado del 26/11/2026 es 462 API + 155 frontend + 18 E2E (635), con cobertura API de 91,89 % líneas / 80,42 % ramas y frontend de 92,77 % líneas / 80,31 % ramas de lógica crítica (cobertura global de `src` 32,34 % líneas / 28,33 % ramas, pendiente), documentado en §5.9 y en las filas 3/F de §7.1.
 
 Evidencia de los gates del backend:
 
@@ -348,13 +348,13 @@ El marketplace es una vitrina: no gestiona precio, unidad ni inventario. La mode
 
 | ID | Discrepancia | PDF dice | Realidad verificada | Explicación | Acción |
 | --- | --- | --- | --- | --- | --- |
-| D1 | Total de pruebas | 373 | 488 (421 + 53 + 14) al 17/11; 629 (456 + 155 + 18) al 26/11 | El PDF no discrimina por suite; las cifras crecieron con el port geoespacial, F3, P-01 y el mapa móvil | Usar el conteo vigente (629) en el próximo informe y conservar 488 como corte histórico |
+| D1 | Total de pruebas | 373 | 488 (421 + 53 + 14) al 17/11; 635 (462 + 155 + 18) al 26/11 | El PDF no discrimina por suite; las cifras crecieron con el port geoespacial, F3, P-01 y el mapa móvil | Usar el conteo vigente (635) en el próximo informe y conservar 488 como corte histórico |
 | D2 | E2E | 10/10 | 14/14 al 24/11; 18/18 al 26/11 | La suite se amplió con F3 y el mapa móvil | Usar 18/18 en el próximo informe |
 | D3 | Estado de la fase 0 | Resumen: fases 0–2 cerradas; tabla: fase 0 PARCIAL | Fase 0 PARCIAL | La fase 0 depende de Jira y Notion; prevalece la lectura granular | Corregir la redacción del próximo informe |
 | D4 | Commit de corte | `588b234` | `2dca6d4` | El PDF se generó en un corte anterior; el repositorio avanzó con perfiles, moderación, P-01 y correcciones | Mantener ambos como "corte PDF" y "verificación actual" |
 | D5 | Rutas de los hallazgos | `backend/src/...` | `apps/api/src/...` | El código se movió al monorepo; la desviación ya está registrada en la fase 2.3 | Actualizar referencias en el acta; no reescribir el PDF |
 | D6 | `GET/PATCH /me` y admin | Fase 2.4: faltan | Perfiles en `84db165`; administración en P-01 | El PDF es anterior a la implementación | Fase 2.4 cerrada en backend |
-| D8 | Cobertura reportada | No reportada en el PDF; acta v1.0: 94,01 % líneas / 82,32 % ramas | 91,89 % líneas / 80,50 % ramas (API, 48 suites) | La cobertura baja al incorporar más código, pero permanece por encima del umbral del 80 % | Reportar siempre cobertura por suite y con numerador/denominador |
+| D8 | Cobertura reportada | No reportada en el PDF; acta v1.0: 94,01 % líneas / 82,32 % ramas | 91,89 % líneas / 80,42 % ramas (API, 48 suites) | La cobertura baja al incorporar más código, pero permanece por encima del umbral del 80 % | Reportar siempre cobertura por suite y con numerador/denominador |
 
 ---
 

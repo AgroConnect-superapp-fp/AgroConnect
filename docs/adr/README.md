@@ -34,5 +34,9 @@ Hay dos series de ADR:
 | [ADR-023](0023-moderacion-previa-productos.md)          | Moderación previa de productos con rol administrador                                | Aceptada — implementada            |
 | [ADR-024](0024-fase-3-router-datos-ui.md)               | Fase 3 frontend: React Router 7, TanStack Query, `src/shared/ui` y URLs estables    | Aceptada — F1–F4 implementadas     |
 | [ADR-025](0025-tipos-openapi-sin-cliente-runtime.md)   | Tipos OpenAPI generados como guard de contrato, sin cliente HTTP runtime           | Aceptada — implementada            |
+| [ADR-026](0026-alcance-datos-mvp-vs-modelo-objetivo.md) | Alcance de datos: MVP implementado vs modelo comercial objetivo | Sustituida por ADR-029 |
+| [ADR-027](0027-control-acceso-datos-rls-mvp.md) | Control de acceso a datos: API autoritativa y RLS objetivo | Aceptada para el MVP |
+| [ADR-028](0028-rpo-rto-respaldo-restauracion.md) | RPO, RTO y restauración de datos | Aceptada provisionalmente |
+| [ADR-029](0029-ruta-b-modelo-comercial-completo.md) | Ruta B: implementación del modelo comercial completo | Aceptada — en ejecución |
 
 Para una decisión nueva, copia la estructura de cualquier ADR: Estado, Fecha, Decisores, Relacionado, Contexto, Decisión, Alternativas y Consecuencias. Enlázala aquí y en el índice de ADRs de Obsidian.

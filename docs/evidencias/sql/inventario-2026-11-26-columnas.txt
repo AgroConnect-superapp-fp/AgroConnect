@@ -1,0 +1,116 @@
+_prisma_migrations|id|character varying|NO|
+_prisma_migrations|checksum|character varying|NO|
+_prisma_migrations|finished_at|timestamp with time zone|YES|
+_prisma_migrations|migration_name|character varying|NO|
+_prisma_migrations|logs|text|YES|
+_prisma_migrations|rolled_back_at|timestamp with time zone|YES|
+_prisma_migrations|started_at|timestamp with time zone|NO|now()
+_prisma_migrations|applied_steps_count|integer|NO|0
+company_profiles|id|uuid|NO|
+company_profiles|user_id|uuid|NO|
+company_profiles|razon_social|text|NO|
+company_profiles|nit|text|NO|
+company_profiles|direccion|text|YES|
+company_profiles|tipo_empresa|USER-DEFINED|YES|
+company_profiles|departamento|text|YES|
+company_profiles|municipio|text|YES|
+email_verification_tokens|id|uuid|NO|
+email_verification_tokens|user_id|uuid|NO|
+email_verification_tokens|token_hash|text|NO|
+email_verification_tokens|expira_en|timestamp without time zone|NO|
+email_verification_tokens|usado_en|timestamp without time zone|YES|
+email_verification_tokens|creado_en|timestamp without time zone|NO|CURRENT_TIMESTAMP
+geography_columns|f_table_catalog|name|YES|
+geography_columns|f_table_schema|name|YES|
+geography_columns|f_table_name|name|YES|
+geography_columns|f_geography_column|name|YES|
+geography_columns|coord_dimension|integer|YES|
+geography_columns|srid|integer|YES|
+geography_columns|type|text|YES|
+geometry_columns|f_table_catalog|character varying|YES|
+geometry_columns|f_table_schema|name|YES|
+geometry_columns|f_table_name|name|YES|
+geometry_columns|f_geometry_column|name|YES|
+geometry_columns|coord_dimension|integer|YES|
+geometry_columns|srid|integer|YES|
+geometry_columns|type|character varying|YES|
+password_reset_tokens|id|uuid|NO|
+password_reset_tokens|user_id|uuid|NO|
+password_reset_tokens|token_hash|text|NO|
+password_reset_tokens|expira_en|timestamp without time zone|NO|
+password_reset_tokens|usado_en|timestamp without time zone|YES|
+password_reset_tokens|creado_en|timestamp without time zone|NO|CURRENT_TIMESTAMP
+plots|id|uuid|NO|
+plots|name|text|NO|
+plots|area_hectares|double precision|NO|0
+plots|municipality|text|NO|
+plots|department|text|NO|
+plots|farmer_id|uuid|NO|
+plots|centroid|USER-DEFINED|YES|
+plots|created_at|timestamp without time zone|NO|CURRENT_TIMESTAMP
+plots|geom|USER-DEFINED|YES|
+plots|deleted_at|timestamp without time zone|YES|
+plots|updated_at|timestamp without time zone|NO|CURRENT_TIMESTAMP
+producer_profiles|id|uuid|NO|
+producer_profiles|user_id|uuid|NO|
+producer_profiles|nombre_finca|text|NO|
+producer_profiles|municipio|text|NO|
+producer_profiles|vereda|text|NO|
+producer_profiles|coordenadas|USER-DEFINED|YES|
+products|id|uuid|NO|
+products|name|text|NO|
+products|owner|text|NO|
+products|description|text|YES|
+products|contact|text|YES|
+products|department|text|NO|
+products|municipality|text|NO|
+products|crop|USER-DEFINED|NO|
+products|area_hectares|double precision|NO|
+products|productivity|integer|NO|
+products|certification|USER-DEFINED|YES|
+products|lat|double precision|NO|
+products|lng|double precision|NO|
+products|images|jsonb|NO|'[]'::jsonb
+products|coordinates|jsonb|NO|'[]'::jsonb
+products|created_at|timestamp without time zone|NO|CURRENT_TIMESTAMP
+products|updated_at|timestamp without time zone|NO|
+products|producer_id|uuid|YES|
+products|moderation_status|USER-DEFINED|NO|'pending'::product_moderation_status
+refresh_tokens|id|uuid|NO|
+refresh_tokens|user_id|uuid|NO|
+refresh_tokens|token_hash|text|NO|
+refresh_tokens|expira_en|timestamp without time zone|NO|
+refresh_tokens|revocado|boolean|NO|false
+refresh_tokens|creado_en|timestamp without time zone|NO|CURRENT_TIMESTAMP
+refresh_tokens|family_id|uuid|NO|
+refresh_tokens|generation|integer|NO|0
+refresh_tokens|rotated_at|timestamp without time zone|YES|
+roles|id|uuid|NO|
+roles|nombre|text|NO|
+roles|descripcion|text|NO|
+spatial_ref_sys|srid|integer|NO|
+spatial_ref_sys|auth_name|character varying|YES|
+spatial_ref_sys|auth_srid|integer|YES|
+spatial_ref_sys|srtext|character varying|YES|
+spatial_ref_sys|proj4text|character varying|YES|
+transporter_profiles|id|uuid|NO|
+transporter_profiles|user_id|uuid|NO|
+transporter_profiles|tipo_vehiculo|USER-DEFINED|NO|
+transporter_profiles|placa|text|NO|
+transporter_profiles|capacidad_kg|double precision|NO|
+transporter_profiles|cobertura_municipios|ARRAY|NO|
+transporter_profiles|cadena_frio|boolean|NO|false
+transporter_profiles|soat_vence|date|NO|
+transporter_profiles|licencia_vence|date|NO|
+users|id|uuid|NO|
+users|nombre_completo|text|NO|
+users|documento|text|NO|
+users|correo|text|NO|
+users|celular|text|NO|
+users|password_hash|text|NO|
+users|rol_id|uuid|NO|
+users|estado|USER-DEFINED|NO|'ACTIVO'::"UserStatus"
+users|acepta_tratamiento_datos|boolean|NO|
+users|fecha_registro|timestamp without time zone|NO|CURRENT_TIMESTAMP
+users|actualizado_en|timestamp without time zone|NO|
+users|correo_verificado_en|timestamp without time zone|YES|

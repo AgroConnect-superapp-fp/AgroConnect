@@ -8,6 +8,7 @@ import type { RoleName } from '../../domain/entities/Role';
 import type {
   AdminContinuityResult,
   AdminUserFilters,
+  AuditEventData,
   AdminUserPage,
   CompanyProfileUpdate,
   ProfileSnapshot,
@@ -491,6 +492,7 @@ export class PrismaUserRepository implements UserRepository {
   async updateStatusPreservingAdminContinuity(
     userId: string,
     status: UserStatus,
+    audit?: AuditEventData,
   ): Promise<AdminContinuityResult> {
     return this.prisma.$transaction(async (tx) => {
       await this.lockAdminContinuity(tx);
@@ -532,6 +534,8 @@ export class PrismaUserRepository implements UserRepository {
         });
       }
 
+      await this.writeAuditEvent(tx, audit);
+
       return { outcome: 'UPDATED', user: this.toDomain(record) };
     });
   }
@@ -540,6 +544,7 @@ export class PrismaUserRepository implements UserRepository {
     userId: string,
     roleId: string,
     roleName: RoleName,
+    audit?: AuditEventData,
   ): Promise<AdminContinuityResult> {
     return this.prisma.$transaction(async (tx) => {
       await this.lockAdminContinuity(tx);
@@ -578,7 +583,31 @@ export class PrismaUserRepository implements UserRepository {
         data: { revoked: true },
       });
 
+      await this.writeAuditEvent(tx, audit);
+
       return { outcome: 'UPDATED', user: this.toDomain(record) };
+    });
+  }
+
+  private async writeAuditEvent(
+    tx: Prisma.TransactionClient,
+    audit: AuditEventData | undefined,
+  ): Promise<void> {
+    if (!audit) {
+      return;
+    }
+
+    await tx.auditEvent.create({
+      data: {
+        actorId: audit.actorId ?? null,
+        actorRole: audit.actorRole,
+        action: audit.action,
+        entityType: audit.entityType,
+        entityId: audit.entityId ?? null,
+        beforeData: audit.before as Prisma.InputJsonValue | undefined,
+        afterData: audit.after as Prisma.InputJsonValue | undefined,
+        correlationId: audit.correlationId ?? null,
+      },
     });
   }
 
