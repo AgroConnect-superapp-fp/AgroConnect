@@ -58,7 +58,7 @@ export class GenerateUploadSignatureUseCase {
     const folder = `${this.config.folder.replace(/\/+$/, '')}/${actor.id}`;
     const allowedFormats = ALLOWED_FORMATS.join(',');
     const toSign = `allowed_formats=${allowedFormats}&folder=${folder}&timestamp=${timestamp}`;
-    const signature = createHash('sha1').update(`${toSign}${apiSecret}`).digest('hex');
+    const signature = createHash('sha256').update(`${toSign}${apiSecret}`).digest('hex');
 
     return {
       cloudName,

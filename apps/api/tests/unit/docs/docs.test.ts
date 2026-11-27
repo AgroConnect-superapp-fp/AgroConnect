@@ -87,6 +87,12 @@ describe('docs-url: resolveDocsBaseUrl', () => {
     expect(resolveDocsBaseUrl('')).toBe('/docs');
     expect(resolveDocsBaseUrl('/otra/ruta')).toBe('/docs');
   });
+
+  it('descarta prefijos arbitrarios para evitar XSS reflejado', () => {
+    expect(resolveDocsBaseUrl('/%22%3E%3Cscript%3E/docs')).toBe('/docs');
+    expect(resolveDocsBaseUrl('/evil/docs')).toBe('/docs');
+    expect(resolveDocsBaseUrl('/api/docs')).toBe('/docs');
+  });
 });
 
 describe('docs-url: rewriteRelativeAssetUrls', () => {
@@ -100,9 +106,9 @@ describe('docs-url: rewriteRelativeAssetUrls', () => {
   });
 
   it('reescribe también las referencias entre comillas simples', () => {
-    expect(
-      rewriteRelativeAssetUrls("<script src='./swagger-ui-init.js'></script>", '/docs'),
-    ).toBe("<script src='/docs/swagger-ui-init.js'></script>");
+    expect(rewriteRelativeAssetUrls("<script src='./swagger-ui-init.js'></script>", '/docs')).toBe(
+      "<script src='/docs/swagger-ui-init.js'></script>",
+    );
   });
 
   it('deja intactas las referencias absolutas', () => {
@@ -206,7 +212,7 @@ describe('SwaggerAssetsMiddleware', () => {
   const middleware = new SwaggerAssetsMiddleware({ load } as unknown as OpenApiSource);
 
   const peticion = (url: string, originalUrl: string): Request =>
-    ({ url, originalUrl } as unknown as Request);
+    ({ url, originalUrl }) as unknown as Request;
 
   beforeEach(() => {
     env.ENABLE_API_DOCS = true;
@@ -221,11 +227,7 @@ describe('SwaggerAssetsMiddleware', () => {
     load.mockResolvedValue(CONTRATO);
 
     const next = jest.fn();
-    await middleware.use(
-      peticion('/swagger-ui.css', '/docs/swagger-ui.css'),
-      {} as Response,
-      next,
-    );
+    await middleware.use(peticion('/swagger-ui.css', '/docs/swagger-ui.css'), {} as Response, next);
 
     expect(serveFilesMock).toHaveBeenCalledWith(CONTRATO, {
       swaggerOptions: { url: '/docs/openapi.json' },
@@ -249,11 +251,7 @@ describe('SwaggerAssetsMiddleware', () => {
     load.mockRejectedValue(error);
     const next = jest.fn();
 
-    await middleware.use(
-      peticion('/swagger-ui.css', '/docs/swagger-ui.css'),
-      {} as Response,
-      next,
-    );
+    await middleware.use(peticion('/swagger-ui.css', '/docs/swagger-ui.css'), {} as Response, next);
 
     expect(next).toHaveBeenCalledWith(error);
   });
@@ -262,11 +260,7 @@ describe('SwaggerAssetsMiddleware', () => {
     env.ENABLE_API_DOCS = false;
     const next = jest.fn();
 
-    await middleware.use(
-      peticion('/swagger-ui.css', '/docs/swagger-ui.css'),
-      {} as Response,
-      next,
-    );
+    await middleware.use(peticion('/swagger-ui.css', '/docs/swagger-ui.css'), {} as Response, next);
 
     expect(next).toHaveBeenCalledWith(expect.any(NotFoundException));
     expect(serveFilesMock).not.toHaveBeenCalled();

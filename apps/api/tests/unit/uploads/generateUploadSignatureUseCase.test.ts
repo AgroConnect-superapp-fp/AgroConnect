@@ -27,7 +27,7 @@ describe('GenerateUploadSignatureUseCase', () => {
     expect(signature.timestamp).toBeLessThanOrEqual(after);
 
     const toSign = `allowed_formats=${signature.allowedFormats.join(',')}&folder=${signature.folder}&timestamp=${signature.timestamp}`;
-    const expected = createHash('sha1').update(`${toSign}${config.apiSecret}`).digest('hex');
+    const expected = createHash('sha256').update(`${toSign}${config.apiSecret}`).digest('hex');
     expect(signature.signature).toBe(expected);
     expect(JSON.stringify(signature)).not.toContain('secret');
   });

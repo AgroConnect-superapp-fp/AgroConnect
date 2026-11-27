@@ -200,6 +200,10 @@ export function getResponsiveImageUrls(
  * - Unsplash and Wikimedia direct URLs get provider-specific small variants.
  * - Unknown providers fall back to the original reference (no transformation).
  */
+function matchesHost(hostname: string, domain: string): boolean {
+  return hostname === domain || hostname.endsWith(`.${domain}`);
+}
+
 export function getLqipUrl(reference: string): string {
   if (!isDirectImageUrl(reference)) {
     return getImageUrl(reference, 'lqip');
@@ -208,14 +212,14 @@ export function getLqipUrl(reference: string): string {
   try {
     const parsed = new URL(reference);
 
-    if (parsed.hostname.includes('unsplash.com')) {
+    if (matchesHost(parsed.hostname, 'unsplash.com')) {
       parsed.searchParams.set('w', '50');
       parsed.searchParams.set('q', '10');
       parsed.searchParams.set('blur', '40');
       return parsed.toString();
     }
 
-    if (parsed.hostname.includes('wikimedia.org')) {
+    if (matchesHost(parsed.hostname, 'wikimedia.org')) {
       if (parsed.searchParams.has('width')) {
         parsed.searchParams.set('width', '50');
       }
@@ -223,7 +227,7 @@ export function getLqipUrl(reference: string): string {
     }
 
     if (
-      parsed.hostname.includes('cloudinary.com') &&
+      matchesHost(parsed.hostname, 'cloudinary.com') &&
       parsed.pathname.includes('/image/upload/')
     ) {
       return reference.replace('/image/upload/', '/image/upload/w_50,q_10,f_auto/');

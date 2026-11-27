@@ -47,7 +47,7 @@ if (!cloudName || !apiKey || !apiSecret) {
   const allowedFormats = "jpg,jpeg,png,webp,avif";
   const timestamp = Math.floor(Date.now() / 1000);
   const toSign = `allowed_formats=${allowedFormats}&folder=${folder}&timestamp=${timestamp}`;
-  const signature = createHash("sha1")
+  const signature = createHash("sha256")
     .update(`${toSign}${apiSecret}`)
     .digest("hex");
 
