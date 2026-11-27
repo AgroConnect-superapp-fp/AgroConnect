@@ -17,7 +17,7 @@ editar un producto ajeno si existiera un endpoint de escritura.
 
 1. **Firma server-side:** `POST /api/v1/uploads/signature` exige
    `SessionAuthGuard` y rol productor/administrador. El backend emite
-   `timestamp`, `folder` por usuario, `allowed_formats` y firma SHA-1 con
+   `timestamp`, `folder` por usuario, `allowed_formats` y firma SHA-256 con
    `CLOUDINARY_API_SECRET`. El secreto nunca viaja al frontend.
 2. **Subida directa:** el navegador envía archivo, `api_key`, `timestamp`,
    `signature`, `folder` y `allowed_formats` a Cloudinary. El servidor no
@@ -36,6 +36,8 @@ editar un producto ajeno si existiera un endpoint de escritura.
   memoria y tiempo de Render free; además duplica la CDN. Rechazada.
 - **Subida firmada desde el backend con SDK:** requeriría mover el binario al
   servidor; mismo problema que el proxy. Rechazada.
+
+> **Actualización 27/11/2026:** la firma se migró de SHA-1 a SHA-256, admitida por Cloudinary. El smoke test también usa SHA-256.
 
 ## Consecuencias
 
