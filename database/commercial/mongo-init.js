@@ -5,7 +5,7 @@
 // Ejecutar en mongosh conectado al servidor
 // =============================================
 
-use agroconnect_nosql;
+db = db.getSiblingDB("agroconnect_nosql");
 
 // Crea una colección solo si aún no existe para permitir ejecuciones repetibles.
 function ensureCollection(name, options = {}) {
