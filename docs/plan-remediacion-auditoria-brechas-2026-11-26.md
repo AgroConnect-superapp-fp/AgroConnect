@@ -170,7 +170,7 @@ Sin estas decisiones, varios hallazgos no pueden cerrarse aunque se escriba docu
 | H09 | Crítica | Validación de stock no reserva ni descuenta | Implementado target: reserva y liberación atómicas | Integración con API | 2 |
 | H10 | Alta | Restricciones y triggers fuera del DDL base | Implementado target: 96 constraints | Integración con API | 1 |
 | H11 | Media | Índices sin planes de consulta comercial | Implementado target: 64 índices + 3 EXPLAIN | Repetir con volumen productivo | 1 |
-| H12 | Crítica | LWW y sincronización sin versión/reconciliación | Excluido provisional (opción A) | Acta de exclusión + ADR de versionado | 2 |
+| H12 | Crítica | LWW y sincronización sin versión/reconciliación | Parcial: protocolo de publicación con versión de servidor | Falta sync bidireccional/Mongo/offline | 2 |
 | H13 | Alta | MongoDB sin validadores ni deduplicación por conversación | Implementado target: 6 colecciones + validadores | Integración con API | 2 |
 | H14 | Alta | `logs_actividad` sin inmutabilidad demostrada | Implementado técnico: `audit_events` + trigger + E2E | Falta firma del auditor | 1 |
 | H15 | Alta | Migraciones con datos y offline sin ensayo | Parcial: instalación limpia Prisma OK; faltan datos/offline | Ensayo con datos y offline | 2 |

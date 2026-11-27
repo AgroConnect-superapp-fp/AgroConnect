@@ -36,13 +36,13 @@ El MVP no hereda la aceptación del diseño objetivo. El diseño objetivo no se 
 | H09 | Crítica | Implementación Ruta B | **Implementado target** | Reserva atómica + liberación; prueba 7+7 y cancelación |
 | H10 | Alta | Técnica MVP | **Implementado target** | 96 constraints en esquema comercial + pruebas |
 | H11 | Media | Técnica MVP | **Implementado target** | 64 índices; EXPLAIN de 3 consultas; pendiente volumen productivo |
-| H12 | Crítica | Implementación Ruta B | **Abierto** | Pendiente contrato/pruebas de sync |
+| H12 | Crítica | Implementación Ruta B | **Parcial target** | Protocolo de publicación versionado e idempotente |
 | H13 | Alta | Implementación Ruta B | **Implementado target** | 6 colecciones, validadores, TTL y unique por conversación; probado |
 | H14 | Alta | Técnica MVP | **Implementado técnico** | `audit_events` append-only + E2E; falta firma del auditor |
 | H15 | Alta | Implementación Ruta B | **Abierto** | Instalación limpia local OK; falta migración con datos y offline |
 | H16 | Alta | Técnica MVP | **Parcial** | ADR-028; restauración local OK; falta RPO/RTO de producción |
 
-**Resumen:** Ruta B activa; **0 hallazgos cerrados por auditor**. H05, H07, H08, H09, H10 y H13 tienen implementación target validada. H12, H15 y H16 siguen pendientes; H06/H11 requieren staging/EXPLAIN.
+**Resumen:** Ruta B activa; **0 hallazgos cerrados por auditor**. H05, H07, H08, H09, H10 y H13 tienen implementación target validada. H12 tiene protocolo target parcial; H15/H16 siguen parciales; H06/H11 requieren staging/EXPLAIN.
 
 ---
 
