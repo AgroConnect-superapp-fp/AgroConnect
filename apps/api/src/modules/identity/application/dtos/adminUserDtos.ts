@@ -10,6 +10,7 @@ import type { RoleName } from '../../domain/entities/Role';
 export interface AdminUserActor {
   id: string;
   role: string;
+  correlationId?: string;
 }
 
 /**

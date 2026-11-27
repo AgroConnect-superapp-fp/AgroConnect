@@ -42,6 +42,16 @@ export class UpdateUserStatusUseCase {
     const result = await this.userRepository.updateStatusPreservingAdminContinuity(
       target.id,
       status,
+      {
+        actorId: actor.id,
+        actorRole: actor.role,
+        action: 'admin.user.status_changed',
+        entityType: 'user',
+        entityId: target.id,
+        before: { estado: target.status },
+        after: { estado: status },
+        correlationId: actor.correlationId,
+      },
     );
 
     if (result.outcome === 'NOT_FOUND') {

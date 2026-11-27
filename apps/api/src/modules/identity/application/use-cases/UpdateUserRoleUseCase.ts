@@ -76,6 +76,16 @@ export class UpdateUserRoleUseCase {
       target.id,
       newRole.id,
       newRole.name,
+      {
+        actorId: actor.id,
+        actorRole: actor.role,
+        action: 'admin.user.role_changed',
+        entityType: 'user',
+        entityId: target.id,
+        before: { rol: target.roleName },
+        after: { rol: newRole.name },
+        correlationId: actor.correlationId,
+      },
     );
 
     if (result.outcome === 'NOT_FOUND') {

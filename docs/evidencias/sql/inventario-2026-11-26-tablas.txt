@@ -1,0 +1,14 @@
+_prisma_migrations
+company_profiles
+email_verification_tokens
+geography_columns
+geometry_columns
+password_reset_tokens
+plots
+producer_profiles
+products
+refresh_tokens
+roles
+spatial_ref_sys
+transporter_profiles
+users

@@ -390,6 +390,7 @@ export class InMemoryUserRepository implements UserRepository {
   async updateStatusPreservingAdminContinuity(
     userId: string,
     status: UserStatus,
+    _audit?: import('../../src/modules/identity/domain/interfaces/UserRepository').AuditEventData,
   ): Promise<AdminContinuityResult> {
     const target = this.users.find((user) => user.id === userId);
     if (!target) {
@@ -416,6 +417,7 @@ export class InMemoryUserRepository implements UserRepository {
     userId: string,
     roleId: string,
     roleName: RoleName,
+    _audit?: import('../../src/modules/identity/domain/interfaces/UserRepository').AuditEventData,
   ): Promise<AdminContinuityResult> {
     const target = this.users.find((user) => user.id === userId);
     if (!target) {

@@ -143,6 +143,18 @@ export interface ProfilePresence {
   transporter: boolean;
 }
 
+/** Datos mínimos de auditoría que se escriben en la misma transacción. */
+export interface AuditEventData {
+  actorId?: string;
+  actorRole: string;
+  action: string;
+  entityType: string;
+  entityId?: string;
+  before?: Record<string, unknown>;
+  after?: Record<string, unknown>;
+  correlationId?: string;
+}
+
 export type AdminContinuityResult =
   { outcome: 'UPDATED'; user: User } | { outcome: 'NOT_FOUND' } | { outcome: 'LAST_ACTIVE_ADMIN' };
 
@@ -194,6 +206,7 @@ export interface UserRepository {
   updateStatusPreservingAdminContinuity(
     userId: string,
     status: UserStatus,
+    audit?: AuditEventData,
   ): Promise<AdminContinuityResult>;
   /**
    * Cambia el rol y revoca refresh tokens bajo el mismo lock de continuidad
@@ -203,5 +216,6 @@ export interface UserRepository {
     userId: string,
     roleId: string,
     roleName: RoleName,
+    audit?: AuditEventData,
   ): Promise<AdminContinuityResult>;
 }
