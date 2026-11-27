@@ -13,6 +13,7 @@
 | `integrity.sql` | H07–H09: pedido con ítems, stock atómico y liberación al cancelar |
 | `mongo-init.js` | 6 colecciones MongoDB con validadores, índices, TTL y deduplicación |
 | `verify.sql` | conteos y verificaciones de aceptación |
+| `sync.sql` | H12: versión por entidad, idempotencia y conflictos |
 
 ## Aplicación local
 
@@ -31,6 +32,7 @@ docker exec -i agroconnect-mongo mongosh --quiet < database/commercial/mongo-ini
 - `docs/evidencias/sql/commercial-schema-2026-11-27.txt`
 - `docs/evidencias/sql/commercial-integrity-2026-11-27.txt`
 - `docs/evidencias/mongo/commercial-mongo-2026-11-27.txt`
+- `docs/evidencias/sql/commercial-sync-2026-11-27.txt`
 - `docs/evidencias/sql/commercial-explain-2026-11-27.txt`
 
 ## Límites
