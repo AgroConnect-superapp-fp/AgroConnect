@@ -168,7 +168,7 @@ Sin estas decisiones, varios hallazgos no pueden cerrarse aunque se escriba docu
 | H07 | Alta | Pedido sin ítems y envío único; unidad de despacho | Excluido provisional (opción A) | Acta de exclusión + ADR de unidad de despacho | 2 |
 | H08 | Alta | `detalle_pedido` sin UNIQUE de pedido/publicación | Excluido provisional (opción A) | Acta de exclusión + decisión de detalle | 2 |
 | H09 | Crítica | Validación de stock no reserva ni descuenta | Excluido provisional (opción A) | Acta de exclusión + diseño de reserva | 2 |
-| H10 | Alta | Restricciones y triggers fuera del DDL base | Parcial: Prisma aplica restricciones, sin catálogo completo | Catálogo de constraints + pruebas negativas | 1 |
+| H10 | Alta | Restricciones y triggers fuera del DDL base | Parcial: catálogo + 4 E2E; faltan tablas comerciales | Catálogo + pruebas negativas | 1 |
 | H11 | Media | Índices sin planes de consulta comercial | Parcial: existen índices, sin EXPLAIN | Medir búsquedas, historial y cobertura; justificar índices | 1 |
 | H12 | Crítica | LWW y sincronización sin versión/reconciliación | Excluido provisional (opción A) | Acta de exclusión + ADR de versionado | 2 |
 | H13 | Alta | MongoDB sin validadores ni deduplicación por conversación | Excluido provisional: MongoDB fuera del MVP | Acta de exclusión + reevaluación académica | 2 |

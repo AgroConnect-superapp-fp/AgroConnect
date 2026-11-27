@@ -34,7 +34,7 @@ El MVP no hereda la aceptación del diseño objetivo. El diseño objetivo no se 
 | H07 | Alta | Implementación Ruta B | **Abierto** | ADR-029; pedidos/envíos por implementar |
 | H08 | Alta | Implementación Ruta B | **Abierto** | ADR-029; detalle por implementar |
 | H09 | Crítica | Implementación Ruta B | **Abierto** | ADR-029; stock/reserva por implementar |
-| H10 | Alta | Técnica MVP | **Parcial** | Inventario de constraints; faltan pruebas negativas |
+| H10 | Alta | Técnica MVP | **Parcial** | Catálogo + 4 pruebas E2E de constraints; faltan tablas comerciales |
 | H11 | Media | Técnica MVP | **Parcial** | Inventario de índices; faltan EXPLAIN |
 | H12 | Crítica | Implementación Ruta B | **Abierto** | ADR-029; ADR-006/versionado por implementar |
 | H13 | Alta | Implementación Ruta B | **Abierto** | ADR-029; MongoDB por implementar |
