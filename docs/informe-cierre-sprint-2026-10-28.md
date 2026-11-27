@@ -34,16 +34,16 @@
 
 ## 1. Resumen ejecutivo
 
-El sprint cierra con el núcleo técnico de AgroConnect consolidado: seguridad P0 corregida, monolito modular NestJS 11 operativo, contratos compartidos, módulo geoespacial con PostGIS, marketplace con moderación, frontend con router y capa de datos, y una suite automatizada de **629 pruebas**.
+El sprint cierra con el núcleo técnico de AgroConnect consolidado: seguridad P0 corregida, monolito modular NestJS 11 operativo, contratos compartidos, módulo geoespacial con PostGIS, marketplace con moderación, frontend con router y capa de datos, y una suite automatizada de **635 pruebas**.
 
 El avance respecto al informe del 28/10 es sustancial:
 
-- Se pasó de **373 a 629 pruebas automatizadas**.
+- Se pasó de **373 a 635 pruebas automatizadas**.
 - Los E2E crecieron de **10 a 18**, con axe WCAG AA en rutas críticas y mapa móvil bajo demanda.
 - El frontend cerró las cinco fases de su plan de modernización: router, TanStack Query, sistema de componentes, división del marketplace y documentación.
 - El build de producción quedó cubierto por un smoke test propio, después de corregir un fallo que no detectaba el E2E contra Vite dev.
 - El bundle inicial bajó a **109,4 KB gzip** y el LCP de marketplace quedó en **2,83 s**, a 0,33 s del objetivo.
-- La API mantiene cobertura por encima del umbral: **91,89 % líneas / 80,50 % ramas**.
+- La API mantiene cobertura por encima del umbral: **91,89 % líneas / 80,42 % ramas**.
 
 Sin embargo, **el sprint no cierra todas las fases del plan**:
 
@@ -214,7 +214,7 @@ Controles adicionales incorporados:
 
 ### 4.7 Documentación y trazabilidad
 
-- README, manifiesto de alineación y Obsidian sincronizados con **456 backend · 155 frontend · 18 E2E**.
+- README, manifiesto de alineación y Obsidian sincronizados con **462 backend · 155 frontend · 18 E2E**.
 - 19 ADRs, incluidos router/datos/UI y tipos OpenAPI.
 - Matrices de trazabilidad y decisión D7 documentadas.
 - Acta detallada de cierre y plan de fase 3.
@@ -228,16 +228,16 @@ Controles adicionales incorporados:
 
 | Suite | Cantidad | Estado |
 | --- | --- | --- |
-| API / backend | **456** pruebas en 48 suites | En verde |
+| API / backend | **462** pruebas en 48 suites | En verde |
 | Frontend / web | **155** pruebas en 25 archivos | En verde |
 | E2E Playwright | **18** | En verde |
-| **Total automatizado** | **629** | En verde |
+| **Total automatizado** | **635** | En verde |
 
 ### 5.2 Cobertura
 
 | Componente | Statements | Branches | Functions | Lines | Lectura |
 | --- | --- | --- | --- | --- | --- |
-| API | 91,45 % | **80,50 %** | 94,86 % | **91,89 %** | Umbral del 80 % cumplido |
+| API | 91,45 % | **80,42 %** | 94,86 % | **91,89 %** | Umbral del 80 % cumplido |
 | Frontend — lógica crítica | — | **80,31 %** | — | **92,77 %** | Gate del 80 % cumplido |
 | Frontend — todo `src/` | 32,28 % | 28,33 % | 30,03 % | 32,34 % | **Brecha declarada**; pantallas y hooks de mapa/upload no medidos por unitarias |
 
@@ -304,7 +304,7 @@ npm run test:e2e --workspace agroconnect-frontend
 Resultados del corte:
 
 - Lint y typecheck: **0 errores**.
-- API: **456/456** pruebas; 48 suites.
+- API: **462/462** pruebas; 48 suites.
 - Frontend: **155/155** pruebas; 25 archivos.
 - E2E: **18/18** en Chromium.
 - Arquitectura: **0 violaciones**.
@@ -320,7 +320,7 @@ Resultados del corte:
 
 | ID | Punto | Informe del 28/10 | Cierre real 26/11 | Lectura |
 | --- | --- | --- | --- | --- |
-| D1 | Total de pruebas | 373 | **629** (456 + 155 + 18) | Crecimiento por port geoespacial, fase 3, a11y y mapa móvil |
+| D1 | Total de pruebas | 373 | **635** (462 + 155 + 18) | Crecimiento por port geoespacial, fase 3, a11y y mapa móvil |
 | D2 | E2E | 10/10 | **18/18** | Se amplió la cobertura de rutas, mapa móvil y publicación |
 | D3 | Fases 0–2 | “cerradas” en el resumen | 0 parcial; 2.4 cerrada con P-01 | Prevalece la tabla granular del propio PDF; el trabajo posterior cerró 2.4 y dejó la fase 0 a la espera de accesos externos |
 | D4 | Commit de corte | `588b234` | `2dca6d4` | El repositorio avanzó 131 commits |
@@ -356,13 +356,13 @@ Resultados del corte:
 | --- | --- | --- | --- |
 | Q-01 | Cobertura global frontend 32,34 % | El gate no mide todas las pantallas | Ampliar pruebas de componentes/pantallas o formalizar excepción |
 | Q-02 | LCP marketplace 2,83 s | 0,33 s sobre el objetivo | Atacar render delay del entry y chunk de ruta |
-| Q-03 | Cobertura API 80,50 % ramas | Margen estrecho | Añadir pruebas de ramas antes de nuevos módulos |
+| Q-03 | Cobertura API 80,42 % ramas | Margen estrecho | Añadir pruebas de ramas antes de nuevos módulos |
 | Q-04 | 3 HIGH de Prisma en desarrollo | Ruido en auditoría | Revisar con Prisma 8 estable |
 | Q-05 | Moderación P2 | Flujo de rechazo incompleto | Decidir motivo, notificación y auditoría |
 | Q-06 | Fixture de administrador E2E | Cobertura de moderación limitada | Crear fixture reproducible |
 | Q-07 | Límite de Cloudinary | Riesgo de cuota en producción | Verificar plan y fallback |
 | Q-08 | D7: renumeración HU | Trazabilidad oficial incompleta | Esperar numeración del Product Backlog v2.0 |
-| Q-09 | README de `origin/main` | Desalineado con 629 pruebas | Push/PR autorizado |
+| Q-09 | README de `origin/main` | Desalineado con 635 pruebas | Push/PR autorizado |
 
 ---
 
