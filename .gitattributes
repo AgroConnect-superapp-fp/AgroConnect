@@ -1,0 +1,21 @@
+# Los CSV de trazabilidad de AgroConnect se versionan con finales de línea CRLF.
+# `-text` evita que Git los normalice a LF y genere diffs de una línea completa
+# en cada cambio, conservando el formato histórico de los artefactos SENA.
+# `whitespace=cr-at-eol` declara que el CR pertenece al fin de línea y no es
+# espacio sobrante, para que `git diff --check` no reporte falsos positivos.
+docs/matriz_trazabilidad_*.csv -text whitespace=cr-at-eol
+
+# El resto del repositorio usa LF de forma nativa.
+*.ts -text
+*.tsx -text
+*.js -text
+*.mjs -text
+*.json -text
+# En Markdown, dos espacios finales son un salto de línea intencional
+# (hard break), no espacio sobrante: se excluye de `blank-at-eol`.
+*.md -text whitespace=-blank-at-eol
+*.yml -text
+*.yaml -text
+*.prisma -text
+*.css -text
+*.html -text

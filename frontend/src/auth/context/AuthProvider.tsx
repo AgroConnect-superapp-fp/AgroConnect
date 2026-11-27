@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { queryClient } from '../../shared/api/queryClient';
 import { authApi } from '../api/authClient';
 import type { AuthSession, LoginPayload, PublicUser, RegisterPayload } from '../types';
 import { AuthContext } from './authContext';
@@ -13,6 +14,7 @@ export function AuthProvider({ children }: { children: ReactNode }): React.React
     'loading'
   );
   const [usuario, setUsuario] = useState<PublicUser | null>(null);
+  const [restored, setRestored] = useState(false);
   // Cookie-only puro: NINGÚN token vive en JavaScript. apps/api emite las
   // cookies httpOnly `access_token` (corta vida) y `refresh_token` (7 días),
   // y el navegador las adjunta a cada request vía `credentials: 'include'`.
@@ -25,10 +27,16 @@ export function AuthProvider({ children }: { children: ReactNode }): React.React
   // promesa compartida garantiza UNA sola renovación por ciclo de montaje.
   const refreshInFlight = useRef<Promise<void> | null>(null);
 
-  const applySession = useCallback((session: AuthSession) => {
-    setUsuario(session.usuario);
-    setStatus('authenticated');
-  }, []);
+  const applySession = useCallback(
+    (session: AuthSession, options?: { restored?: boolean }) => {
+      setUsuario(session.usuario);
+      setStatus('authenticated');
+      // Solo el refresh silencioso al arrancar marca `restored`: login y demo
+      // tienen su propia navegación y no deben rebotar a /panel.
+      setRestored(options?.restored ?? false);
+    },
+    []
+  );
 
   useEffect(() => {
     if (refreshInFlight.current) {
@@ -37,7 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }): React.React
 
     refreshInFlight.current = authApi
       .refresh()
-      .then(applySession)
+      .then((session) => applySession(session, { restored: true }))
       .catch(() => {
         // Sin cookie válida no hay sesión: queda anónimo.
         setStatus('anonymous');
@@ -61,7 +69,15 @@ export function AuthProvider({ children }: { children: ReactNode }): React.React
     await authApi.register(payload);
   }, []);
 
+  const isDemo = usuario?.id === DEMO_USER_ID;
+
   const loginDemo = useCallback(() => {
+    // Nunca se reemplaza una sesión real por la demo: la cookie httpOnly
+    // seguiría viva y el logout posterior podría no revocarla.
+    if (status === 'authenticated' && !isDemo) {
+      return;
+    }
+
     // Sesión demo SOLO en memoria: no toca la API ni persiste nada.
     applySession({
       usuario: {
@@ -74,25 +90,49 @@ export function AuthProvider({ children }: { children: ReactNode }): React.React
         fechaRegistro: new Date().toISOString(),
       },
     });
-  }, [applySession]);
+  }, [applySession, status, isDemo]);
+
+  useEffect(() => {
+    const handleExpired = (): void => {
+      // Sin esto, el perfil o las parcelas del usuario anterior quedarían en
+      // caché y podrían mostrarse a la siguiente sesión en la misma pestaña.
+      queryClient.clear();
+      setUsuario(null);
+      setStatus('anonymous');
+      setRestored(false);
+    };
+
+    window.addEventListener('agroconnect:session-expired', handleExpired);
+    return () => window.removeEventListener('agroconnect:session-expired', handleExpired);
+  }, []);
 
   const logout = useCallback(async () => {
-    // La sesión demo no tiene cookie de servidor: no hay nada que revocar.
-    if (usuario?.id !== DEMO_USER_ID) {
-      try {
-        await authApi.logout();
-      } catch {
-        // La sesión local se cierra aunque el servidor no responda.
-      }
+    if (isDemo) {
+      // Puede existir una cookie real si el usuario entró a la demo antes de
+      // esta sesión: se intenta revocar en el servidor y, pase lo que pase, se
+      // limpia el estado local (la demo no tiene sesión que conservar).
+      await authApi.logout().catch(() => undefined);
+      queryClient.clear();
+
+      setUsuario(null);
+      setStatus('anonymous');
+      setRestored(false);
+      return;
     }
+
+    // Sesión real: si el servidor falla, NO limpiamos el estado local porque
+    // la cookie httpOnly seguiría viva y un reload volvería a autenticar.
+    await authApi.logout();
+    queryClient.clear();
 
     setUsuario(null);
     setStatus('anonymous');
-  }, [usuario]);
+    setRestored(false);
+  }, [isDemo]);
 
   const value = useMemo(
-    () => ({ status, usuario, login, register, loginDemo, logout }),
-    [status, usuario, login, register, loginDemo, logout]
+    () => ({ status, restored, isDemo, usuario, login, register, loginDemo, logout }),
+    [status, restored, isDemo, usuario, login, register, loginDemo, logout]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

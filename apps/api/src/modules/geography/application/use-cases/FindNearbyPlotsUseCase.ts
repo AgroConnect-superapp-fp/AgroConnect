@@ -25,14 +25,14 @@ export class FindNearbyPlotsUseCase {
       throw new DomainError(
         'VALIDATION_ERROR',
         'Coordenadas inválidas: la latitud debe estar entre -90 y 90 y la longitud entre -180 y 180',
-        400,
+        422,
       );
     }
-    if (radiusKm <= 0 || radiusKm > 100) {
+    if (radiusKm < 1 || radiusKm > 100) {
       throw new DomainError(
         'VALIDATION_ERROR',
         'El radio de búsqueda debe estar entre 1 y 100 km',
-        400,
+        422,
       );
     }
 

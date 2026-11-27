@@ -1,6 +1,6 @@
 {
   "name": "@agroconnect/api",
-  "version": "1.0.0",
+  "version": "1.1.2",
   "private": true,
   "description": "API AgroConnect sobre NestJS 11 (ADR-009) — migración progresiva del backend Express legacy (Strangler Fig)",
   "main": "dist/main.js",
@@ -13,6 +13,7 @@
     "start": "node dist/main.js",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
+    "arch:check": "depcruise --config .dependency-cruiser.js src --output-type err-long",
     "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\"",
     "typecheck": "tsc --noEmit",
@@ -23,7 +24,12 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
-    "prisma:status": "prisma migrate status"
+    "prisma:status": "prisma migrate status",
+    "prisma:seed": "ts-node scripts/seed.ts",
+    "test:reset-db": "ts-node --transpile-only scripts/reset-test-db.ts",
+    "seed:products": "ts-node --transpile-only scripts/seed-products.ts",
+    "seed:e2e-admin": "ts-node --transpile-only scripts/seed-e2e-admin.ts",
+    "create:admin": "ts-node --transpile-only scripts/create-admin.ts"
   },
   "dependencies": {
     "@agroconnect/contracts": "*",
@@ -47,11 +53,14 @@
     "pino-http": "^11.0.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
+    "swagger-ui-express": "^5.0.1",
     "zod": "^4.6.5"
   },
   "devDependencies": {
     "@nestjs/cli": "^12.0.11",
     "@nestjs/testing": "^11.2.8",
+    "@swc/core": "^1.16.22",
+    "@swc/jest": "^0.2.39",
     "@types/cookie-parser": "^1.4.9",
     "@types/express": "^5.0.0",
     "@types/jest": "^30.0.0",
@@ -60,18 +69,23 @@
     "@types/nodemailer": "^8.0.2",
     "@types/pg": "^8.23.1",
     "@types/supertest": "^6.0.2",
-    "@typescript-eslint/eslint-plugin": "^8.71.0",
-    "@typescript-eslint/parser": "^8.19.1",
+    "@typescript-eslint/eslint-plugin": "8.71.0",
+    "@typescript-eslint/parser": "8.71.0",
+    "dependency-cruiser": "^18.7.2",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",
     "jest": "^30.5.2",
     "pino-pretty": "^13.0.0",
     "prettier": "^3.4.2",
     "prisma": "^7.10.0",
-    "supertest": "^7.0.0",
+    "supertest": "^7.3.2",
+    "testcontainers": "^12.2.1",
     "ts-jest": "^29.4.14",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.3"
+  },
+  "prisma": {
+    "seed": "ts-node scripts/seed.ts"
   }
 }

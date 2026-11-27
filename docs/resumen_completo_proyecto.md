@@ -1,5 +1,7 @@
 # Resumen Completo del Proyecto AgroConnect
 
+> **Documento de fase (octubre 2026):** para el estado vigente consulta `README.md` y `docs/estado`/ADR-019.
+
 **Versión:** 1.0  
 **Fecha de corte:** 31 de julio de 2026  
 **Estado del documento:** Consolidación del proyecto formativo  

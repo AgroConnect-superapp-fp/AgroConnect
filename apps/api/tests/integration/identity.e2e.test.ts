@@ -102,6 +102,69 @@ describe('Identity (e2e)', () => {
     expect(cookies ?? []).toHaveLength(0);
   });
 
+  it('registra un transportista y persiste su perfil de vehículo', async () => {
+    const prisma = app.get(PrismaService);
+
+    /**
+     * Elige una placa libre antes de registrar.
+     *
+     * La base de datos de pruebas arrastra datos de corridas anteriores y el
+     * espacio `TRA###` (900 combinaciones) provoca colisiones intermitentes en
+     * la restricción única `transporter_profiles_placa_key`. Se usa el formato
+     * `ABC12D` (26 000 combinaciones) y se consulta la base para evitar el
+     * fallo sin borrar datos ajenos a la prueba.
+     */
+    const freePlaca = async (): Promise<string> => {
+      const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+      for (let attempt = 0; attempt < 50; attempt += 1) {
+        const digits = String(Math.floor(Math.random() * 100)).padStart(2, '0');
+        const letter = letters[Math.floor(Math.random() * letters.length)];
+        const candidate = `TRA${digits}${letter}`;
+        const existing = await prisma.transporterProfile.findUnique({
+          where: { plate: candidate },
+        });
+
+        if (!existing) {
+          return candidate;
+        }
+      }
+
+      throw new Error('No se encontró una placa libre en la base de datos de pruebas');
+    };
+
+    const payload = registerPayload({
+      rol: 'transportista',
+      finca: undefined,
+      transportista: {
+        tipoVehiculo: 'camion',
+        placa: await freePlaca(),
+        capacidadKg: 3500,
+        cobertura: ['Armenia', 'Salento'],
+        cadenaFrio: true,
+        soatVence: '2027-12-31',
+        licenciaVence: '2027-12-31',
+      },
+    });
+
+    const response = await request(server).post('/api/v1/auth/register').send(payload);
+    expect(response.status).toBe(201);
+    expect(response.body).toMatchObject({
+      success: true,
+      data: { usuario: { rol: 'transportista' } },
+    });
+
+    const profile = await prisma.transporterProfile.findUnique({
+      where: { userId: response.body.data.usuario.id as string },
+    });
+    expect(profile).toMatchObject({
+      vehicleType: 'camion',
+      capacityKg: 3500,
+      coldChain: true,
+      coverageMunicipalities: ['Armenia', 'Salento'],
+    });
+  });
+
   it('rechaza con 409 un correo ya registrado', async () => {
     const payload = registerPayload();
     const first = await request(server).post('/api/v1/auth/register').send(payload);
@@ -211,7 +274,8 @@ describe('Identity (e2e)', () => {
     expect(response.status).toBe(202);
     expect(response.body).toMatchObject({
       success: true,
-      message: 'Si el correo está registrado, recibirás instrucciones para restablecer tu contraseña',
+      message:
+        'Si el correo está registrado, recibirás instrucciones para restablecer tu contraseña',
     });
   });
 
@@ -270,7 +334,10 @@ describe('Identity (e2e)', () => {
       .post('/api/v1/auth/reset-password')
       .send({ token, password: 'NuevaClaveSegura2' });
     expect(reset.status).toBe(200);
-    expect(reset.body).toMatchObject({ success: true, message: 'Contraseña actualizada correctamente' });
+    expect(reset.body).toMatchObject({
+      success: true,
+      message: 'Contraseña actualizada correctamente',
+    });
 
     await verifyUser(payload.correo as string);
 
@@ -293,7 +360,10 @@ describe('Identity (e2e)', () => {
 
     const verified = await request(server).post('/api/v1/auth/verify-email').send({ token });
     expect(verified.status).toBe(200);
-    expect(verified.body).toMatchObject({ success: true, message: 'Correo verificado correctamente' });
+    expect(verified.body).toMatchObject({
+      success: true,
+      message: 'Correo verificado correctamente',
+    });
 
     // El token es de un solo uso: al reutilizarlo debe rechazarse.
     const reutilizado = await request(server).post('/api/v1/auth/verify-email').send({ token });
@@ -309,7 +379,10 @@ describe('Identity (e2e)', () => {
       .send(registerPayload({ documento: payload.documento }));
 
     expect(segundo.status).toBe(409);
-    expect(segundo.body).toMatchObject({ success: false, error: { code: 'DOCUMENT_ALREADY_EXISTS' } });
+    expect(segundo.body).toMatchObject({
+      success: false,
+      error: { code: 'DOCUMENT_ALREADY_EXISTS' },
+    });
   });
 
   it('rechaza con 409 un celular ya registrado', async () => {

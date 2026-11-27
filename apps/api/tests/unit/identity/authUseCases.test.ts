@@ -80,6 +80,9 @@ describe('RegisterUserUseCase', () => {
         razonSocial: 'Frutas del Quindío S.A.S.',
         nit: '901234567-8',
         direccion: 'Calle 12 # 4-56, Armenia',
+        tipoEmpresa: 'distribuidor',
+        departamento: 'Quindío',
+        municipio: 'Armenia',
       },
     });
 
@@ -87,6 +90,44 @@ describe('RegisterUserUseCase', () => {
     expect(sut.repository.companyProfiles.get(result.user.id)?.companyName).toBe(
       'Frutas del Quindío S.A.S.',
     );
+    expect(sut.repository.companyProfiles.get(result.user.id)?.companyType).toBe('distribuidor');
+  });
+
+  it('registra un transportista con su vehículo y cobertura', async () => {
+    const sut = buildSut();
+    const result = await sut.register.execute({
+      ...validProducerInput,
+      correo: 'transporte@example.com',
+      celular: '3123334455',
+      documento: '80123456',
+      rol: 'transportista',
+      finca: undefined,
+      transportista: {
+        tipoVehiculo: 'camion',
+        placa: 'abc123',
+        capacidadKg: 3500,
+        cobertura: ['Armenia', 'Salento'],
+        cadenaFrio: true,
+        soatVence: '2027-12-31',
+        licenciaVence: '2027-12-31',
+      },
+    });
+
+    expect(result.user.rol).toBe('transportista');
+    expect(sut.repository.transporterProfiles.get(result.user.id)).toMatchObject({
+      plate: 'ABC123',
+      capacityKg: 3500,
+      coverageMunicipalities: ['Armenia', 'Salento'],
+      coldChain: true,
+    });
+  });
+
+  it('exige los datos del transportista al rol transportista', async () => {
+    const sut = buildSut();
+
+    await expect(
+      sut.register.execute({ ...validProducerInput, rol: 'transportista', finca: undefined }),
+    ).rejects.toMatchObject({ code: 'VALIDATION_ERROR', statusCode: 422 });
   });
 
   it('rechaza correo duplicado con EMAIL_ALREADY_EXISTS', async () => {

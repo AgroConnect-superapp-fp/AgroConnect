@@ -1,5 +1,6 @@
 import { InMemoryUserRepository } from '../../fakes/InMemoryUserRepository';
 import { InMemoryPasswordResetTokenRepository } from '../../fakes/InMemoryPasswordResetTokenRepository';
+import { PasswordResetToken } from '../../../src/modules/identity/domain/entities/PasswordResetToken';
 import { FakeEmailService } from '../../fakes/FakeEmailService';
 import { FakePasswordHasher } from '../../fakes/FakePasswordHasher';
 import { FakeTokenService } from '../../fakes/FakeTokenService';
@@ -104,11 +105,27 @@ describe('RequestPasswordResetUseCase', () => {
     expect(sut.emailService.sent).toHaveLength(0);
   });
 
-  it('invalida los tokens anteriores del usuario al solicitar uno nuevo', async () => {
+  it('aplica cooldown y, fuera de él, invalida el token anterior', async () => {
     const sut = buildSut();
     await sut.register.execute(validProducerInput);
 
     await sut.requestReset.execute({ correo: 'maria.lopez@example.com' });
+    await sut.requestReset.execute({ correo: 'maria.lopez@example.com' });
+
+    expect(sut.resetRepository.tokens).toHaveLength(1);
+    expect(sut.emailService.sent).toHaveLength(1);
+
+    const current = sut.resetRepository.tokens[0];
+    if (!current) throw new Error('No se creó el token inicial');
+    sut.resetRepository.tokens[0] = PasswordResetToken.create({
+      id: current.id,
+      userId: current.userId,
+      tokenHash: current.tokenHash,
+      expiresAt: current.expiresAt,
+      usedAt: null,
+      createdAt: new Date(Date.now() - 6 * 60 * 1000),
+    });
+
     await sut.requestReset.execute({ correo: 'maria.lopez@example.com' });
 
     const usable = sut.resetRepository.tokens.filter((token) => token.usedAt === null);

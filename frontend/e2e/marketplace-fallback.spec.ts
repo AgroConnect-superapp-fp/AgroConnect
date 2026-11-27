@@ -8,10 +8,9 @@ const PNG_PIXEL = Buffer.from(
 test('si la base de datos falla, muestra datos de demostración con aviso', async ({
   page,
 }) => {
-  // El modo demo no consulta ninguna base de datos: se abortan las rutas de
-  // datos (legacy Supabase y apps/api) para demostrarlo.
-  await page.route('**/rest/v1/properties*', (route) => route.abort());
-  await page.route('**/api/v1/properties*', (route) => route.abort());
+  // El modo demo no consulta la base de datos: se aborta la ruta de productos
+  // de apps/api para demostrarlo.
+  await page.route('**/api/v1/products*', (route) => route.abort());
 
   // Imágenes demo (Cloudinary) y respaldos (Wikimedia) servidas localmente.
   // Globs con URL absoluta: Playwright los ancla al host exacto.

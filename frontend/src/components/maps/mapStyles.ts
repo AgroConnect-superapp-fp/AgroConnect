@@ -350,9 +350,11 @@ export const MAP_STYLES_CSS = `
   /* - Width: 520/450 (spacious for rich content)  */
   /* - Triangular tip (▲) visible, pointing to icon */
   /* ============================================ */
+  /* Solo opacity: Leaflet posiciona .leaflet-popup con transform inline.
+     Animar transform aquí lo sobrescribe y el popup queda anclado al pane. */
   @keyframes popupFadeIn {
-    from { opacity: 0; transform: translateY(10px) scale(0.95); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 
   @keyframes popupSlideIn {
@@ -391,7 +393,35 @@ export const MAP_STYLES_CSS = `
     margin: 0 !important;
     padding: 0 !important;
     position: relative;
-    width: auto !important;
+    /* No fijar width: auto; Leaflet aplica aquí el ancho calculado con
+       minWidth/maxWidth (450-520 px). Anularlo comprimía el popup a su
+       ancho mínimo (~182 px), disparaba la altura y rompía autoPan. */
+    /* El popup rico puede superar la altura del mapa (800 px) y Leaflet
+       no logra encajarlo con autoPan. Se limita a la ventana y se permite
+       scroll interno; así autoPan siempre encuentra una posición válida. */
+    max-height: min(65vh, 560px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: #9ca3af transparent;
+  }
+
+  .leaflet-popup-content::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .leaflet-popup-content::-webkit-scrollbar-thumb {
+    background: #9ca3af;
+    border-radius: 9999px;
+  }
+
+  .leaflet-popup-content::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .leaflet-popup-content:focus-visible {
+    outline: 2px solid #2E7D32;
+    outline-offset: -2px;
   }
 
   .leaflet-popup-close-button {

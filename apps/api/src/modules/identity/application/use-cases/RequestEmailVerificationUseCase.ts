@@ -7,6 +7,7 @@ import type { TokenService } from '../../domain/interfaces/TokenService';
 import type { ResendVerificationInput } from '../dtos/authDtos';
 
 export const EMAIL_VERIFICATION_TTL_HOURS = 24;
+export const EMAIL_VERIFICATION_COOLDOWN_MS = 60 * 1000;
 
 export class RequestEmailVerificationUseCase {
   constructor(
@@ -22,6 +23,16 @@ export class RequestEmailVerificationUseCase {
     const user = await this.userRepository.findByEmail(email.value);
 
     if (!user || !user.isActive() || user.isEmailVerified()) {
+      return;
+    }
+
+    // Cooldown por cuenta: el endpoint público no debe permitir spam de correo.
+    if (
+      await this.emailVerificationTokenRepository.hasRecentToken(
+        user.id,
+        new Date(Date.now() - EMAIL_VERIFICATION_COOLDOWN_MS),
+      )
+    ) {
       return;
     }
 

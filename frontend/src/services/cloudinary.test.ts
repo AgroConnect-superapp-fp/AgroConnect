@@ -1,41 +1,256 @@
-import { describe, expect, it } from 'vitest';
-import { getLqipUrl } from './cloudinary';
+// @vitest-environment jsdom
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { apiRequest } from './apiClient';
+import {
+  CLOUDINARY_CONFIG,
+  getImageUrl,
+  getLqipUrl,
+  getResponsiveImageUrls,
+  isDirectImageUrl,
+  resolveImageUrl,
+  uploadImage,
+  validateImageFile,
+} from './cloudinary';
 
-describe('getLqipUrl', () => {
-  it('reduce imágenes de Unsplash con blur', () => {
-    const url = getLqipUrl('https://images.unsplash.com/photo-123?w=800');
+vi.mock('./apiClient', () => ({
+  apiRequest: vi.fn(),
+}));
 
-    expect(url).toContain('w=50');
-    expect(url).toContain('q=10');
-    expect(url).toContain('blur=40');
+const mockApiRequest = vi.mocked(apiRequest);
+
+const signature = {
+  apiKey: 'key',
+  timestamp: 123,
+  signature: 'firma',
+  folder: 'agroconnect/test',
+  allowedFormats: ['jpg', 'png'],
+  cloudName: 'demo',
+};
+
+class MockXhr {
+  upload = new EventTarget();
+  status = 200;
+  responseText = JSON.stringify({ public_id: 'foto', secure_url: 'https://x' });
+  protected loadHandler?: () => void;
+  protected errorHandler?: () => void;
+  open = vi.fn();
+  abort = vi.fn();
+  addEventListener = vi.fn((event: string, handler: () => void) => {
+    if (event === 'load') this.loadHandler = handler;
+    if (event === 'error') this.errorHandler = handler;
+  });
+  send = vi.fn(() => {
+    this.loadHandler?.();
+  });
+  failNetwork = (): void => {
+    this.errorHandler?.();
+  };
+}
+
+describe('cloudinary URL helpers', () => {
+  it('distingue URLs directas de public IDs', () => {
+    expect(isDirectImageUrl('https://images.unsplash.com/a.jpg')).toBe(true);
+    expect(isDirectImageUrl('//cdn.example.com/a.jpg')).toBe(true);
+    expect(isDirectImageUrl('data:image/png;base64,abc')).toBe(true);
+    expect(isDirectImageUrl('agroconnect/finca/cosecha')).toBe(false);
   });
 
-  it('reduce miniaturas de Wikimedia a width=50', () => {
-    const url = getLqipUrl(
-      'https://commons.wikimedia.org/wiki/Special:FilePath/A.jpg?width=800'
+  it('devuelve la URL directa sin transformarla', () => {
+    const url = 'https://images.unsplash.com/a.jpg';
+    expect(resolveImageUrl(url, 'medium')).toBe(url);
+  });
+
+  it('genera una URL de Cloudinary con el preset solicitado', () => {
+    const url = getImageUrl('agroconnect/finca/cosecha', 'thumbnail');
+    expect(url).toContain(
+      `res.cloudinary.com/${CLOUDINARY_CONFIG.cloudName}/image/upload`
     );
-
-    expect(url).toContain('width=50');
+    expect(url).toContain('w_200');
+    expect(url).toContain('h_200');
+    expect(getImageUrl('agroconnect/finca/cosecha', 'medium', 0)).not.toContain('r_');
   });
 
-  it('transforma URLs directas de Cloudinary en el path', () => {
-    const url = getLqipUrl(
-      'https://res.cloudinary.com/demo/image/upload/v123/agro/a.jpg'
+  it('genera variantes responsive y LQIP', () => {
+    const responsive = getResponsiveImageUrls('agroconnect/finca/cosecha');
+    expect(responsive.small).not.toBe(responsive.large);
+    expect(responsive.lqip).toContain('w_50');
+
+    const direct = 'https://images.unsplash.com/a.jpg?w=800';
+    const directResponsive = getResponsiveImageUrls(direct);
+    expect(directResponsive.small).toBe(direct);
+    expect(directResponsive.lqip).toContain('w=50');
+  });
+
+  it('adapta LQIP por proveedor', () => {
+    expect(getLqipUrl('https://images.unsplash.com/a.jpg')).toContain('blur=40');
+    expect(getLqipUrl('https://upload.wikimedia.org/a.jpg?width=800')).toContain(
+      'width=50'
     );
-
-    expect(url).toContain('/image/upload/w_50,q_10,f_auto/');
-  });
-
-  it('usa el preset lqip para public IDs', () => {
-    const url = getLqipUrl('agroconnect/finca/cosecha');
-
-    expect(url).toContain('w_50');
-    expect(url).toContain('q_10');
-  });
-
-  it('deja igual las URLs de proveedores desconocidos', () => {
-    expect(getLqipUrl('https://example.com/foto.jpg')).toBe(
-      'https://example.com/foto.jpg'
+    expect(getLqipUrl('https://res.cloudinary.com/demo/image/upload/v1/a.jpg')).toContain(
+      '/image/upload/w_50,q_10,f_auto/'
     );
+    expect(getLqipUrl('https://example.com/a.jpg')).toBe('https://example.com/a.jpg');
+    expect(getLqipUrl('no-es-url')).toContain('res.cloudinary.com');
+    expect(getLqipUrl('http://%')).toBe('http://%');
+  });
+});
+
+describe('validateImageFile', () => {
+  class MockImage {
+    naturalWidth = 800;
+    naturalHeight = 600;
+    onload?: () => void;
+    onerror?: () => void;
+    set src(_value: string) {
+      queueMicrotask(() => this.onload?.());
+    }
+  }
+
+  beforeEach(() => {
+    vi.stubGlobal('Image', MockImage);
+    vi.stubGlobal('URL', {
+      createObjectURL: vi.fn(() => 'blob:test'),
+      revokeObjectURL: vi.fn(),
+    });
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('rechaza tipo y tamaño inválidos sin leer la imagen', async () => {
+    await expect(
+      validateImageFile(new File(['x'], 'a.gif', { type: 'image/gif' }))
+    ).resolves.toMatchObject({ valid: false, error: expect.stringContaining('Tipo') });
+
+    await expect(
+      validateImageFile(
+        new File([new Uint8Array(11 * 1024 * 1024)], 'a.jpg', { type: 'image/jpeg' })
+      )
+    ).resolves.toMatchObject({ valid: false, error: expect.stringContaining('grande') });
+  });
+
+  it('rechaza imágenes corruptas y errores de lectura', async () => {
+    class CorruptImage extends MockImage {
+      override naturalWidth = 0;
+      override naturalHeight = 0;
+    }
+    vi.stubGlobal('Image', CorruptImage);
+    await expect(
+      validateImageFile(new File(['x'], 'a.jpg', { type: 'image/jpeg' }), {
+        minWidth: 0,
+        minHeight: 0,
+      })
+    ).resolves.toMatchObject({
+      valid: false,
+      error: expect.stringContaining('corrupto'),
+    });
+
+    class ErrorImage extends MockImage {
+      override set src(_value: string) {
+        queueMicrotask(() => this.onerror?.());
+      }
+    }
+    vi.stubGlobal('Image', ErrorImage);
+    await expect(
+      validateImageFile(new File(['x'], 'a.jpg', { type: 'image/jpeg' }))
+    ).resolves.toMatchObject({ valid: false, error: expect.stringContaining('leer') });
+  });
+
+  it('rechaza imágenes por debajo del mínimo', async () => {
+    class SmallImage extends MockImage {
+      override naturalWidth = 50;
+      override naturalHeight = 50;
+    }
+    vi.stubGlobal('Image', SmallImage);
+    await expect(
+      validateImageFile(new File(['x'], 'a.jpg', { type: 'image/jpeg' }))
+    ).resolves.toMatchObject({
+      valid: false,
+      error: expect.stringContaining('pequeña'),
+    });
+  });
+
+  it('acepta una imagen con dimensiones suficientes', async () => {
+    await expect(
+      validateImageFile(new File(['x'], 'a.jpg', { type: 'image/jpeg' }))
+    ).resolves.toEqual({ valid: true });
+  });
+});
+
+describe('uploadImage', () => {
+  beforeEach(() => {
+    vi.stubGlobal('XMLHttpRequest', MockXhr);
+    mockApiRequest.mockResolvedValue(signature);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.clearAllMocks();
+  });
+
+  it('firma y sube la imagen', async () => {
+    const file = new File(['x'], 'a.jpg', { type: 'image/jpeg' });
+    await expect(uploadImage({ file })).resolves.toMatchObject({ public_id: 'foto' });
+    expect(mockApiRequest).toHaveBeenCalledWith(
+      '/api/v1/uploads/signature',
+      { method: 'POST' },
+      10_000
+    );
+  });
+
+  it('propaga el fallo de firma', async () => {
+    mockApiRequest.mockRejectedValueOnce(new Error('sin firma'));
+    await expect(
+      uploadImage({ file: new File(['x'], 'a.jpg', { type: 'image/jpeg' }) })
+    ).rejects.toThrow('sin firma');
+  });
+
+  it('no inicia la subida si la señal ya está abortada', async () => {
+    const controller = new AbortController();
+    controller.abort();
+    await expect(
+      uploadImage({
+        file: new File(['x'], 'a.jpg', { type: 'image/jpeg' }),
+        signal: controller.signal,
+      })
+    ).rejects.toMatchObject({ name: 'AbortError' });
+  });
+
+  it('reintenta un fallo de red y termina con éxito', async () => {
+    vi.useFakeTimers();
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    class RetryXhr extends MockXhr {
+      static attempts = 0;
+      override send = vi.fn(() => {
+        RetryXhr.attempts += 1;
+        if (RetryXhr.attempts === 1) {
+          this.failNetwork();
+        } else {
+          this.loadHandler?.();
+        }
+      });
+    }
+    vi.stubGlobal('XMLHttpRequest', RetryXhr);
+
+    const promise = uploadImage({
+      file: new File(['x'], 'a.jpg', { type: 'image/jpeg' }),
+    });
+    await vi.advanceTimersByTimeAsync(1_000);
+    await expect(promise).resolves.toMatchObject({ public_id: 'foto' });
+    expect(RetryXhr.attempts).toBe(2);
+    expect(warnSpy).toHaveBeenCalled();
+    vi.useRealTimers();
+    warnSpy.mockRestore();
+  });
+
+  it('no reintenta errores 4xx', async () => {
+    class ErrorXhr extends MockXhr {
+      override status = 400;
+    }
+    vi.stubGlobal('XMLHttpRequest', ErrorXhr);
+    await expect(
+      uploadImage({ file: new File(['x'], 'a.jpg', { type: 'image/jpeg' }) })
+    ).rejects.toThrow('status 400');
   });
 });

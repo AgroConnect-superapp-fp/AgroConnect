@@ -1,7 +1,12 @@
 # Runbook — recuperación de la base de producción (Supabase)
 
+> **Suspendido el 2026-11-03.** El marketplace migró a `GET /api/v1/products`
+> y ya no usa Supabase. Este runbook se conserva como referencia para recuperar
+> la base histórica de autenticación; el nuevo entorno usará PostgreSQL propio.
+
 **Síntoma:** `/health` responde 200 pero `/health/ready` responde 503; login y
-`/plots/nearby` devuelven 500; el marketplace cae al modo demo.
+`/plots/nearby` devuelven 500. El marketplace ya no depende de Supabase y usa
+su propio fallback demo si `GET /api/v1/products` falla.
 
 **Diagnóstico reproducible:**
 
@@ -9,10 +14,12 @@
 node scripts/diagnose-production.mjs
 ```
 
-Salida del 2026-11-02: **8/11 OK**, con fallos en `DNS Supabase` (ENOTFOUND),
-`/health/ready` (503) y login (500). El pooler
+Salida del 2026-11-02 y **reproducida el 2026-11-03: 8/11 OK**, con fallos en
+`DNS Supabase` (ENOTFOUND), `/health/ready` (503) y login (500). El pooler
 `aws-1-sa-east-1.pooler.supabase.com` resuelve y acepta TCP, pero el proyecto
-`fwmaehhzfydbhilpfbrl.supabase.co` no existe en DNS.
+`fwmaehhzfydbhilpfbrl.supabase.co` no existe en DNS. El entorno local no tiene
+`DATABASE_URL`, `DIRECT_URL` ni `SUPABASE_DB_URL`; la recuperación exige acceso
+al dashboard de Supabase o secretos válidos.
 
 ---
 
@@ -24,20 +31,20 @@ Salida del 2026-11-02: **8/11 OK**, con fallos en `DNS Supabase` (ENOTFOUND),
 4. Si fue **eliminado**: crear un proyecto nuevo en la misma región
    (`sa-east-1`), anotar la nueva ref y continuar con el paso 2.
 
-> El proyecto del marketplace y el de autenticación son el mismo. Si se crea
-> uno nuevo, hay que actualizar también `VITE_SUPABASE_URL` y
-> `VITE_SUPABASE_ANON_KEY` en Vercel (Production y Preview).
+> El proyecto histórico también alojaba la autenticación. Si se crea uno nuevo,
+> actualiza `DATABASE_URL` en Render; el marketplace ya no requiere variables
+> `VITE_SUPABASE_*`.
 
 ## 2. Actualizar la conexión en Render
 
 En **Render → agroconnect-api → Environment**:
 
-| Variable | Valor |
-|---|---|
-| `DATABASE_URL` | Connection string del **Session pooler** de Supabase (usuario `postgres.<ref>`, contraseña vigente) |
-| `DATABASE_SCHEMA` | `agroconnect` |
-| `TRUST_PROXY` | `1` |
-| `CORS_ORIGIN` | `https://agroconnectpreview.vercel.app` |
+| Variable          | Valor                                                                                               |
+| ----------------- | --------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL`    | Connection string del **Session pooler** de Supabase (usuario `postgres.<ref>`, contraseña vigente) |
+| `DATABASE_SCHEMA` | `agroconnect`                                                                                       |
+| `TRUST_PROXY`     | `1`                                                                                                 |
+| `CORS_ORIGIN`     | `https://agroconnectpreview.vercel.app`                                                             |
 
 Guardar y hacer **Manual Deploy** (o esperar el auto-deploy de `main`).
 

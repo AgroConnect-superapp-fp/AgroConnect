@@ -13,7 +13,7 @@ import { useEffect } from 'react';
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 
-interface UseLeafletDrawProps {
+export interface UseLeafletDrawProps {
   enabled: boolean;
   onPolygonCreated?: (coords: [number, number][]) => void;
 }

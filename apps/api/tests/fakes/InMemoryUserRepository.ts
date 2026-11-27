@@ -1,10 +1,23 @@
 import { randomUUID } from 'node:crypto';
 import { Role, type RoleName } from '../../src/modules/identity/domain/entities/Role';
-import { User } from '../../src/modules/identity/domain/entities/User';
+import {
+  User,
+  type UserProps,
+  type UserStatus,
+} from '../../src/modules/identity/domain/entities/User';
 import { RefreshToken } from '../../src/modules/identity/domain/entities/RefreshToken';
 import type {
+  AdminContinuityResult,
+  AdminUserFilters,
+  AdminUserPage,
+  CompanyProfileUpdate,
+  ProfilePresence,
+  ProfileSnapshot,
+  ProducerProfileUpdate,
+  TransporterProfileUpdate,
   NewCompanyProfileData,
   NewProducerProfileData,
+  NewTransporterProfileData,
   RegisterUserData,
   UserRepository,
 } from '../../src/modules/identity/domain/interfaces/UserRepository';
@@ -21,6 +34,7 @@ export class InMemoryUserRepository implements UserRepository {
   users: User[] = [];
   producerProfiles = new Map<string, NewProducerProfileData>();
   companyProfiles = new Map<string, NewCompanyProfileData>();
+  transporterProfiles = new Map<string, NewTransporterProfileData>();
   refreshTokens: RefreshToken[] = [];
   failUpdatePassword = false;
   private roleIds = new Map<RoleName, string>();
@@ -141,6 +155,10 @@ export class InMemoryUserRepository implements UserRepository {
       this.companyProfiles.set(user.id, data.companyProfile);
     }
 
+    if (data.transporterProfile) {
+      this.transporterProfiles.set(user.id, data.transporterProfile);
+    }
+
     if (data.refreshToken) {
       this.seedRefreshToken(
         user.id,
@@ -240,6 +258,71 @@ export class InMemoryUserRepository implements UserRepository {
     return true;
   }
 
+  async findProfileById(id: string): Promise<ProfileSnapshot | null> {
+    const user = this.users.find((item) => item.id === id);
+    if (!user) {
+      return null;
+    }
+
+    const snapshot: ProfileSnapshot = { user: user.toPublicProfile() };
+    const producer = this.producerProfiles.get(id);
+    if (producer) {
+      snapshot.producer = {
+        farmName: producer.farmName,
+        municipality: producer.municipality,
+        village: producer.village,
+        ...(producer.latitude !== undefined && producer.longitude !== undefined
+          ? { latitude: producer.latitude, longitude: producer.longitude }
+          : {}),
+      };
+    }
+
+    const company = this.companyProfiles.get(id);
+    if (company) {
+      snapshot.company = {
+        companyName: company.companyName,
+        nit: company.nit,
+        ...(company.address ? { address: company.address } : {}),
+        ...(company.companyType ? { companyType: company.companyType } : {}),
+        ...(company.department ? { department: company.department } : {}),
+        ...(company.municipality ? { municipality: company.municipality } : {}),
+      };
+    }
+
+    const transporter = this.transporterProfiles.get(id);
+    if (transporter) {
+      snapshot.transporter = {
+        vehicleType: transporter.vehicleType,
+        plate: transporter.plate,
+        capacityKg: transporter.capacityKg,
+        coverageMunicipalities: transporter.coverageMunicipalities,
+        coldChain: transporter.coldChain,
+        soatExpiresAt: transporter.soatExpiresAt,
+        licenseExpiresAt: transporter.licenseExpiresAt,
+      };
+    }
+
+    return snapshot;
+  }
+
+  async updateProducerProfile(userId: string, data: ProducerProfileUpdate): Promise<void> {
+    const current = this.producerProfiles.get(userId);
+    if (!current) throw new Error('perfil de productor no encontrado');
+    this.producerProfiles.set(userId, { ...current, ...data });
+  }
+
+  async updateCompanyProfile(userId: string, data: CompanyProfileUpdate): Promise<void> {
+    const current = this.companyProfiles.get(userId);
+    if (!current) throw new Error('perfil de empresa no encontrado');
+    this.companyProfiles.set(userId, { ...current, ...data });
+  }
+
+  async updateTransporterProfile(userId: string, data: TransporterProfileUpdate): Promise<void> {
+    const current = this.transporterProfiles.get(userId);
+    if (!current) throw new Error('perfil de transportista no encontrado');
+    this.transporterProfiles.set(userId, { ...current, ...data });
+  }
+
   async updatePassword(userId: string, passwordHash: string): Promise<void> {
     if (this.failUpdatePassword) {
       throw new Error('fallo simulado al actualizar el hash');
@@ -264,6 +347,107 @@ export class InMemoryUserRepository implements UserRepository {
     );
   }
 
+  async findManyForAdmin(filters: AdminUserFilters): Promise<AdminUserPage> {
+    const search = filters.search?.toLowerCase();
+
+    const filtered = this.users.filter((user) => {
+      if (filters.roleName && user.roleName !== filters.roleName) {
+        return false;
+      }
+      if (filters.status && user.status !== filters.status) {
+        return false;
+      }
+      if (!search) {
+        return true;
+      }
+      return [user.fullName, user.email, user.document, user.phone].some((value) =>
+        value.toLowerCase().includes(search),
+      );
+    });
+
+    const sorted = [...filtered].sort(
+      (a, b) => b.createdAt.getTime() - a.createdAt.getTime() || a.id.localeCompare(b.id),
+    );
+
+    return {
+      items: sorted.slice(filters.offset, filters.offset + filters.limit),
+      total: filtered.length,
+    };
+  }
+
+  async findProfilePresenceById(userId: string): Promise<ProfilePresence | null> {
+    if (!this.users.some((user) => user.id === userId)) {
+      return null;
+    }
+
+    return {
+      producer: this.producerProfiles.has(userId),
+      company: this.companyProfiles.has(userId),
+      transporter: this.transporterProfiles.has(userId),
+    };
+  }
+
+  async updateStatusPreservingAdminContinuity(
+    userId: string,
+    status: UserStatus,
+    _audit?: import('../../src/modules/identity/domain/interfaces/UserRepository').AuditEventData,
+  ): Promise<AdminContinuityResult> {
+    const target = this.users.find((user) => user.id === userId);
+    if (!target) {
+      return { outcome: 'NOT_FOUND' };
+    }
+
+    const isActiveAdmin = target.roleName === 'administrador' && target.status === 'ACTIVO';
+    if (isActiveAdmin && status !== 'ACTIVO' && this.countActiveAdministrators() <= 1) {
+      return { outcome: 'LAST_ACTIVE_ADMIN' };
+    }
+
+    if (target.status === status) {
+      return { outcome: 'UPDATED', user: target };
+    }
+
+    const updated = this.replaceUser(userId, { status });
+    if (status !== 'ACTIVO') {
+      await this.revokeAllUserTokens(userId);
+    }
+    return { outcome: 'UPDATED', user: updated };
+  }
+
+  async updateRolePreservingAdminContinuity(
+    userId: string,
+    roleId: string,
+    roleName: RoleName,
+    _audit?: import('../../src/modules/identity/domain/interfaces/UserRepository').AuditEventData,
+  ): Promise<AdminContinuityResult> {
+    const target = this.users.find((user) => user.id === userId);
+    if (!target) {
+      return { outcome: 'NOT_FOUND' };
+    }
+
+    if (target.roleId === roleId) {
+      return { outcome: 'UPDATED', user: target };
+    }
+
+    const isActiveAdmin = target.roleName === 'administrador' && target.status === 'ACTIVO';
+    if (isActiveAdmin && roleName !== 'administrador' && this.countActiveAdministrators() <= 1) {
+      return { outcome: 'LAST_ACTIVE_ADMIN' };
+    }
+
+    const updated = this.replaceUser(userId, {
+      roleId,
+      roleName: this.findRoleNameById(roleId),
+    });
+
+    await this.revokeAllUserTokens(userId);
+    return { outcome: 'UPDATED', user: updated };
+  }
+
+  private countActiveAdministrators(): number {
+    return this.users.filter(
+      (user) => user.roleName === 'administrador' && user.status === 'ACTIVO',
+    ).length;
+  }
+
   async markEmailVerified(userId: string): Promise<void> {
     this.users = this.users.map((user) =>
       user.id === userId
@@ -283,6 +467,45 @@ export class InMemoryUserRepository implements UserRepository {
           })
         : user,
     );
+  }
+
+  private replaceUser(
+    userId: string,
+    overrides: Partial<Pick<UserProps, 'status' | 'roleId' | 'roleName'>>,
+  ): User {
+    const index = this.users.findIndex((user) => user.id === userId);
+    const current = this.users[index] ?? undefined;
+    if (!current) {
+      throw new Error('usuario no encontrado');
+    }
+
+    const updated = User.create({
+      id: current.id,
+      fullName: current.fullName,
+      document: current.document,
+      email: current.email,
+      phone: current.phone,
+      passwordHash: current.passwordHash,
+      roleId: current.roleId,
+      roleName: current.roleName,
+      status: current.status,
+      acceptsDataProcessing: current.acceptsDataProcessing,
+      emailVerifiedAt: current.emailVerifiedAt,
+      createdAt: current.createdAt,
+      ...overrides,
+    });
+
+    this.users[index] = updated;
+    return updated;
+  }
+
+  private findRoleNameById(roleId: string): RoleName {
+    for (const [name, id] of this.roleIds) {
+      if (id === roleId) {
+        return name;
+      }
+    }
+    throw new Error('rol no encontrado');
   }
 
   private toProps(token: RefreshToken) {

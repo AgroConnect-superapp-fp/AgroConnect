@@ -15,6 +15,7 @@
  */
 
 import React from 'react';
+import { reportClientError } from '../../shared/observability/reportClientError';
 
 interface ErrorBoundaryProps {
   /** Child components to wrap */
@@ -58,18 +59,14 @@ export class ErrorBoundary extends React.Component<
   }
 
   override componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
-    // Log error details for debugging
-    console.error('[ErrorBoundary] Caught error:', error);
-    console.error('[ErrorBoundary] Component stack:', errorInfo.componentStack);
-
-    // Call optional onError callback
-    this.props.onError?.(error, errorInfo);
-
-    // TODO: In production, send error to monitoring service
-    // e.g., Sentry, LogRocket, or custom analytics endpoint
-    if (import.meta.env.PROD) {
-      // Example: await fetch('/api/errors', { method: 'POST', body: JSON.stringify({ error, errorInfo }) });
+    if (import.meta.env.DEV) {
+      console.error('[ErrorBoundary] Caught error:', error);
+      console.error('[ErrorBoundary] Component stack:', errorInfo.componentStack);
     }
+
+    // Reporte opt-in: solo envía si VITE_ERROR_REPORT_URL está configurada.
+    reportClientError(error, errorInfo.componentStack ?? undefined);
+    this.props.onError?.(error, errorInfo);
   }
 
   /**

@@ -8,9 +8,22 @@ describe('FindNearbyPlotsUseCase', () => {
     return { repository, useCase: new FindNearbyPlotsUseCase(repository) };
   };
 
+  const buildPlot = (overrides: Partial<ConstructorParameters<typeof Plot>[0]> = {}) =>
+    new Plot({
+      id: 'plot-1',
+      name: 'Lote La Esperanza',
+      areaHectares: 3.5,
+      municipality: 'Salento',
+      department: 'Quindío',
+      farmerId: 'farmer-1',
+      boundary: null,
+      centroid: { lat: 4.5339, lng: -75.6811 },
+      ...overrides,
+    });
+
   it('delega la búsqueda en el repositorio con los parámetros recibidos', async () => {
     const sut = buildSut();
-    const plot = new Plot('plot-1', 'Lote La Esperanza', 3.5, 'Salento', 'Quindío', 'farmer-1');
+    const plot = buildPlot();
     sut.repository.seedPlot(plot);
 
     const result = await sut.useCase.execute(4.5339, -75.6811, 5);
@@ -24,11 +37,11 @@ describe('FindNearbyPlotsUseCase', () => {
 
     await expect(sut.useCase.execute(90.01, -75.6, 10)).rejects.toMatchObject({
       code: 'VALIDATION_ERROR',
-      statusCode: 400,
+      statusCode: 422,
     });
     await expect(sut.useCase.execute(-90.01, -75.6, 10)).rejects.toMatchObject({
       code: 'VALIDATION_ERROR',
-      statusCode: 400,
+      statusCode: 422,
     });
     expect(sut.repository.lastQuery).toBeNull();
   });
@@ -38,11 +51,11 @@ describe('FindNearbyPlotsUseCase', () => {
 
     await expect(sut.useCase.execute(4.5, -180.01, 10)).rejects.toMatchObject({
       code: 'VALIDATION_ERROR',
-      statusCode: 400,
+      statusCode: 422,
     });
     await expect(sut.useCase.execute(4.5, 180.01, 10)).rejects.toMatchObject({
       code: 'VALIDATION_ERROR',
-      statusCode: 400,
+      statusCode: 422,
     });
   });
 
@@ -51,16 +64,16 @@ describe('FindNearbyPlotsUseCase', () => {
 
     await expect(sut.useCase.execute(4.5, -75.6, 0)).rejects.toMatchObject({
       code: 'VALIDATION_ERROR',
-      statusCode: 400,
+      statusCode: 422,
       message: 'El radio de búsqueda debe estar entre 1 y 100 km',
     });
     await expect(sut.useCase.execute(4.5, -75.6, 100.01)).rejects.toMatchObject({
       code: 'VALIDATION_ERROR',
-      statusCode: 400,
+      statusCode: 422,
     });
     await expect(sut.useCase.execute(4.5, -75.6, -5)).rejects.toMatchObject({
       code: 'VALIDATION_ERROR',
-      statusCode: 400,
+      statusCode: 422,
     });
   });
 

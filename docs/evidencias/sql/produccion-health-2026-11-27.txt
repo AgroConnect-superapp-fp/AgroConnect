@@ -1,0 +1,11 @@
+Consulta de salud de producción — 2026-11-27
+URL: https://agroconnect-api-5t7n.onrender.com
+
+GET /health
+Resultado: timeout de 30 s, 0 bytes. Estado no concluyente por cold start/proxy.
+
+GET /health/ready
+HTTP 503
+{"success":false,"error":{"code":"INTERNAL_ERROR","message":"Error inesperado. Intente de nuevo más tarde."},"correlationId":"a5fb0bb9-ad4d-46f9-88fa-c29c4c5622a1"}
+
+Lectura: el servicio no está listo o la base de datos no responde. Requiere revisar logs de Render y variables de entorno. No se declara conformidad de producción.

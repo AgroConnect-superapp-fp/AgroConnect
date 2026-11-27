@@ -7,6 +7,7 @@
  */
 export function devLog(...args: unknown[]): void {
   if (import.meta.env.DEV) {
+    // eslint-disable-next-line no-console -- logger de desarrollo, eliminado por Vite en producción
     console.log(...args);
   }
 }

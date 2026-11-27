@@ -1,5 +1,8 @@
 # Guía de arranque — PostgreSQL 16 + PostGIS 3.4
 
+> **Documento histórico:** las rutas `backend/` fueron retiradas; el backend vigente vive en `apps/api/`.
+
+
 Esta guía resuelve el hallazgo **"La conexión a PostgreSQL con PostGIS en los equipos del equipo — Pendiente"** de la clasificación de hallazgos del entregable 06. Sigue los pasos en el orden indicado; al final tendrás la base de datos lista para correr las migraciones del proyecto.
 
 ## 1. Requisitos

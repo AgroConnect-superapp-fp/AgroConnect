@@ -136,9 +136,9 @@ CU,CU#66,Auditar Cumplimiento de Cadena de Frío para ICA,M17,Manejo de Producto
 HU,HU01,Registro de usuario,M02,Gestión de Usuarios y Perfiles,Inferido (manual por contexto RF),No
 HU,HU02,Inicio de sesión,M02,Gestión de Inicio y Panel General,Inferido (manual por contexto RF),No
 HU,HU03,Gestión de perfil,M02,Gestión de Usuarios y Perfiles,Inferido (manual por contexto RF),No
-HU,HU04,Publicar productos,M04,Marketplace Agropecuario,Inferido (keywords),No
+HU,HU04,Publicar productos,M04,Marketplace Agropecuario,D7: equivalencia oficial HU11,No
 HU,HU05,Visualización de productos,M03,Marketplace Agropecuario,Inferido (keywords),No
-HU,HU06,Solicitud de compra,M03,Marketplace Agropecuario,Inferido (manual por contexto RF),Si
+HU,HU06,Solicitud de compra,M03,Marketplace Agropecuario,D7: equivalencia oficial HU14,No
 HU,HU07,Registro de pedidos,M07,Gestión de Pedidos,Inferido (keywords),No
 HU,HU08,Control de inventario,M04,Gestión de Inventarios,Inferido (keywords),No
 HU,HU09,Gestión de roles,M02,Gestión de Usuarios y Perfiles,Inferido (keywords),No
@@ -147,7 +147,7 @@ HU,HU11,Negociación empresarial,M03,Marketplace Agropecuario,Inferido (manual p
 HU,HU12,Recuperación de contraseña,M02,Gestión de Inicio y Panel General,Inferido (manual por contexto RF),No
 HU,HU13,Control de sesiones,M02,Gestión de Inicio y Panel General,Inferido (keywords),No
 HU,HU14,Panel general,M01,Gestión de Inicio y Panel General,Inferido (keywords),No
-HU,HU15,Búsqueda de usuarios,M02,Gestión de Usuarios y Perfiles,Inferido (keywords),No
+HU,HU15,Búsqueda de usuarios,M02,Gestión de Usuarios y Perfiles,D7: equivalencia oficial HU08,No
 HU,HU16,Desactivación de usuarios,M02,Gestión de Usuarios y Perfiles,Inferido (keywords),No
 HU,HU17,Reputación,M02,Gestión de Usuarios y Perfiles,Inferido (manual por contexto RF),Si
 HU,HU18,Búsqueda avanzada de productos,M03,Marketplace Agropecuario,Inferido (keywords),No
@@ -165,7 +165,7 @@ HU,HU29,Historial de pedidos,M07,Gestión de Pedidos,Inferido (keywords),No
 HU,HU30,Integración de pagos,M08,Pagos y Transacciones,Inferido (keywords),No
 HU,HU31,Registro de transacciones,M08,Pagos y Transacciones,Inferido (manual por contexto RF),Si
 HU,HU32,Monitoreo del sistema,M09,Panel Administrativo,Inferido (keywords),No
-HU,HU33,Gestión de incidencias,M09,Panel Administrativo,Inferido (manual por contexto RF),Si
+HU,HU33,Gestión de incidencias,M09,Panel Administrativo,D7: confirmado CU#31 en matriz Notion,No
 HU,HU34,Control de accesos,M10,Seguridad y Control,Inferido (keywords),No
 HU,HU35,Registro de actividad,M10,Seguridad y Control,Inferido (manual por contexto RF),No
 HU,HU36,Copias de seguridad,M10,Seguridad y Control,Inferido (keywords),No

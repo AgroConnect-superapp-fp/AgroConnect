@@ -1,3 +1,5 @@
+import type { CompanyType, VehicleType } from '@agroconnect/contracts';
+
 export type RoleName =
   'productor' | 'comprador_b2c' | 'comprador_b2b' | 'transportista' | 'administrador';
 
@@ -27,6 +29,19 @@ export interface CompanyInput {
   razonSocial: string;
   nit: string;
   direccion?: string;
+  tipoEmpresa?: CompanyType;
+  departamento?: string;
+  municipio?: string;
+}
+
+export interface TransporterInput {
+  tipoVehiculo: VehicleType;
+  placa: string;
+  capacidadKg: number;
+  cobertura: string[];
+  cadenaFrio: boolean;
+  soatVence: string;
+  licenciaVence: string;
 }
 
 export interface RegisterPayload {
@@ -38,6 +53,7 @@ export interface RegisterPayload {
   rol: RoleName;
   finca?: ProducerFarmInput;
   empresa?: CompanyInput;
+  transportista?: TransporterInput;
   aceptaTratamientoDatos: boolean;
 }
 

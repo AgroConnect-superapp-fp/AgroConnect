@@ -5,11 +5,25 @@ import { User } from '../../domain/entities/User';
 import { Role } from '../../domain/entities/Role';
 import { RefreshToken } from '../../domain/entities/RefreshToken';
 import type { RoleName } from '../../domain/entities/Role';
-import type { RegisterUserData, UserRepository } from '../../domain/interfaces/UserRepository';
+import type {
+  AdminContinuityResult,
+  AdminUserFilters,
+  AuditEventData,
+  AdminUserPage,
+  CompanyProfileUpdate,
+  ProfileSnapshot,
+  ProducerProfileUpdate,
+  ProfilePresence,
+  RegisterUserData,
+  TransporterProfileUpdate,
+  UserRepository,
+} from '../../domain/interfaces/UserRepository';
+import type { UserStatus } from '../../domain/entities/User';
 import { InfrastructureError } from '../../../../shared/errors/errors';
 import { uniqueViolationTarget } from '../../../../shared/infrastructure/prismaErrors';
 import {
   DocumentAlreadyExistsError,
+  PlateAlreadyExistsError,
   EmailAlreadyExistsError,
   NitAlreadyExistsError,
   PhoneAlreadyExistsError,
@@ -20,6 +34,13 @@ type UserRecord = Prisma.UserGetPayload<{ include: { role: true } }>;
 
 @Injectable()
 export class PrismaUserRepository implements UserRepository {
+  /**
+   * Clave compartida para serializar los cambios que afectan la continuidad
+   * administrativa. El lock se libera al hacer commit/rollback y funciona
+   * entre procesos e instancias porque vive en PostgreSQL.
+   */
+  private static readonly ADMIN_CONTINUITY_LOCK = 741_852_963;
+
   constructor(private readonly prisma: PrismaClient) {}
 
   async findRoleByName(name: RoleName): Promise<Role | null> {
@@ -111,6 +132,24 @@ export class PrismaUserRepository implements UserRepository {
               companyName: data.companyProfile.companyName,
               nit: data.companyProfile.nit,
               address: data.companyProfile.address ?? null,
+              companyType: data.companyProfile.companyType,
+              department: data.companyProfile.department ?? null,
+              municipality: data.companyProfile.municipality ?? null,
+            },
+          });
+        }
+
+        if (data.transporterProfile) {
+          await tx.transporterProfile.create({
+            data: {
+              userId: user.id,
+              vehicleType: data.transporterProfile.vehicleType,
+              plate: data.transporterProfile.plate,
+              capacityKg: data.transporterProfile.capacityKg,
+              coverageMunicipalities: data.transporterProfile.coverageMunicipalities,
+              coldChain: data.transporterProfile.coldChain,
+              soatExpiresAt: data.transporterProfile.soatExpiresAt,
+              licenseExpiresAt: data.transporterProfile.licenseExpiresAt,
             },
           });
         }
@@ -230,10 +269,24 @@ export class PrismaUserRepository implements UserRepository {
         data: { revoked: true, rotatedAt: new Date() },
       });
       if (revoked.count !== 1) {
-        await tx.refreshToken.updateMany({
-          where: { familyId: current.familyId, revoked: false },
-          data: { revoked: true },
+        // Dos pestañas pueden leer el mismo token antes de que una lo rote.
+        // Si otra petición acaba de rotarlo, NO revocamos la familia: eso
+        // invalidaría el token nuevo de la petición ganadora. Solo tratamos
+        // como reuso una rotación antigua fuera de la ventana de gracia.
+        const latest = await tx.refreshToken.findUnique({
+          where: { id: current.id },
         });
+        const rotatedRecently =
+          latest?.rotatedAt !== null &&
+          latest?.rotatedAt !== undefined &&
+          Date.now() - latest.rotatedAt.getTime() < 30_000;
+
+        if (!rotatedRecently) {
+          await tx.refreshToken.updateMany({
+            where: { familyId: current.familyId, revoked: false },
+            data: { revoked: true },
+          });
+        }
         return false;
       }
 
@@ -250,6 +303,123 @@ export class PrismaUserRepository implements UserRepository {
     });
   }
 
+  async findProfileById(id: string): Promise<ProfileSnapshot | null> {
+    const record = await this.prisma.user.findUnique({
+      where: { id },
+      include: {
+        role: true,
+        producerProfile: true,
+        companyProfile: true,
+        transporterProfile: true,
+      },
+    });
+    if (!record) {
+      return null;
+    }
+
+    const snapshot: ProfileSnapshot = { user: this.toDomain(record).toPublicProfile() };
+
+    if (record.producerProfile) {
+      const coordinatesRows = await this.prisma.$queryRaw<
+        Array<{ lat: number | null; lng: number | null }>
+      >`
+        SELECT ST_Y(coordenadas::geometry) AS lat, ST_X(coordenadas::geometry) AS lng
+        FROM producer_profiles
+        WHERE id = ${record.producerProfile.id}::uuid
+      `;
+      const coordinates = coordinatesRows[0];
+      snapshot.producer = {
+        farmName: record.producerProfile.farmName,
+        municipality: record.producerProfile.municipality,
+        village: record.producerProfile.village,
+        latitude: coordinates?.lat ?? undefined,
+        longitude: coordinates?.lng ?? undefined,
+      };
+    }
+
+    snapshot.company = record.companyProfile
+      ? {
+          companyName: record.companyProfile.companyName,
+          nit: record.companyProfile.nit,
+          address: record.companyProfile.address ?? undefined,
+          companyType: record.companyProfile.companyType ?? undefined,
+          department: record.companyProfile.department ?? undefined,
+          municipality: record.companyProfile.municipality ?? undefined,
+        }
+      : undefined;
+
+    snapshot.transporter = record.transporterProfile
+      ? {
+          vehicleType: record.transporterProfile.vehicleType,
+          plate: record.transporterProfile.plate,
+          capacityKg: record.transporterProfile.capacityKg,
+          coverageMunicipalities: record.transporterProfile.coverageMunicipalities,
+          coldChain: record.transporterProfile.coldChain,
+          soatExpiresAt: record.transporterProfile.soatExpiresAt,
+          licenseExpiresAt: record.transporterProfile.licenseExpiresAt,
+        }
+      : undefined;
+
+    return snapshot;
+  }
+
+  async updateProducerProfile(userId: string, data: ProducerProfileUpdate): Promise<void> {
+    await this.prisma.$transaction(async (tx) => {
+      await tx.producerProfile.update({
+        where: { userId },
+        data: {
+          farmName: data.farmName,
+          municipality: data.municipality,
+          village: data.village,
+        },
+      });
+
+      if (data.latitude !== undefined && data.longitude !== undefined) {
+        await tx.$executeRaw`
+          UPDATE producer_profiles
+          SET coordenadas = ST_SetSRID(ST_MakePoint(${data.longitude}, ${data.latitude}), 4326)::geography
+          WHERE user_id = ${userId}::uuid
+        `;
+      }
+    });
+  }
+
+  async updateCompanyProfile(userId: string, data: CompanyProfileUpdate): Promise<void> {
+    await this.prisma.companyProfile.update({
+      where: { userId },
+      data: {
+        companyName: data.companyName,
+        address: data.address,
+        companyType: data.companyType,
+        department: data.department,
+        municipality: data.municipality,
+      },
+    });
+  }
+
+  async updateTransporterProfile(userId: string, data: TransporterProfileUpdate): Promise<void> {
+    try {
+      await this.prisma.transporterProfile.update({
+        where: { userId },
+        data: {
+          vehicleType: data.vehicleType,
+          plate: data.plate,
+          capacityKg: data.capacityKg,
+          coverageMunicipalities: data.coverageMunicipalities,
+          coldChain: data.coldChain,
+          soatExpiresAt: data.soatExpiresAt,
+          licenseExpiresAt: data.licenseExpiresAt,
+        },
+      });
+    } catch (error) {
+      const target = uniqueViolationTarget(error);
+      if (target?.includes('placa') || target?.includes('plate')) {
+        throw new PlateAlreadyExistsError();
+      }
+      throw error;
+    }
+  }
+
   async updatePassword(userId: string, passwordHash: string): Promise<void> {
     await this.prisma.user.update({
       where: { id: userId },
@@ -264,6 +434,187 @@ export class PrismaUserRepository implements UserRepository {
     });
   }
 
+  async findManyForAdmin(filters: AdminUserFilters): Promise<AdminUserPage> {
+    const where: Prisma.UserWhereInput = {};
+
+    if (filters.search) {
+      where.OR = [
+        { fullName: { contains: filters.search, mode: 'insensitive' } },
+        { email: { contains: filters.search, mode: 'insensitive' } },
+        { document: { contains: filters.search, mode: 'insensitive' } },
+        { phone: { contains: filters.search, mode: 'insensitive' } },
+      ];
+    }
+
+    if (filters.roleName) {
+      where.role = { name: filters.roleName };
+    }
+
+    if (filters.status) {
+      where.status = filters.status;
+    }
+
+    const [records, total] = await this.prisma.$transaction([
+      this.prisma.user.findMany({
+        where,
+        include: { role: true },
+        orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+        skip: filters.offset,
+        take: filters.limit,
+      }),
+      this.prisma.user.count({ where }),
+    ]);
+
+    return { items: records.map((record) => this.toDomain(record)), total };
+  }
+
+  async findProfilePresenceById(userId: string): Promise<ProfilePresence | null> {
+    const record = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        producerProfile: { select: { id: true } },
+        companyProfile: { select: { id: true } },
+        transporterProfile: { select: { id: true } },
+      },
+    });
+
+    if (!record) {
+      return null;
+    }
+
+    return {
+      producer: record.producerProfile !== null,
+      company: record.companyProfile !== null,
+      transporter: record.transporterProfile !== null,
+    };
+  }
+
+  async updateStatusPreservingAdminContinuity(
+    userId: string,
+    status: UserStatus,
+    audit?: AuditEventData,
+  ): Promise<AdminContinuityResult> {
+    return this.prisma.$transaction(async (tx) => {
+      await this.lockAdminContinuity(tx);
+
+      const target = await tx.user.findUnique({
+        where: { id: userId },
+        include: { role: true },
+      });
+      if (!target) {
+        return { outcome: 'NOT_FOUND' };
+      }
+
+      const isActiveAdmin = target.role.name === 'administrador' && target.status === 'ACTIVO';
+
+      if (isActiveAdmin && status !== 'ACTIVO') {
+        const activeAdmins = await tx.user.count({
+          where: { status: 'ACTIVO', role: { name: 'administrador' } },
+        });
+        if (activeAdmins <= 1) {
+          return { outcome: 'LAST_ACTIVE_ADMIN' };
+        }
+      }
+
+      // Idempotente: no revocar sesiones si el estado no cambia.
+      if (target.status === status) {
+        return { outcome: 'UPDATED', user: this.toDomain(target) };
+      }
+
+      const record = await tx.user.update({
+        where: { id: userId },
+        data: { status },
+        include: { role: true },
+      });
+
+      if (status !== 'ACTIVO') {
+        await tx.refreshToken.updateMany({
+          where: { userId, revoked: false },
+          data: { revoked: true },
+        });
+      }
+
+      await this.writeAuditEvent(tx, audit);
+
+      return { outcome: 'UPDATED', user: this.toDomain(record) };
+    });
+  }
+
+  async updateRolePreservingAdminContinuity(
+    userId: string,
+    roleId: string,
+    roleName: RoleName,
+    audit?: AuditEventData,
+  ): Promise<AdminContinuityResult> {
+    return this.prisma.$transaction(async (tx) => {
+      await this.lockAdminContinuity(tx);
+
+      const target = await tx.user.findUnique({
+        where: { id: userId },
+        include: { role: true },
+      });
+      if (!target) {
+        return { outcome: 'NOT_FOUND' };
+      }
+
+      // Idempotente: no revocar sesiones si el rol no cambia.
+      if (target.roleId === roleId) {
+        return { outcome: 'UPDATED', user: this.toDomain(target) };
+      }
+
+      const isActiveAdmin = target.role.name === 'administrador' && target.status === 'ACTIVO';
+      if (isActiveAdmin && roleName !== 'administrador') {
+        const activeAdmins = await tx.user.count({
+          where: { status: 'ACTIVO', role: { name: 'administrador' } },
+        });
+        if (activeAdmins <= 1) {
+          return { outcome: 'LAST_ACTIVE_ADMIN' };
+        }
+      }
+
+      const record = await tx.user.update({
+        where: { id: userId },
+        data: { roleId },
+        include: { role: true },
+      });
+
+      await tx.refreshToken.updateMany({
+        where: { userId, revoked: false },
+        data: { revoked: true },
+      });
+
+      await this.writeAuditEvent(tx, audit);
+
+      return { outcome: 'UPDATED', user: this.toDomain(record) };
+    });
+  }
+
+  private async writeAuditEvent(
+    tx: Prisma.TransactionClient,
+    audit: AuditEventData | undefined,
+  ): Promise<void> {
+    if (!audit) {
+      return;
+    }
+
+    await tx.auditEvent.create({
+      data: {
+        actorId: audit.actorId ?? null,
+        actorRole: audit.actorRole,
+        action: audit.action,
+        entityType: audit.entityType,
+        entityId: audit.entityId ?? null,
+        beforeData: audit.before as Prisma.InputJsonValue | undefined,
+        afterData: audit.after as Prisma.InputJsonValue | undefined,
+        correlationId: audit.correlationId ?? null,
+      },
+    });
+  }
+
+  private async lockAdminContinuity(tx: Prisma.TransactionClient): Promise<void> {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(${PrismaUserRepository.ADMIN_CONTINUITY_LOCK}::bigint)`;
+  }
+
   /** Una carrera entre dos registros llega aquí como P2002: se traduce a 409, no a 500. */
   private mapRegisterError(error: unknown): Error {
     const target = uniqueViolationTarget(error);
@@ -274,8 +625,12 @@ export class PrismaUserRepository implements UserRepository {
     if (target.includes('documento') || target.includes('document')) {
       return new DocumentAlreadyExistsError();
     }
-    if (target.includes('celular') || target.includes('phone')) return new PhoneAlreadyExistsError();
+    if (target.includes('celular') || target.includes('phone'))
+      return new PhoneAlreadyExistsError();
     if (target.includes('nit')) return new NitAlreadyExistsError();
+    if (target.includes('placa') || target.includes('plate')) {
+      return new PlateAlreadyExistsError();
+    }
     return new UserAlreadyExistsError();
   }
 

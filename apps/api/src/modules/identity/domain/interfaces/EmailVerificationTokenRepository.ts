@@ -12,5 +12,6 @@ export interface EmailVerificationTokenRepository {
   findByHash(tokenHash: string): Promise<EmailVerificationToken | null>;
   /** Marca el token como usado solo si aún no lo estaba; `false` si otro proceso lo consumió primero. */
   consume(id: string): Promise<boolean>;
+  hasRecentToken(userId: string, since: Date): Promise<boolean>;
   invalidateUserTokens(userId: string): Promise<void>;
 }

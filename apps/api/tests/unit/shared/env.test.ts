@@ -26,13 +26,11 @@ describe('configuración de entorno', () => {
       ...MINIMO_VALIDO,
       PORT: '4100',
       TRUST_PROXY: '1',
-      BCRYPT_SALT_ROUNDS: '10',
       RATE_LIMIT_MAX_ATTEMPTS: '30',
     });
 
     expect(env.PORT).toBe(4100);
     expect(env.TRUST_PROXY).toBe(1);
-    expect(env.BCRYPT_SALT_ROUNDS).toBe(10);
     expect(env.RATE_LIMIT_MAX_ATTEMPTS).toBe(30);
   });
 
@@ -50,7 +48,12 @@ describe('configuración de entorno', () => {
 
   it('exige SMTP_HOST en producción (D5)', () => {
     expect(() =>
-      parseEnv({ ...MINIMO_VALIDO, NODE_ENV: 'production', SMTP_HOST: '' }),
+      parseEnv({
+        ...MINIMO_VALIDO,
+        NODE_ENV: 'production',
+        SMTP_HOST: '',
+        CORS_ORIGIN: 'https://app.example.com',
+      }),
     ).toThrow(/SMTP_HOST/);
 
     expect(() =>
@@ -58,6 +61,7 @@ describe('configuración de entorno', () => {
         ...MINIMO_VALIDO,
         NODE_ENV: 'production',
         SMTP_HOST: 'smtp.example.com',
+        CORS_ORIGIN: 'https://app.example.com',
       }),
     ).not.toThrow();
   });
@@ -72,6 +76,61 @@ describe('configuración de entorno', () => {
 
   it('rechaza un APP_BASE_URL que no es URL', () => {
     expect(() => parseEnv({ ...MINIMO_VALIDO, APP_BASE_URL: 'no-es-una-url' })).toThrow();
+  });
+
+  it('rechaza un CORS_ORIGIN con comodines', () => {
+    expect(() => parseEnv({ ...MINIMO_VALIDO, CORS_ORIGIN: '*' })).toThrow(/comodines/);
+    expect(() =>
+      parseEnv({ ...MINIMO_VALIDO, CORS_ORIGIN: 'https://app.example.com,*' }),
+    ).toThrow(/comodines/);
+  });
+
+  it('rechaza un origen CORS que no es una URL absoluta', () => {
+    expect(() => parseEnv({ ...MINIMO_VALIDO, CORS_ORIGIN: 'app.example.com' })).toThrow(
+      /URL absoluta/,
+    );
+  });
+
+  it('exige https:// en los orígenes CORS de producción', () => {
+    expect(() =>
+      parseEnv({
+        ...MINIMO_VALIDO,
+        NODE_ENV: 'production',
+        SMTP_HOST: 'smtp.example.com',
+        CORS_ORIGIN: 'http://app.example.com',
+      }),
+    ).toThrow(/https:\/\//);
+
+    expect(() =>
+      parseEnv({
+        ...MINIMO_VALIDO,
+        NODE_ENV: 'production',
+        SMTP_HOST: 'smtp.example.com',
+        CORS_ORIGIN: 'https://app.example.com',
+      }),
+    ).not.toThrow();
+  });
+
+  it('expone la lista de orígenes CORS ya normalizada', () => {
+    const env = parseEnv({
+      ...MINIMO_VALIDO,
+      CORS_ORIGIN: 'https://app.example.com, https://admin.example.com',
+    });
+
+    expect(env.CORS_ORIGINS).toEqual([
+      'https://app.example.com',
+      'https://admin.example.com',
+    ]);
+  });
+
+  it('exige que los secretos de acceso y de refresh sean distintos', () => {
+    expect(() =>
+      parseEnv({
+        ...MINIMO_VALIDO,
+        JWT_ACCESS_SECRET: 'secreto'.repeat(6),
+        JWT_REFRESH_SECRET: 'secreto'.repeat(6),
+      }),
+    ).toThrow(/deben ser distintos/);
   });
 
   it('expone el esquema para reutilizarlo en otros puntos', () => {

@@ -24,19 +24,19 @@ Además:
    - `SameSite=None` en producción, porque el frontend (Vercel) y la API
      (Render) son sitios distintos; `Lax` en desarrollo/pruebas.
    - `Path=/api/v1` para el access token y `Path=/api/v1/auth` para el refresh.
-3. **Rotación con detección de reutilización (planificada, no implementada):**
-   - Cada refresh token pertenece a una *familia*.
+3. **Rotación con detección de reutilización (implementada 2026-11-03):**
+   - Cada refresh token pertenece a una _familia_.
    - Si se presenta un token ya rotado, se revoca la familia completa.
-   - Estado 2026-11-02: la tabla `refresh_tokens` aún no tiene
-     `family_id`/`generation`; queda en la fase 2.
-4. **JWT endurecido:** `HS256` fijado en firma y verificación (ya aplicado).
-   `iss`/`aud` y autorización por rol desde BD quedan planificados.
+   - La tabla `refresh_tokens` incluye `family_id`, `generation` y
+     `rotated_at`; la rotación es atómica y detecta reutilización.
+4. **JWT endurecido:** `HS256` fijado en firma y verificación, con `iss`/`aud`
+   verificados y autorización por rol desde BD.
 5. **Protección CSRF:** `CsrfGuard` valida `Origin`/`Referer` contra
    `CORS_ORIGIN` y exige `X-Requested-With: XMLHttpRequest` en toda petición
    mutante. Implementado el 2026-11-02.
 6. **Hash de contraseñas:** Argon2id para hashes nuevos, con re-hash
-   transparente desde bcrypt en el siguiente login exitoso. **Pendiente**:
-   hoy se usa bcrypt con 12 rondas.
+   transparente desde bcrypt en el siguiente login exitoso. Implementado;
+   bcrypt se conserva únicamente como fallback con rehash.
 
 ## Alternativas consideradas
 

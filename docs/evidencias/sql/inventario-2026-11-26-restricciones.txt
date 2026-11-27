@@ -1,0 +1,27 @@
+company_profiles|company_profiles_pkey|p|PRIMARY KEY (id)
+company_profiles|company_profiles_user_id_fkey|f|FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE
+email_verification_tokens|email_verification_tokens_pkey|p|PRIMARY KEY (id)
+email_verification_tokens|email_verification_tokens_user_id_fkey|f|FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE
+password_reset_tokens|password_reset_tokens_pkey|p|PRIMARY KEY (id)
+password_reset_tokens|password_reset_tokens_user_id_fkey|f|FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE
+plots|plots_area_positive_check|c|CHECK (((geom IS NULL) OR (area_hectares > (0)::double precision)))
+plots|plots_centroid_colombia_check|c|CHECK (((centroid IS NULL) OR st_within((centroid)::geometry, st_makeenvelope(('-79'::integer)::double precision, ('-4.2'::numeric)::double precision, ('-66.8'::numeric)::double precision, (13.3)::double precision, 4326))))
+plots|plots_farmer_id_fkey|f|FOREIGN KEY (farmer_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE RESTRICT
+plots|plots_geom_valid_check|c|CHECK (((geom IS NULL) OR st_isvalid(geom)))
+plots|plots_pkey|p|PRIMARY KEY (id)
+_prisma_migrations|_prisma_migrations_pkey|p|PRIMARY KEY (id)
+producer_profiles|producer_profiles_pkey|p|PRIMARY KEY (id)
+producer_profiles|producer_profiles_user_id_fkey|f|FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE
+products|products_coordinates_check|c|CHECK ((((lat >= ('-90'::integer)::double precision) AND (lat <= (90)::double precision)) AND ((lng >= ('-180'::integer)::double precision) AND (lng <= (180)::double precision))))
+products|products_pkey|p|PRIMARY KEY (id)
+products|products_producer_id_fkey|f|FOREIGN KEY (producer_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE SET NULL
+products|products_productivity_check|c|CHECK (((productivity >= 0) AND (productivity <= 100)))
+refresh_tokens|refresh_tokens_pkey|p|PRIMARY KEY (id)
+refresh_tokens|refresh_tokens_user_id_fkey|f|FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE
+roles|roles_pkey|p|PRIMARY KEY (id)
+spatial_ref_sys|spatial_ref_sys_pkey|p|PRIMARY KEY (srid)
+spatial_ref_sys|spatial_ref_sys_srid_check|c|CHECK (((srid > 0) AND (srid <= 998999)))
+transporter_profiles|transporter_profiles_pkey|p|PRIMARY KEY (id)
+transporter_profiles|transporter_profiles_user_id_fkey|f|FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE
+users|users_pkey|p|PRIMARY KEY (id)
+users|users_rol_id_fkey|f|FOREIGN KEY (rol_id) REFERENCES roles(id) ON UPDATE CASCADE ON DELETE RESTRICT

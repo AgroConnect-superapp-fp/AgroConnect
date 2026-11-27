@@ -1,0 +1,3 @@
+collections=notificaciones,estadisticas_agregadas,eventos_sincronizacion,conversaciones,mensajes,logs_actividad
+mensajes=2
+indexes=_id_,uk_mensaje_por_conversacion

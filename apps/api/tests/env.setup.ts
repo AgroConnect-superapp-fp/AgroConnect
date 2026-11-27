@@ -8,7 +8,6 @@ process.env.JWT_REFRESH_SECRET =
   process.env.JWT_REFRESH_SECRET ?? 'test_refresh_secret_with_at_least_32_characters_ok';
 process.env.JWT_ACCESS_EXPIRES_IN = '15m';
 process.env.JWT_REFRESH_EXPIRES_IN = '7d';
-process.env.BCRYPT_SALT_ROUNDS = '10';
 process.env.RATE_LIMIT_WINDOW_MS = '900000';
 // Límite bajo a propósito: la e2e del módulo identity necesita agotarlo
 // para comprobar la respuesta 429 del guard de rate limiting.
@@ -22,3 +21,9 @@ process.env.LOG_LEVEL = process.env.LOG_LEVEL ?? 'fatal';
 // servidor externo. Se deshabilita para que se use el servicio de archivo.
 process.env.SMTP_HOST = '';
 process.env.MAIL_DIR = process.env.MAIL_DIR ?? '/tmp/agroconnect-mails-test';
+
+// Las pruebas no llaman a Cloudinary real. La firma debe responder 503 si no
+// hay credenciales; los tests unitarios de firma inyectan su propia config.
+process.env.CLOUDINARY_CLOUD_NAME = '';
+process.env.CLOUDINARY_API_KEY = '';
+process.env.CLOUDINARY_API_SECRET = '';

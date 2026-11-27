@@ -87,7 +87,13 @@ export function PropertyPopup({
 
   if (variant === 'polygon') {
     return (
-      <div className="relative" style={popupStyles.content}>
+      <div
+        className="relative"
+        style={popupStyles.content}
+        tabIndex={0}
+        role="region"
+        aria-label={`Detalles de la parcela ${property.name}`}
+      >
         <PopupCloseButton />
 
         <div style={popupStyles.polygonHeader}>
@@ -130,7 +136,13 @@ export function PropertyPopup({
   const hasImages = Boolean(property.images && property.images.length > 0);
 
   return (
-    <div className="relative" style={popupStyles.content}>
+    <div
+      className="relative"
+      style={popupStyles.content}
+      tabIndex={0}
+      role="region"
+      aria-label={`Detalles de ${property.name}`}
+    >
       <PopupCloseButton />
 
       <div className="popup-gallery">

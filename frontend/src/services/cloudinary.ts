@@ -23,19 +23,17 @@ import { Cloudinary } from '@cloudinary/url-gen';
 import { format, quality } from '@cloudinary/url-gen/actions/delivery';
 import { scale, fill } from '@cloudinary/url-gen/actions/resize';
 import { byRadius } from '@cloudinary/url-gen/actions/roundCorners';
+import type { UploadSignature } from '@agroconnect/contracts';
+import { apiRequest } from './apiClient';
 
 /**
  * Cloudinary configuration from environment variables.
  *
- * SECURITY: Only CLOUD_NAME and UPLOAD_PRESET are exposed to the client.
- * These are public by design (visible in network requests anyway).
- * API_KEY and API_SECRET are intentionally excluded - they must only
- * exist in the backend environment.
+ * SECURITY: Only CLOUD_NAME is exposed to the client. La subida usa una
+ * firma emitida por el backend; API_KEY y API_SECRET no viven en el bundle.
  */
 export const CLOUDINARY_CONFIG = {
   cloudName: (import.meta.env['VITE_CLOUDINARY_CLOUD_NAME'] as string) || 'demo',
-  uploadPreset:
-    (import.meta.env['VITE_CLOUDINARY_UPLOAD_PRESET'] as string) || 'ml_default',
 } as const;
 
 /**
@@ -93,7 +91,7 @@ export const IMAGE_PRESETS = {
  *
  * AgroConnect stores image references in two shapes:
  * - Cloudinary public IDs (e.g. "agroconnect/finca-12/cosecha") -> transformed.
- * - Direct URLs from external providers (legacy Supabase rows) -> used as-is.
+ * - Direct URLs from external providers (legacy rows) -> used as-is.
  */
 const DIRECT_IMAGE_URL_PATTERN = /^(https?:)?\/\//i;
 const DATA_IMAGE_URL_PATTERN = /^data:image\//i;
@@ -202,6 +200,10 @@ export function getResponsiveImageUrls(
  * - Unsplash and Wikimedia direct URLs get provider-specific small variants.
  * - Unknown providers fall back to the original reference (no transformation).
  */
+function matchesHost(hostname: string, domain: string): boolean {
+  return hostname === domain || hostname.endsWith(`.${domain}`);
+}
+
 export function getLqipUrl(reference: string): string {
   if (!isDirectImageUrl(reference)) {
     return getImageUrl(reference, 'lqip');
@@ -210,14 +212,14 @@ export function getLqipUrl(reference: string): string {
   try {
     const parsed = new URL(reference);
 
-    if (parsed.hostname.includes('unsplash.com')) {
+    if (matchesHost(parsed.hostname, 'unsplash.com')) {
       parsed.searchParams.set('w', '50');
       parsed.searchParams.set('q', '10');
       parsed.searchParams.set('blur', '40');
       return parsed.toString();
     }
 
-    if (parsed.hostname.includes('wikimedia.org')) {
+    if (matchesHost(parsed.hostname, 'wikimedia.org')) {
       if (parsed.searchParams.has('width')) {
         parsed.searchParams.set('width', '50');
       }
@@ -225,7 +227,7 @@ export function getLqipUrl(reference: string): string {
     }
 
     if (
-      parsed.hostname.includes('cloudinary.com') &&
+      matchesHost(parsed.hostname, 'cloudinary.com') &&
       parsed.pathname.includes('/image/upload/')
     ) {
       return reference.replace('/image/upload/', '/image/upload/w_50,q_10,f_auto/');
@@ -291,12 +293,29 @@ function sleep(ms: number): Promise<void> {
  */
 export async function uploadImage({
   file,
-  folder = 'agroconnect',
-  tags = [],
   signal,
   onProgress,
   maxRetries = 2,
 }: UploadOptions): Promise<CloudinaryUploadResponse> {
+  if (signal?.aborted) {
+    throw new DOMException('Upload aborted', 'AbortError');
+  }
+
+  let signature: UploadSignature;
+  try {
+    signature = await apiRequest<UploadSignature>(
+      '/api/v1/uploads/signature',
+      { method: 'POST' },
+      10_000
+    );
+  } catch (error) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : 'No fue posible preparar la carga de imágenes.';
+    throw new Error(message);
+  }
+
   let lastError: Error | null = null;
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
@@ -306,12 +325,12 @@ export async function uploadImage({
     }
 
     try {
-      return await performUpload(file, folder, tags, signal, onProgress);
+      return await performUpload(file, signature, signal, onProgress);
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
 
       // Don't retry on abort or validation errors
-      if (lastError.name === 'AbortError' || lastError.message.includes('400')) {
+      if (lastError.name === 'AbortError' || /status 4\d\d/.test(lastError.message)) {
         throw lastError;
       }
 
@@ -339,8 +358,7 @@ export async function uploadImage({
  */
 function performUpload(
   file: File,
-  folder: string,
-  tags: string[],
+  signature: UploadSignature,
   signal: AbortSignal | undefined,
   onProgress?: (progress: number) => void
 ): Promise<CloudinaryUploadResponse> {
@@ -349,11 +367,11 @@ function performUpload(
     const formData = new FormData();
 
     formData.append('file', file);
-    formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset);
-    formData.append('folder', folder);
-    if (tags.length > 0) {
-      formData.append('tags', tags.join(','));
-    }
+    formData.append('api_key', signature.apiKey);
+    formData.append('timestamp', String(signature.timestamp));
+    formData.append('signature', signature.signature);
+    formData.append('folder', signature.folder);
+    formData.append('allowed_formats', signature.allowedFormats.join(','));
 
     // Handle abort signal
     if (signal) {
@@ -394,7 +412,7 @@ function performUpload(
 
     xhr.open(
       'POST',
-      `https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/image/upload`
+      `https://api.cloudinary.com/v1_1/${signature.cloudName}/image/upload`
     );
     xhr.send(formData);
   });

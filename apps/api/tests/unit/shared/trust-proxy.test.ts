@@ -13,6 +13,7 @@ describe('configureApp — trust proxy', () => {
       set: jest.fn(),
       use: jest.fn(),
       enableCors: jest.fn(),
+      useBodyParser: jest.fn(),
     } as unknown as NestExpressApplication;
   }
 

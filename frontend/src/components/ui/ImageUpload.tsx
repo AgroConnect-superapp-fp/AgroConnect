@@ -48,6 +48,7 @@ export function ImageUpload({
   const [previews, setPreviews] = useState<Array<{ file: File; url: string }>>([]);
   const [validationError, setValidationError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const lastNotifiedCountRef = useRef(0);
 
   const { uploadState, handleUpload, handleDrop, handleDragOver, reset } = useImageUpload(
     folder,
@@ -59,24 +60,30 @@ export function ImageUpload({
    */
   const handleFileSelect = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>): void => {
-      const files = event.target.files;
+      const selected = event.target.files ? Array.from(event.target.files) : [];
       setValidationError(null);
+      // Permite volver a seleccionar el mismo archivo después de un error.
+      event.target.value = '';
 
-      if (files && files.length > 0) {
-        // Validate max files
-        if (previews.length + files.length > maxFiles) {
+      if (selected.length > 0) {
+        const invalid = selected.find((file) => !file.type.startsWith('image/'));
+        if (invalid) {
+          setValidationError(`"${invalid.name}" no es una imagen válida.`);
+          return;
+        }
+
+        if (previews.length + selected.length > maxFiles) {
           setValidationError(`Máximo ${maxFiles} archivos permitidos.`);
           return;
         }
 
-        // Generate previews
-        const newPreviews = Array.from(files).map((file) => ({
+        const newPreviews = selected.map((file) => ({
           file,
           url: URL.createObjectURL(file),
         }));
 
         setPreviews((prev) => [...prev, ...newPreviews]);
-        void handleUpload(files);
+        void handleUpload(selected);
       }
     },
     [handleUpload, maxFiles, previews.length]
@@ -92,16 +99,20 @@ export function ImageUpload({
       setIsDragging(false);
       setValidationError(null);
 
-      const files = event.dataTransfer.files;
+      const files = Array.from(event.dataTransfer.files);
       if (files.length > 0) {
-        // Validate max files
+        const invalid = files.find((file) => !file.type.startsWith('image/'));
+        if (invalid) {
+          setValidationError(`"${invalid.name}" no es una imagen válida.`);
+          return;
+        }
+
         if (previews.length + files.length > maxFiles) {
           setValidationError(`Máximo ${maxFiles} archivos permitidos.`);
           return;
         }
 
-        // Generate previews
-        const newPreviews = Array.from(files).map((file) => ({
+        const newPreviews = files.map((file) => ({
           file,
           url: URL.createObjectURL(file),
         }));
@@ -150,6 +161,7 @@ export function ImageUpload({
     previews.forEach((preview) => URL.revokeObjectURL(preview.url));
     setPreviews([]);
     setValidationError(null);
+    lastNotifiedCountRef.current = 0;
     reset();
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -165,13 +177,16 @@ export function ImageUpload({
 
   // Notify parent when upload completes (improved timing)
   React.useEffect(() => {
+    const count = uploadState.uploadedImages.length;
     if (
       !uploadState.isUploading &&
-      uploadState.uploadedImages.length > 0 &&
+      count > lastNotifiedCountRef.current &&
       !uploadState.error &&
       onImagesUploaded
     ) {
-      onImagesUploaded(uploadState.uploadedImages);
+      const newImages = uploadState.uploadedImages.slice(lastNotifiedCountRef.current);
+      lastNotifiedCountRef.current = count;
+      onImagesUploaded(newImages);
     }
   }, [
     uploadState.isUploading,
@@ -181,6 +196,13 @@ export function ImageUpload({
   ]);
 
   const isDisabled = uploadState.isUploading;
+
+  const uploadTitle = isDisabled
+    ? 'Subiendo imágenes...'
+    : isDragging
+      ? '¡Suelta las imágenes aquí!'
+      : 'Arrastra imágenes o haz clic para seleccionar';
+  const uploadHint = `JPEG, PNG, WebP o AVIF • Máximo 10MB por archivo • Hasta ${maxFiles} archivos`;
 
   return (
     <div className={`w-full ${className}`}>
@@ -202,20 +224,7 @@ export function ImageUpload({
                 : 'border-gray-300 hover:border-agro-green hover:bg-gray-50 cursor-pointer'
           }
         `}
-        role="button"
-        tabIndex={isDisabled ? -1 : 0}
-        aria-label={
-          isDisabled
-            ? 'Subiendo imágenes, por favor espere...'
-            : 'Zona de carga de imágenes. Haz clic o arrastra archivos aquí.'
-        }
-        aria-disabled={isDisabled}
-        onKeyDown={(e) => {
-          if (!isDisabled && (e.key === 'Enter' || e.key === ' ')) {
-            e.preventDefault();
-            triggerFileInput();
-          }
-        }}
+        aria-busy={isDisabled}
       >
         <input
           ref={fileInputRef}
@@ -229,19 +238,24 @@ export function ImageUpload({
         />
 
         <div className="flex flex-col items-center gap-3">
-          <div className="text-5xl">{isDisabled ? '⏳' : '📸'}</div>
-          <div>
-            <p className="text-lg font-semibold text-gray-700">
-              {isDisabled
-                ? 'Subiendo imágenes...'
-                : isDragging
-                  ? '¡Suelta las imágenes aquí!'
-                  : 'Arrastra imágenes o haz clic para seleccionar'}
-            </p>
-            <p className="text-sm text-gray-500 mt-1">
-              JPEG, PNG, WebP o AVIF • Máximo 10MB por archivo • Hasta {maxFiles} archivos
-            </p>
+          <div className="text-5xl" aria-hidden="true">
+            {isDisabled ? '⏳' : '📸'}
           </div>
+          <div>
+            <p className="text-lg font-semibold text-gray-700">{uploadTitle}</p>
+            <p className="text-sm text-gray-500 mt-1">{uploadHint}</p>
+          </div>
+          <button
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              triggerFileInput();
+            }}
+            disabled={isDisabled}
+            className="min-h-11 rounded-lg bg-agro-green px-4 py-2 text-sm font-semibold text-white hover:bg-agro-dark disabled:cursor-not-allowed disabled:bg-agro-green/60"
+          >
+            Seleccionar imágenes
+          </button>
         </div>
       </div>
 
@@ -273,11 +287,11 @@ export function ImageUpload({
             <p className="text-sm text-yellow-800 font-semibold">
               Validación de archivos
             </p>
-            <p className="text-sm text-yellow-600">{validationError}</p>
+            <p className="text-sm text-amber-700">{validationError}</p>
           </div>
           <button
             onClick={() => setValidationError(null)}
-            className="text-yellow-600 hover:text-yellow-800 text-sm font-semibold"
+            className="text-amber-700 hover:text-amber-800 text-sm font-semibold"
           >
             Cerrar
           </button>

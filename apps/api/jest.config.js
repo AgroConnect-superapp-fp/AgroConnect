@@ -1,6 +1,5 @@
 /** @type {import('jest').Config} */
 module.exports = {
-  preset: 'ts-jest',
   testEnvironment: 'node',
   roots: ['<rootDir>/tests'],
   testMatch: ['**/*.test.ts', '**/*.spec.ts'],
@@ -27,13 +26,22 @@ module.exports = {
       statements: 80,
     },
   },
+  /**
+   * Transformación con SWC: transpila sin verificar tipos (esa tarea la cubre
+   * `npm run typecheck`) y conserva los decoradores legacy que exige NestJS,
+   * incluida la metadata de tipos para la inyección de dependencias.
+   */
   transform: {
     '^.+\\.ts$': [
-      'ts-jest',
+      '@swc/jest',
       {
-        tsconfig: {
-          types: ['node', 'jest'],
+        jsc: {
+          parser: { syntax: 'typescript', decorators: true },
+          transform: { legacyDecorator: true, decoratorMetadata: true },
+          target: 'es2022',
+          keepClassNames: true,
         },
+        module: { type: 'commonjs' },
       },
     ],
   },

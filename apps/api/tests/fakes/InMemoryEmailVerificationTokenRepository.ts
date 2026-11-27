@@ -35,6 +35,10 @@ export class InMemoryEmailVerificationTokenRepository implements EmailVerificati
     return true;
   }
 
+  async hasRecentToken(userId: string, since: Date): Promise<boolean> {
+    return this.tokens.some((token) => token.userId === userId && token.createdAt >= since);
+  }
+
   async invalidateUserTokens(userId: string): Promise<void> {
     this.tokens = this.tokens.map((token) =>
       token.userId === userId && token.usedAt === null

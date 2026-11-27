@@ -5,12 +5,15 @@ interface WelcomeScreenProps {
   onCreateAccount: () => void;
   onLogin: () => void;
   onDemo: () => void;
+  /** Se oculta con sesión real activa para no mezclar demo y cuenta. */
+  showDemo?: boolean;
 }
 
 export function WelcomeScreen({
   onCreateAccount,
   onLogin,
   onDemo,
+  showDemo = true,
 }: WelcomeScreenProps): React.ReactElement {
   return (
     <AuthShell
@@ -43,21 +46,25 @@ export function WelcomeScreen({
           Iniciar sesión
         </Button>
 
-        <div className="flex items-center gap-3 pt-1" aria-hidden="true">
-          <span className="h-px flex-1 bg-gray-200" />
-          <span className="text-xs font-medium uppercase tracking-wide text-gray-400">
-            o
-          </span>
-          <span className="h-px flex-1 bg-gray-200" />
-        </div>
+        {showDemo && (
+          <>
+            <div className="flex items-center gap-3 pt-1" aria-hidden="true">
+              <span className="h-px flex-1 bg-gray-200" />
+              <span className="text-xs font-medium uppercase tracking-wide text-gray-400">
+                o
+              </span>
+              <span className="h-px flex-1 bg-gray-200" />
+            </div>
 
-        <Button onClick={onDemo} variant="secondary" fullWidth>
-          🚀 Explorar la demo (sin registro)
-        </Button>
-        <p className="text-center text-xs text-gray-500">
-          El registro e inicio de sesión requieren el backend local; la demo permite
-          recorrer el mercado con datos de ejemplo.
-        </p>
+            <Button onClick={onDemo} variant="secondary" fullWidth>
+              🚀 Explorar la demo (sin registro)
+            </Button>
+            <p className="text-center text-xs text-gray-500">
+              El registro e inicio de sesión requieren el backend local; la demo permite
+              recorrer el mercado con datos de ejemplo.
+            </p>
+          </>
+        )}
       </div>
     </AuthShell>
   );
