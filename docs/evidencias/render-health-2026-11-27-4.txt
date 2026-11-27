@@ -1,0 +1,16 @@
+Estado de producción — release #113
+Merge: ca2e0b1
+Servicio: agroconnect-api
+
+GET /health -> 200
+{"status":"ok","service":"agroconnect-api"}
+
+GET /health/ready -> 200
+{"status":"ok","service":"agroconnect-api","database":"up"}
+
+POST /api/v1/auth/login (credenciales inválidas) -> 401
+Lectura: autenticación y tablas base operativas.
+
+GET /api/v1/products?limit=2 -> 503
+{"success":false,"error":{"code":"SERVICE_UNAVAILABLE","message":"El servicio de datos no está disponible. Intente de nuevo más tarde."},"correlationId":"..."}
+Lectura: la ruta nueva ya está desplegada; el marketplace falla por tablas/migraciones del schema agroconnect. No es un 404 de código.
