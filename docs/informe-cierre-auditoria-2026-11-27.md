@@ -4,7 +4,7 @@
 
 ### Cierre documental y de implementación target
 
-**Versión:** 1.1  
+**Versión:** 1.2  
 **Fecha de corte:** 27 de noviembre de 2026  
 **Documento auditado:** `AgroConnect-Informe-de-brechas.pdf`  
 **Fuente auditada:** PT-MCBD-01 Manual de Configuración Base de Datos, v3.0  
@@ -50,7 +50,7 @@ La auditoría original contiene **3 hallazgos críticos** (H05, H09, H12), **11 
 - `/health` → **200**
 - `/health/ready` → **200**
 - Login con credenciales inválidas → **401**, lo que confirma que el schema de autenticación existe.
-- `/api/v1/products` → **404**, porque Render despliega `main`, que no contiene el marketplace actual. No es un fallo de Supabase.
+- `/api/v1/products` → **503**, porque el código nuevo ya está desplegado pero faltan tablas/migraciones del marketplace en el schema `agroconnect`. No es un 404 de código.
 
 **Conclusión:** procede el **cierre documental y de implementación target**. No procede declarar conformidad total de producción hasta integrar el esquema target al API y desplegar la rama correcta.
 
@@ -164,7 +164,7 @@ Validadores, TTL y `UNIQUE (conversacion_id, uuid_local)` aplicados. Se probó d
 - Supabase conectado.
 - `/health` y `/health/ready` en 200.
 - Login inválido 401.
-- `/api/v1/products` 404 por código de `main` desactualizado.
+- `/api/v1/products` 503 por tablas/migraciones pendientes en el schema `agroconnect`.
 
 ---
 
@@ -180,7 +180,7 @@ Validadores, TTL y `UNIQUE (conversacion_id, uuid_local)` aplicados. Se probó d
 | H15 datos/offline | Instalación limpia, sin migración con datos ni SQLite/IndexedDB | Ensayo con datos y app móvil |
 | H16 staging/RPO/RTO | Backup local, sin staging ni acta | Simulacro en staging y firmar RPO/RTO |
 | Integración API/Prisma | Esquema target separado del API | Adaptadores, contratos y migración |
-| `main` desactualizado | Productos 404 en producción | Fusionar PRs o desplegar rama correcta |
+| Migraciones de producción | Productos 503 en producción; `/ready` no valida tablas de negocio | Aplicar migraciones y verificar marketplace |
 
 ### 5.2 Plan inmediato
 
@@ -205,7 +205,7 @@ Validadores, TTL y `UNIQUE (conversacion_id, uuid_local)` aplicados. Se probó d
 
 ### 6.3 Cierre de producción
 
-**No procede todavía.** Producción tiene salud y base de datos, pero el código desplegado en `main` no contiene el marketplace actual. Además, H06, H11, H12, H15 y H16 conservan residuales.
+**No procede todavía.** El release #113 ya está en `main`, `/health` y `/health/ready` están en 200 y el login responde 401. El marketplace responde 503 porque faltan tablas/migraciones en el schema `agroconnect`. Además, H06, H11, H12, H15 y H16 conservan residuales.
 
 ### 6.4 Declaración
 
@@ -290,4 +290,4 @@ npm test --workspace @agroconnect/api -- --runInBand
 ---
 
 **Fin del informe.**  
-Versión 1.1 — 27/11/2026. Cierre documental y target con residuales de producción declarados.
+Versión 1.2 — 27/11/2026. Cierre documental y target con residuales de producción declarados.
