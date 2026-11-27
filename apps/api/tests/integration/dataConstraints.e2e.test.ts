@@ -1,4 +1,3 @@
-import type { Server } from 'node:http';
 import { randomUUID } from 'node:crypto';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
@@ -13,7 +12,6 @@ import { PrismaService } from '../../src/prisma/prisma.service';
  */
 describe('Data constraints (e2e)', () => {
   let app: NestExpressApplication;
-  let server: Server;
   let prisma: PrismaService;
 
   beforeAll(async () => {
@@ -22,7 +20,6 @@ describe('Data constraints (e2e)', () => {
     configureApp(app);
     app.setGlobalPrefix('api/v1', { exclude: ['health', 'health/ready'] });
     await app.init();
-    server = app.getHttpServer() as Server;
     prisma = app.get(PrismaService);
   });
 
