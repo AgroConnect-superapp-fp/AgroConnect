@@ -169,7 +169,7 @@ Sin estas decisiones, varios hallazgos no pueden cerrarse aunque se escriba docu
 | H08 | Alta | `detalle_pedido` sin UNIQUE de pedido/publicación | Implementado target: UNIQUE compuesto | Integración con API | 2 |
 | H09 | Crítica | Validación de stock no reserva ni descuenta | Implementado target: reserva y liberación atómicas | Integración con API | 2 |
 | H10 | Alta | Restricciones y triggers fuera del DDL base | Implementado target: 96 constraints | Integración con API | 1 |
-| H11 | Media | Índices sin planes de consulta comercial | Parcial: existen índices, sin EXPLAIN | Medir búsquedas, historial y cobertura; justificar índices | 1 |
+| H11 | Media | Índices sin planes de consulta comercial | Implementado target: 64 índices + 3 EXPLAIN | Repetir con volumen productivo | 1 |
 | H12 | Crítica | LWW y sincronización sin versión/reconciliación | Excluido provisional (opción A) | Acta de exclusión + ADR de versionado | 2 |
 | H13 | Alta | MongoDB sin validadores ni deduplicación por conversación | Implementado target: 6 colecciones + validadores | Integración con API | 2 |
 | H14 | Alta | `logs_actividad` sin inmutabilidad demostrada | Implementado técnico: `audit_events` + trigger + E2E | Falta firma del auditor | 1 |

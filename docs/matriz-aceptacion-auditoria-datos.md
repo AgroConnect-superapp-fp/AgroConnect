@@ -35,7 +35,7 @@ El MVP no hereda la aceptación del diseño objetivo. El diseño objetivo no se 
 | H08 | Alta | Implementación Ruta B | **Implementado target** | `UNIQUE (id_pedido,id_publicacion)` |
 | H09 | Crítica | Implementación Ruta B | **Implementado target** | Reserva atómica + liberación; prueba 7+7 y cancelación |
 | H10 | Alta | Técnica MVP | **Implementado target** | 96 constraints en esquema comercial + pruebas |
-| H11 | Media | Técnica MVP | **Parcial** | 63 índices; falta EXPLAIN con volumen |
+| H11 | Media | Técnica MVP | **Implementado target** | 64 índices; EXPLAIN de 3 consultas; pendiente volumen productivo |
 | H12 | Crítica | Implementación Ruta B | **Abierto** | Pendiente contrato/pruebas de sync |
 | H13 | Alta | Implementación Ruta B | **Implementado target** | 6 colecciones, validadores, TTL y unique por conversación; probado |
 | H14 | Alta | Técnica MVP | **Implementado técnico** | `audit_events` append-only + E2E; falta firma del auditor |

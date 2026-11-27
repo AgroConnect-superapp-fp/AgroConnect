@@ -31,6 +31,7 @@ docker exec -i agroconnect-mongo mongosh --quiet < database/commercial/mongo-ini
 - `docs/evidencias/sql/commercial-schema-2026-11-27.txt`
 - `docs/evidencias/sql/commercial-integrity-2026-11-27.txt`
 - `docs/evidencias/mongo/commercial-mongo-2026-11-27.txt`
+- `docs/evidencias/sql/commercial-explain-2026-11-27.txt`
 
 ## Límites
 
