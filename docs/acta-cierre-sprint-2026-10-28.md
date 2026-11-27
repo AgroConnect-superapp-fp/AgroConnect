@@ -19,8 +19,8 @@
 | Fecha de actualización | 26 de noviembre de 2026 (P-01) |
 | Rama y commit del PDF | `develop @ 588b234` |
 | Rama verificada | `feature/property-map-phase-2` |
-| Commit base de la verificación | `2be7ec7` |
-| Estado del árbol verificado | Código P-01 en `2be7ec7`; cierre documental en curso |
+| Commit base de la verificación | `2dca6d4` |
+| Estado del árbol verificado | Código P-01 en `2dca6d4`; cierre documental en curso |
 | PRs abiertos reportados en el PDF | 0 |
 
 ---
@@ -53,7 +53,7 @@ No forman parte de esta acta:
 
 ### 1.4 Método y fuentes
 
-La verificación se realizó sobre el repositorio local, en la rama `feature/property-map-phase-2`, con HEAD `2be7ec7` y el cierre documental en curso. Se contrastaron el PDF, el manifiesto `tools/alignment-check/manifest.json`, los ADRs de `docs/adr/`, las matrices de trazabilidad, el historial de Git, las suites de pruebas y los gates de lint, typecheck, build, arquitectura, contratos y alineación. Las cifras del PDF se conservan como estado histórico del 28/10/2026; las cifras del acta corresponden a la verificación del 17/11/2026.
+La verificación se realizó sobre el repositorio local, en la rama `feature/property-map-phase-2`, con HEAD `2dca6d4` y el cierre documental en curso. Se contrastaron el PDF, el manifiesto `tools/alignment-check/manifest.json`, los ADRs de `docs/adr/`, las matrices de trazabilidad, el historial de Git, las suites de pruebas y los gates de lint, typecheck, build, arquitectura, contratos y alineación. Las cifras del PDF se conservan como estado histórico del 28/10/2026; las cifras del acta corresponden a la verificación del 17/11/2026.
 
 ---
 
@@ -351,7 +351,7 @@ El marketplace es una vitrina: no gestiona precio, unidad ni inventario. La mode
 | D1 | Total de pruebas | 373 | 488 (421 + 53 + 14) al 17/11; 629 (456 + 155 + 18) al 26/11 | El PDF no discrimina por suite; las cifras crecieron con el port geoespacial, F3, P-01 y el mapa móvil | Usar el conteo vigente (629) en el próximo informe y conservar 488 como corte histórico |
 | D2 | E2E | 10/10 | 14/14 al 24/11; 18/18 al 26/11 | La suite se amplió con F3 y el mapa móvil | Usar 18/18 en el próximo informe |
 | D3 | Estado de la fase 0 | Resumen: fases 0–2 cerradas; tabla: fase 0 PARCIAL | Fase 0 PARCIAL | La fase 0 depende de Jira y Notion; prevalece la lectura granular | Corregir la redacción del próximo informe |
-| D4 | Commit de corte | `588b234` | `2be7ec7` | El PDF se generó en un corte anterior; el repositorio avanzó con perfiles, moderación, P-01 y correcciones | Mantener ambos como "corte PDF" y "verificación actual" |
+| D4 | Commit de corte | `588b234` | `2dca6d4` | El PDF se generó en un corte anterior; el repositorio avanzó con perfiles, moderación, P-01 y correcciones | Mantener ambos como "corte PDF" y "verificación actual" |
 | D5 | Rutas de los hallazgos | `backend/src/...` | `apps/api/src/...` | El código se movió al monorepo; la desviación ya está registrada en la fase 2.3 | Actualizar referencias en el acta; no reescribir el PDF |
 | D6 | `GET/PATCH /me` y admin | Fase 2.4: faltan | Perfiles en `84db165`; administración en P-01 | El PDF es anterior a la implementación | Fase 2.4 cerrada en backend |
 | D8 | Cobertura reportada | No reportada en el PDF; acta v1.0: 94,01 % líneas / 82,32 % ramas | 91,89 % líneas / 80,50 % ramas (API, 48 suites) | La cobertura baja al incorporar más código, pero permanece por encima del umbral del 80 % | Reportar siempre cobertura por suite y con numerador/denominador |

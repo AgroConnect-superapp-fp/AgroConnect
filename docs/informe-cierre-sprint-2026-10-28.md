@@ -23,8 +23,8 @@
 | Tipo de documento | Informe de cierre de sprint |
 | Periodo de referencia | Plan del 22/10/2026; avance al 28/10/2026; cierre verificado al 26/11/2026 |
 | Rama verificada | `feature/property-map-phase-2` |
-| Commit de corte | `2be7ec7` |
-| Estado del árbol | Código P-01 en `2be7ec7`; cierre documental en curso |
+| Commit de corte | `2dca6d4` |
+| Estado del árbol | Código P-01 en `2dca6d4`; cierre documental en curso |
 | Fuentes contrastadas | PDF de avance, plan autorizado, historial Git, ADRs, contratos OpenAPI, manifiesto de alineación, matrices de trazabilidad, suites de pruebas y gates ejecutados |
 | Documento detallado de soporte | `docs/acta-cierre-sprint-2026-10-28.md` |
 
@@ -323,7 +323,7 @@ Resultados del corte:
 | D1 | Total de pruebas | 373 | **629** (456 + 155 + 18) | Crecimiento por port geoespacial, fase 3, a11y y mapa móvil |
 | D2 | E2E | 10/10 | **18/18** | Se amplió la cobertura de rutas, mapa móvil y publicación |
 | D3 | Fases 0–2 | “cerradas” en el resumen | 0 parcial; 2.4 cerrada con P-01 | Prevalece la tabla granular del propio PDF; el trabajo posterior cerró 2.4 y dejó la fase 0 a la espera de accesos externos |
-| D4 | Commit de corte | `588b234` | `2be7ec7` | El repositorio avanzó 127 commits |
+| D4 | Commit de corte | `588b234` | `2dca6d4` | El repositorio avanzó 131 commits |
 | D5 | Rutas del backend | `backend/src/...` | `apps/api/src/...` | Monorepo y cutover a NestJS |
 | D6 | Backend | Scaffold NestJS con legacy en paralelo | NestJS canónico; legacy fuera del camino de ejecución | La migración Strangler Fig se completó |
 | D7 | Frontend cookie-only | Pendiente | Cerrado | Sin tokens en `localStorage`; refresh silencioso |
