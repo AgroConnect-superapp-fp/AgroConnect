@@ -1,0 +1,23 @@
+PLANES DE EJECUCIÓN — ESQUEMA COMERCIAL (H11)
+Fecha: 2026-11-27
+Base: agroconnect_commercial (PostgreSQL 16.4)
+Volumen: 5.001 publicaciones, 5.001 pedidos, 5.000 lotes
+
+1) Publicaciones por productor + estado + fecha
+   Índice: idx_publicaciones_actor_estado_fecha
+   Plan: Index Scan
+   Execution Time: 0.129 ms
+
+2) Pedidos por comprador + estado + fecha
+   Índice: idx_pedidos_comprador_estado_fecha
+   Plan: Index Scan
+   Execution Time: 0.065 ms
+
+3) Lotes por publicación + vencimiento
+   Antes: Seq Scan + Sort; Execution Time 1.868 ms
+   Índice: idx_lotes_publicacion_vencimiento
+   Después: Index Scan; Execution Time 0.162 ms
+   Mejora: ~11.5x
+
+Meta local: consultas prioritarias < 50 ms con índice; cumplen.
+Pendiente: repetir con volumen y datos representativos de producción.

@@ -424,3 +424,15 @@ INSERT INTO categorias (nombre_categoria, descripcion, icono) VALUES
   ('Tubérculos',   'Papa, yuca, ñame, arracacha y similares',               'tuberculos.svg'),
   ('Plátano',      'Plátano verde, hartón, dominico y banano',              'platano.svg'),
   ('Panela',       'Panela en bloque, cuadrada, granulada y derivados',     'panela.svg');
+
+-- H11: índices para consultas comerciales prioritarias.
+CREATE INDEX IF NOT EXISTS idx_publicaciones_actor_estado_fecha
+  ON publicaciones(id_usuario, estado, fecha_publicacion DESC);
+CREATE INDEX IF NOT EXISTS idx_pedidos_comprador_estado_fecha
+  ON pedidos(id_comprador, estado, fecha_pedido DESC);
+CREATE INDEX IF NOT EXISTS idx_lotes_publicacion
+  ON lotes_perecederos(id_publicacion);
+CREATE INDEX IF NOT EXISTS idx_detalle_publicacion
+  ON detalle_pedido(id_publicacion);
+CREATE INDEX IF NOT EXISTS idx_lotes_publicacion_vencimiento
+  ON lotes_perecederos(id_publicacion, fecha_vencimiento);
