@@ -4,7 +4,7 @@
 
 ### Cierre documental y de implementación target
 
-**Versión:** 1.0  
+**Versión:** 1.1  
 **Fecha de corte:** 27 de noviembre de 2026  
 **Documento auditado:** `AgroConnect-Informe-de-brechas.pdf`  
 **Fuente auditada:** PT-MCBD-01 Manual de Configuración Base de Datos, v3.0  
@@ -43,7 +43,7 @@ La auditoría original contiene **3 hallazgos críticos** (H05, H09, H12), **11 
 
 - **11 hallazgos** tienen corrección documental, target o local con evidencia.
 - **5 hallazgos** conservan residuales de producción o integración: H06, H11, H12, H15 y H16.
-- **Ningún hallazgo tiene certificación firmada por el auditor externo.**
+- **Este es un informe de avance/cierre del ejercicio SENA; no requiere firma de auditor externo.**
 
 ### Estado de producción
 
@@ -82,7 +82,7 @@ El informe cubre:
 
 ### 2.3 Regla de cierre
 
-Un hallazgo se considera **atendido** cuando tiene acción, evidencia y residual identificado. Se considera **certificado** solo cuando el auditor externo firma. Este informe distingue ambos conceptos.
+Un hallazgo se considera **atendido** cuando tiene acción, evidencia y residual identificado. No se exige certificación externa para este ejercicio; el informe deja constancia de acciones, evidencias y residuales.
 
 ---
 
@@ -90,10 +90,10 @@ Un hallazgo se considera **atendido** cuando tiene acción, evidencia y residual
 
 | ID | Severidad | Estado de cierre | Respuesta aplicada | Evidencia | Residual |
 | --- | --- | --- | --- | --- | --- |
-| H01 | Alta | Cerrado documental | Matriz de aceptación con capas MVP, target y backlog | `docs/matriz-aceptacion-auditoria-datos.md` | Firma del auditor |
-| H02 | Alta | Cerrado | R19 corregida a transportistas y R21 a publicaciones; rutas indirectas y FK documentadas | PT-MCBD-01 actualizado | Firma del auditor |
+| H01 | Alta | Cerrado documental | Matriz de aceptación con capas MVP, target y backlog | `docs/matriz-aceptacion-auditoria-datos.md` | — |
+| H02 | Alta | Cerrado | R19 corregida a transportistas y R21 a publicaciones; rutas indirectas y FK documentadas | PT-MCBD-01 actualizado | — |
 | H03 | Media | Cerrado local | Matriz de ambientes y instalación limpia con 13 migraciones | `docs/matriz-ambientes-datos.md`; `clean-install-docker` | Staging/producción |
-| H04 | Alta | Cerrado | `latitud`/`longitud` y cuatro campos de consentimiento dentro del DDL | PT-MCBD-01 actualizado | Firma del auditor |
+| H04 | Alta | Cerrado | `latitud`/`longitud` y cuatro campos de consentimiento dentro del DDL | PT-MCBD-01 actualizado | — |
 | H05 | Crítica | Cerrado target | 17 políticas RLS, funciones anti-recursión y RLS financiero | `database/commercial/security*.sql`; `commercial-rls-finance` | Integración con API |
 | H06 | Alta | Parcial | RLS financiero probado: soporte no ve transacciones; comprador y admin sí | `docs/evidencias/sql/commercial-rls-finance-2026-11-27.txt` | TLS de staging |
 | H07 | Alta | Cerrado target | Varios envíos por pedido y trigger de pedido con ítems | `database/commercial/integrity.sql` | Integración con API |
@@ -181,7 +181,6 @@ Validadores, TTL y `UNIQUE (conversacion_id, uuid_local)` aplicados. Se probó d
 | H16 staging/RPO/RTO | Backup local, sin staging ni acta | Simulacro en staging y firmar RPO/RTO |
 | Integración API/Prisma | Esquema target separado del API | Adaptadores, contratos y migración |
 | `main` desactualizado | Productos 404 en producción | Fusionar PRs o desplegar rama correcta |
-| Firma del auditor | No hay certificación externa | Reauditoría y firma |
 
 ### 5.2 Plan inmediato
 
@@ -190,7 +189,7 @@ Validadores, TTL y `UNIQUE (conversacion_id, uuid_local)` aplicados. Se probó d
 3. Integrar el esquema commercial al API.
 4. Completar H12 con sync Mongo/offline.
 5. Ejecutar H15 con datos y H16 en staging.
-6. Reauditoría y firma.
+6. Revisión final del equipo y del instructor.
 
 ---
 
@@ -210,18 +209,28 @@ Validadores, TTL y `UNIQUE (conversacion_id, uuid_local)` aplicados. Se probó d
 
 ### 6.4 Declaración
 
-El proyecto declara **atendidos documentalmente y en target** los 16 hallazgos, con residuales explícitos. No declara que los 16 estén certificados en producción.
+El proyecto declara **atendidos documentalmente y en target** los 16 hallazgos, con residuales explícitos. No declara conformidad total de producción.
 
 ---
 
-## 7. Aprobaciones
+## 7. Equipo del proyecto y aprobaciones
+
+### 7.1 Integrantes
+
+| Integrante | Rol |
+| --- | --- |
+| Nelson Fabián Gallego Sánchez | Scrum Master / Arquitectura |
+| Juan David Ferrer Castillo | Product Owner |
+| Santiago Palacio Tovar | Desarrollador |
+
+### 7.2 Aprobaciones
 
 | Rol | Nombre | Firma | Fecha |
 | --- | --- | --- | --- |
-| Elaboró — Arquitectura / Datos |  |  |  |
-| Revisó — QA |  |  |  |
+| Elaboró — Arquitectura / Datos | Nelson Fabián Gallego Sánchez |  |  |
+| Revisó — Product Owner | Juan David Ferrer Castillo |  |  |
+| Revisó — Desarrollo | Santiago Palacio Tovar |  |  |
 | Aprobó — Instructor SENA |  |  |  |
-| Aprobó — Auditor |  |  |  |
 
 ---
 
@@ -281,4 +290,4 @@ npm test --workspace @agroconnect/api -- --runInBand
 ---
 
 **Fin del informe.**  
-Versión 1.0 — 27/11/2026. Cierre documental y target con residuales de producción declarados.
+Versión 1.1 — 27/11/2026. Cierre documental y target con residuales de producción declarados.
