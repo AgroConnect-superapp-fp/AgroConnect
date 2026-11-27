@@ -23,7 +23,7 @@
     "diagnose:prod": "node scripts/diagnose-production.mjs"
   },
   "devDependencies": {
-    "turbo": "^2.11.10",
+    "turbo": "^2.11.13",
     "typescript": "^5.7.3"
   },
   "overrides": {
