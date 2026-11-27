@@ -150,3 +150,27 @@ CREATE TRIGGER tg_alertas_vencimiento
 AFTER INSERT ON lotes_perecederos
 FOR EACH ROW EXECUTE FUNCTION fn_generar_alertas_vencimiento();
 
+
+-- H06: datos financieros. Solo el comprador propietario y el administrador.
+ALTER TABLE transacciones_pago ENABLE ROW LEVEL SECURITY;
+ALTER TABLE conciliaciones_dian ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY comprador_transacciones ON transacciones_pago
+  FOR SELECT TO agroconnect_app
+  USING (id_pedido IN (
+    SELECT id_pedido FROM pedidos
+    WHERE id_comprador = current_setting('app.current_user_id')::BIGINT
+  ));
+
+CREATE POLICY admin_transacciones ON transacciones_pago
+  FOR ALL TO agroconnect_admin USING (true);
+
+CREATE POLICY admin_conciliaciones ON conciliaciones_dian
+  FOR ALL TO agroconnect_admin USING (true);
+
+GRANT SELECT, INSERT, UPDATE ON transacciones_pago TO agroconnect_app;
+GRANT SELECT ON conciliaciones_dian TO agroconnect_app;
+
+-- Administración: privilegios de lectura/operación del esquema comercial.
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO agroconnect_admin;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO agroconnect_admin;

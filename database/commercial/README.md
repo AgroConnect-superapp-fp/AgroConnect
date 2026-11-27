@@ -8,6 +8,8 @@
 | --- | --- |
 | `schema.sql` | 24 tablas PostgreSQL 16, enums, restricciones e índices |
 | `security.sql` | roles mínimos, RLS y políticas por actor, GRANT |
+| `security-rls-fix.sql` | funciones SECURITY DEFINER y políticas sin recursión |
+| `security-finance.sql` | RLS financiero: comprador propietario y administrador |
 | `integrity.sql` | H07–H09: pedido con ítems, stock atómico y liberación al cancelar |
 | `mongo-init.js` | 6 colecciones MongoDB con validadores, índices, TTL y deduplicación |
 | `verify.sql` | conteos y verificaciones de aceptación |

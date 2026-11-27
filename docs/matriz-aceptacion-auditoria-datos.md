@@ -29,15 +29,15 @@ El MVP no hereda la aceptación del diseño objetivo. El diseño objetivo no se 
 | H02 | Alta | Documental | **En cierre** | Corrección R19/R21 en anexo Notion |
 | H03 | Media | Documental/técnica | **Parcial** | `docs/matriz-ambientes-datos.md`; instalación limpia local OK; staging/producción pendientes |
 | H04 | Alta | Documental | **En cierre** | Diccionario conceptual/físico en anexo Notion |
-| H05 | Crítica | Implementación RLS | **Implementado target** | 14 políticas RLS + GRANT; falta integrar sesión de app |
-| H06 | Alta | Técnica MVP | **Parcial** | Pruebas de roles/TLS pendientes |
+| H05 | Crítica | Implementación RLS | **Implementado target** | 17 políticas RLS + funciones anti-recursión + GRANT |
+| H06 | Alta | Técnica MVP | **Parcial** | RLS financiero y denegación a soporte probados; TLS de staging pendiente |
 | H07 | Alta | Implementación Ruta B | **Implementado target** | 24 tablas; varios envíos; trigger de ítems |
 | H08 | Alta | Implementación Ruta B | **Implementado target** | `UNIQUE (id_pedido,id_publicacion)` |
 | H09 | Crítica | Implementación Ruta B | **Implementado target** | Reserva atómica + liberación; prueba 7+7 y cancelación |
 | H10 | Alta | Técnica MVP | **Implementado target** | 96 constraints en esquema comercial + pruebas |
 | H11 | Media | Técnica MVP | **Parcial** | 63 índices; falta EXPLAIN con volumen |
 | H12 | Crítica | Implementación Ruta B | **Abierto** | Pendiente contrato/pruebas de sync |
-| H13 | Alta | Implementación Ruta B | **Implementado target** | 6 colecciones, validadores, TTL y unique por conversación |
+| H13 | Alta | Implementación Ruta B | **Implementado target** | 6 colecciones, validadores, TTL y unique por conversación; probado |
 | H14 | Alta | Técnica MVP | **Implementado técnico** | `audit_events` append-only + E2E; falta firma del auditor |
 | H15 | Alta | Implementación Ruta B | **Abierto** | Instalación limpia local OK; falta migración con datos y offline |
 | H16 | Alta | Técnica MVP | **Parcial** | ADR-028; restauración local OK; falta RPO/RTO de producción |

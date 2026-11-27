@@ -1,0 +1,29 @@
+BEGIN
+INSERT 0 1
+SET
+SET
+         ?column?          
+---------------------------
+ comprador_transacciones=1
+(1 row)
+
+SET
+        ?column?         
+-------------------------
+ soporte_transacciones=0
+(1 row)
+
+        ?column?         
+-------------------------
+ soporte_publicaciones=0
+(1 row)
+
+RESET
+SET
+       ?column?        
+-----------------------
+ admin_transacciones=1
+(1 row)
+
+RESET
+COMMIT

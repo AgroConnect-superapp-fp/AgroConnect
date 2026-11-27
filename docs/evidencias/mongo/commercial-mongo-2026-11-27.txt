@@ -1,4 +1,3 @@
-Colecciones: notificaciones, estadisticas_agregadas, eventos_sincronizacion, conversaciones, mensajes, logs_actividad
-Mensajes: 2
-Indices mensajes: _id_, uk_mensaje_por_conversacion
-Validador mensajes: {"$jsonSchema":{"bsonType":"object","required":["conversacion_id","uuid_local","contenido","fecha"],"properties":{"conversacion_id":{"bsonType":["long","int"]},"uuid_local":{"bsonType":"string"},"contenido":{"bsonType":"string","maxLength":4000},"fecha":{"bsonType":"date"}}}}
+collections=notificaciones,estadisticas_agregadas,eventos_sincronizacion,conversaciones,mensajes,logs_actividad
+mensajes=2
+indexes=_id_,uk_mensaje_por_conversacion

@@ -163,7 +163,7 @@ Sin estas decisiones, varios hallazgos no pueden cerrarse aunque se escriba docu
 | H02 | Alta | R19/R21 no coinciden entre MER, diccionario y DDL | Abierto documental | Corregir MER, cardinalidades, diccionario y rutas indirectas | 0 |
 | H03 | Media | Falta ficha reproducible por ambiente | Parcial: hay guía de despliegue, no matriz completa | Matriz de ambientes + instalación limpia | 1 |
 | H04 | Alta | `ubicacion_geo` vs `latitud/longitud`; consentimiento en ALTER separado | Parcial: el esquema real mezcla `coordinates`, `lat/lng`, `centroid/geom` | Diccionario conceptual/físico + orden de migración | 0 |
-| H05 | Crítica | RLS incompleto para productor/pedidos/lotes | Implementado target: 14 políticas RLS | Integración con sesión de app | 1 |
+| H05 | Crítica | RLS incompleto para productor/pedidos/lotes | Implementado target: 17 políticas RLS y funciones anti-recursión | Integración con sesión de app | 1 |
 | H06 | Alta | Acceso, secretos y TLS sin evidencia por perfil | Parcial: auth y TLS documentados, sin pruebas de matriz | Pruebas positivas/negativas por rol + evidencia TLS | 1 |
 | H07 | Alta | Pedido sin ítems y envío único; unidad de despacho | Implementado target: varios envíos y trigger de ítems | Integración con API | 2 |
 | H08 | Alta | `detalle_pedido` sin UNIQUE de pedido/publicación | Implementado target: UNIQUE compuesto | Integración con API | 2 |
