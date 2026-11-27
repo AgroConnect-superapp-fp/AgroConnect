@@ -71,7 +71,7 @@ El MVP no hereda la aceptación del diseño objetivo. El diseño objetivo no se 
 | Políticas RLS | 0 | `docs/evidencias/sql/inventario-2026-11-26-rls.txt` |
 | MongoDB | 0 colecciones | No existe dependencia |
 | Auditoría inmutable | 0 tablas | Solo Pino |
-| Pruebas | 456 API · 155 frontend · 18 E2E | Cierre 26/11/2026 |
+| Pruebas | 462 API · 155 frontend · 18 E2E | Cierre 26/11/2026 |
 | Instalación limpia | 13 tablas, PostGIS 3.4.3, 26 constraints, 39 índices | `docs/evidencias/sql/instalacion-limpia-2026-11-26.txt` |
 | Restauración | 14 tablas, 27 constraints, 40 índices, 0 RLS | `docs/evidencias/sql/restauracion-2026-11-26.txt` |
 

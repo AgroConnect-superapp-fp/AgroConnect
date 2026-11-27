@@ -120,7 +120,7 @@ No incluye:
 | Sincronización offline | **No implementada** | M14 sigue en backlog |
 | Auditoría inmutable | **No implementada** | Solo logs Pino; no existe tabla `audit_events` |
 | Autorización actual | API: `SessionAuthGuard`, `RolesGuard`, casos de uso | `apps/api/src/modules/identity` |
-| Pruebas actuales | 456 API, 155 frontend, 18 E2E | Gates del cierre 26/11/2026 |
+| Pruebas actuales | 462 API, 155 frontend, 18 E2E | Gates del cierre 26/11/2026 |
 | Backups | Runbooks documentados; restauración no ensayada en esta iteración | `docs/runbook-*.md` |
 
 **Conclusión:** el sistema real es un MVP de identidad, perfiles, marketplace y geoespacial; el manual auditado describe un sistema comercial más amplio. La matriz de aceptación debe reflejarlo.
