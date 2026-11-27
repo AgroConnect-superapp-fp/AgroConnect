@@ -22,6 +22,8 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
+      // El registro del SW no debe bloquear el primer paint (LCP).
+      injectRegister: 'script-defer',
       includeAssets: [
         'favicon.svg',
         'favicon.ico',
@@ -52,7 +54,9 @@ export default defineConfig({
       },
       workbox: {
         cleanupOutdatedCaches: true,
-        globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
+        // El precache final lo genera scripts/generate-sw.mjs después del build;
+        // Workbox no puede globear los assets en este entorno.
+        globPatterns: [],
         navigateFallback: '/index.html',
         runtimeCaching: [
           {
@@ -113,17 +117,9 @@ export default defineConfig({
               return 'vendor-react';
             }
 
-            // Mapping libraries (~220KB)
-            if (
-              id.includes('/leaflet/') ||
-              id.includes('/react-leaflet/') ||
-              id.includes('/leaflet-draw/') ||
-              id.includes('/leaflet.heat/') ||
-              id.includes('/leaflet-geosearch/') ||
-              id.includes('/react-leaflet-markercluster/')
-            ) {
-              return 'vendor-leaflet';
-            }
+            // Leaflet y sus plugins no se agrupan a mano: viven en el chunk
+            // lazy de `PropertyMap` y solo se descargan al abrir el mapa. Un
+            // chunk manual los precargaba en el entry y retrasaba el LCP.
 
             // Image processing (~50KB)
             if (id.includes('/@cloudinary/')) {

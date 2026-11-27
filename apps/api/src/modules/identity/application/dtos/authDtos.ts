@@ -7,6 +7,8 @@
  * de `@agroconnect/contracts` en la capa de presentación).
  */
 import type { RoleName } from '../../domain/entities/Role';
+import type { CompanyType } from '../../domain/entities/CompanyProfile';
+import type { VehicleType } from '../../domain/entities/TransporterProfile';
 
 export interface RegisterUserInput {
   nombre: string;
@@ -26,6 +28,18 @@ export interface RegisterUserInput {
     razonSocial: string;
     nit: string;
     direccion?: string;
+    tipoEmpresa?: CompanyType;
+    departamento?: string;
+    municipio?: string;
+  };
+  transportista?: {
+    tipoVehiculo: VehicleType;
+    placa: string;
+    capacidadKg: number;
+    cobertura: string[];
+    cadenaFrio: boolean;
+    soatVence: string;
+    licenciaVence: string;
   };
   aceptaTratamientoDatos: boolean;
 }

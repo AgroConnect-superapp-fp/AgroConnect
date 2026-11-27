@@ -45,6 +45,14 @@ export class PrismaEmailVerificationTokenRepository implements EmailVerification
     return result.count === 1;
   }
 
+  async hasRecentToken(userId: string, since: Date): Promise<boolean> {
+    const token = await this.prisma.emailVerificationToken.findFirst({
+      where: { userId, createdAt: { gte: since } },
+      select: { id: true },
+    });
+    return token !== null;
+  }
+
   async invalidateUserTokens(userId: string): Promise<void> {
     await this.prisma.emailVerificationToken.updateMany({
       where: { userId, usedAt: null },

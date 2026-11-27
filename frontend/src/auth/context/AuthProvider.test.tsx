@@ -2,6 +2,8 @@
 import { StrictMode, type ReactElement } from 'react';
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { queryClient } from '../../shared/api/queryClient';
+import { queryKeys } from '../../shared/api/queryKeys';
 import { authApi } from '../api/authClient';
 import type { AuthSession } from '../types';
 import { AuthProvider } from './AuthProvider';
@@ -92,6 +94,7 @@ describe('AuthProvider (sesión cookie-only)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
+    queryClient.clear();
   });
 
   it('el montaje sin cookie válida deja la sesión anónima sin tocar localStorage', async () => {
@@ -147,8 +150,52 @@ describe('AuthProvider (sesión cookie-only)', () => {
     expectNothingPersisted();
   });
 
-  it('la sesión demo vive solo en memoria y su cierre no llama a la API', async () => {
+  it('el logout vacía la caché de datos del usuario anterior', async () => {
     mockedRefresh.mockRejectedValue(new Error('sin cookie'));
+    mockedLogin.mockResolvedValue(session);
+    mockedLogout.mockResolvedValue(undefined);
+
+    mountAuth();
+    await waitFor(() =>
+      expect(screen.getByTestId('status').textContent).toBe('anonymous')
+    );
+    await click('login');
+    await waitFor(() =>
+      expect(screen.getByTestId('status').textContent).toBe('authenticated')
+    );
+
+    queryClient.setQueryData(queryKeys.profile.me(), { usuario: session.usuario });
+    await click('logout');
+
+    await waitFor(() =>
+      expect(screen.getByTestId('status').textContent).toBe('anonymous')
+    );
+    expect(queryClient.getQueryData(queryKeys.profile.me())).toBeUndefined();
+  });
+
+  it('una sesión expirada también vacía la caché de datos', async () => {
+    mockedRefresh.mockResolvedValue(session);
+
+    mountAuth();
+    await waitFor(() =>
+      expect(screen.getByTestId('status').textContent).toBe('authenticated')
+    );
+
+    queryClient.setQueryData(queryKeys.profile.me(), { usuario: session.usuario });
+    await act(async () => {
+      window.dispatchEvent(new Event('agroconnect:session-expired'));
+    });
+
+    await waitFor(() =>
+      expect(screen.getByTestId('status').textContent).toBe('anonymous')
+    );
+    expect(queryClient.getQueryData(queryKeys.profile.me())).toBeUndefined();
+  });
+
+  it('la sesión demo vive solo en memoria y su cierre revoca una cookie real residual', async () => {
+    mockedRefresh.mockRejectedValue(new Error('sin cookie'));
+    // Aunque la revocación falle, la demo debe poder cerrarse localmente.
+    mockedLogout.mockRejectedValue(new Error('sin cookie'));
 
     mountAuth();
     await waitFor(() =>
@@ -165,8 +212,30 @@ describe('AuthProvider (sesión cookie-only)', () => {
     await waitFor(() =>
       expect(screen.getByTestId('status').textContent).toBe('anonymous')
     );
-    expect(mockedLogout).not.toHaveBeenCalled();
+    expect(mockedLogout).toHaveBeenCalledTimes(1);
     expectNothingPersisted();
+  });
+
+  it('no permite reemplazar una sesión real por la demo', async () => {
+    mockedRefresh.mockRejectedValue(new Error('sin cookie'));
+    mockedLogin.mockResolvedValue(session);
+
+    mountAuth();
+    await waitFor(() =>
+      expect(screen.getByTestId('status').textContent).toBe('anonymous')
+    );
+
+    await click('login');
+    await waitFor(() =>
+      expect(screen.getByTestId('status').textContent).toBe('authenticated')
+    );
+    expect(screen.getByTestId('usuario').textContent).toBe('María Fernanda López');
+
+    await click('demo');
+
+    expect(screen.getByTestId('status').textContent).toBe('authenticated');
+    expect(screen.getByTestId('usuario').textContent).toBe('María Fernanda López');
+    expect(mockedLogout).not.toHaveBeenCalled();
   });
 
   it('en StrictMode el refresh silencioso del montaje se ejecuta una sola vez', async () => {

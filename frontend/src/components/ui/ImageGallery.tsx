@@ -318,9 +318,9 @@ export function ImageGallery({
         <div
           className={`absolute top-2 right-2 px-2 py-1 rounded text-xs font-semibold ${
             currentImage.moderationStatus === 'approved'
-              ? 'bg-green-500 text-white'
+              ? 'bg-green-700 text-white'
               : currentImage.moderationStatus === 'rejected'
-                ? 'bg-red-500 text-white'
+                ? 'bg-red-700 text-white'
                 : 'bg-yellow-500 text-black'
           }`}
           aria-label={`Estado de moderación: ${currentImage.moderationStatus}`}

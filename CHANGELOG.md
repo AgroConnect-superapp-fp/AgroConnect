@@ -7,6 +7,124 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+### Añadido
+
+- **Subida firmada a Cloudinary:** `POST /api/v1/uploads/signature`
+  (productor/administrador) emite `timestamp`, `folder` por usuario,
+  `allowed_formats` y firma SHA-1; el `api_secret` nunca llega al frontend.
+  Sin credenciales Cloudinary el endpoint responde 503.
+- **Edición de imágenes por propietario:** `PATCH /api/v1/products/:id`
+  reemplaza hasta 6 imágenes; el caso de uso valida rol, propiedad (BOLA) y
+  existencia. El modal guarda las imágenes en PostgreSQL y actualiza la galería.
+- **Multi-imagen:** el modal ahora notifica solo las imágenes nuevas y evita
+  duplicados al re-renderizar.
+
+- **Perfil autenticado (`GET/PATCH /api/v1/profile/me`):** consulta y edición
+  del perfil del rol en sesión (finca, empresa o transportista), con contrato
+  Zod/OpenAPI, autorización por rol, persistencia Prisma/PostGIS y pantalla
+  `ProfileScreen` accesible desde el panel. El NIT, el rol y los identificadores
+  no son editables. 297 pruebas backend (94.01 % líneas, 82.32 % ramas) y
+  14/14 E2E.
+
+- **Marketplace sobre API propia (2.3a):** modelo Prisma `Product` con enums de
+  cultivo/certificación, imágenes/coordenadas JSONB, checks e índices;
+  `GET /api/v1/products` con búsqueda, filtros y paginación; contrato Zod y
+  OpenAPI en `@agroconnect/contracts`; seed idempotente de 10 productos.
+- **Publicación de productos (2.3b):** `POST /api/v1/products` con
+  `SessionAuthGuard` (cookie httpOnly, usuario activo y correo verificado),
+  autorización productor/administrador y `producerId` tomado de la sesión;
+  formulario `PublishProductScreen` con carga de imágenes a Cloudinary.
+- **ADR-019:** decisión de retirar Supabase/PostgREST del marketplace y usar la
+  API NestJS como única puerta de lectura.
+- **Perfiles de empresa y transportista (2c):** `company_profiles` ampliado con
+  tipo, departamento y municipio; `transporter_profiles` con vehículo, placa
+  única, capacidad, cobertura, cadena de frío y vigencias; registro UI y
+  validación de dominio.
+- **ADR-020:** decisión de perfiles operativos para empresa y transportista.
+- **PWA/precache:** el build genera el service worker final después de Vite, con `index.html`, JS, CSS e imágenes; se elimina el precache vacío de Workbox.
+- **Rate limit y 503:** `POST /products` limita a 10 publicaciones/minuto; los fallos de conexión Prisma responden 503 `SERVICE_UNAVAILABLE`.
+- **Gate de accesibilidad (D9):** `e2e/a11y.spec.ts` con axe sobre marketplace
+  y modal; se corrigieron contrastes de badges, productividad, botón de
+  reintento y semántica del dropzone de imágenes.
+- **Fix build PWA:** `scripts/generate-sw.mjs` calcula el tamaño real del
+  precache; el build ya no falla por `totalBytes` y reporta 20 entradas.
+- **Despliegue PostgreSQL propio:** runbook operativo y script
+  `npm run smoke:cloudinary` para validar credenciales firmadas sin subir PII; acepta variables separadas o `CLOUDINARY_URL`.
+- **Moderación previa de productos:** `Product.moderationStatus`
+  (`pending/approved/rejected`), publicación en `pending`, catálogo público
+  solo con `approved`, `GET /products/pending` y
+  `PATCH /products/:id/moderation` para administradores, y aviso al productor.
+- **Decisiones de producto:** marketplace vitrina sin precio/inventario
+  (ADR-022) y moderación previa (ADR-023); D7 aprobada por Fabián Gallego.
+- **UI de moderación:** pantalla `ModerationScreen` en el panel administrador
+  para listar pendientes y aprobar/rechazar.
+- **Provisión de administradores:** script `create:admin` idempotente y seguro
+  para crear la cuenta que opera la moderación, sin auto-registro.
+
+### Corregido
+
+- **Migraciones y runtime alineados:** el CLI de Prisma recibe `DATABASE_SCHEMA`
+  como `?schema=...`; se evita migrar a `public` mientras la API lee
+  `agroconnect`.
+- **Sesión:** refresh automático ante 401, logout que no oculta fallos del
+  servidor, normalización de body vacío en refresh/logout y ventana de gracia
+  para rotaciones concurrentes entre pestañas.
+- **Imágenes:** `moderationStatus` se fuerza a `pending` para productores,
+  se valida que el `publicId` pertenezca a su carpeta y se limitan longitudes
+  de metadatos.
+- **Marketplace:** catálogo vacío ya no activa datos demo; el fallback solo
+  aparece ante un error real. El modal no descarta imágenes silenciosamente.
+- **Contratos/CI:** `productivity` es entero, OpenAPI documenta el sobre real y
+  los códigos 202, el frontend ejecuta sus 53 unitarios en CI y el manifiesto
+  de alineación queda en 297/53/14.
+- **Endurecimiento:** rate limit en lecturas públicas, `Cache-Control: no-store`
+  en auth/perfil, transacción en actualización de coordenadas y mapeo de
+  `P2025` a 404.
+- **Anti email bombing:** cooldown por cuenta en recuperación de contraseña
+  (5 min) y reenvío de verificación (60 s), además del rate limit por IP.
+- **Minimización de datos:** `GET /products` ya no expone `producerId` y
+  `GET /plots/nearby` ya no expone `farmerId`.
+
+### Cambiado
+
+- **Versiones del monorepo:** `package.json`, `apps/api` y `frontend` se
+  alinean con la release `v1.1.2`; `@agroconnect/contracts` conserva su versión
+  interna `0.1.0`.
+
+- **Marketplace frontend:** `services/productsApi.ts` reemplaza
+  `services/supabase.ts`; se elimina `@supabase/supabase-js` del bundle y del
+  lockfile. El fallback demo se activa si la API no responde. 246 tests backend
+  (83.59 % ramas), 49 unitarios frontend y 14 pruebas E2E.
+- **PropertyMap Fase 2:** `useMapViewport`, `useMapSearch`, `useMapDrawing` y
+  `usePropertySelection` extraídos, junto con los puentes `MapViewport` /
+  `MapDrawing` y los helpers `mapUtils` / `mapSearchUtils`; 952 → 601 líneas,
+  sin cambio de comportamiento. 42 tests unitarios frontend y E2E 10/10.
+- **PropertyMap Fase 3:** `PropertyMapCanvas`, `PropertyMapToolbar` y
+  `PropertyMapSidebar` extraídos; `PropertyMap` queda en 69 líneas como
+  composición. Se preserva el orden de controles Leaflet y el comportamiento
+  de búsqueda, capas, clusters y popups. 42 unitarios, lint, typecheck, build y
+  E2E 10/10 verdes; screenshot del mapa validado.
+- **PropertyMap Fase 4:** popup del marcador corregido, `MapLegend` con
+  jerarquía `h3`, `PropertyPopup` accesible (`role="region"`, foco y
+  `aria-label`) y auditoría axe 4.10.2 con **0 violaciones** en marketplace y
+  popup. `PropertyMap` queda en 42.83 kB (11.71 kB gzip); E2E 10/10.
+
+### Corregido
+
+- **Popup del mapa:** se eliminó `width: auto !important`, que anulaba el ancho
+  calculado por Leaflet, y la animación dejó de tocar `transform` para no pisar
+  el `translate3d` inline. El contenido usa `max-height: min(65vh, 560px)` con
+  scroll interno; el popup queda dentro del mapa (451×560 px sobre 1184×800 px).
+- **Fallback del marketplace:** `fetchProducts` acota la consulta a 5 s y
+  devuelve `[]` ante cualquier error; la UI muestra los datos de demostración en
+  lugar de quedar en `LoadingScreen`.
+- **Migración de productos:** el SQL generado por Prisma eliminaba los índices
+  GIST de PostGIS por drift; se corrigió para preservarlos y se restauraron en
+  la base de pruebas.
+- **ADR-018:** la evidencia del bloqueo de NestJS 12 se corrigió: el impedimento
+  es ESM-only en `@nestjs/common/core/platform-express` 12, no los peers de
+  `@nestjs/config` ni `@nestjs/jwt`, que ya aceptan 12.
+
 ## [1.1.2] — 2026-11-03
 
 ### Añadido

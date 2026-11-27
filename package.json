@@ -1,6 +1,6 @@
 {
   "name": "agroconnect",
-  "version": "1.0.0",
+  "version": "1.1.2",
   "private": true,
   "description": "Monorepo de AgroConnect — plataforma B2B+B2C agropecuaria para Colombia rural (SENA ADSO, Ficha 3292136). ADR-015: npm workspaces + Turborepo, desarrollo contract-first",
   "workspaces": [
@@ -20,13 +20,21 @@
     "dev": "turbo run dev",
     "generate:openapi": "npm run generate:openapi --workspace @agroconnect/contracts",
     "check:drift": "npm run check:drift --workspace @agroconnect/contracts",
-    "diagnose:prod": "node scripts/diagnose-production.mjs"
+    "diagnose:prod": "node scripts/diagnose-production.mjs",
+    "smoke:cloudinary": "node scripts/smoke-cloudinary.mjs"
   },
   "devDependencies": {
     "turbo": "^2.11.13",
     "typescript": "^5.7.3"
   },
   "overrides": {
+    "glob": "^14.0.6",
+    "rimraf": {
+      "glob": "^7.2.3"
+    },
+    "workbox-build": {
+      "glob": "^14.0.6"
+    },
     "deepmerge-ts": "^8.0.0",
     "mysql2": "^3.23.1",
     "multer": "^2.5.0",

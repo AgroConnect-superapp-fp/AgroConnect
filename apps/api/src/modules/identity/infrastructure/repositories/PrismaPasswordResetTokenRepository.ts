@@ -45,6 +45,14 @@ export class PrismaPasswordResetTokenRepository implements PasswordResetTokenRep
     return result.count === 1;
   }
 
+  async hasRecentToken(userId: string, since: Date): Promise<boolean> {
+    const token = await this.prisma.passwordResetToken.findFirst({
+      where: { userId, createdAt: { gte: since } },
+      select: { id: true },
+    });
+    return token !== null;
+  }
+
   async invalidateUserTokens(userId: string): Promise<void> {
     await this.prisma.passwordResetToken.updateMany({
       where: { userId, usedAt: null },

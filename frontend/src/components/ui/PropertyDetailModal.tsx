@@ -13,17 +13,20 @@
  * @see https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/
  */
 
-import React, { useEffect, useCallback } from 'react';
-import type { Property } from '../../types/property';
+import React, { useEffect, useCallback, useState } from 'react';
+import type { Property, PropertyImage } from '../../types/property';
 import { getCropInfo, getCertificationInfo } from '../../types/property';
 import { getCropFallbackImage } from '../../data/fallbackImages';
-import { devLog } from '../../utils/devLog';
+import { getContrastTextColor } from '../../utils/colorContrast';
+import { updateProductImages } from '../../services/productsApi';
+import { ApiError } from '../../services/apiClient';
 import { ImageGallery } from './ImageGallery';
 import { ImageUpload } from './ImageUpload';
 
 interface PropertyDetailModalProps {
   property: Property;
   onClose: () => void;
+  onPropertyUpdated?: (property: Property) => void;
 }
 
 /**
@@ -33,7 +36,12 @@ interface PropertyDetailModalProps {
 export function PropertyDetailModal({
   property,
   onClose,
+  onPropertyUpdated,
 }: PropertyDetailModalProps): React.ReactElement {
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [savingImages, setSavingImages] = useState(false);
+  const existingImageCount = property.images?.length ?? 0;
+  const remainingImageSlots = Math.max(0, 6 - existingImageCount);
   const cropInfo = getCropInfo(property.crop);
   const certificationInfo = getCertificationInfo(property.certification);
 
@@ -45,6 +53,43 @@ export function PropertyDetailModal({
   const galleryTitle = masculineNouns.includes(propertyType)
     ? `Galería del ${propertyType}`
     : `Galería de la ${propertyType}`;
+
+  const handleImagesUploaded = useCallback(
+    async (newImages: PropertyImage[]): Promise<void> => {
+      if (newImages.length === 0 || savingImages) return;
+
+      if (existingImageCount + newImages.length > 6) {
+        setUploadError(
+          `Solo puedes tener 6 imágenes por producto. Te quedan ${remainingImageSlots} espacios.`
+        );
+        return;
+      }
+
+      setSavingImages(true);
+      setUploadError(null);
+      try {
+        const images = [...(property.images ?? []), ...newImages];
+        const updated = await updateProductImages(property.id, images);
+        onPropertyUpdated?.(updated);
+      } catch (error) {
+        setUploadError(
+          error instanceof ApiError
+            ? error.message
+            : 'No fue posible guardar las imágenes en el producto.'
+        );
+      } finally {
+        setSavingImages(false);
+      }
+    },
+    [
+      existingImageCount,
+      onPropertyUpdated,
+      property.id,
+      property.images,
+      remainingImageSlots,
+      savingImages,
+    ]
+  );
 
   // Close on Escape key press (WCAG accessibility requirement)
   const handleKeyDown = useCallback(
@@ -109,18 +154,33 @@ export function PropertyDetailModal({
               <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
                 📤 Subir Nuevas Fotos
               </h3>
-              <ImageUpload
-                folder={`properties/${property.id}`}
-                tags={[property.crop, property.department.toLowerCase()]}
-                maxFiles={5}
-                onImagesUploaded={(newImages) => {
-                  devLog(
-                    `[AgroConnect] Nuevas imágenes subidas para ${property.name}:`,
-                    newImages
-                  );
-                  // TODO: En la Fase de Backend, enviar estas imágenes a la API
-                }}
-              />
+              {uploadError && (
+                <p
+                  role="alert"
+                  data-testid="modal-images-error"
+                  className="mb-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700"
+                >
+                  {uploadError}
+                </p>
+              )}
+              {savingImages && (
+                <p role="status" className="mb-3 text-sm font-medium text-agro-green">
+                  Guardando imágenes en el producto…
+                </p>
+              )}
+              {remainingImageSlots > 0 ? (
+                <ImageUpload
+                  key={existingImageCount}
+                  folder={`properties/${property.id}`}
+                  tags={[property.crop, property.department.toLowerCase()]}
+                  maxFiles={remainingImageSlots}
+                  onImagesUploaded={(newImages) => void handleImagesUploaded(newImages)}
+                />
+              ) : (
+                <p className="rounded-lg border border-dashed border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-600">
+                  Este producto ya tiene el máximo de 6 imágenes.
+                </p>
+              )}
             </div>
           </div>
 
@@ -173,8 +233,11 @@ export function PropertyDetailModal({
                   </p>
                   <div className="mt-1">
                     <span
-                      className="px-2.5 py-1 text-white text-xs font-semibold rounded-full shadow-sm inline-block transition-all duration-200 group-hover:scale-110 group-hover:shadow-md"
-                      style={{ backgroundColor: cropInfo.color }}
+                      className="px-2.5 py-1 text-xs font-semibold rounded-full shadow-sm inline-block transition-all duration-200 group-hover:scale-110 group-hover:shadow-md"
+                      style={{
+                        backgroundColor: cropInfo.color,
+                        color: getContrastTextColor(cropInfo.color),
+                      }}
                     >
                       {cropInfo.displayName}
                     </span>
@@ -195,9 +258,9 @@ export function PropertyDetailModal({
                   <p
                     className={`text-lg font-bold mt-1 transition-transform duration-200 group-hover:scale-110 ${
                       property.productivity >= 70
-                        ? 'text-green-600'
+                        ? 'text-green-700'
                         : property.productivity >= 40
-                          ? 'text-yellow-600'
+                          ? 'text-yellow-700'
                           : 'text-red-600'
                     }`}
                   >
@@ -242,11 +305,10 @@ export function PropertyDetailModal({
 
             {/* Architectural Note */}
             <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-800 leading-relaxed animate-[fadeInUp_0.6s_ease-out_0.8s_both] hover:shadow-md transition-shadow duration-300">
-              <strong>💡 Nota de Arquitectura (Fase Backend):</strong> Las imágenes
-              subidas aquí se sincronizarán con PostgreSQL y el mapa se actualizará en
-              tiempo real vía WebSockets. El nombre de la propiedad es un campo
-              obligatorio y determina el título de la galería según su género gramatical
-              en español. Por ahora, los datos se mantienen en el estado local de React.
+              <strong>💡 Persistencia:</strong> las imágenes subidas se guardan en
+              PostgreSQL mediante `PATCH /api/v1/products/:id`; solo el productor
+              propietario o un administrador puede modificarlas. El nombre de la propiedad
+              determina el título de la galería según su género gramatical en español.
             </div>
           </div>
         </div>

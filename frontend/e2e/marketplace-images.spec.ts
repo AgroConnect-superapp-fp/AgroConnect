@@ -30,8 +30,10 @@ test('una imagen rota se reemplaza por el respaldo del cultivo', async ({ page }
     page.getByRole('heading', { name: /Productores Destacados/ })
   ).toBeVisible();
 
-  // La imagen rota cae al respaldo del cultivo (café, Wikimedia).
+  // La imagen está en una tarjeta con lazy-loading: hay que acercarla al
+  // viewport para que el navegador intente cargarla y dispare el fallback.
   const brokenImage = page.getByRole('img', { name: 'Finca La Esperanza' });
+  await brokenImage.scrollIntoViewIfNeeded();
   await expect(brokenImage).toHaveAttribute('src', /Special:FilePath\/Coffee/);
   await expect(brokenImage).not.toHaveAttribute('src', /cld-sample-4/);
   await expect

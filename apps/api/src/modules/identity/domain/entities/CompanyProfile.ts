@@ -1,11 +1,17 @@
 import { InvalidDataError } from '../errors/AuthErrors';
 
+export type CompanyType =
+  'restaurante' | 'plaza_mercado' | 'distribuidor' | 'supermercado' | 'exportador' | 'otro';
+
 export interface CompanyProfileProps {
   id: string;
   userId: string;
   companyName: string;
   nit: string;
   address?: string;
+  companyType?: CompanyType;
+  department?: string;
+  municipality?: string;
 }
 
 const NIT_REGEX = /^\d{9,10}(-\d)?$/;
@@ -22,6 +28,14 @@ export class CompanyProfile {
       throw new InvalidDataError(
         'El NIT debe tener 9 o 10 dígitos, con guion y dígito de verificación opcional',
       );
+    }
+
+    if (props.department !== undefined && props.department.trim().length < 2) {
+      throw new InvalidDataError('El departamento debe tener al menos 2 caracteres');
+    }
+
+    if (props.municipality !== undefined && props.municipality.trim().length < 2) {
+      throw new InvalidDataError('El municipio debe tener al menos 2 caracteres');
     }
 
     return new CompanyProfile(props);
@@ -45,5 +59,17 @@ export class CompanyProfile {
 
   get address(): string | undefined {
     return this.props.address;
+  }
+
+  get companyType(): CompanyType | undefined {
+    return this.props.companyType;
+  }
+
+  get department(): string | undefined {
+    return this.props.department;
+  }
+
+  get municipality(): string | undefined {
+    return this.props.municipality;
   }
 }

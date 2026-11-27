@@ -1,4 +1,9 @@
-import { Injectable, type CallHandler, type ExecutionContext, type NestInterceptor } from '@nestjs/common';
+import {
+  Injectable,
+  type CallHandler,
+  type ExecutionContext,
+  type NestInterceptor,
+} from '@nestjs/common';
 import type { Request } from 'express';
 import { Observable } from 'rxjs';
 import { extractRefreshToken } from './session';
@@ -16,9 +21,16 @@ import { extractRefreshToken } from './session';
 export class SessionTokenInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const request = context.switchToHttp().getRequest<Request>();
-    const body = request.body as Record<string, unknown> | undefined;
+    // `express.json()` puede dejar `req.body` undefined cuando el cliente no
+    // envía cuerpo (refresh/logout cookie-only). Normalizamos a {} antes de
+    // inyectar el token para que el ZodValidationPipe siempre lo reciba.
+    const body =
+      request.body && typeof request.body === 'object'
+        ? (request.body as Record<string, unknown>)
+        : {};
+    request.body = body;
 
-    if (body && typeof body === 'object' && !body.refreshToken) {
+    if (!body.refreshToken) {
       const token = extractRefreshToken(request);
       if (token) {
         body.refreshToken = token;

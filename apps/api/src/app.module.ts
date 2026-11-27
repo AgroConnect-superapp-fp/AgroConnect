@@ -3,9 +3,13 @@ import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { HealthModule } from './health/health.module';
+import { DocsModule } from './docs/docs.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { IdentityModule } from './modules/identity/presentation/identity.module';
+import { RolesGuard } from './modules/identity/presentation/guards/roles.guard';
 import { GeographyModule } from './modules/geography/presentation/geography.module';
+import { MarketplaceModule } from './modules/marketplace/presentation/marketplace.module';
+import { UploadsModule } from './modules/uploads/presentation/uploads.module';
 import { parseEnv } from './shared/config/env';
 import { CsrfGuard } from './shared/http/csrf.guard';
 import { AllExceptionsFilter } from './shared/errors/all-exceptions.filter';
@@ -37,13 +41,19 @@ import { PinoNestLogger } from './shared/logger/nest-logger.service';
     JwtModule.register({}),
     PrismaModule,
     HealthModule,
+    DocsModule,
     IdentityModule,
     GeographyModule,
+    MarketplaceModule,
+    UploadsModule,
   ],
   providers: [
     PinoNestLogger,
     { provide: APP_FILTER, useClass: AllExceptionsFilter },
     { provide: APP_GUARD, useClass: CsrfGuard },
+    // Guard de autorización por rol: se registra aquí para que NestJS pueda
+    // resolverlo cuando un controlador lo referencia con `@UseGuards(RolesGuard)`.
+    RolesGuard,
   ],
   exports: [PinoNestLogger],
 })

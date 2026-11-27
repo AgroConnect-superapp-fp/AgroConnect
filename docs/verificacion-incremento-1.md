@@ -1,5 +1,8 @@
 # Verificación de cumplimiento — Incremento 1 (T5)
 
+> **Documento histórico del incremento 1:** las rutas `backend/` fueron retiradas; el backend vigente es `apps/api/`.
+
+
 **Fecha:** 28 de septiembre de 2026
 **Alcance:** comprobar que el software construido cumple, punto por punto, lo documentado en los entregables 01 a 06 del proyecto formativo AgroConnect (SENA ADSO, Ficha 3292136).
 **Método:** cada afirmación de los documentos se contrasta con evidencia ejecutable en el repositorio (código, migraciones, pruebas y comandos reproducibles).

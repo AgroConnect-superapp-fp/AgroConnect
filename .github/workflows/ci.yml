@@ -2,14 +2,14 @@ name: CI — AgroConnect
 
 on:
   push:
-    branches: [main, develop, 'feature/**', 'hotfix/**']
+    branches: [main, develop, "feature/**", "hotfix/**"]
     # Un push que solo cambia documentación no necesita reconstruir ni
     # desplegar. Los PR siguen ejecutando todos los gates.
     paths-ignore:
-      - 'docs/**'
-      - '**/*.md'
-      - 'scripts/**'
-      - 'obsidian-vault/**'
+      - "docs/**"
+      - "**/*.md"
+      - "scripts/**"
+      - "obsidian-vault/**"
   pull_request:
     branches: [main, develop]
 
@@ -18,7 +18,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: '24'
+  NODE_VERSION: "24"
   DATABASE_URL_TEST: postgresql://agroconnect:agroconnect_dev@localhost:5432/agroconnect_test?schema=public
 
 jobs:
@@ -68,6 +68,9 @@ jobs:
 
       - name: Type check (0 errores permitidos)
         run: npm run typecheck
+
+      - name: Arquitectura (dependency-cruiser)
+        run: npm run arch:check
 
       # El módulo identity sí toca la base de datos (registro, login, rotación
       # de tokens), así que este job levanta PostGIS y aplica las migraciones.
@@ -123,6 +126,9 @@ jobs:
       - name: Type check
         run: npx tsc -b
 
+      - name: Pruebas unitarias con cobertura
+        run: npm run test:coverage
+
       - name: Build de producción
         run: npm run build
 
@@ -132,12 +138,18 @@ jobs:
           test -f dist/sw.js
           test -f dist/registerSW.js
 
-      # Bloquea vulnerabilidades high/critical; las moderate/low se reportan sin
-      # bloquear. Hoy provienen de la toolchain de pruebas (jest → sprintf-js),
-      # sin fix disponible que no introduzca un cambio incompatible
-      # (ver auditoría de seguridad 2026-10-06).
+      - name: Instalar Chromium para el smoke del build
+        run: npx playwright install --with-deps chromium
+
+      - name: Smoke del build de producción
+        run: npm run test:preview
+
+      # Bloquea critical. Las 3 HIGH actuales son una cadena dev/build de
+      # Prisma (`prisma → @prisma/config → effect`) sin parche compatible con
+      # Prisma 7; riesgo aceptado y documentado en el acta §5.8. Las HIGH se
+      # reportan, pero no bloquean el pipeline mientras siga vigente la excepción.
       - name: Auditoría de dependencias (SAST)
-        run: npm audit --audit-level=high
+        run: npm audit --audit-level=critical
 
   e2e:
     name: E2E — registro y autenticación
@@ -189,7 +201,7 @@ jobs:
         run: npm run test:e2e
         working-directory: frontend
         env:
-          CI: 'true'
+          CI: "true"
           TEST_DATABASE_URL: ${{ env.DATABASE_URL_TEST }}
 
       - name: Publicar reporte de Playwright
@@ -263,3 +275,6 @@ jobs:
 
       - name: Verificar que openapi.json coincide con los esquemas Zod
         run: npm run check:drift -w @agroconnect/contracts
+
+      - name: Verificar tipos OpenAPI generados
+        run: npm run check:api-types -w agroconnect-frontend

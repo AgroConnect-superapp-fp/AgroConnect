@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from 'node:fs/promises';
+import { chmod, mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import type {
   EmailService,
@@ -55,8 +55,10 @@ export class FileEmailService implements EmailService {
   }
 
   private async writeMessage(kind: string, content: string): Promise<void> {
-    await mkdir(this.mailDir, { recursive: true });
+    // Contiene PII y tokens: solo el usuario del proceso debe poder leerlo.
+    await mkdir(this.mailDir, { recursive: true, mode: 0o700 });
+    await chmod(this.mailDir, 0o700);
     const fileName = `${Date.now()}-${kind}.txt`;
-    await writeFile(join(this.mailDir, fileName), content, 'utf8');
+    await writeFile(join(this.mailDir, fileName), content, { encoding: 'utf8', mode: 0o600 });
   }
 }

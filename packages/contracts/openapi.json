@@ -96,16 +96,6 @@
           "Auth"
         ],
         "summary": "Renueva la sesión con la cookie httpOnly de refresh",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RefreshRequestBody"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Sesión renovada; cookies httpOnly rotadas"
@@ -137,16 +127,6 @@
           "Auth"
         ],
         "summary": "Revoca la sesión y limpia las cookies",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LogoutRequestBody"
-              }
-            }
-          }
-        },
         "responses": {
           "204": {
             "description": "Sesión revocada"
@@ -180,7 +160,7 @@
           }
         },
         "responses": {
-          "200": {
+          "202": {
             "description": "Respuesta neutra; no revela si el correo existe"
           },
           "400": {
@@ -291,7 +271,7 @@
           }
         },
         "responses": {
-          "200": {
+          "202": {
             "description": "Respuesta neutra; no revela si el correo existe"
           },
           "400": {
@@ -302,6 +282,322 @@
           },
           "429": {
             "description": "Demasiadas solicitudes: límite de tasa aplicado"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        }
+      }
+    },
+    "/plots": {
+      "get": {
+        "tags": [
+          "Geography"
+        ],
+        "summary": "Lista paginada de las parcelas del agricultor autenticado (solo productor o administrador)",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Parcelas del agricultor autenticado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/PlotList"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud malformada o cuerpo inválido"
+          },
+          "401": {
+            "description": "Sesión ausente, expirada o inválida"
+          },
+          "403": {
+            "description": "El rol no puede gestionar parcelas"
+          },
+          "422": {
+            "description": "Reglas de negocio incumplidas (detalles por campo)"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Geography"
+        ],
+        "summary": "Registra una parcela con su geometría (PostGIS)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePlotRequestBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Parcela creada; centroide y área calculados por PostGIS",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Plot"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud malformada o cuerpo inválido"
+          },
+          "401": {
+            "description": "Sesión ausente, expirada o inválida"
+          },
+          "403": {
+            "description": "El rol no puede registrar parcelas"
+          },
+          "422": {
+            "description": "Reglas de negocio incumplidas (detalles por campo)"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        }
+      }
+    },
+    "/plots/{id}": {
+      "get": {
+        "tags": [
+          "Geography"
+        ],
+        "summary": "Obtiene una parcela del agricultor autenticado",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Parcela solicitada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Plot"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud malformada o cuerpo inválido"
+          },
+          "401": {
+            "description": "Sesión ausente, expirada o inválida"
+          },
+          "403": {
+            "description": "La parcela pertenece a otro agricultor"
+          },
+          "404": {
+            "description": "Parcela no encontrada"
+          },
+          "422": {
+            "description": "Reglas de negocio incumplidas (detalles por campo)"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Geography"
+        ],
+        "summary": "Actualiza parcialmente una parcela del agricultor autenticado",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePlotRequestBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Parcela actualizada; centroide y área recalculados por PostGIS",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Plot"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud malformada o cuerpo inválido"
+          },
+          "401": {
+            "description": "Sesión ausente, expirada o inválida"
+          },
+          "403": {
+            "description": "La parcela pertenece a otro agricultor"
+          },
+          "404": {
+            "description": "Parcela no encontrada"
+          },
+          "422": {
+            "description": "Reglas de negocio incumplidas (detalles por campo)"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Geography"
+        ],
+        "summary": "Elimina (soft delete) una parcela del agricultor autenticado",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Parcela eliminada"
+          },
+          "400": {
+            "description": "Solicitud malformada o cuerpo inválido"
+          },
+          "401": {
+            "description": "Sesión ausente, expirada o inválida"
+          },
+          "403": {
+            "description": "La parcela pertenece a otro agricultor"
+          },
+          "404": {
+            "description": "Parcela no encontrada"
+          },
+          "422": {
+            "description": "Reglas de negocio incumplidas (detalles por campo)"
           },
           "500": {
             "description": "Error interno del servidor"
@@ -350,7 +646,31 @@
         ],
         "responses": {
           "200": {
-            "description": "Parcelas dentro del radio de búsqueda"
+            "description": "Parcelas dentro del radio de búsqueda, con su distancia en km",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/NearbyPlotList"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "Solicitud malformada o cuerpo inválido"
@@ -360,6 +680,932 @@
           },
           "500": {
             "description": "Error interno del servidor"
+          }
+        }
+      }
+    },
+    "/profile/me": {
+      "get": {
+        "tags": [
+          "Profile"
+        ],
+        "summary": "Obtiene el perfil del usuario autenticado",
+        "responses": {
+          "200": {
+            "description": "Perfil del usuario",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ProfileSnapshot"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud malformada o cuerpo inválido"
+          },
+          "401": {
+            "description": "Sesión ausente, expirada o inválida"
+          },
+          "422": {
+            "description": "Reglas de negocio incumplidas (detalles por campo)"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Profile"
+        ],
+        "summary": "Actualiza el perfil del rol autenticado",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfileUpdateRequestBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Perfil actualizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ProfileSnapshot"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud malformada o cuerpo inválido"
+          },
+          "401": {
+            "description": "Sesión ausente, expirada o inválida"
+          },
+          "403": {
+            "description": "El bloque no corresponde al rol autenticado"
+          },
+          "422": {
+            "description": "Reglas de negocio incumplidas (detalles por campo)"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        }
+      }
+    },
+    "/products": {
+      "get": {
+        "tags": [
+          "Marketplace"
+        ],
+        "summary": "Lista los productos del marketplace con búsqueda, filtros y paginación",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 80
+            }
+          },
+          {
+            "name": "crop",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "coffee",
+                "cacao",
+                "banana",
+                "sugarcane",
+                "rice",
+                "corn",
+                "cassava",
+                "oil_palm"
+              ]
+            }
+          },
+          {
+            "name": "department",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 120
+            }
+          },
+          {
+            "name": "municipality",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 120
+            }
+          },
+          {
+            "name": "certification",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "organic",
+                "rainforest_alliance",
+                "fair_trade",
+                "conventional",
+                "global_gap"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Productos del marketplace",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ProductList"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud malformada o cuerpo inválido"
+          },
+          "422": {
+            "description": "Reglas de negocio incumplidas (detalles por campo)"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Marketplace"
+        ],
+        "summary": "Publica un producto (solo productor autenticado)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublishProductRequestBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Producto publicado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Product"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud malformada o cuerpo inválido"
+          },
+          "401": {
+            "description": "Sesión ausente, expirada o inválida"
+          },
+          "403": {
+            "description": "El rol no puede publicar productos"
+          },
+          "422": {
+            "description": "Reglas de negocio incumplidas (detalles por campo)"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        }
+      }
+    },
+    "/products/pending": {
+      "get": {
+        "tags": [
+          "Marketplace"
+        ],
+        "summary": "Lista productos pendientes de moderación (solo administrador)",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Productos pendientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ProductList"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud malformada o cuerpo inválido"
+          },
+          "401": {
+            "description": "Sesión ausente, expirada o inválida"
+          },
+          "403": {
+            "description": "El usuario no es administrador"
+          },
+          "422": {
+            "description": "Reglas de negocio incumplidas (detalles por campo)"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        }
+      }
+    },
+    "/products/{id}/moderation": {
+      "patch": {
+        "tags": [
+          "Marketplace"
+        ],
+        "summary": "Aprueba o rechaza un producto (solo administrador)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProductModerationRequestBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Producto moderado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Product"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud malformada o cuerpo inválido"
+          },
+          "401": {
+            "description": "Sesión ausente, expirada o inválida"
+          },
+          "403": {
+            "description": "El usuario no es administrador"
+          },
+          "404": {
+            "description": "Producto no encontrado"
+          },
+          "422": {
+            "description": "Reglas de negocio incumplidas (detalles por campo)"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        }
+      }
+    },
+    "/products/{id}": {
+      "patch": {
+        "tags": [
+          "Marketplace"
+        ],
+        "summary": "Actualiza las imágenes de un producto del propietario",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProductImagesRequestBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Imágenes actualizadas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Product"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud malformada o cuerpo inválido"
+          },
+          "401": {
+            "description": "Sesión ausente, expirada o inválida"
+          },
+          "403": {
+            "description": "El usuario no es propietario ni administrador"
+          },
+          "404": {
+            "description": "Producto no encontrado"
+          },
+          "422": {
+            "description": "Reglas de negocio incumplidas (detalles por campo)"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        }
+      }
+    },
+    "/admin/users": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Lista usuarios con búsqueda y filtros (solo administrador)",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 80
+            }
+          },
+          {
+            "name": "rol",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "productor",
+                "comprador_b2c",
+                "comprador_b2b",
+                "transportista",
+                "administrador"
+              ]
+            }
+          },
+          {
+            "name": "estado",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ACTIVO",
+                "INACTIVO",
+                "SUSPENDIDO"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuarios encontrados con su total y paginación",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/AdminUserList"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud malformada o cuerpo inválido"
+          },
+          "401": {
+            "description": "Sesión ausente, expirada o inválida"
+          },
+          "403": {
+            "description": "El usuario no es administrador"
+          },
+          "422": {
+            "description": "Reglas de negocio incumplidas (detalles por campo)"
+          },
+          "429": {
+            "description": "Demasiadas solicitudes: límite de tasa aplicado"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        }
+      }
+    },
+    "/admin/users/{id}": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Obtiene el detalle administrativo de un usuario",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario solicitado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/AdminUser"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud malformada o cuerpo inválido"
+          },
+          "401": {
+            "description": "Sesión ausente, expirada o inválida"
+          },
+          "403": {
+            "description": "El usuario no es administrador"
+          },
+          "404": {
+            "description": "Usuario no encontrado"
+          },
+          "422": {
+            "description": "Reglas de negocio incumplidas (detalles por campo)"
+          },
+          "429": {
+            "description": "Demasiadas solicitudes: límite de tasa aplicado"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        }
+      }
+    },
+    "/admin/users/{id}/status": {
+      "patch": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Cambia el estado de un usuario (solo administrador)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserStatusRequestBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Estado actualizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/AdminUser"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud malformada o cuerpo inválido"
+          },
+          "401": {
+            "description": "Sesión ausente, expirada o inválida"
+          },
+          "403": {
+            "description": "El usuario no es administrador"
+          },
+          "404": {
+            "description": "Usuario no encontrado"
+          },
+          "409": {
+            "description": "Intento de auto-modificación o de dejar sin administradores activos"
+          },
+          "422": {
+            "description": "Reglas de negocio incumplidas (detalles por campo)"
+          },
+          "429": {
+            "description": "Demasiadas solicitudes: límite de tasa aplicado"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        }
+      }
+    },
+    "/admin/users/{id}/role": {
+      "patch": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Cambia el rol de un usuario (solo administrador)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserRoleRequestBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Rol actualizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/AdminUser"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud malformada o cuerpo inválido"
+          },
+          "401": {
+            "description": "Sesión ausente, expirada o inválida"
+          },
+          "403": {
+            "description": "El usuario no es administrador"
+          },
+          "404": {
+            "description": "Usuario no encontrado"
+          },
+          "409": {
+            "description": "Intento de auto-modificación o de dejar sin administradores activos"
+          },
+          "422": {
+            "description": "Reglas de negocio incumplidas (detalles por campo)"
+          },
+          "429": {
+            "description": "Demasiadas solicitudes: límite de tasa aplicado"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        }
+      }
+    },
+    "/uploads/signature": {
+      "post": {
+        "tags": [
+          "Uploads"
+        ],
+        "summary": "Genera una firma de subida directa a Cloudinary",
+        "responses": {
+          "200": {
+            "description": "Firma de subida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/UploadSignature"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sesión ausente, expirada o inválida"
+          },
+          "403": {
+            "description": "El rol no puede subir imágenes de producto"
+          },
+          "429": {
+            "description": "Demasiadas solicitudes: límite de tasa aplicado"
+          },
+          "503": {
+            "description": "Cloudinary no configurado en este entorno"
           }
         }
       }
@@ -455,11 +1701,87 @@
               "direccion": {
                 "type": "string",
                 "maxLength": 200
+              },
+              "tipoEmpresa": {
+                "type": "string",
+                "enum": [
+                  "restaurante",
+                  "plaza_mercado",
+                  "distribuidor",
+                  "supermercado",
+                  "exportador",
+                  "otro"
+                ]
+              },
+              "departamento": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 120
+              },
+              "municipio": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 120
               }
             },
             "required": [
               "razonSocial",
               "nit"
+            ],
+            "additionalProperties": false
+          },
+          "transportista": {
+            "type": "object",
+            "properties": {
+              "tipoVehiculo": {
+                "type": "string",
+                "enum": [
+                  "camion",
+                  "camioneta",
+                  "moto",
+                  "furgon"
+                ]
+              },
+              "placa": {
+                "type": "string",
+                "pattern": "^[A-Z]{3}\\d{3}$|^[A-Z]{3}\\d{2}[A-Z]$"
+              },
+              "capacidadKg": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 100000
+              },
+              "cobertura": {
+                "minItems": 1,
+                "maxItems": 20,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 3,
+                  "maxLength": 120
+                }
+              },
+              "cadenaFrio": {
+                "default": false,
+                "type": "boolean"
+              },
+              "soatVence": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              },
+              "licenciaVence": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              }
+            },
+            "required": [
+              "tipoVehiculo",
+              "placa",
+              "capacidadKg",
+              "cobertura",
+              "cadenaFrio",
+              "soatVence",
+              "licenciaVence"
             ],
             "additionalProperties": false
           },
@@ -615,6 +1937,1447 @@
           "lat",
           "lng"
         ]
+      },
+      "ListMyPlotsQuery": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "limit": {
+            "default": 20,
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "offset": {
+            "default": 0,
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        }
+      },
+      "NearbyPlotList": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "name": {
+              "type": "string"
+            },
+            "areaHectares": {
+              "type": "number"
+            },
+            "municipality": {
+              "type": "string"
+            },
+            "department": {
+              "type": "string"
+            },
+            "createdAt": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "distanceKm": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "id",
+            "name",
+            "areaHectares",
+            "municipality",
+            "department",
+            "createdAt",
+            "distanceKm"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "CreatePlotRequestBody": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 120
+          },
+          "municipality": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 120
+          },
+          "department": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 120
+          },
+          "boundary": {
+            "minItems": 1,
+            "maxItems": 1,
+            "type": "array",
+            "items": {
+              "minItems": 3,
+              "maxItems": 500,
+              "type": "array",
+              "items": {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "number",
+                    "minimum": -79,
+                    "maximum": -66.8
+                  },
+                  {
+                    "type": "number",
+                    "minimum": -4.2,
+                    "maximum": 13.3
+                  }
+                ],
+                "items": false,
+                "minItems": 2,
+                "maxItems": 2
+              }
+            }
+          }
+        },
+        "required": [
+          "name",
+          "municipality",
+          "department",
+          "boundary"
+        ],
+        "additionalProperties": false
+      },
+      "UpdatePlotRequestBody": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 120
+          },
+          "municipality": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 120
+          },
+          "department": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 120
+          },
+          "boundary": {
+            "minItems": 1,
+            "maxItems": 1,
+            "type": "array",
+            "items": {
+              "minItems": 3,
+              "maxItems": 500,
+              "type": "array",
+              "items": {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "number",
+                    "minimum": -79,
+                    "maximum": -66.8
+                  },
+                  {
+                    "type": "number",
+                    "minimum": -4.2,
+                    "maximum": 13.3
+                  }
+                ],
+                "items": false,
+                "minItems": 2,
+                "maxItems": 2
+              }
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "Plot": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "name": {
+            "type": "string"
+          },
+          "municipality": {
+            "type": "string"
+          },
+          "department": {
+            "type": "string"
+          },
+          "farmerId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "areaHectares": {
+            "type": "number"
+          },
+          "centroid": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "lat": {
+                    "type": "number"
+                  },
+                  "lng": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "lat",
+                  "lng"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "boundary": {
+            "anyOf": [
+              {
+                "minItems": 1,
+                "maxItems": 1,
+                "type": "array",
+                "items": {
+                  "minItems": 3,
+                  "maxItems": 500,
+                  "type": "array",
+                  "items": {
+                    "type": "array",
+                    "prefixItems": [
+                      {
+                        "type": "number",
+                        "minimum": -79,
+                        "maximum": -66.8
+                      },
+                      {
+                        "type": "number",
+                        "minimum": -4.2,
+                        "maximum": 13.3
+                      }
+                    ],
+                    "items": false,
+                    "minItems": 2,
+                    "maxItems": 2
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "createdAt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updatedAt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "municipality",
+          "department",
+          "farmerId",
+          "areaHectares",
+          "centroid",
+          "boundary",
+          "createdAt",
+          "updatedAt"
+        ],
+        "additionalProperties": false
+      },
+      "PlotList": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "name": {
+              "type": "string"
+            },
+            "municipality": {
+              "type": "string"
+            },
+            "department": {
+              "type": "string"
+            },
+            "farmerId": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "areaHectares": {
+              "type": "number"
+            },
+            "centroid": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "lat": {
+                      "type": "number"
+                    },
+                    "lng": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "lat",
+                    "lng"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "boundary": {
+              "anyOf": [
+                {
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "type": "array",
+                  "items": {
+                    "minItems": 3,
+                    "maxItems": 500,
+                    "type": "array",
+                    "items": {
+                      "type": "array",
+                      "prefixItems": [
+                        {
+                          "type": "number",
+                          "minimum": -79,
+                          "maximum": -66.8
+                        },
+                        {
+                          "type": "number",
+                          "minimum": -4.2,
+                          "maximum": 13.3
+                        }
+                      ],
+                      "items": false,
+                      "minItems": 2,
+                      "maxItems": 2
+                    }
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "createdAt": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "updatedAt": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "id",
+            "name",
+            "municipality",
+            "department",
+            "farmerId",
+            "areaHectares",
+            "centroid",
+            "boundary",
+            "createdAt",
+            "updatedAt"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "ProductsQuery": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "search": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "crop": {
+            "type": "string",
+            "enum": [
+              "coffee",
+              "cacao",
+              "banana",
+              "sugarcane",
+              "rice",
+              "corn",
+              "cassava",
+              "oil_palm"
+            ]
+          },
+          "department": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "municipality": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "certification": {
+            "type": "string",
+            "enum": [
+              "organic",
+              "rainforest_alliance",
+              "fair_trade",
+              "conventional",
+              "global_gap"
+            ]
+          },
+          "limit": {
+            "default": 50,
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "offset": {
+            "default": 0,
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        }
+      },
+      "Product": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "owner": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string"
+          },
+          "contact": {
+            "type": "string"
+          },
+          "department": {
+            "type": "string",
+            "minLength": 1
+          },
+          "municipality": {
+            "type": "string",
+            "minLength": 1
+          },
+          "crop": {
+            "type": "string",
+            "enum": [
+              "coffee",
+              "cacao",
+              "banana",
+              "sugarcane",
+              "rice",
+              "corn",
+              "cassava",
+              "oil_palm"
+            ]
+          },
+          "area": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "productivity": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "certification": {
+            "type": "string",
+            "enum": [
+              "organic",
+              "rainforest_alliance",
+              "fair_trade",
+              "conventional",
+              "global_gap"
+            ]
+          },
+          "moderationStatus": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "approved",
+              "rejected"
+            ]
+          },
+          "lat": {
+            "type": "number",
+            "minimum": -90,
+            "maximum": 90
+          },
+          "lng": {
+            "type": "number",
+            "minimum": -180,
+            "maximum": 180
+          },
+          "producerId": {
+            "type": "string"
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "publicId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "url": {
+                  "type": "string",
+                  "maxLength": 2048
+                },
+                "alt": {
+                  "type": "string",
+                  "maxLength": 200
+                },
+                "width": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "height": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "bytes": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "uploadedAt": {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                "moderationStatus": {
+                  "type": "string",
+                  "enum": [
+                    "pending",
+                    "approved",
+                    "rejected"
+                  ]
+                },
+                "lqip": {
+                  "type": "string",
+                  "maxLength": 8192
+                }
+              },
+              "required": [
+                "publicId"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "coordinates": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "items": false,
+              "minItems": 2,
+              "maxItems": 2
+            }
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "owner",
+          "department",
+          "municipality",
+          "crop",
+          "area",
+          "productivity",
+          "moderationStatus",
+          "lat",
+          "lng",
+          "images",
+          "coordinates"
+        ],
+        "additionalProperties": false
+      },
+      "ProfileUpdateRequestBody": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "productor": {
+            "type": "object",
+            "properties": {
+              "nombre": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 120
+              },
+              "municipio": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 120
+              },
+              "vereda": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 120
+              },
+              "latitud": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "longitud": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              }
+            },
+            "additionalProperties": false
+          },
+          "empresa": {
+            "type": "object",
+            "properties": {
+              "razonSocial": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 160
+              },
+              "direccion": {
+                "type": "string",
+                "maxLength": 200
+              },
+              "tipoEmpresa": {
+                "type": "string",
+                "enum": [
+                  "restaurante",
+                  "plaza_mercado",
+                  "distribuidor",
+                  "supermercado",
+                  "exportador",
+                  "otro"
+                ]
+              },
+              "departamento": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 120
+              },
+              "municipio": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 120
+              }
+            },
+            "additionalProperties": false
+          },
+          "transportista": {
+            "type": "object",
+            "properties": {
+              "tipoVehiculo": {
+                "type": "string",
+                "enum": [
+                  "camion",
+                  "camioneta",
+                  "moto",
+                  "furgon"
+                ]
+              },
+              "placa": {
+                "type": "string",
+                "pattern": "^[A-Z]{3}\\d{3}$|^[A-Z]{3}\\d{2}[A-Z]$"
+              },
+              "capacidadKg": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 100000
+              },
+              "cobertura": {
+                "minItems": 1,
+                "maxItems": 20,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 3,
+                  "maxLength": 120
+                }
+              },
+              "cadenaFrio": {
+                "type": "boolean"
+              },
+              "soatVence": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              },
+              "licenciaVence": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProfileSnapshot": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "usuario": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "nombre": {
+                "type": "string"
+              },
+              "correo": {
+                "type": "string"
+              },
+              "rol": {
+                "type": "string",
+                "enum": [
+                  "productor",
+                  "comprador_b2c",
+                  "comprador_b2b",
+                  "transportista",
+                  "administrador"
+                ]
+              },
+              "estado": {
+                "type": "string",
+                "enum": [
+                  "ACTIVO",
+                  "INACTIVO",
+                  "SUSPENDIDO"
+                ]
+              },
+              "verificado": {
+                "type": "boolean"
+              },
+              "fechaRegistro": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "nombre",
+              "correo",
+              "rol",
+              "estado",
+              "verificado",
+              "fechaRegistro"
+            ],
+            "additionalProperties": false
+          },
+          "productor": {
+            "type": "object",
+            "properties": {
+              "nombre": {
+                "type": "string"
+              },
+              "municipio": {
+                "type": "string"
+              },
+              "vereda": {
+                "type": "string"
+              },
+              "latitud": {
+                "type": "number"
+              },
+              "longitud": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "nombre",
+              "municipio",
+              "vereda"
+            ],
+            "additionalProperties": false
+          },
+          "empresa": {
+            "type": "object",
+            "properties": {
+              "razonSocial": {
+                "type": "string"
+              },
+              "nit": {
+                "type": "string"
+              },
+              "direccion": {
+                "type": "string"
+              },
+              "tipoEmpresa": {
+                "type": "string",
+                "enum": [
+                  "restaurante",
+                  "plaza_mercado",
+                  "distribuidor",
+                  "supermercado",
+                  "exportador",
+                  "otro"
+                ]
+              },
+              "departamento": {
+                "type": "string"
+              },
+              "municipio": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "razonSocial",
+              "nit"
+            ],
+            "additionalProperties": false
+          },
+          "transportista": {
+            "type": "object",
+            "properties": {
+              "tipoVehiculo": {
+                "type": "string",
+                "enum": [
+                  "camion",
+                  "camioneta",
+                  "moto",
+                  "furgon"
+                ]
+              },
+              "placa": {
+                "type": "string"
+              },
+              "capacidadKg": {
+                "type": "number"
+              },
+              "cobertura": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "cadenaFrio": {
+                "type": "boolean"
+              },
+              "soatVence": {
+                "type": "string"
+              },
+              "licenciaVence": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "tipoVehiculo",
+              "placa",
+              "capacidadKg",
+              "cobertura",
+              "cadenaFrio",
+              "soatVence",
+              "licenciaVence"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "usuario"
+        ],
+        "additionalProperties": false
+      },
+      "PublishProductRequestBody": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 160
+          },
+          "owner": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 160
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "contact": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "department": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 120
+          },
+          "municipality": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 120
+          },
+          "crop": {
+            "type": "string",
+            "enum": [
+              "coffee",
+              "cacao",
+              "banana",
+              "sugarcane",
+              "rice",
+              "corn",
+              "cassava",
+              "oil_palm"
+            ]
+          },
+          "area": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 100000
+          },
+          "productivity": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "certification": {
+            "type": "string",
+            "enum": [
+              "organic",
+              "rainforest_alliance",
+              "fair_trade",
+              "conventional",
+              "global_gap"
+            ]
+          },
+          "lat": {
+            "type": "number",
+            "minimum": -90,
+            "maximum": 90
+          },
+          "lng": {
+            "type": "number",
+            "minimum": -180,
+            "maximum": 180
+          },
+          "images": {
+            "default": [],
+            "maxItems": 6,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "publicId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "url": {
+                  "type": "string",
+                  "maxLength": 2048
+                },
+                "alt": {
+                  "type": "string",
+                  "maxLength": 200
+                },
+                "width": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "height": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "bytes": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "uploadedAt": {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                "moderationStatus": {
+                  "type": "string",
+                  "enum": [
+                    "pending",
+                    "approved",
+                    "rejected"
+                  ]
+                },
+                "lqip": {
+                  "type": "string",
+                  "maxLength": 8192
+                }
+              },
+              "required": [
+                "publicId"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "coordinates": {
+            "default": [],
+            "maxItems": 100,
+            "type": "array",
+            "items": {
+              "type": "array",
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "items": false,
+              "minItems": 2,
+              "maxItems": 2
+            }
+          }
+        },
+        "required": [
+          "name",
+          "department",
+          "municipality",
+          "crop",
+          "area",
+          "productivity",
+          "lat",
+          "lng",
+          "images",
+          "coordinates"
+        ],
+        "additionalProperties": false
+      },
+      "UpdateProductImagesRequestBody": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "images": {
+            "maxItems": 6,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "publicId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "url": {
+                  "type": "string",
+                  "maxLength": 2048
+                },
+                "alt": {
+                  "type": "string",
+                  "maxLength": 200
+                },
+                "width": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "height": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "bytes": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "uploadedAt": {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                "moderationStatus": {
+                  "type": "string",
+                  "enum": [
+                    "pending",
+                    "approved",
+                    "rejected"
+                  ]
+                },
+                "lqip": {
+                  "type": "string",
+                  "maxLength": 8192
+                }
+              },
+              "required": [
+                "publicId"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "images"
+        ],
+        "additionalProperties": false
+      },
+      "UpdateProductModerationRequestBody": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "approved",
+              "rejected"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "UploadSignature": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "cloudName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "apiKey": {
+            "type": "string",
+            "minLength": 1
+          },
+          "timestamp": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "signature": {
+            "type": "string",
+            "minLength": 1
+          },
+          "folder": {
+            "type": "string",
+            "minLength": 1
+          },
+          "allowedFormats": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "maxBytes": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "cloudName",
+          "apiKey",
+          "timestamp",
+          "signature",
+          "folder",
+          "allowedFormats",
+          "maxBytes"
+        ],
+        "additionalProperties": false
+      },
+      "AdminUser": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "nombre": {
+            "type": "string",
+            "minLength": 1
+          },
+          "correo": {
+            "type": "string",
+            "minLength": 1
+          },
+          "documento": {
+            "type": "string",
+            "minLength": 1
+          },
+          "celular": {
+            "type": "string",
+            "minLength": 1
+          },
+          "rol": {
+            "type": "string",
+            "enum": [
+              "productor",
+              "comprador_b2c",
+              "comprador_b2b",
+              "transportista",
+              "administrador"
+            ]
+          },
+          "estado": {
+            "type": "string",
+            "enum": [
+              "ACTIVO",
+              "INACTIVO",
+              "SUSPENDIDO"
+            ]
+          },
+          "verificado": {
+            "type": "boolean"
+          },
+          "fechaRegistro": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "nombre",
+          "correo",
+          "documento",
+          "celular",
+          "rol",
+          "estado",
+          "verificado",
+          "fechaRegistro"
+        ],
+        "additionalProperties": false
+      },
+      "AdminUserList": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                },
+                "nombre": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "correo": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "documento": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "celular": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "rol": {
+                  "type": "string",
+                  "enum": [
+                    "productor",
+                    "comprador_b2c",
+                    "comprador_b2b",
+                    "transportista",
+                    "administrador"
+                  ]
+                },
+                "estado": {
+                  "type": "string",
+                  "enum": [
+                    "ACTIVO",
+                    "INACTIVO",
+                    "SUSPENDIDO"
+                  ]
+                },
+                "verificado": {
+                  "type": "boolean"
+                },
+                "fechaRegistro": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "id",
+                "nombre",
+                "correo",
+                "documento",
+                "celular",
+                "rol",
+                "estado",
+                "verificado",
+                "fechaRegistro"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "additionalProperties": false
+      },
+      "AdminUsersQuery": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "search": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 80
+          },
+          "rol": {
+            "type": "string",
+            "enum": [
+              "productor",
+              "comprador_b2c",
+              "comprador_b2b",
+              "transportista",
+              "administrador"
+            ]
+          },
+          "estado": {
+            "type": "string",
+            "enum": [
+              "ACTIVO",
+              "INACTIVO",
+              "SUSPENDIDO"
+            ]
+          },
+          "limit": {
+            "default": 20,
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "offset": {
+            "default": 0,
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        }
+      },
+      "UpdateUserStatusRequestBody": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "estado": {
+            "type": "string",
+            "enum": [
+              "ACTIVO",
+              "INACTIVO",
+              "SUSPENDIDO"
+            ]
+          }
+        },
+        "required": [
+          "estado"
+        ],
+        "additionalProperties": false
+      },
+      "UpdateUserRoleRequestBody": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "rol": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "description": "Nombre del rol: productor | comprador_b2c | comprador_b2b | transportista | administrador"
+          }
+        },
+        "required": [
+          "rol"
+        ],
+        "additionalProperties": false
+      },
+      "ProductList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Product"
+        }
       }
     }
   }

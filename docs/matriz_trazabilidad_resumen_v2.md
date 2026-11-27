@@ -1,6 +1,6 @@
 # Matriz de Trazabilidad RF↔CU↔HU — Resumen
 
-**Generado:** 2026-07-03T10:34:21.494758
+**Origen:** `scripts/build_traceability_matrix.py` (generación no destructiva)
 
 **Totales:** 68 RF, 66 CU, 69 HU
 
@@ -30,6 +30,7 @@
 
 - RF con CU asignado: 68/68
 - CU con HU asignado: 66/66
+- Relaciones CU→HU totales: 75
 - Relaciones RF→CU débiles: 0
 - Relaciones CU→HU débiles: 0
 

@@ -5,7 +5,7 @@
  * - All 8 Colombian crops defined
  * - All 5 certifications defined
  * - Exported getCropInfo() helper with fallback for unknown values
- * - Prevents runtime errors from Supabase data inconsistencies
+ * - Prevents runtime errors from API data inconsistencies
  */
 
 // ============================================
@@ -67,7 +67,7 @@ export const CROP_CATALOG: Record<CropType, CropInfo> = {
   oil_palm: {
     displayName: 'Palma de Aceite',
     emoji: '🌴',
-    color: '#228B22',
+    color: '#1B5E20',
     season: 'Todo el año',
   },
 };
@@ -169,6 +169,7 @@ export interface Property {
   area: number;
   productivity: number;
   certification?: CertificationType;
+  moderationStatus?: 'pending' | 'approved' | 'rejected';
   lat: number;
   lng: number;
   images?: PropertyImage[];

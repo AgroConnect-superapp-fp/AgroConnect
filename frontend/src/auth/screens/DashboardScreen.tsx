@@ -1,9 +1,13 @@
+import { useState } from 'react';
 import { Button } from '../components/Button';
 import { useAuth } from '../context/useAuth';
 import { getRoleOption, ROLE_LABELS } from '../types';
 
 interface DashboardScreenProps {
   onOpenMarketplace: () => void;
+  onPublishProduct: () => void;
+  onOpenProfile: () => void;
+  onOpenModeration: () => void;
   showSuccessBanner?: boolean;
   onDismissSuccessBanner?: () => void;
 }
@@ -23,14 +27,9 @@ const ROLE_WELCOME: Record<string, string> = {
 
 const NEXT_INCREMENTS = [
   {
-    nombre: 'Pulido del acceso',
-    detalle: 'Verificación por correo, recuperación de contraseña y edición de perfil.',
-    estado: 'Siguiente',
-  },
-  {
-    nombre: 'Registro de productos',
-    detalle: 'Nombre, precio, unidad e imágenes de tus cosechas con Cloudinary.',
-    estado: 'Planificado',
+    nombre: 'Edición de perfil',
+    detalle: 'Consulta y actualiza los datos de tu finca, empresa o vehículo.',
+    estado: 'Disponible',
   },
   {
     nombre: 'Inventario del productor',
@@ -46,16 +45,31 @@ const NEXT_INCREMENTS = [
 
 export function DashboardScreen({
   onOpenMarketplace,
+  onPublishProduct,
+  onOpenProfile,
+  onOpenModeration,
   showSuccessBanner = false,
   onDismissSuccessBanner,
 }: DashboardScreenProps): React.ReactElement {
   const { usuario, logout } = useAuth();
+  const [logoutError, setLogoutError] = useState<string | null>(null);
 
   if (!usuario) {
     return <div className="p-8 text-center text-gray-600">Cargando tu panel…</div>;
   }
 
   const roleOption = getRoleOption(usuario.rol);
+
+  async function handleLogout(): Promise<void> {
+    setLogoutError(null);
+    try {
+      await logout();
+    } catch {
+      setLogoutError(
+        'No fue posible cerrar la sesión en el servidor. Revisa tu conexión e inténtalo de nuevo.'
+      );
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-50 via-white to-amber-50">
@@ -79,8 +93,16 @@ export function DashboardScreen({
             </div>
             <Button
               variant="ghost"
+              data-testid="dashboard-profile"
+              onClick={onOpenProfile}
+              className="!min-h-10 !px-3 !py-2 text-sm"
+            >
+              Mi perfil
+            </Button>
+            <Button
+              variant="ghost"
               data-testid="dashboard-logout"
-              onClick={() => void logout()}
+              onClick={() => void handleLogout()}
               className="!min-h-10 !px-3 !py-2 text-sm"
             >
               Cerrar sesión
@@ -90,6 +112,15 @@ export function DashboardScreen({
       </header>
 
       <main className="mx-auto max-w-4xl px-4 py-8">
+        {logoutError && (
+          <div
+            role="alert"
+            data-testid="logout-error"
+            className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700"
+          >
+            {logoutError}
+          </div>
+        )}
         {showSuccessBanner && (
           <div
             role="status"
@@ -133,6 +164,40 @@ export function DashboardScreen({
             </div>
           </div>
         </section>
+
+        {usuario.rol === 'administrador' && (
+          <section className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm">
+            <h2 className="text-lg font-bold text-amber-950">Moderación pendiente</h2>
+            <p className="mt-1 text-sm text-amber-900">
+              Revisa las publicaciones nuevas antes de que aparezcan en el marketplace.
+            </p>
+            <Button
+              variant="secondary"
+              data-testid="dashboard-moderation"
+              onClick={onOpenModeration}
+              className="mt-3"
+            >
+              Revisar publicaciones
+            </Button>
+          </section>
+        )}
+
+        {usuario.rol === 'productor' && (
+          <section className="mt-6 rounded-2xl border border-emerald-200 bg-white p-5 shadow-sm">
+            <h2 className="text-lg font-bold text-gray-900">Publica tu cosecha</h2>
+            <p className="mt-1 text-sm text-gray-600">
+              Registra el producto, sube imágenes a Cloudinary y publícalo en el
+              marketplace.
+            </p>
+            <Button
+              data-testid="dashboard-publish"
+              onClick={onPublishProduct}
+              className="mt-3"
+            >
+              Publicar producto
+            </Button>
+          </section>
+        )}
 
         <section className="mt-6">
           <h2 className="text-lg font-bold text-gray-900">Lo que viene para tu panel</h2>

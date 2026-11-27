@@ -6,22 +6,55 @@ Genera:
   - docs/matriz_trazabilidad_rf_cu.csv (RF->CU)
   - docs/matriz_trazabilidad_cu_hu.csv (CU->HU)
   - docs/matriz_trazabilidad_resumen_v2.md
+
+Principio de autoridad (SENA):
+  Los CSV de trazabilidad son artefactos curados a mano. El generador es un
+  bootstrap: NUNCA borra una relación existente y solo añade los pares que
+  falten. Por eso las multi-relaciones manuales de M17 (CU#66 -> HU61..HU67,
+  HU69) y las equivalencias aprobadas por D7 (CU#31 -> HU33) sobreviven a una
+  regeneración.
+
+Modos de uso:
+  python3 scripts/build_traceability_matrix.py            # regenera (no destructivo)
+  python3 scripts/build_traceability_matrix.py --check    # valida sin escribir
 """
 
 import csv
-import json
 import pathlib
 import re
+import sys
 from collections import defaultdict, Counter
 
-ROOT = pathlib.Path(
-    "/home/fabian/Documents/Proyectos de Programación/Proyecto_Formativo_ADSO_SENA/AgroConnect"
-)
+ROOT = pathlib.Path(__file__).resolve().parents[1]
 DETAIL_CSV = ROOT / "docs" / "matriz_trazabilidad_detalle.csv"
+RF_CU_CSV = ROOT / "docs" / "matriz_trazabilidad_rf_cu.csv"
+CU_HU_CSV = ROOT / "docs" / "matriz_trazabilidad_cu_hu.csv"
+RF_CU_HU_DETAIL_CSV = ROOT / "docs" / "matriz_trazabilidad_rf_cu_hu_detalle.csv"
+MODULES_CSV = ROOT / "docs" / "matriz_trazabilidad_rf_cu_hu.csv"
+RESUMEN_MD = ROOT / "docs" / "matriz_trazabilidad_resumen_v2.md"
+
+# Equivalencias aprobadas por la decisión D7 del 2026-11-05.
+D7_APROBADAS = {
+    "HU04": "HU11",
+    "HU06": "HU14",
+    "HU15": "HU08",
+}
+# Estas tres fichas de la numeración original no tienen equivalencia CU en el
+# SSOT: inventar una relación para ellas está prohibido.
+D7_SIN_EQUIVALENCIA = {"HU08", "HU28", "HU30"}
+# Relación confirmada en la matriz detallada de Notion.
+D7_RELACIONES = {("CU#31", "HU33")}
+
+
+def read_csv(path):
+    """Lee un CSV tolerando CRLF; devuelve lista de diccionarios."""
+    if not path.exists():
+        return []
+    return list(csv.DictReader(path.read_text(encoding="utf-8").splitlines()))
 
 
 def load():
-    rows = list(csv.DictReader(DETAIL_CSV.read_text().splitlines()))
+    rows = read_csv(DETAIL_CSV)
     rf = [r for r in rows if r["Tipo"] == "RF"]
     cu = [r for r in rows if r["Tipo"] == "CU"]
     hu = [r for r in rows if r["Tipo"] == "HU"]
@@ -173,9 +206,8 @@ def best_match(source, candidates, overrides, source_code_field="Codigo"):
     return scored[0]
 
 
-def main():
-    rf, cu, hu = load()
-
+def build(rf, cu, hu):
+    """Calcula las matrices sin tocar el disco (función pura)."""
     rf_cu = []
     for r in rf:
         c, score = best_match(r, cu, RF_CU_OVERRIDES)
@@ -225,15 +257,49 @@ def main():
             }
         )
 
-    # Guardar CSVs
-    def write_csv(path, rows, fieldnames):
-        with open(path, "w", newline="", encoding="utf-8") as f:
-            w = csv.DictWriter(f, fieldnames=fieldnames)
-            w.writeheader()
-            w.writerows(rows)
+    return rf_cu, cu_hu, detalle
+
+
+def merge_pairs(generated, existing, key_fields):
+    """El CSV curado a mano manda: el generador solo añade pares que falten.
+
+    Garantiza que una regeneración nunca borra una relación manual (multi-
+    relaciones de M17 ni equivalencias D7) y que el resultado sea idempotente.
+    """
+    existing_keys = {tuple(row[f] for f in key_fields) for row in existing}
+    merged = list(existing)
+    for row in generated:
+        key = tuple(row[f] for f in key_fields)
+        if key not in existing_keys:
+            merged.append(row)
+            existing_keys.add(key)
+    return merged
+
+
+def merge_single(generated, existing, key):
+    """Igual que `merge_pairs` pero con una sola clave (una fila por elemento)."""
+    return merge_pairs(generated, existing, (key,))
+
+
+def write_csv(path, rows, fieldnames):
+    """Escribe CSV con CRLF, igual que el formato histórico de los artefactos."""
+    with open(path, "w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=fieldnames)
+        w.writeheader()
+        w.writerows(rows)
+
+
+def main():
+    rf, cu, hu = load()
+    rf_cu, cu_hu, detalle = build(rf, cu, hu)
+
+    # Fusión no destructiva con lo que ya está curado a mano.
+    rf_cu = merge_single(rf_cu, read_csv(RF_CU_CSV), "RF_Codigo")
+    cu_hu = merge_pairs(cu_hu, read_csv(CU_HU_CSV), ("CU_Codigo", "HU_Codigo"))
+    detalle = merge_single(detalle, read_csv(RF_CU_HU_DETAIL_CSV), "RF_Codigo")
 
     write_csv(
-        ROOT / "docs/matriz_trazabilidad_rf_cu.csv",
+        RF_CU_CSV,
         rf_cu,
         [
             "RF_Codigo",
@@ -246,7 +312,7 @@ def main():
         ],
     )
     write_csv(
-        ROOT / "docs/matriz_trazabilidad_cu_hu.csv",
+        CU_HU_CSV,
         cu_hu,
         [
             "CU_Codigo",
@@ -259,7 +325,7 @@ def main():
         ],
     )
     write_csv(
-        ROOT / "docs/matriz_trazabilidad_rf_cu_hu_detalle.csv",
+        RF_CU_HU_DETAIL_CSV,
         detalle,
         [
             "RF_Codigo",
@@ -288,7 +354,7 @@ def main():
 
     md = []
     md.append("# Matriz de Trazabilidad RF↔CU↔HU — Resumen\n")
-    md.append(f"**Generado:** {__import__('datetime').datetime.now().isoformat()}\n")
+    md.append("**Origen:** `scripts/build_traceability_matrix.py` (generación no destructiva)\n")
     md.append(f"**Totales:** {len(rf)} RF, {len(cu)} CU, {len(hu)} HU\n")
     md.append("## Conteos por módulo\n")
     md.append("| Módulo | RF | CU | HU | Observación |")
@@ -306,8 +372,10 @@ def main():
         f"- RF con CU asignado: {sum(1 for r in rf_cu if r['CU_Codigo'])}/{len(rf)}"
     )
     md.append(
-        f"- CU con HU asignado: {sum(1 for c in cu_hu if c['HU_Codigo'])}/{len(cu)}"
+        f"- CU con HU asignado: "
+        f"{len({c['CU_Codigo'] for c in cu_hu if c['HU_Codigo']})}/{len(cu)}"
     )
+    md.append(f"- Relaciones CU→HU totales: {len(cu_hu)}")
     md.append(f"- Relaciones RF→CU débiles: {len(weak_cu)}")
     md.append(f"- Relaciones CU→HU débiles: {len(weak_hu)}")
     md.append("\n## Mapeos débiles RF→CU (requieren validación humana)\n")
@@ -326,9 +394,7 @@ def main():
     md.append("- `docs/matriz_trazabilidad_rf_cu_hu_detalle.csv`")
     md.append("- `docs/matriz_trazabilidad_detalle.csv`")
 
-    (ROOT / "docs/matriz_trazabilidad_resumen_v2.md").write_text(
-        "\n".join(md), encoding="utf-8"
-    )
+    RESUMEN_MD.write_text("\n".join(md), encoding="utf-8")
 
     print("RF->CU:", len(rf_cu), "filas")
     print("CU->HU:", len(cu_hu), "filas")
@@ -337,5 +403,141 @@ def main():
     print("Débiles CU->HU:", len(weak_hu))
 
 
+def check():
+    """Valida la matriz sin escribir archivos (`--check`)."""
+    rf, cu, hu = load()
+    failures = []
+    expected = {"RF": 68, "CU": 66, "HU": 69}
+
+    # 1) Integridad de la fuente de verdad (detalle.csv)
+    for kind, rows in (("RF", rf), ("CU", cu), ("HU", hu)):
+        codes = [r["Codigo"] for r in rows]
+        duplicates = [c for c, n in Counter(codes).items() if n > 1]
+        if duplicates:
+            failures.append(f"{kind}: códigos duplicados {duplicates}")
+        if len(codes) != expected[kind]:
+            failures.append(f"{kind}: {len(codes)} filas, esperado {expected[kind]}")
+        numbers = sorted(int(re.sub(r"\D", "", c)) for c in codes)
+        missing = [
+            i for i in range(1, (numbers[-1] if numbers else 0) + 1) if i not in numbers
+        ]
+        if missing:
+            failures.append(f"{kind}: faltan {missing[:10]}")
+
+    cu_hu = read_csv(CU_HU_CSV)
+    rf_cu = read_csv(RF_CU_CSV)
+    detalle = read_csv(RF_CU_HU_DETAIL_CSV)
+
+    # 2) Integridad referencial de las matrices derivadas
+    cu_codes = {r["Codigo"] for r in cu}
+    hu_codes = {r["Codigo"] for r in hu}
+    rf_codes = {r["Codigo"] for r in rf}
+
+    unknown_cu = sorted({r["CU_Codigo"] for r in cu_hu if r["CU_Codigo"]} - cu_codes)
+    if unknown_cu:
+        failures.append(f"cu_hu.csv: CU inexistentes {unknown_cu}")
+    unknown_hu = sorted({r["HU_Codigo"] for r in cu_hu if r["HU_Codigo"]} - hu_codes)
+    if unknown_hu:
+        failures.append(f"cu_hu.csv: HU inexistentes {unknown_hu}")
+    duplicated_pairs = [
+        pair
+        for pair, n in Counter((r["CU_Codigo"], r["HU_Codigo"]) for r in cu_hu).items()
+        if n > 1
+    ]
+    if duplicated_pairs:
+        failures.append(f"cu_hu.csv: pares CU→HU duplicados {duplicated_pairs}")
+
+    if len(detalle) != len(rf):
+        failures.append(f"rf_cu_hu_detalle.csv: {len(detalle)} filas, esperado {len(rf)}")
+    if {r["RF_Codigo"] for r in detalle} != rf_codes:
+        failures.append("rf_cu_hu_detalle.csv: los códigos RF no coinciden con detalle.csv")
+    unknown_rf = sorted({r["RF_Codigo"] for r in rf_cu} - rf_codes)
+    if unknown_rf:
+        failures.append(f"rf_cu.csv: RF inexistentes {unknown_rf}")
+
+    # 3) Decisión D7: equivalencias aprobadas y prohibición de invenciones
+    related = {r["HU_Codigo"] for r in cu_hu}
+    invented = sorted(D7_SIN_EQUIVALENCIA & related)
+    if invented:
+        failures.append(f"D7: relaciones inventadas para {invented}")
+
+    pairs = {(r["CU_Codigo"], r["HU_Codigo"]) for r in cu_hu}
+    missing_d7 = sorted(D7_RELACIONES - pairs)
+    if missing_d7:
+        failures.append(f"D7: falta la relación aprobada {missing_d7}")
+
+    hu_rows = {r["Codigo"]: r for r in hu}
+    for hu_code, official in D7_APROBADAS.items():
+        row = hu_rows.get(hu_code, {})
+        source = row.get("Fuente Asignacion", "")
+        if official not in source:
+            failures.append(
+                f"D7: {hu_code} no registra la equivalencia oficial {official} "
+                f"(Fuente Asignacion: {source!r})"
+            )
+    hu33 = hu_rows.get("HU33", {})
+    if "CU#31" not in hu33.get("Fuente Asignacion", ""):
+        failures.append("D7: HU33 no registra la confirmación CU#31")
+
+    # 4) Módulos
+    modules = read_csv(MODULES_CSV)
+    if len(modules) != 17:
+        failures.append(f"Módulos: {len(modules)}, esperado 17")
+    module_codes = [r.get("Modulo", "") for r in modules]
+    if len(set(module_codes)) != len(module_codes):
+        failures.append("Módulos: hay códigos de módulo duplicados")
+
+    # 5) No destructividad: regenerar no debe borrar ni añadir relaciones
+    generated_rf_cu, generated_cu_hu, generated_detalle = build(rf, cu, hu)
+    merged_cu_hu = merge_pairs(
+        generated_cu_hu, cu_hu, ("CU_Codigo", "HU_Codigo")
+    )
+    merged_rf_cu = merge_single(generated_rf_cu, rf_cu, "RF_Codigo")
+    merged_detalle = merge_single(generated_detalle, detalle, "RF_Codigo")
+
+    def as_pairs(rows, fields):
+        return {tuple(row[f] for f in fields) for row in rows}
+
+    if as_pairs(merged_cu_hu, ("CU_Codigo", "HU_Codigo")) != as_pairs(
+        cu_hu, ("CU_Codigo", "HU_Codigo")
+    ):
+        failures.append(
+            "Generador: una regeneración cambiaría cu_hu.csv; revisa las relaciones "
+            "propuestas antes de ejecutarlo"
+        )
+    if as_pairs(merged_rf_cu, ("RF_Codigo", "CU_Codigo")) != as_pairs(
+        rf_cu, ("RF_Codigo", "CU_Codigo")
+    ):
+        failures.append(
+            "Generador: una regeneración cambiaría rf_cu.csv; revisa las relaciones "
+            "propuestas antes de ejecutarlo"
+        )
+    if as_pairs(merged_detalle, ("RF_Codigo", "HU_Codigo")) != as_pairs(
+        detalle, ("RF_Codigo", "HU_Codigo")
+    ):
+        failures.append(
+            "Generador: una regeneración cambiaría rf_cu_hu_detalle.csv; revisa las "
+            "relaciones propuestas antes de ejecutarlo"
+        )
+
+    print("Estado D7")
+    print("  aprobadas: HU06→HU14, HU15→HU08, HU04→HU11, HU33→CU#31")
+    print("  sin equivalencia (no inventar): HU08, HU28, HU30 de la numeración original")
+    print("  bloqueo vigente: numeración oficial v2.0 de HU08, HU11 y HU14 desplazados")
+    print(
+        f"  relaciones CU→HU: {len(cu_hu)} | HU con CU: {len(related)} | "
+        f"HU sin CU: {len(hu_codes - related)}"
+    )
+    if failures:
+        print("\nFALLOS:")
+        for failure in failures:
+            print(f"  - {failure}")
+        raise SystemExit(1)
+    print("\nOK: conteos, unicidad, integridad referencial, módulos, D7 y no destructividad.")
+
+
 if __name__ == "__main__":
-    main()
+    if "--check" in sys.argv[1:]:
+        check()
+    else:
+        main()

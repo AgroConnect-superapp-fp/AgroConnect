@@ -44,9 +44,11 @@ export function LoginScreen({
     setFieldErrors({});
     setSubmitting(true);
 
+    let authenticated = false;
+
     try {
       await login(parsed.data);
-      onSuccess();
+      authenticated = true;
     } catch (error) {
       if (error instanceof ApiError) {
         if (error.code === 'INVALID_CREDENTIALS') {
@@ -70,6 +72,12 @@ export function LoginScreen({
       }
     } finally {
       setSubmitting(false);
+    }
+
+    // Navegar fuera del `try`: un fallo de navegación no debe reportarse como
+    // credenciales inválidas.
+    if (authenticated) {
+      onSuccess();
     }
   }
 

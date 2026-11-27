@@ -1,8 +1,8 @@
 /**
  * Mock data for development and demonstration purposes.
  *
- * In production, this data will come from the backend API
- * (Node.js + Express + PostgreSQL) and images will be uploaded
+ * In production, this data comes from GET /api/v1/products
+ * (NestJS + Prisma + PostgreSQL) and images are uploaded
  * by users via the ImageUpload component to Cloudinary.
  *
  * IMPORTANT NOTES:

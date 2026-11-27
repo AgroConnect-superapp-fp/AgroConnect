@@ -9,6 +9,7 @@ import type { Request, Response } from 'express';
 import { ZodError } from 'zod';
 import { AppError, type ErrorCode } from './errors';
 import { logger } from '../logger/logger';
+import { isDatabaseUnavailable } from '../infrastructure/prismaErrors';
 
 /**
  * Cuerpo de error: EXACTAMENTE el mismo formato que produce el backend legacy
@@ -27,6 +28,7 @@ export interface ErrorBody {
 
 const STATUS_TO_CODE: Readonly<Record<number, ErrorCode>> = {
   [HttpStatus.BAD_REQUEST]: 'BAD_REQUEST',
+  [HttpStatus.PAYLOAD_TOO_LARGE]: 'PAYLOAD_TOO_LARGE',
   [HttpStatus.UNAUTHORIZED]: 'UNAUTHORIZED',
   [HttpStatus.FORBIDDEN]: 'FORBIDDEN',
   [HttpStatus.NOT_FOUND]: 'NOT_FOUND',
@@ -78,6 +80,20 @@ export class AllExceptionsFilter implements ExceptionFilter {
       return;
     }
 
+    if (isDatabaseUnavailable(exception)) {
+      logger.error({ err: exception, correlationId }, 'Base de datos no disponible');
+
+      response.status(HttpStatus.SERVICE_UNAVAILABLE).json({
+        success: false,
+        error: {
+          code: 'SERVICE_UNAVAILABLE',
+          message: 'El servicio de datos no está disponible. Intente de nuevo más tarde.',
+        },
+        correlationId,
+      } satisfies ErrorBody);
+      return;
+    }
+
     logger.error({ err: exception, correlationId }, 'Error no controlado');
 
     response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
@@ -108,12 +124,21 @@ export class AllExceptionsFilter implements ExceptionFilter {
     // En errores 5xx el mensaje real puede filtrar detalles de infraestructura
     // (pool de conexiones, SQL, rutas), así que se sustituye por uno genérico.
     const isServerError = error.statusCode >= 500;
+    const isServiceUnavailable = error.statusCode >= 500 && error.code === 'SERVICE_UNAVAILABLE';
 
     response.status(error.statusCode).json({
       success: false,
       error: {
-        code: isServerError ? 'INTERNAL_ERROR' : error.code,
-        message: isServerError ? 'Error inesperado. Intente de nuevo más tarde.' : error.message,
+        code: isServiceUnavailable
+          ? 'SERVICE_UNAVAILABLE'
+          : isServerError
+            ? 'INTERNAL_ERROR'
+            : error.code,
+        message: isServiceUnavailable
+          ? 'Servicio no disponible. Intente de nuevo más tarde.'
+          : isServerError
+            ? 'Error inesperado. Intente de nuevo más tarde.'
+            : error.message,
         ...(!isServerError && error.details && error.details.length > 0
           ? { details: error.details }
           : {}),

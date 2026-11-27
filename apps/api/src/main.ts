@@ -21,9 +21,15 @@ async function bootstrap(): Promise<void> {
 
   app.useLogger(app.get(PinoNestLogger));
 
-  // `/health` y `/health/ready` viven en la raíz (como en el backend legacy);
-  // el resto de la API queda bajo `/api/v1`.
-  app.setGlobalPrefix('api/v1', { exclude: ['health', 'health/ready'] });
+  // `/health`, `/health/ready` y `/docs` viven en la raíz (como en el backend
+  // legacy); el resto de la API queda bajo `/api/v1`.
+  //
+  // La documentación se expone en `/docs` (no en `/api/v1/docs`) porque es la
+  // ruta convencional para Swagger UI y porque el contrato se consume desde
+  // herramientas externas que no conocen el versionado de la API.
+  app.setGlobalPrefix('api/v1', {
+    exclude: ['health', 'health/ready', 'docs', 'docs/openapi.json'],
+  });
 
   configureApp(app);
 

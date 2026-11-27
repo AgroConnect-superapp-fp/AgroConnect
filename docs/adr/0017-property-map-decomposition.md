@@ -1,6 +1,6 @@
 # ADR-017 — Descomposición progresiva de `PropertyMap`
 
-- **Estado:** Aceptada — Fase 1 implementada
+- **Estado:** Aceptada — Fases 1-4 implementadas
 - **Fecha:** 2026-11-03
 - **Decisores:** fAb Orq, beru, equipo frontend
 - **Relacionado:** ADR-016 (D9, resuelto), ADR-004, ADR-007
@@ -32,16 +32,26 @@ Extraer componentes sin estado ni efectos:
 Criterio: `PropertyMap.tsx` baja de 2021 a ~1200 líneas; tests unitarios de los
 componentes puros.
 
+**Resultado:** 2021 → 952 líneas (mejor que el objetivo); componentes y
+constantes extraídos sin cambiar el comportamiento.
+
 ### Fase 2 — Hooks de estado
 
 Extraer la lógica reutilizable:
 
-- `useMapViewport` (centro, zoom, bounds)
+- `useMapViewport` (ciclo de vida de la instancia y bloqueo de zoom con popup)
 - `useMapSearch`
 - `useMapDrawing`
 - `usePropertySelection`
 
 Criterio: hooks con tests; sin duplicar estado con el contenedor.
+
+**Resultado:** 952 → 601 líneas; `useMapViewport`, `useMapSearch`,
+`useMapDrawing` y `usePropertySelection` extraídos, más los puentes
+`MapViewport`/`MapDrawing` y los helpers `mapUtils`/`mapSearchUtils`. El
+centro, zoom y bounds siguen siendo propiedad de Leaflet (`MapContainer`); el
+hook no los replica en estado React para evitar re-renderizados y doble fuente
+de verdad. Tests: 42 unitarios frontend, 10 E2E, lint/typecheck/build verdes.
 
 ### Fase 3 — Contenedor orquestador
 
@@ -53,11 +63,42 @@ Separar el layout:
 
 Criterio: `PropertyMap.tsx` < 400 líneas y actúa solo como composición.
 
+**Resultado:** 601 → 69 líneas. `PropertyMap` conserva hooks, wrapper y
+composición; `PropertyMapCanvas` (148 líneas) monta `MapContainer`, clusters y
+polígonos; `PropertyMapToolbar` (385 líneas) agrupa búsqueda, cierre y toggle;
+`PropertyMapSidebar` (138 líneas) agrupa leyenda, atribución y capa de zonas
+productivas. El orden de controles Leaflet se preserva con un slot `children`
+para que `MapControls` siga entre búsqueda y toggle. Gate: 42 unitarios, lint,
+typecheck, build y E2E 10/10 verdes; screenshot del mapa validado.
+
 ### Fase 4 — Validación y cierre
 
 - E2E 10/10, screenshot de mapa y popup.
 - Revisión de accesibilidad (axe/Lighthouse) y de rendimiento del bundle.
 - Sin cambios en contratos de API ni en la URL de Leaflet/OSM.
+
+**Resultado:** popup corregido. La causa era doble: `width: auto !important`
+anulaba el ancho calculado por Leaflet y la animación `transform` pisaba el
+`translate3d` inline que usa Leaflet para posicionarlo. Se eliminó el override,
+la animación quedó solo en `opacity` y el contenido se limita a
+`max-height: min(65vh, 560px)` con scroll interno. El popup final mide
+451×560 px dentro de un mapa de 1184×800 px; las capturas de
+`docs/evidencias/fase4/` (`fase4-mapa.png` y `fase4-popup.png`) confirman que
+queda dentro del contenedor.
+
+**Accesibilidad:** auditoría axe 4.10.2 sobre marketplace y popup → **0
+violaciones**. Los hallazgos iniciales `landmark-one-main`,
+`page-has-heading-one` y `region` eran falsos positivos por auditar el
+`LoadingScreen`; `heading-order` era real y se corrigió en `MapLegend`
+(`h4` → `h3`). `PropertyPopup` expone `role="region"`, `tabIndex={0}` y
+`aria-label` tanto en marcador como en polígono.
+
+**E2E y estabilidad:** 10/10. Para que el fallback de demostración no dependa
+de los reintentos de PostgREST, `fetchProperties` y `searchProperties` se
+acotan con `AbortSignal` a 5 s; PostgREST no reintenta una petición abortada y
+la UI muestra los datos de demostración. Bundle: `PropertyMap` 42.83 kB
+(11.71 kB gzip), dentro del presupuesto. Gate final: Prettier, lint, typecheck,
+42 unitarios, build y E2E 10/10 verdes.
 
 ## Alternativas consideradas
 

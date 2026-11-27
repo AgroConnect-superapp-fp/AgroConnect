@@ -50,7 +50,10 @@ describe('AllExceptionsFilter', () => {
   it('traduce un DomainError a su status y su mensaje', () => {
     const { host, captured } = createHost();
 
-    filter.catch(new DomainError('INVALID_CREDENTIALS', 'Correo o contraseña incorrectos', 401), host);
+    filter.catch(
+      new DomainError('INVALID_CREDENTIALS', 'Correo o contraseña incorrectos', 401),
+      host,
+    );
 
     expect(captured.statusCode).toBe(401);
     expect(captured.body).toEqual({
@@ -66,7 +69,12 @@ describe('AllExceptionsFilter', () => {
   it('incluye los detalles de validación cuando existen', () => {
     const { host, captured } = createHost();
 
-    filter.catch(new DomainError('VALIDATION_ERROR', 'Datos incompletos o inválidos', 422, ['correo: requerido']), host);
+    filter.catch(
+      new DomainError('VALIDATION_ERROR', 'Datos incompletos o inválidos', 422, [
+        'correo: requerido',
+      ]),
+      host,
+    );
 
     expect(captured.statusCode).toBe(422);
     expect(captured.body).toMatchObject({
@@ -107,6 +115,42 @@ describe('AllExceptionsFilter', () => {
     expect(JSON.stringify(captured.body)).not.toContain('pool');
   });
 
+  it('preserva 503 SERVICE_UNAVAILABLE sin exponer el mensaje interno', () => {
+    const { host, captured } = createHost();
+
+    filter.catch(
+      new DomainError('SERVICE_UNAVAILABLE', 'Cloudinary no configurado: secreto interno', 503),
+      host,
+    );
+
+    expect(captured.statusCode).toBe(503);
+    expect(captured.body).toEqual({
+      success: false,
+      error: {
+        code: 'SERVICE_UNAVAILABLE',
+        message: 'Servicio no disponible. Intente de nuevo más tarde.',
+      },
+      correlationId: 'corr-123',
+    });
+    expect(JSON.stringify(captured.body)).not.toContain('Cloudinary');
+  });
+
+  it('traduce un fallo de conexión de Prisma a 503 SERVICE_UNAVAILABLE', () => {
+    const { host, captured } = createHost();
+
+    filter.catch({ code: 'P1001', message: "Can't reach database server" }, host);
+
+    expect(captured.statusCode).toBe(503);
+    expect(captured.body).toEqual({
+      success: false,
+      error: {
+        code: 'SERVICE_UNAVAILABLE',
+        message: 'El servicio de datos no está disponible. Intente de nuevo más tarde.',
+      },
+      correlationId: 'corr-123',
+    });
+  });
+
   it('traduce una HttpException de NestJS sin filtrar detalles internos', () => {
     const { host, captured } = createHost();
 
@@ -116,6 +160,28 @@ describe('AllExceptionsFilter', () => {
     expect(captured.body).toMatchObject({
       success: false,
       error: { code: 'NOT_FOUND', message: 'Recurso no encontrado' },
+    });
+  });
+
+  it('traduce un 413 de cuerpo demasiado grande a PAYLOAD_TOO_LARGE', () => {
+    const { host, captured } = createHost();
+
+    filter.catch(
+      new HttpException(
+        'El cuerpo de la petición supera el límite de 32kb.',
+        HttpStatus.PAYLOAD_TOO_LARGE,
+      ),
+      host,
+    );
+
+    expect(captured.statusCode).toBe(413);
+    expect(captured.body).toEqual({
+      success: false,
+      error: {
+        code: 'PAYLOAD_TOO_LARGE',
+        message: 'El cuerpo de la petición supera el límite de 32kb.',
+      },
+      correlationId: 'corr-123',
     });
   });
 
@@ -150,7 +216,10 @@ describe('AllExceptionsFilter', () => {
   it('oculta el mensaje de una HttpException 500', () => {
     const { host, captured } = createHost();
 
-    filter.catch(new HttpException('fallo interno del pool', HttpStatus.INTERNAL_SERVER_ERROR), host);
+    filter.catch(
+      new HttpException('fallo interno del pool', HttpStatus.INTERNAL_SERVER_ERROR),
+      host,
+    );
 
     expect(captured.statusCode).toBe(500);
     expect(captured.body).toMatchObject({
@@ -172,7 +241,10 @@ describe('AllExceptionsFilter', () => {
     const { host, captured } = createHost();
 
     filter.catch(
-      new HttpException({ message: ['correo inválido', 'contraseña corta'] }, HttpStatus.BAD_REQUEST),
+      new HttpException(
+        { message: ['correo inválido', 'contraseña corta'] },
+        HttpStatus.BAD_REQUEST,
+      ),
       host,
     );
 

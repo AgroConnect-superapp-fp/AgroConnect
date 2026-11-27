@@ -14,6 +14,26 @@ enum UserStatus {
   SUSPENDIDO
 }
 
+enum CompanyType {
+  restaurante
+  plaza_mercado
+  distribuidor
+  supermercado
+  exportador
+  otro
+
+  @@map("company_type")
+}
+
+enum VehicleType {
+  camion
+  camioneta
+  moto
+  furgon
+
+  @@map("vehicle_type")
+}
+
 model Role {
   id          String @id @default(uuid()) @db.Uuid
   name        String @unique @map("nombre")
@@ -38,24 +58,26 @@ model User {
   createdAt             DateTime   @default(now()) @map("fecha_registro")
   updatedAt             DateTime   @updatedAt @map("actualizado_en")
 
-  role            Role             @relation(fields: [roleId], references: [id])
-  producerProfile ProducerProfile?
-  companyProfile  CompanyProfile?
-  refreshTokens   RefreshToken[]
-  plots           Plot[]
+  role                    Role                     @relation(fields: [roleId], references: [id])
+  producerProfile         ProducerProfile?
+  companyProfile          CompanyProfile?
+  transporterProfile      TransporterProfile?
+  refreshTokens           RefreshToken[]
+  plots                   Plot[]
   passwordResetTokens     PasswordResetToken[]
   emailVerificationTokens EmailVerificationToken[]
+  products                Product[]
 
   @@index([roleId])
   @@map("users")
 }
 
 model ProducerProfile {
-  id           String  @id @default(uuid()) @db.Uuid
-  userId       String  @unique @map("user_id") @db.Uuid
-  farmName     String  @map("nombre_finca")
-  municipality String  @map("municipio")
-  village      String  @map("vereda")
+  id           String                                 @id @default(uuid()) @db.Uuid
+  userId       String                                 @unique @map("user_id") @db.Uuid
+  farmName     String                                 @map("nombre_finca")
+  municipality String                                 @map("municipio")
+  village      String                                 @map("vereda")
   coordinates  Unsupported("geography(Point, 4326)")? @map("coordenadas")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -64,15 +86,34 @@ model ProducerProfile {
 }
 
 model CompanyProfile {
-  id          String  @id @default(uuid()) @db.Uuid
-  userId      String  @unique @map("user_id") @db.Uuid
-  companyName String  @map("razon_social")
-  nit         String  @unique @map("nit")
-  address     String? @map("direccion")
+  id           String       @id @default(uuid()) @db.Uuid
+  userId       String       @unique @map("user_id") @db.Uuid
+  companyName  String       @map("razon_social")
+  nit          String       @unique @map("nit")
+  address      String?      @map("direccion")
+  companyType  CompanyType? @map("tipo_empresa")
+  department   String?      @map("departamento")
+  municipality String?      @map("municipio")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("company_profiles")
+}
+
+model TransporterProfile {
+  id                     String      @id @default(uuid()) @db.Uuid
+  userId                 String      @unique @map("user_id") @db.Uuid
+  vehicleType            VehicleType @map("tipo_vehiculo")
+  plate                  String      @unique @map("placa")
+  capacityKg             Float       @map("capacidad_kg")
+  coverageMunicipalities String[]    @map("cobertura_municipios")
+  coldChain              Boolean     @default(false) @map("cadena_frio")
+  soatExpiresAt          DateTime    @map("soat_vence") @db.Date
+  licenseExpiresAt       DateTime    @map("licencia_vence") @db.Date
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("transporter_profiles")
 }
 
 model RefreshToken {
@@ -94,19 +135,87 @@ model RefreshToken {
   @@map("refresh_tokens")
 }
 
+enum ProductCrop {
+  coffee
+  cacao
+  banana
+  sugarcane
+  rice
+  corn
+  cassava
+  oil_palm
+
+  @@map("product_crop")
+}
+
+enum ProductCertification {
+  organic
+  rainforest_alliance
+  fair_trade
+  conventional
+  global_gap
+
+  @@map("product_certification")
+}
+
+enum ProductModerationStatus {
+  pending
+  approved
+  rejected
+
+  @@map("product_moderation_status")
+}
+
+model Product {
+  id            String                @id @default(uuid()) @db.Uuid
+  name          String
+  owner         String
+  description   String?
+  contact       String?
+  department    String
+  municipality  String
+  crop          ProductCrop
+  areaHectares  Float                 @map("area_hectares")
+  productivity  Int
+  certification    ProductCertification?
+  moderationStatus ProductModerationStatus @default(pending) @map("moderation_status")
+  lat              Float
+  lng           Float
+  producerId    String?               @map("producer_id") @db.Uuid
+  producer      User?                 @relation(fields: [producerId], references: [id], onDelete: SetNull)
+  images        Json                  @default("[]")
+  coordinates   Json                  @default("[]")
+  createdAt     DateTime              @default(now()) @map("created_at")
+  updatedAt     DateTime              @updatedAt @map("updated_at")
+
+  @@index([crop])
+  @@index([department, municipality])
+  @@index([createdAt])
+  @@index([producerId])
+  @@index([moderationStatus])
+  @@map("products")
+}
+
 model Plot {
-  id           String   @id @default(uuid()) @db.Uuid
+  id           String                                 @id @default(uuid()) @db.Uuid
   name         String
-  areaHectares Float    @map("area_hectares")
+  areaHectares Float                                  @default(0) @map("area_hectares")
   municipality String
   department   String
-  farmerId     String   @map("farmer_id") @db.Uuid
+  farmerId     String                                 @map("farmer_id") @db.Uuid
+  /// Centroide calculado por PostGIS (ST_Centroid) en el trigger de la tabla.
   centroid     Unsupported("geography(Point, 4326)")?
-  createdAt    DateTime @default(now()) @map("created_at")
+  /// Polígono de la parcela: fuente de verdad de la geometría (SRID 4326).
+  geom         Unsupported("geometry(Polygon, 4326)")?
+  createdAt    DateTime                               @default(now()) @map("created_at")
+  updatedAt    DateTime                               @default(now()) @map("updated_at")
+  /// Soft delete: las consultas activas filtran `deleted_at IS NULL`.
+  deletedAt    DateTime?                              @map("deleted_at")
 
   farmer User @relation(fields: [farmerId], references: [id])
 
   @@index([farmerId])
+  @@index([deletedAt])
   @@map("plots")
 }
 

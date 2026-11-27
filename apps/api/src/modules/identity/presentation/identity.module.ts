@@ -17,6 +17,12 @@ import { RequestPasswordResetUseCase } from '../application/use-cases/RequestPas
 import { ResetPasswordUseCase } from '../application/use-cases/ResetPasswordUseCase';
 import { RequestEmailVerificationUseCase } from '../application/use-cases/RequestEmailVerificationUseCase';
 import { VerifyEmailUseCase } from '../application/use-cases/VerifyEmailUseCase';
+import { GetProfileUseCase } from '../application/use-cases/GetProfileUseCase';
+import { UpdateProfileUseCase } from '../application/use-cases/UpdateProfileUseCase';
+import { ListAdminUsersUseCase } from '../application/use-cases/ListAdminUsersUseCase';
+import { GetAdminUserUseCase } from '../application/use-cases/GetAdminUserUseCase';
+import { UpdateUserStatusUseCase } from '../application/use-cases/UpdateUserStatusUseCase';
+import { UpdateUserRoleUseCase } from '../application/use-cases/UpdateUserRoleUseCase';
 import { PrismaUserRepository } from '../infrastructure/repositories/PrismaUserRepository';
 import { PrismaEmailVerificationTokenRepository } from '../infrastructure/repositories/PrismaEmailVerificationTokenRepository';
 import { PrismaPasswordResetTokenRepository } from '../infrastructure/repositories/PrismaPasswordResetTokenRepository';
@@ -25,7 +31,11 @@ import { JwtTokenService } from '../infrastructure/services/JwtTokenService';
 import { FileEmailService } from '../infrastructure/services/FileEmailService';
 import { SmtpEmailService } from '../infrastructure/services/SmtpEmailService';
 import { AuthController } from './controllers/AuthController';
+import { ProfileController } from './controllers/ProfileController';
+import { AdminUserController } from './controllers/AdminUserController';
 import { AuthThrottlerGuard } from './guards/AuthThrottlerGuard';
+import { SessionAuthGuard } from './guards/SessionAuthGuard';
+import { RolesGuard } from './guards/roles.guard';
 import { SessionCookieService } from './http/SessionCookieService';
 import { SessionTokenInterceptor } from './http/SessionTokenInterceptor';
 import { PrismaModule } from '../../../prisma/prisma.module';
@@ -57,7 +67,7 @@ import type { PasswordResetTokenRepository } from '../domain/interfaces/Password
       },
     ]),
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, ProfileController, AdminUserController],
   providers: [
     // Puertos del dominio → implementaciones de infraestructura.
     { provide: USER_REPOSITORY, useClass: PrismaUserRepository },
@@ -198,18 +208,49 @@ import type { PasswordResetTokenRepository } from '../domain/interfaces/Password
       ],
     },
     {
+      provide: GetProfileUseCase,
+      useFactory: (userRepository: UserRepository) => new GetProfileUseCase(userRepository),
+      inject: [USER_REPOSITORY],
+    },
+    {
+      provide: UpdateProfileUseCase,
+      useFactory: (userRepository: UserRepository) => new UpdateProfileUseCase(userRepository),
+      inject: [USER_REPOSITORY],
+    },
+    {
+      provide: ListAdminUsersUseCase,
+      useFactory: (userRepository: UserRepository) => new ListAdminUsersUseCase(userRepository),
+      inject: [USER_REPOSITORY],
+    },
+    {
+      provide: GetAdminUserUseCase,
+      useFactory: (userRepository: UserRepository) => new GetAdminUserUseCase(userRepository),
+      inject: [USER_REPOSITORY],
+    },
+    {
+      provide: UpdateUserStatusUseCase,
+      useFactory: (userRepository: UserRepository) => new UpdateUserStatusUseCase(userRepository),
+      inject: [USER_REPOSITORY],
+    },
+    {
+      provide: UpdateUserRoleUseCase,
+      useFactory: (userRepository: UserRepository) => new UpdateUserRoleUseCase(userRepository),
+      inject: [USER_REPOSITORY],
+    },
+    {
       provide: VerifyEmailUseCase,
       useFactory: (
         userRepository: UserRepository,
         emailVerificationTokenRepository: EmailVerificationTokenRepository,
         tokenService: TokenService,
-      ) =>
-        new VerifyEmailUseCase(userRepository, emailVerificationTokenRepository, tokenService),
+      ) => new VerifyEmailUseCase(userRepository, emailVerificationTokenRepository, tokenService),
       inject: [USER_REPOSITORY, EMAIL_VERIFICATION_TOKEN_REPOSITORY, TOKEN_SERVICE],
     },
 
     // Presentación.
     AuthThrottlerGuard,
+    SessionAuthGuard,
+    RolesGuard,
     SessionCookieService,
     SessionTokenInterceptor,
   ],
@@ -222,6 +263,10 @@ import type { PasswordResetTokenRepository } from '../domain/interfaces/Password
     ResetPasswordUseCase,
     RequestEmailVerificationUseCase,
     VerifyEmailUseCase,
+    SessionAuthGuard,
+    AuthThrottlerGuard,
+    TOKEN_SERVICE,
+    USER_REPOSITORY,
   ],
 })
 export class IdentityModule {}

@@ -81,11 +81,17 @@ que requieren criterio de producto o arquitectura.
 
 - **Situación:** `matriz_trazabilidad_cu_hu.csv` tiene 74 relaciones y el
   total oficial es 69 HU/66 CU; `detalle` tiene 203 filas.
-- **Estado:** parcialmente implementada (2026-11-02). M17 corregido:
-  HU70–HU76 (inexistentes) reemplazadas por HU61–HU67 con CU#66. Quedan 6 HU
-  sin CU (HU06, HU08, HU15, HU28, HU30, HU33) para validar en Notion.
-- **Recomendación:** reconciliar contra Notion (fuente SSOT), marcar duplicados
-  o HU mal clasificadas y regenerar los CSV con el script.
+- **Estado:** aprobada por Fabián Gallego el **2026-11-05**. M17 corregido:
+  HU70–HU76 (inexistentes) reemplazadas por HU61–HU67 con CU#66. La tabla de
+  equivalencias aprobada mapea HU06→HU14, HU15→HU08 y HU04→HU11; HU33→CU#31.
+  HU08, HU28 y HU30 siguen sin equivalencia explícita en el SSOT.
+- **Hallazgo Notion:** solo HU33 está en la matriz detallada (RF-33 → CU#31).
+  El Anexo de Equivalencias advierte que HU06→HU14, HU15→HU08 y HU04→HU11
+  pertenecen a una renumeración **v0.1 pendiente de aprobación**; no se debe
+  propagar todavía.
+- **Recomendación:** aprobar la tabla de equivalencias con Product Owner e
+  instructor, luego regenerar CSV y matriz; no inferir relaciones.
+- **Evidencia:** `docs/matriz_trazabilidad_hallazgos.md` § Consulta a Notion.
 - **Criterio:** `traceability-check` sin discrepancias y matriz firmada.
 
 ### D8. Release y dependencias
@@ -111,8 +117,11 @@ que requieren criterio de producto o arquitectura.
   secondary y el toggle de zonas productivas usan `text-on-accent`; los textos
   accent sobre fondos oscuros usan `soft` y sobre fondos claros usan `ink`.
   No se cambió el color de marca.
-- **Validación:** contraste calculado; lint/build/E2E. La pasada de axe o
-  Lighthouse queda como gate de CI.
+- **Validación:** contraste calculado; lint/build/E2E.
+- **Gate CI (2026-11-03):** `frontend/e2e/a11y.spec.ts` ejecuta axe WCAG 2.1
+  A/AA sobre marketplace y modal. Detectó y corrigió contrastes de badges de
+  cultivo, productividad, botón de reintento y el nombre accesible del dropzone.
+  Lighthouse PWA sigue como gate separado.
 - **Criterio:** 4.5:1 en texto normal y 3:1 en texto grande en todos los
   botones/chips con accent (cumplido en los pares medidos).
 

@@ -12,6 +12,7 @@ import { Password } from '../../domain/value-objects/Password';
 import { Documento } from '../../domain/value-objects/Documento';
 import { Celular } from '../../domain/value-objects/Celular';
 import type { User, PublicUserProfile } from '../../domain/entities/User';
+import { TransporterProfile } from '../../domain/entities/TransporterProfile';
 import type { UserRepository } from '../../domain/interfaces/UserRepository';
 import type { PasswordHasher } from '../../domain/interfaces/PasswordHasher';
 import type { RegisterUserInput } from '../dtos/authDtos';
@@ -60,6 +61,44 @@ export class RegisterUserUseCase {
       throw new InvalidDataError('El rol de empresa requiere los datos de la empresa');
     }
 
+    if (role.requiresTransporterProfile() && !input.transportista) {
+      throw new InvalidDataError('El rol de transportista requiere los datos del vehículo');
+    }
+
+    const userId = randomUUID();
+    let transporterProfile;
+
+    if (role.requiresTransporterProfile() && input.transportista) {
+      const soatExpiresAt = new Date(`${input.transportista.soatVence}T00:00:00.000Z`);
+      const licenseExpiresAt = new Date(`${input.transportista.licenciaVence}T00:00:00.000Z`);
+
+      if (Number.isNaN(soatExpiresAt.getTime()) || Number.isNaN(licenseExpiresAt.getTime())) {
+        throw new InvalidDataError('Las fechas del SOAT y la licencia no son válidas');
+      }
+
+      const profile = TransporterProfile.create({
+        id: randomUUID(),
+        userId,
+        vehicleType: input.transportista.tipoVehiculo,
+        plate: input.transportista.placa,
+        capacityKg: input.transportista.capacidadKg,
+        coverageMunicipalities: input.transportista.cobertura,
+        coldChain: input.transportista.cadenaFrio,
+        soatExpiresAt,
+        licenseExpiresAt,
+      });
+
+      transporterProfile = {
+        vehicleType: profile.vehicleType,
+        plate: profile.plate,
+        capacityKg: profile.capacityKg,
+        coverageMunicipalities: profile.coverageMunicipalities,
+        coldChain: profile.coldChain,
+        soatExpiresAt: profile.soatExpiresAt,
+        licenseExpiresAt: profile.licenseExpiresAt,
+      };
+    }
+
     const [existingEmail, existingDocument, existingPhone] = await Promise.all([
       this.userRepository.findByEmail(email.value),
       this.userRepository.findByDocument(document.value),
@@ -79,7 +118,6 @@ export class RegisterUserUseCase {
     }
 
     const passwordHash = await this.passwordHasher.hash(password.value);
-    const userId = randomUUID();
 
     const user: User = await this.userRepository.register({
       user: {
@@ -109,8 +147,12 @@ export class RegisterUserUseCase {
               companyName: input.empresa.razonSocial,
               nit: input.empresa.nit,
               address: input.empresa.direccion,
+              companyType: input.empresa.tipoEmpresa,
+              department: input.empresa.departamento,
+              municipality: input.empresa.municipio,
             }
           : undefined,
+      transporterProfile,
     });
 
     return {
