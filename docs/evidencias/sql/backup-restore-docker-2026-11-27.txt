@@ -1,0 +1,9 @@
+--- backup ---
+Backup: backups/agroconnect-20261127T131546Z.dump
+SHA256: 9fb3b25e5ffd7e997d9058ddd73dd512655196d47ce731fcef57101c06518a93
+--- restore ---
+tables=15
+Restauración OK en agroconnect_restore_check
+migrations=14
+audit=0
+users=2

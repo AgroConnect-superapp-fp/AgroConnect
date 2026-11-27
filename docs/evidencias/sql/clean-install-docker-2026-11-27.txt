@@ -1,0 +1,64 @@
+npm notice run @agroconnect/api@1.1.2 prisma:deploy
+npm notice run prisma migrate deploy
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+Datasource "db": PostgreSQL database "agroconnect_clean", schema "public" at "127.0.0.1:5434"
+
+13 migrations found in prisma/migrations
+
+Applying migration `20260928041427_init_auth`
+Applying migration `20260928120000_add_plots`
+Applying migration `20261003000000_add_password_reset_tokens`
+Applying migration `20261003100000_add_email_verification`
+Applying migration `20261103000000_add_refresh_token_family`
+Applying migration `20261103114851_add_marketplace_products`
+Applying migration `20261103130000_add_product_producer`
+Applying migration `20261103140000_add_company_transporter_profiles`
+Applying migration `20261105000000_add_product_moderation`
+Applying migration `20261116000000_add_plot_geometry`
+Applying migration `20261116000001_add_plot_updated_at`
+Applying migration `20261116000002_harden_plot_geometry`
+Applying migration `20261127050630_add_audit_events`
+
+The following migration(s) have been applied:
+
+migrations/
+  └─ 20260928041427_init_auth/
+    └─ migration.sql
+  └─ 20260928120000_add_plots/
+    └─ migration.sql
+  └─ 20261003000000_add_password_reset_tokens/
+    └─ migration.sql
+  └─ 20261003100000_add_email_verification/
+    └─ migration.sql
+  └─ 20261103000000_add_refresh_token_family/
+    └─ migration.sql
+  └─ 20261103114851_add_marketplace_products/
+    └─ migration.sql
+  └─ 20261103130000_add_product_producer/
+    └─ migration.sql
+  └─ 20261103140000_add_company_transporter_profiles/
+    └─ migration.sql
+  └─ 20261105000000_add_product_moderation/
+    └─ migration.sql
+  └─ 20261116000000_add_plot_geometry/
+    └─ migration.sql
+  └─ 20261116000001_add_plot_updated_at/
+    └─ migration.sql
+  └─ 20261116000002_harden_plot_geometry/
+    └─ migration.sql
+  └─ 20261127050630_add_audit_events/
+    └─ migration.sql
+
+All migrations have been successfully applied.
+npm notice run @agroconnect/api@1.1.2 prisma:status
+npm notice run prisma migrate status
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+Datasource "db": PostgreSQL database "agroconnect_clean", schema "public" at "127.0.0.1:5434"
+
+13 migrations found in prisma/migrations
+
+Database schema is up to date!

@@ -173,8 +173,8 @@ Sin estas decisiones, varios hallazgos no pueden cerrarse aunque se escriba docu
 | H12 | Crítica | LWW y sincronización sin versión/reconciliación | Excluido provisional (opción A) | Acta de exclusión + ADR de versionado | 2 |
 | H13 | Alta | MongoDB sin validadores ni deduplicación por conversación | Implementado target: 6 colecciones + validadores | Integración con API | 2 |
 | H14 | Alta | `logs_actividad` sin inmutabilidad demostrada | Implementado técnico: `audit_events` + trigger + E2E | Falta firma del auditor | 1 |
-| H15 | Alta | Migraciones con datos y offline sin ensayo | Parcial: migraciones MVP; offline excluido | Ensayo de migración actual + exclusión offline | 2 |
-| H16 | Alta | Respaldos sin RPO/RTO ni restauración coordinada | Parcial: runbooks, sin simulacro | Aprobar RPO/RTO + simulacro y acta | 1 |
+| H15 | Alta | Migraciones con datos y offline sin ensayo | Parcial: instalación limpia Prisma OK; faltan datos/offline | Ensayo con datos y offline | 2 |
+| H16 | Alta | Respaldos sin RPO/RTO ni restauración coordinada | Parcial: backup/restore local con checksum; falta staging | Simulacro staging + acta RPO/RTO | 1 |
 
 **Totales:** 3 críticos (H05, H09, H12), 11 altos, 2 medios. Los críticos no se cierran con texto: requieren decisión y prueba.
 

@@ -61,3 +61,6 @@ npm-debug.log*
 .vercel
 .env*
 !.env.example
+
+# Backups locales de base de datos
+backups/
